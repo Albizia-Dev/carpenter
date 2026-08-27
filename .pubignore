@@ -1,0 +1,11 @@
+AGENTS.md
+docs/
+widgetbook/
+coverage/
+doc/api/
+.dart_tool/
+build/
+.idea/
+.vscode/
+*.iml
+*.log

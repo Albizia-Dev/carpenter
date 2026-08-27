@@ -1,0 +1,21 @@
+focus:
+  width: 2px
+  gap: 2px
+
+motion:
+  reduced: 0ms
+  state: 120ms
+  busy: 900ms
+  busyArc: 0.75
+  loading: 500ms
+  loadingAngle: 45deg
+  curve: easeOut
+  tooltip:
+    immediate: 0ms
+    short: 100ms
+    long: 500ms
+  menu:
+    typeaheadReset: 700ms
+  toast:
+    short: 4s
+    long: 8s

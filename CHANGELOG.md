@@ -1,0 +1,44 @@
+# 0.1.0-dev.1
+
+- Established the initial publishable Flutter package.
+- Added the development example application.
+- Added the Widgetbook development catalog.
+- Added package documentation and publication quality gates.
+
+# Unreleased
+
+- Added the framework-only `Application` root with Carpenter theme and unit
+  scopes plus Navigator and Router integration.
+- Added semantic action prominence variants, the utility action color role,
+  and matching role support for buttons and icon buttons.
+- Added independently configurable logical start/end shape roles for controls
+  and status indicators.
+- Replaced loading content substitution with a token-driven animated striped
+  background that preserves action content and geometry.
+- Added generated OKLCH palette tokens and expanded the Widgetbook catalog.
+- Added warning, success, and info action roles, role-tinted action state
+  backgrounds, and the revised loading-stripe direction.
+- Added extra-small and extra-large control/icon size roles, tokenized loading
+  rotation, and generator-backed OKLCH ramps for every semantic palette.
+- Added semantic field infrastructure, text input and text area controls,
+  tri-state checkbox, generic radio groups, switches, and interactive
+  Widgetbook playgrounds for the complete Basic control set.
+- Added full mouse text-selection gestures, semantic color roles for checkbox,
+  radio, and switch controls, and size-dependent rounded shape tokens.
+- Added shared anchored-overlay infrastructure plus controlled popover, menu,
+  action dropdown, and semantic tooltip components.
+- Added typed Select, ComboBox, Autosuggest, queued toast presentation, modal
+  dialogs, and a shared overlay lifecycle and option-navigation runtime.
+- Added the backend-neutral Collections Kernel and a controlled structured-data
+  Table with typed columns, stable-key selection, pagination, resizing, and
+  keyboard navigation.
+- Added semantic application shell, navigation and adaptive regions, page
+  headers, overflow toolbars, controlled split views, and master/detail layout.
+- Added controlled collection, report, object, form, and master/detail page
+  patterns with unified zero, empty-result, loading, and initial-error states.
+- Expanded Layout and Page Patterns Widgetbook cases with deterministic
+  network-like loading, cursor pagination, refresh failures, and async actions.
+- Added Foundation color catalogs, role and size comparison cases, and
+  Layout/Page Pattern-only semantic viewport presets with an off mode.
+- Hardened Table body sizing for short viewport constraints used by adaptive
+  page patterns.

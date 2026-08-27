@@ -1,0 +1,17 @@
+font:
+  size:
+    display: 2rem
+    title: 1.5rem
+    body: 1rem
+    label: 0.875rem
+    caption: 0.75rem
+  lineHeight:
+    display: 2.5rem
+    title: 2rem
+    body: 1.5rem
+    label: 1.25rem
+    caption: 1rem
+  weight:
+    regular: 400
+    medium: 500
+    strong: 700

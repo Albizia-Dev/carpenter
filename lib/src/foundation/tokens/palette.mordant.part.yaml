@@ -1,0 +1,72 @@
+palette:
+  transparent: "#00000000"
+  white: "#FFFFFF"
+  black: "#000000"
+  neutral:
+    $generate: palette
+    seed: "#686875"
+    pivot: 500
+    gamut: srgb
+
+  brand:
+    $generate: palette
+    seed:
+      colorSpace: oklch
+      components: [ 0.6052, 0.1535, 250.11 ]
+      alpha: 1
+    pivot: 500
+    gamut: srgb
+
+  secondary:
+    $generate: palette
+    seed:
+      colorSpace: oklch
+      components: [ 0.615, 0.15, 205 ]
+      alpha: 1
+    pivot: 500
+    gamut: srgb
+
+  success:
+    $generate: palette
+    seed:
+      colorSpace: oklch
+      components: [ 0.615, 0.155, 170 ]
+      alpha: 1
+    pivot: 500
+    gamut: srgb
+
+  warning:
+    $generate: palette
+    seed:
+      colorSpace: oklch
+      components: [ 0.68, 0.165, 58 ]
+      alpha: 1
+    pivot: 500
+    gamut: srgb
+
+  danger:
+    $generate: palette
+    seed:
+      colorSpace: oklch
+      components: [ 0.605, 0.235, 13 ]
+      alpha: 1
+    pivot: 500
+    gamut: srgb
+
+  info:
+    $generate: palette
+    seed:
+      colorSpace: oklch
+      components: [ 0.615, 0.15, 235 ]
+      alpha: 1
+    pivot: 500
+    gamut: srgb
+
+  utility:
+    $generate: palette
+    seed:
+      colorSpace: oklch
+      components: [ 0.6, 0.16, 290 ]
+      alpha: 1
+    pivot: 500
+    gamut: srgb

@@ -1,0 +1,17 @@
+name: carpenter_example
+description: Development example for the Carpenter package.
+publish_to: none
+
+environment:
+  sdk: ">=3.12.2 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  carpenter:
+    path: ..
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0

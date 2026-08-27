@@ -1,0 +1,24 @@
+stages:
+  - quality
+
+quality:
+  stage: quality
+  script:
+    - flutter pub get
+    - dart format --output=none --set-exit-if-changed lib test
+    - flutter analyze
+    - flutter test
+    - cd example
+    - flutter pub get
+    - dart format --output=none --set-exit-if-changed lib test
+    - flutter analyze
+    - flutter test
+    - cd ..
+    - cd widgetbook
+    - flutter pub get
+    - dart format --output=none --set-exit-if-changed lib test
+    - flutter analyze
+    - flutter test
+    - cd ..
+    - dart doc
+    - dart pub publish --dry-run

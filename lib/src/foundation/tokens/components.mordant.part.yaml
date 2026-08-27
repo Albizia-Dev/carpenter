@@ -1,0 +1,390 @@
+component:
+  action:
+    height:
+      xsmall: "${size.control.xsmall}"
+      small: "${size.control.small}"
+      medium: "${size.control.medium}"
+      large: "${size.control.large}"
+      xlarge: "${size.control.xlarge}"
+
+    horizontalPadding:
+      xsmall: "${spacing.control.horizontalXsmall}"
+      small: "${spacing.control.horizontalSmall}"
+      medium: "${spacing.control.horizontalMedium}"
+      large: "${spacing.control.horizontalLarge}"
+      xlarge: "${spacing.control.horizontalXlarge}"
+
+    verticalPadding:
+      xsmall: 0.1875rem
+      small: 0.3125rem
+      medium: 0.4375rem
+      large: 0.5625rem
+      xlarge: 0.625rem
+
+    compactHorizontalPadding:
+      xsmall: "${spacing.control.compactHorizontalXsmall}"
+      small: "${spacing.control.compactHorizontalSmall}"
+      medium: "${spacing.control.compactHorizontalMedium}"
+      large: "${spacing.control.compactHorizontalLarge}"
+      xlarge: "${spacing.control.compactHorizontalXlarge}"
+
+    gap:
+      xsmall: "${spacing.control.gap}"
+      small: "${spacing.control.gap}"
+      medium: "${spacing.control.gap}"
+      large: "${spacing.control.gap}"
+      xlarge: "${spacing.control.gap}"
+
+    icon:
+      xsmall: "${size.icon.xsmall}"
+      small: "${size.icon.small}"
+      medium: "${size.icon.medium}"
+      large: "${size.icon.large}"
+      xlarge: "${size.icon.xlarge}"
+
+    radius:
+      xsmall: "${shape.roundedXsmall}"
+      small: "${shape.roundedSmall}"
+      medium: "${shape.rounded}"
+      large: "${shape.roundedLarge}"
+      xlarge: "${shape.roundedXlarge}"
+
+    font:
+      size:
+        xsmall: "${font.size.label}"
+        small: "${font.size.label}"
+        medium: "${font.size.label}"
+        large: "${font.size.label}"
+        xlarge: "${font.size.label}"
+
+      lineHeight:
+        xsmall: "${font.lineHeight.label}"
+        small: "${font.lineHeight.label}"
+        medium: "${font.lineHeight.label}"
+        large: "${font.lineHeight.label}"
+        xlarge: "${font.lineHeight.label}"
+
+    borderWidth: "${border.standard}"
+
+  field:
+    height:
+      xsmall: "${component.action.height.xsmall}"
+      small: "${component.action.height.small}"
+      medium: "${component.action.height.medium}"
+      large: "${component.action.height.large}"
+      xlarge: "${component.action.height.xlarge}"
+
+    horizontalPadding:
+      xsmall: "${spacing.control.horizontalXsmall}"
+      small: "${spacing.control.horizontalSmall}"
+      medium: "${spacing.control.horizontalMedium}"
+      large: "${spacing.control.horizontalLarge}"
+      xlarge: "${spacing.control.horizontalXlarge}"
+
+    verticalPadding:
+      xsmall: "${component.action.verticalPadding.xsmall}"
+      small: "${component.action.verticalPadding.small}"
+      medium: "${component.action.verticalPadding.medium}"
+      large: "${component.action.verticalPadding.large}"
+      xlarge: "${component.action.verticalPadding.xlarge}"
+
+    contentGap:
+      xsmall: "${spacing.field.contentGap}"
+      small: "${spacing.field.contentGap}"
+      medium: "${spacing.field.contentGap}"
+      large: "${spacing.field.contentGap}"
+      xlarge: "${spacing.field.contentGap}"
+
+    labelGap:
+      xsmall: "${spacing.field.labelGap}"
+      small: "${spacing.field.labelGap}"
+      medium: "${spacing.field.labelGap}"
+      large: "${spacing.field.labelGap}"
+      xlarge: "${spacing.field.labelGap}"
+
+    supportingGap:
+      xsmall: "${spacing.field.supportingGap}"
+      small: "${spacing.field.supportingGap}"
+      medium: "${spacing.field.supportingGap}"
+      large: "${spacing.field.supportingGap}"
+      xlarge: "${spacing.field.supportingGap}"
+
+    scrollPadding:
+      xsmall: "${spacing.field.scrollPadding}"
+      small: "${spacing.field.scrollPadding}"
+      medium: "${spacing.field.scrollPadding}"
+      large: "${spacing.field.scrollPadding}"
+      xlarge: "${spacing.field.scrollPadding}"
+
+    icon:
+      xsmall: "${size.icon.xsmall}"
+      small: "${size.icon.small}"
+      medium: "${size.icon.medium}"
+      large: "${size.icon.large}"
+      xlarge: "${size.icon.xlarge}"
+
+    radius:
+      xsmall: "${shape.roundedXsmall}"
+      small: "${shape.roundedSmall}"
+      medium: "${shape.rounded}"
+      large: "${shape.roundedLarge}"
+      xlarge: "${shape.roundedXlarge}"
+
+    inputFont:
+      size:
+        xsmall: "${component.action.font.size.xsmall}"
+        small: "${component.action.font.size.small}"
+        medium: "${component.action.font.size.medium}"
+        large: "${component.action.font.size.large}"
+        xlarge: "${component.action.font.size.xlarge}"
+
+      lineHeight:
+        xsmall: "${component.action.font.lineHeight.xsmall}"
+        small: "${component.action.font.lineHeight.small}"
+        medium: "${component.action.font.lineHeight.medium}"
+        large: "${component.action.font.lineHeight.large}"
+        xlarge: "${component.action.font.lineHeight.xlarge}"
+
+    labelFont:
+      size:
+        xsmall: "${font.size.label}"
+        small: "${font.size.label}"
+        medium: "${font.size.label}"
+        large: "${font.size.label}"
+        xlarge: "${font.size.label}"
+
+      lineHeight:
+        xsmall: "${font.lineHeight.label}"
+        small: "${font.lineHeight.label}"
+        medium: "${font.lineHeight.label}"
+        large: "${font.lineHeight.label}"
+        xlarge: "${font.lineHeight.label}"
+
+    supportingFont:
+      size:
+        xsmall: "${font.size.caption}"
+        small: "${font.size.caption}"
+        medium: "${font.size.caption}"
+        large: "${font.size.caption}"
+        xlarge: "${font.size.caption}"
+
+      lineHeight:
+        xsmall: "${font.lineHeight.caption}"
+        small: "${font.lineHeight.caption}"
+        medium: "${font.lineHeight.caption}"
+        large: "${font.lineHeight.caption}"
+        xlarge: "${font.lineHeight.caption}"
+
+    borderWidth: "${border.standard}"
+    cursorWidth: "${border.standard}"
+
+  selection:
+    labelGap:
+      xsmall: "${spacing.selection.labelGap}"
+      small: "${spacing.selection.labelGap}"
+      medium: "${spacing.selection.labelGap}"
+      large: "${spacing.selection.labelGap}"
+      xlarge: "${spacing.selection.labelGap}"
+
+    supportingGap:
+      xsmall: "${spacing.selection.supportingGap}"
+      small: "${spacing.selection.supportingGap}"
+      medium: "${spacing.selection.supportingGap}"
+      large: "${spacing.selection.supportingGap}"
+      xlarge: "${spacing.selection.supportingGap}"
+
+    labelFont:
+      size:
+        xsmall: "${component.action.font.size.xsmall}"
+        small: "${component.action.font.size.small}"
+        medium: "${component.action.font.size.medium}"
+        large: "${component.action.font.size.large}"
+        xlarge: "${component.action.font.size.xlarge}"
+
+      lineHeight:
+        xsmall: "${component.action.font.lineHeight.xsmall}"
+        small: "${component.action.font.lineHeight.small}"
+        medium: "${component.action.font.lineHeight.medium}"
+        large: "${component.action.font.lineHeight.large}"
+        xlarge: "${component.action.font.lineHeight.xlarge}"
+
+    supportingFont:
+      size:
+        xsmall: "${font.size.caption}"
+        small: "${font.size.caption}"
+        medium: "${font.size.caption}"
+        large: "${font.size.caption}"
+        xlarge: "${font.size.caption}"
+
+      lineHeight:
+        xsmall: "${font.lineHeight.caption}"
+        small: "${font.lineHeight.caption}"
+        medium: "${font.lineHeight.caption}"
+        large: "${font.lineHeight.caption}"
+        xlarge: "${font.lineHeight.caption}"
+
+    checkbox:
+      size:
+        xsmall: "${size.selection.indicatorXsmall}"
+        small: "${size.selection.indicatorSmall}"
+        medium: "${size.selection.indicatorMedium}"
+        large: "${size.selection.indicatorLarge}"
+        xlarge: "${size.selection.indicatorXlarge}"
+
+      radius:
+        xsmall: "${shape.roundedXsmall}"
+        small: "${shape.roundedXsmall}"
+        medium: "${shape.roundedXsmall}"
+        large: "${shape.roundedXsmall}"
+        xlarge: "${shape.roundedXsmall}"
+
+      markInset:
+        xsmall: "${spacing.selection.markInset}"
+        small: "${spacing.selection.markInset}"
+        medium: "${spacing.selection.markInset}"
+        large: "${spacing.selection.markInset}"
+        xlarge: "${spacing.selection.markInset}"
+
+      borderWidth: "${border.standard}"
+      markStrokeWidth: "${border.strong}"
+
+    radio:
+      size:
+        xsmall: "${size.selection.indicatorXsmall}"
+        small: "${size.selection.indicatorSmall}"
+        medium: "${size.selection.indicatorMedium}"
+        large: "${size.selection.indicatorLarge}"
+        xlarge: "${size.selection.indicatorXlarge}"
+
+      markInset:
+        xsmall: "${spacing.selection.markInset}"
+        small: "${spacing.selection.markInset}"
+        medium: "${spacing.selection.markInset}"
+        large: "${spacing.selection.markInset}"
+        xlarge: "${spacing.selection.markInset}"
+
+      borderWidth: "${border.standard}"
+
+    switch:
+      width:
+        xsmall: "${size.selection.switchWidthXsmall}"
+        small: "${size.selection.switchWidthSmall}"
+        medium: "${size.selection.switchWidthMedium}"
+        large: "${size.selection.switchWidthLarge}"
+        xlarge: "${size.selection.switchWidthXlarge}"
+
+      height:
+        xsmall: "${size.selection.switchHeightXsmall}"
+        small: "${size.selection.switchHeightSmall}"
+        medium: "${size.selection.switchHeightMedium}"
+        large: "${size.selection.switchHeightLarge}"
+        xlarge: "${size.selection.switchHeightXlarge}"
+
+      inset:
+        xsmall: "${spacing.selection.switchInset}"
+        small: "${spacing.selection.switchInset}"
+        medium: "${spacing.selection.switchInset}"
+        large: "${spacing.selection.switchInset}"
+        xlarge: "${spacing.selection.switchInset}"
+
+      radius:
+        xsmall: "${shape.circular}"
+        small: "${shape.circular}"
+        medium: "${shape.circular}"
+        large: "${shape.circular}"
+        xlarge: "${shape.circular}"
+
+      borderWidth: "${border.standard}"
+
+  status:
+    horizontalPadding: "${spacing.status.horizontal}"
+    verticalPadding: "${spacing.status.vertical}"
+    radius: "${shape.circular}"
+    roundedRadius: "${shape.rounded}"
+    circularRadius: "${shape.circular}"
+    fontSize: "${font.size.label}"
+    lineHeight: "${font.lineHeight.label}"
+
+  menu:
+    minWidth: "${size.overlay.menuMinWidth}"
+    maxHeight: "${size.overlay.menuMaxHeight}"
+
+    itemHorizontalPadding: "${spacing.overlay.menuItemHorizontal}"
+    itemVerticalPadding: "${spacing.overlay.menuItemVertical}"
+    itemGap: "${spacing.overlay.menuItemGap}"
+
+    itemRadius: "${shape.roundedSmall}"
+    itemIcon: "${size.icon.small}"
+
+    itemFontSize: "${font.size.label}"
+    itemLineHeight: "${font.lineHeight.label}"
+
+  overlay:
+    viewportInset: "${spacing.overlay.viewportInset}"
+    anchorGap: "${spacing.overlay.anchorGap}"
+    surfacePadding: "${spacing.overlay.surfacePadding}"
+
+    surfaceRadius: "${shape.rounded}"
+    borderWidth: "${border.standard}"
+
+    tooltipHorizontalPadding: "${spacing.overlay.tooltipHorizontal}"
+    tooltipVerticalPadding: "${spacing.overlay.tooltipVertical}"
+    tooltipMaxWidth: "${size.overlay.tooltipMaxWidth}"
+    tooltipFontSize: "${font.size.caption}"
+    tooltipLineHeight: "${font.lineHeight.caption}"
+
+    dialogViewportInset: "${spacing.overlay.dialogViewportInset}"
+    dialogContentGap: "${spacing.overlay.dialogContentGap}"
+    dialogActionGap: "${spacing.overlay.dialogActionGap}"
+    dialogMaxWidth: "${size.overlay.dialogMaxWidth}"
+
+    dialogTitleFontSize: "${font.size.title}"
+    dialogTitleLineHeight: "${font.lineHeight.title}"
+
+    toastRegionInset: "${spacing.overlay.toastRegionInset}"
+    toastGap: "${spacing.overlay.toastGap}"
+    toastContentGap: "${spacing.overlay.toastContentGap}"
+    toastMaxWidth: "${size.overlay.toastMaxWidth}"
+
+    toastRadius: "${shape.rounded}"
+
+    toastTitleFontSize: "${font.size.label}"
+    toastTitleLineHeight: "${font.lineHeight.label}"
+
+    toastMessageFontSize: "${font.size.body}"
+    toastMessageLineHeight: "${font.lineHeight.body}"
+
+  table:
+    columnWidth: "${size.table.column}"
+    columnMinWidth: "${size.table.columnMin}"
+    columnMaxWidth: "${size.table.columnMax}"
+
+    selectionColumnWidth: "${size.table.selectionColumn}"
+
+    headerHeight: "${size.table.headerHeight}"
+    rowHeight: "${size.table.rowHeight}"
+
+    stateHeight: "${size.table.stateHeight}"
+    bodyMaxHeight: "${size.table.bodyMaxHeight}"
+
+    resizeHandleWidth: "${size.table.resizeHandle}"
+
+    horizontalPadding: "${spacing.table.horizontal}"
+    verticalPadding: "${spacing.table.vertical}"
+    cellGap: "${spacing.table.cellGap}"
+    stateGap: "${spacing.table.stateGap}"
+
+    surfaceRadius: "${shape.rounded}"
+    borderWidth: "${border.standard}"
+
+    headerFontSize: "${font.size.label}"
+    headerLineHeight: "${font.lineHeight.label}"
+
+    cellFontSize: "${font.size.body}"
+    cellLineHeight: "${font.lineHeight.body}"
+
+  popover:
+    anchorFocusRadius: "${shape.rounded}"
+
+  adaptiveRegion:
+    borderWidth: "${border.standard}"

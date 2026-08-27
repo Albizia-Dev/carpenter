@@ -1,0 +1,8 @@
+$include:
+  - palette.mordant.part.yaml
+  - typography.mordant.part.yaml
+  - metrics.mordant.part.yaml
+  - interaction.mordant.part.yaml
+  - components.mordant.part.yaml
+  - theme-light.mordant.part.yaml
+  - theme-dark.mordant.part.yaml

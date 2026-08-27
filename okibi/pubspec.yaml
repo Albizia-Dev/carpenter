@@ -1,0 +1,26 @@
+name: okibi
+description: Okibi application, built with the local Carpenter UI platform.
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  carpenter:
+    path: ..
+  yx_navigation: ^1.0.0
+  yx_navigation_flutter: ^1.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: false
