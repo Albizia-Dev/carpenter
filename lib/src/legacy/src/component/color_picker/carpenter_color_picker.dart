@@ -1,6 +1,6 @@
-import 'package:carpenter/src/legacy/src/component/input/carpenter_input.dart';
+import 'package:carpenter/src/components/basic/input/input.dart';
+import 'package:carpenter/src/foundation/roles.dart';
 import 'package:carpenter/src/legacy/src/root/context.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 /// Непрозрачный RGB color picker с визуальной HSV-палитрой и HEX/RGB вводом.
@@ -73,14 +73,36 @@ class _CarpenterColorPickerState extends State<CarpenterColorPicker> {
   }
 
   void _onHexChanged(String source) {
-    final color = carpenterParseRgbColor(source);
+    final filtered = source.replaceAll(RegExp(r'[^0-9a-fA-F#]'), '');
+    final normalized = filtered.length > 7
+        ? filtered.substring(0, 7)
+        : filtered;
+    if (normalized != source) {
+      _hex.value = TextEditingValue(
+        text: normalized,
+        selection: TextSelection.collapsed(offset: normalized.length),
+      );
+      return;
+    }
+    final color = carpenterParseRgbColor(normalized);
     setState(
       () => _hexError = color == null ? 'Введите #RGB или #RRGGBB' : null,
     );
     if (color != null) _emit(color, syncHex: false);
   }
 
-  void _onRgbChanged(String _) {
+  void _onRgbChanged(TextEditingController controller, String source) {
+    final filtered = source.replaceAll(RegExp(r'\D'), '');
+    final normalized = filtered.length > 3
+        ? filtered.substring(0, 3)
+        : filtered;
+    if (normalized != source) {
+      controller.value = TextEditingValue(
+        text: normalized,
+        selection: TextSelection.collapsed(offset: normalized.length),
+      );
+      return;
+    }
     final red = int.tryParse(_red.text);
     final green = int.tryParse(_green.text);
     final blue = int.tryParse(_blue.text);
@@ -136,12 +158,10 @@ class _CarpenterColorPickerState extends State<CarpenterColorPicker> {
     final hex = CarpenterInput(
       controller: _hex,
       label: 'HEX',
-      enabled: widget.enabled,
+      availability: widget.enabled
+          ? FieldAvailability.enabled
+          : FieldAvailability.disabled,
       errorText: _hexError,
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(RegExp(r'[0-9a-fA-F#]')),
-        LengthLimitingTextInputFormatter(7),
-      ],
       onChanged: _onHexChanged,
     );
     final rgb = <Widget>[
@@ -154,14 +174,12 @@ class _CarpenterColorPickerState extends State<CarpenterColorPicker> {
           child: CarpenterInput(
             controller: field.controller,
             label: field.label,
-            enabled: widget.enabled,
+            availability: widget.enabled
+                ? FieldAvailability.enabled
+                : FieldAvailability.disabled,
             errorText: field.label == 'B' ? _rgbError : null,
             keyboardType: TextInputType.number,
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-              LengthLimitingTextInputFormatter(3),
-            ],
-            onChanged: _onRgbChanged,
+            onChanged: (value) => _onRgbChanged(field.controller, value),
           ),
         ),
         if (field.label != 'B') SizedBox(width: face.space('0.375')),

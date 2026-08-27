@@ -1,16 +1,18 @@
 import 'dart:async';
 
-import 'package:carpenter/src/legacy/src/component/button/carpenter_button.dart';
-import 'package:carpenter/src/legacy/src/component/card/carpenter_card.dart';
-import 'package:carpenter/src/legacy/src/component/checkbox/carpenter_checkbox.dart';
-import 'package:carpenter/src/legacy/src/component/input/carpenter_input.dart';
+import 'package:carpenter/src/components/basic/button/button.dart';
+import 'package:carpenter/src/components/basic/card.dart';
+import 'package:carpenter/src/components/basic/checkbox.dart';
+import 'package:carpenter/src/components/basic/input/input.dart';
+import 'package:carpenter/src/components/basic/input/text_area.dart';
+import 'package:carpenter/src/components/basic/text.dart';
+import 'package:carpenter/src/foundation/roles.dart';
 import 'package:carpenter/src/legacy/src/component/loader/carpenter_loader.dart';
 import 'package:carpenter/src/legacy/src/component/workbench/carpenter_workbench.dart';
 import 'package:carpenter/src/legacy/src/page/capability.dart';
 import 'package:carpenter/src/legacy/src/page/command.dart';
 import 'package:carpenter/src/legacy/src/page/state.dart';
 import 'package:carpenter/src/legacy/src/root/context.dart';
-import 'package:carpenter/src/legacy/src/component/text/carpenter_text.dart';
 import 'package:flutter/widgets.dart' hide Text;
 
 extension type const CarpenterPageSectionId(String value) {}
@@ -48,19 +50,13 @@ class _CarpenterPageSectionState extends State<CarpenterPageSection> {
     final heading = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        CarpenterText(
-          widget.title,
-          style: context.face
-              .type('title')
-              .copyWith(color: context.face.color('text.primary')),
-        ),
+        CarpenterText(widget.title, role: .title),
         if (widget.description != null) ...[
           const SizedBox(height: 4),
           CarpenterText(
             widget.description!,
-            style: context.face
-                .type('caption')
-                .copyWith(color: context.face.color('text.secondary')),
+            role: .caption,
+            colorRole: .secondary,
           ),
         ],
       ],
@@ -331,14 +327,12 @@ class CarpenterSelectionBar<T> extends StatelessWidget {
       final actions = [
         ...commands,
         CarpenterButton(
-          type: .outlined,
-          color: .secondary,
-          onPressed: controller.clear,
-          child: const CarpenterText('Снять выбор'),
+          label: 'Снять выбор',
+          prominence: .outlined,
+          onInvoke: controller.clear,
         ),
       ];
       return CarpenterCard(
-        muted: true,
         child: LayoutBuilder(
           builder: (context, constraints) => constraints.maxWidth < 520
               ? Column(
@@ -383,18 +377,14 @@ class CarpenterEmptyState extends StatelessWidget {
           CarpenterText(
             descriptor.title,
             textAlign: TextAlign.center,
-            style: context.face
-                .type('title')
-                .copyWith(color: context.face.color('text.primary')),
+            role: .title,
           ),
           if (descriptor.message != null) ...[
             const SizedBox(height: 8),
             CarpenterText(
               descriptor.message!,
               textAlign: TextAlign.center,
-              style: context.face
-                  .type('body')
-                  .copyWith(color: context.face.color('text.secondary')),
+              colorRole: .secondary,
             ),
           ],
           if (descriptor.action != null) ...[
@@ -685,7 +675,6 @@ class _InspectorValue extends StatelessWidget {
         items: items.cast<Object?>(),
         emptyMessage: emptyMessage,
         itemBuilder: (context, item) => CarpenterCard(
-          muted: true,
           child: CarpenterInspector(
             value: item,
             labelBuilder: label,
@@ -711,9 +700,9 @@ class _InspectorField extends StatelessWidget {
     builder: (context, constraints) {
       final labelWidget = CarpenterText(
         label,
-        style: context.face
-            .type('label.strong')
-            .copyWith(color: context.face.color('text.secondary')),
+        role: .label,
+        emphasis: .strong,
+        colorRole: .secondary,
       );
       if (constraints.maxWidth < 420) {
         return CarpenterBlockGroup(spacing: 4, children: [labelWidget, value]);
@@ -870,10 +859,17 @@ class CarpenterSelectableCollection<T> extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               CarpenterCheckbox(
-                checked: selected(item),
+                value: selected(item)
+                    ? CheckboxValue.checked
+                    : CheckboxValue.unchecked,
+                label: '',
+                semanticLabel: 'Выбрать ${itemIdentity(item)}',
                 onChanged: selectionEnabled?.call(item) == false
                     ? null
-                    : (value) => onSelectionChanged(item, value),
+                    : (value) => onSelectionChanged(
+                        item,
+                        value == CheckboxValue.checked,
+                      ),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -952,25 +948,30 @@ class _CarpenterTextPromptDialogState extends State<CarpenterTextPromptDialog> {
           spacing: 6,
           children: [
             CarpenterText(widget.label),
-            CarpenterInput(
-              controller: text,
-              placeholder: widget.placeholder,
-              maxLines: widget.maxLines,
-            ),
+            if (widget.maxLines == 1)
+              CarpenterInput(controller: text, placeholder: widget.placeholder)
+            else
+              CarpenterTextArea(
+                controller: text,
+                placeholder: widget.placeholder,
+                minLines: 1,
+                maxLines: widget.maxLines,
+              ),
           ],
         ),
       ],
     ),
     actions: [
       CarpenterButton(
-        type: .outlined,
-        color: .secondary,
-        onPressed: () => Navigator.pop(context),
-        child: CarpenterText(widget.cancelLabel),
+        label: widget.cancelLabel,
+        prominence: .outlined,
+        onInvoke: () => Navigator.pop(context),
       ),
       CarpenterButton(
-        onPressed: () => Navigator.pop(context, text.text.trim()),
-        child: CarpenterText(widget.confirmLabel),
+        label: widget.confirmLabel,
+        colorRole: .primary,
+        prominence: .high,
+        onInvoke: () => Navigator.pop(context, text.text.trim()),
       ),
     ],
   );
@@ -1043,27 +1044,35 @@ class _CarpenterTextFieldsDialogState extends State<CarpenterTextFieldsDialog> {
             spacing: 6,
             children: [
               CarpenterText(field.label),
-              CarpenterInput(
-                controller: fields[field.id],
-                placeholder: field.placeholder,
-                maxLines: field.maxLines,
-              ),
+              if (field.maxLines == 1)
+                CarpenterInput(
+                  controller: fields[field.id]!,
+                  placeholder: field.placeholder,
+                )
+              else
+                CarpenterTextArea(
+                  controller: fields[field.id]!,
+                  placeholder: field.placeholder,
+                  minLines: 1,
+                  maxLines: field.maxLines,
+                ),
             ],
           ),
       ],
     ),
     actions: [
       CarpenterButton(
-        type: .outlined,
-        color: .secondary,
-        onPressed: () => Navigator.pop(context),
-        child: CarpenterText(widget.cancelLabel),
+        label: widget.cancelLabel,
+        prominence: .outlined,
+        onInvoke: () => Navigator.pop(context),
       ),
       CarpenterButton(
-        onPressed: () => Navigator.pop(context, {
+        label: widget.confirmLabel,
+        colorRole: .primary,
+        prominence: .high,
+        onInvoke: () => Navigator.pop(context, {
           for (final entry in fields.entries) entry.key: entry.value.text,
         }),
-        child: CarpenterText(widget.confirmLabel),
       ),
     ],
   );
@@ -1159,25 +1168,29 @@ class _CarpenterAsyncSearchFieldState<T>
   Widget build(BuildContext context) => CarpenterBlockGroup(
     spacing: 6,
     children: [
-      CarpenterInput(
-        controller: _text,
-        focusNode: _focusNode,
-        placeholder: widget.placeholder,
-        prefix: const Icon(CarpenterIcons.search),
-        suffix: _loading
-            ? const Padding(
-                padding: EdgeInsets.all(9),
-                child: SizedBox.square(
-                  dimension: 14,
-                  child: CarpenterLoader(strokeWidth: 2),
-                ),
-              )
-            : null,
-        onChanged: _changed,
+      Row(
+        children: [
+          Expanded(
+            child: CarpenterInput(
+              controller: _text,
+              focusNode: _focusNode,
+              placeholder: widget.placeholder,
+              leadingIcon: CarpenterIcons.search,
+              onChanged: _changed,
+            ),
+          ),
+          if (_loading) ...[
+            const SizedBox(width: 8),
+            const SizedBox.square(
+              dimension: 14,
+              child: CarpenterLoader(strokeWidth: 2),
+            ),
+          ],
+        ],
       ),
       if (_text.text.isNotEmpty && _items.isNotEmpty)
         CarpenterCard(
-          padding: EdgeInsets.zero,
+          padded: false,
           child: ConstrainedBox(
             constraints: BoxConstraints(maxHeight: widget.maxSuggestionHeight),
             child: ListView.builder(
@@ -1197,13 +1210,7 @@ class _CarpenterAsyncSearchFieldState<T>
             ),
           ),
         ),
-      if (widget.error != null)
-        CarpenterText(
-          widget.error!,
-          style: context.face
-              .type('caption')
-              .copyWith(color: context.face.color('status.danger')),
-        ),
+      if (widget.error != null) CarpenterText(widget.error!, role: .caption),
     ],
   );
 }

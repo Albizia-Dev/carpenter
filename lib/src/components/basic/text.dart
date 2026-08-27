@@ -7,7 +7,7 @@ final class CarpenterText extends StatelessWidget {
   const CarpenterText(
     this.data, {
     super.key,
-    required this.role,
+    this.role = .body,
     this.emphasis = TypographyEmphasis.regular,
     this.colorRole = ContentColorRole.primary,
     this.textAlign,

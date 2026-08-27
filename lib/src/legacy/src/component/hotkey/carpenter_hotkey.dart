@@ -1,6 +1,6 @@
-import 'package:carpenter/src/legacy/src/component/card/carpenter_card.dart';
+import 'package:carpenter/src/components/basic/card.dart';
+import 'package:carpenter/src/components/basic/text.dart';
 import 'package:carpenter/src/legacy/src/component/tag/carpenter_tag.dart';
-import 'package:carpenter/src/legacy/src/component/text/carpenter_text.dart';
 import 'package:carpenter/src/legacy/src/page/command.dart';
 import 'package:carpenter/src/legacy/src/root/context.dart';
 import 'package:flutter/foundation.dart';
@@ -586,11 +586,10 @@ class CarpenterHotkeyDisplay extends StatelessWidget {
     };
 
     return CarpenterCard(
-      padding: EdgeInsets.all(face.space('1')),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          CarpenterText(title, variant: CarpenterTextVariant.title),
+          CarpenterText(title, role: .title),
           SizedBox(height: face.space('1')),
           Wrap(
             spacing: face.space('0.75'),
@@ -606,7 +605,8 @@ class CarpenterHotkeyDisplay extends StatelessWidget {
             SizedBox(height: face.space('1.5')),
             CarpenterText(
               'Registered commands',
-              variant: CarpenterTextVariant.labelStrong,
+              role: .label,
+              emphasis: .strong,
             ),
             SizedBox(height: face.space('0.75')),
             ..._commandRows(context, commands, formatter),
@@ -631,7 +631,7 @@ class CarpenterHotkeyDisplay extends StatelessWidget {
         if (rows.isNotEmpty) {
           rows.add(SizedBox(height: face.space('0.75')));
         }
-        rows.add(CarpenterText(group, tone: CarpenterTextTone.secondary));
+        rows.add(CarpenterText(group, role: .label));
         rows.add(SizedBox(height: face.space('0.375')));
       }
 
@@ -670,18 +670,9 @@ class _HotkeyValue extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            CarpenterText(
-              label,
-              variant: CarpenterTextVariant.caption,
-              tone: CarpenterTextTone.secondary,
-            ),
+            CarpenterText(label, role: .caption, colorRole: .secondary),
             SizedBox(width: face.space('0.5')),
-            CarpenterText(
-              value,
-              style: face
-                  .type('label.strong')
-                  .copyWith(color: face.color('text.primary')),
-            ),
+            CarpenterText(value, role: .label, emphasis: .strong),
           ],
         ),
       ),
@@ -713,16 +704,13 @@ class _HotkeyCommandRow extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CarpenterText(
-                    command.title,
-                    variant: CarpenterTextVariant.labelStrong,
-                  ),
+                  CarpenterText(command.title, role: .label, emphasis: .strong),
                   if (command.description != null) ...[
                     SizedBox(height: face.space('0.25')),
                     CarpenterText(
                       command.description!,
-                      variant: CarpenterTextVariant.caption,
-                      tone: CarpenterTextTone.secondary,
+                      role: .caption,
+                      colorRole: .secondary,
                     ),
                   ],
                 ],

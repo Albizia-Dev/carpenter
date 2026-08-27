@@ -1,5 +1,5 @@
 import 'package:carpenter/src/legacy/src/component/avatar/carpenter_avatar.dart';
-import 'package:carpenter/src/legacy/src/component/text/carpenter_text.dart';
+import 'package:carpenter/src/components/basic/text.dart';
 import 'package:carpenter/src/legacy/src/root/context.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart' hide Text;
@@ -169,15 +169,12 @@ class CarpenterTopPanel extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (title != null)
-                    CarpenterText(
-                      title!,
-                      variant: CarpenterTextVariant.labelStrong,
-                    ),
+                    CarpenterText(title!, role: .label, emphasis: .strong),
                   if (subtitle != null)
                     CarpenterText(
                       subtitle!,
-                      variant: CarpenterTextVariant.caption,
-                      tone: CarpenterTextTone.secondary,
+                      role: .caption,
+                      colorRole: .secondary,
                     ),
                 ],
               ),

@@ -1,6 +1,6 @@
 import 'package:carpenter/src/legacy/src/block/page_blocks.dart';
-import 'package:carpenter/src/legacy/src/component/button/carpenter_button.dart';
-import 'package:carpenter/src/legacy/src/component/card/carpenter_card.dart';
+import 'package:carpenter/src/components/basic/button/button.dart';
+import 'package:carpenter/src/components/basic/card.dart';
 import 'package:carpenter/src/legacy/src/component/workbench/carpenter_workbench.dart';
 import 'package:carpenter/src/legacy/src/page/descriptor.dart';
 import 'package:carpenter/src/legacy/src/page/state.dart';
@@ -414,10 +414,9 @@ class CarpenterWorkflowPage<TState, TContext> extends StatelessWidget {
                   content: Text(controller.error.toString()),
                   tone: CarpenterNoticeTone.danger,
                   action: CarpenterButton(
-                    type: .outlined,
-                    color: .secondary,
-                    onPressed: controller.retry,
-                    child: const Text('Повторить'),
+                    label: 'Повторить',
+                    prominence: .outlined,
+                    onInvoke: controller.retry,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -430,18 +429,17 @@ class CarpenterWorkflowPage<TState, TContext> extends StatelessWidget {
           footer: CarpenterActionBar(
             secondary: [
               CarpenterButton(
-                type: .outlined,
-                color: .secondary,
-                onPressed: controller.executing ? null : controller.cancel,
-                child: Text(cancelLabel),
+                label: cancelLabel,
+                prominence: .outlined,
+                onInvoke: controller.executing ? null : controller.cancel,
               ),
               for (final transition in transitions.take(
                 transitions.length > 1 ? transitions.length - 1 : 0,
               ))
                 CarpenterButton(
-                  type: .outlined,
-                  color: .secondary,
-                  onPressed:
+                  label: transition.title,
+                  prominence: .outlined,
+                  onInvoke:
                       !controller.executing &&
                           transition.canExecute(
                             controller.state,
@@ -449,13 +447,15 @@ class CarpenterWorkflowPage<TState, TContext> extends StatelessWidget {
                           )
                       ? () => controller.transition(transition)
                       : null,
-                  child: Text(transition.title),
                 ),
             ],
             primary: [
               if (submit != null)
                 CarpenterButton(
-                  onPressed:
+                  label: submit.title,
+                  colorRole: .primary,
+                  prominence: .high,
+                  onInvoke:
                       !controller.executing &&
                           submit.canExecute(
                             controller.state,
@@ -463,7 +463,6 @@ class CarpenterWorkflowPage<TState, TContext> extends StatelessWidget {
                           )
                       ? () => controller.transition(submit)
                       : null,
-                  child: Text(submit.title),
                 ),
             ],
           ),

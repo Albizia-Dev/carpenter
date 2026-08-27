@@ -1,6 +1,7 @@
 import 'dart:async';
 
-import 'package:carpenter/src/legacy/src/component/button/carpenter_button.dart';
+import 'package:carpenter/src/components/basic/select/select.dart' as modern;
+import 'package:carpenter/src/foundation/roles.dart';
 import 'package:carpenter/src/legacy/src/component/control/carpenter_control.dart';
 import 'package:carpenter/src/legacy/src/component/loader/carpenter_loader.dart';
 import 'package:carpenter/src/legacy/src/page/capability.dart';
@@ -900,7 +901,7 @@ class CarpenterSelectItem<T> {
   final Widget child;
 }
 
-class CarpenterSelect<T> extends StatelessWidget {
+class CarpenterSelect<T> extends StatefulWidget {
   const CarpenterSelect({
     super.key,
     required this.items,
@@ -919,80 +920,48 @@ class CarpenterSelect<T> extends StatelessWidget {
   final Widget? placeholder;
 
   @override
-  Widget build(BuildContext context) {
-    CarpenterSelectItem<T>? selected;
-    for (final item in items) {
-      if (item.value == value) selected = item;
-    }
-    final selectedChild =
-        selected?.child ?? placeholder ?? const Text('Выберите');
-    final button = CarpenterButton(
-      type: .outlined,
-      color: .secondary,
-      compact: compact,
-      onPressed: onChanged == null
-          ? null
-          : () async {
-              final result =
-                  await showCarpenterDialog<_CarpenterSelectResult<T>>(
-                    context: context,
-                    builder: (dialogContext) => CarpenterDialog(
-                      title: const Text('Выберите значение'),
-                      content: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          for (final item in items)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 6),
-                              child: CarpenterButton(
-                                type: .outlined,
-                                color: .secondary,
-                                onPressed: () => Navigator.pop(
-                                  dialogContext,
-                                  _CarpenterSelectResult(item.value),
-                                ),
-                                child: item.child,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  );
-              if (result != null) onChanged?.call(result.value);
-            },
-      child: Row(
-        mainAxisSize: isExpanded ? MainAxisSize.max : MainAxisSize.min,
-        children: [
-          if (isExpanded)
-            Expanded(
-              child: DefaultTextStyle.merge(
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                child: selectedChild,
-              ),
-            )
-          else
-            DefaultTextStyle.merge(
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              child: selectedChild,
-            ),
-          const SizedBox(width: 8),
-          const Text('⌄'),
-        ],
-      ),
-    );
-    return isExpanded
-        ? SizedBox(width: double.infinity, child: button)
-        : button;
-  }
+  State<CarpenterSelect<T>> createState() => _CarpenterSelectState<T>();
 }
 
-class _CarpenterSelectResult<T> {
-  const _CarpenterSelectResult(this.value);
+class _CarpenterSelectState<T> extends State<CarpenterSelect<T>> {
+  bool _open = false;
 
-  final T value;
+  String _labelOf(CarpenterSelectItem<T> item) {
+    final child = item.child;
+    if (child case Text(:final data?)) return data;
+    return item.value?.toString() ?? 'Все';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final select = modern.CarpenterSelect<T>(
+      value: widget.value,
+      onChanged: widget.onChanged == null
+          ? null
+          : (value) {
+              setState(() => _open = false);
+              widget.onChanged!(value);
+            },
+      open: _open,
+      onOpenChanged: (open) => setState(() => _open = open),
+      placeholder: switch (widget.placeholder) {
+        Text(:final data?) => data,
+        _ => 'Выберите',
+      },
+      size: widget.compact ? FieldSize.small : FieldSize.medium,
+      options: [
+        for (final (index, item) in widget.items.indexed)
+          CarpenterOption<T>(
+            id: index,
+            value: item.value,
+            label: _labelOf(item),
+          ),
+      ],
+    );
+    return widget.isExpanded
+        ? SizedBox(width: double.infinity, child: select)
+        : select;
+  }
 }
 
 class CarpenterDialog extends StatelessWidget {

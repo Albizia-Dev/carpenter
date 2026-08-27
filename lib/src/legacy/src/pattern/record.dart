@@ -1,5 +1,5 @@
 import 'package:carpenter/src/legacy/src/block/page_blocks.dart';
-import 'package:carpenter/src/legacy/src/component/card/carpenter_card.dart';
+import 'package:carpenter/src/components/basic/card.dart';
 import 'package:carpenter/src/legacy/src/component/workbench/carpenter_workbench.dart';
 import 'package:carpenter/src/legacy/src/page/capability.dart';
 import 'package:carpenter/src/legacy/src/page/command.dart';

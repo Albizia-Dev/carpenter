@@ -1,5 +1,5 @@
-import 'package:carpenter/src/legacy/src/component/button/carpenter_button.dart';
-import 'package:carpenter/src/legacy/src/component/input/carpenter_input.dart';
+import 'package:carpenter/src/components/basic/button/button.dart';
+import 'package:carpenter/src/components/basic/input/input.dart';
 import 'package:carpenter/src/legacy/src/component/workbench/carpenter_workbench.dart';
 import 'package:carpenter/src/legacy/src/root/context.dart';
 import 'package:flutter/widgets.dart';
@@ -204,14 +204,13 @@ final class _CarpenterTableState<T> extends State<CarpenterTable<T>> {
       ),
       if (search.text.isNotEmpty || filters.isNotEmpty)
         CarpenterButton(
-          compact: true,
-          type: .outlined,
-          color: .secondary,
-          onPressed: () => setState(() {
+          label: 'Сбросить',
+          size: .small,
+          prominence: .outlined,
+          onInvoke: () => setState(() {
             search.clear();
             filters.clear();
           }),
-          child: const Text('Сбросить'),
         ),
     ],
   );

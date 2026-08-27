@@ -1,4 +1,4 @@
-import 'package:carpenter/src/legacy/src/component/button/carpenter_button.dart';
+import 'package:carpenter/src/components/basic/button/button.dart';
 import 'package:carpenter/src/legacy/src/component/control/carpenter_control.dart';
 import 'package:carpenter/src/legacy/src/component/workbench/carpenter_workbench.dart';
 import 'package:carpenter/src/legacy/src/root/context.dart';
@@ -38,9 +38,9 @@ class CarpenterDatePicker extends StatelessWidget {
     );
     final value = selected == null ? null : _dateOnly(selected!);
     return CarpenterButton(
-      type: .outlined,
-      color: .secondary,
-      onPressed: enabled
+      label: value == null ? placeholder : _formatDate(value),
+      prominence: .outlined,
+      onInvoke: enabled
           ? () async {
               final result = await showCarpenterDialog<_DatePickerResult>(
                 context: context,
@@ -54,10 +54,6 @@ class CarpenterDatePicker extends StatelessWidget {
               if (result != null) onChanged(result.value);
             }
           : null,
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(value == null ? placeholder : _formatDate(value)),
-      ),
     );
   }
 }
@@ -125,16 +121,16 @@ class _CarpenterCalendarDialogState extends State<_CarpenterCalendarDialog> {
           Row(
             children: [
               CarpenterButton(
-                type: .outlined,
-                color: .secondary,
-                compact: true,
-                onPressed:
+                label: '‹',
+                semanticLabel: 'Предыдущий месяц',
+                prominence: .outlined,
+                size: .small,
+                onInvoke:
                     _canShowMonth(
                       DateTime(_visibleMonth.year, _visibleMonth.month - 1),
                     )
                     ? () => _changeMonth(-1)
                     : null,
-                child: const Text('‹'),
               ),
               Expanded(
                 child: Center(
@@ -146,16 +142,16 @@ class _CarpenterCalendarDialogState extends State<_CarpenterCalendarDialog> {
                 ),
               ),
               CarpenterButton(
-                type: .outlined,
-                color: .secondary,
-                compact: true,
-                onPressed:
+                label: '›',
+                semanticLabel: 'Следующий месяц',
+                prominence: .outlined,
+                size: .small,
+                onInvoke:
                     _canShowMonth(
                       DateTime(_visibleMonth.year, _visibleMonth.month + 1),
                     )
                     ? () => _changeMonth(1)
                     : null,
-                child: const Text('›'),
               ),
             ],
           ),
@@ -204,17 +200,15 @@ class _CarpenterCalendarDialogState extends State<_CarpenterCalendarDialog> {
       actions: [
         if (widget.allowClear)
           CarpenterButton(
-            type: .outlined,
-            color: .secondary,
             label: 'Очистить',
-            onPressed: () =>
+            prominence: .outlined,
+            onInvoke: () =>
                 Navigator.pop(context, const _DatePickerResult(null)),
           ),
         CarpenterButton(
-          type: .outlined,
-          color: .secondary,
           label: 'Отмена',
-          onPressed: () => Navigator.pop(context),
+          prominence: .outlined,
+          onInvoke: () => Navigator.pop(context),
         ),
       ],
     );

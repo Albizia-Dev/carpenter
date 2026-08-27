@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:carpenter/src/legacy/src/block/page_blocks.dart';
-import 'package:carpenter/src/legacy/src/component/button/carpenter_button.dart';
-import 'package:carpenter/src/legacy/src/component/card/carpenter_card.dart';
-import 'package:carpenter/src/legacy/src/component/input/carpenter_input.dart';
+import 'package:carpenter/src/components/basic/button/button.dart';
+import 'package:carpenter/src/components/basic/card.dart';
+import 'package:carpenter/src/components/basic/input/input.dart';
+import 'package:carpenter/src/foundation/roles.dart';
 import 'package:carpenter/src/legacy/src/component/loader/carpenter_loader.dart';
 import 'package:carpenter/src/legacy/src/component/workbench/carpenter_workbench.dart';
 import 'package:carpenter/src/legacy/src/page/capability.dart';
@@ -415,17 +416,21 @@ class _CarpenterCollectionSearchFieldState<T, TFilter, TSort>
       controller: text,
       focusNode: focusNode,
       placeholder: widget.placeholder,
-      prefix: widget.prefix,
-      suffix: text.text.isEmpty
+      leadingIcon: switch (widget.prefix) {
+        Icon(:final icon) => icon,
+        _ => null,
+      },
+      trailingAction: text.text.isEmpty
           ? null
-          : CarpenterIconButton(
-              semanticLabel: 'Очистить поиск',
-              onPressed: () {
+          : CarpenterActionDescriptor(
+              id: 'clear-search',
+              label: 'Очистить поиск',
+              icon: CarpenterIcons.clear,
+              onInvoke: () {
                 text.clear();
                 widget.controller.updateSearch('');
                 setState(() {});
               },
-              icon: const Text('×'),
             ),
       onChanged: (value) {
         widget.controller.updateSearch(value);
@@ -522,8 +527,8 @@ class _CarpenterDataCollectionState<T, TFilter, TSort>
           content: Text(message ?? error.toString()),
           tone: CarpenterNoticeTone.danger,
           action: CarpenterButton(
-            onPressed: widget.controller.refresh,
-            child: const Text('Повторить'),
+            onInvoke: widget.controller.refresh,
+            label: 'Повторить',
           ),
         ),
       ),
@@ -634,10 +639,9 @@ class _CarpenterDataCollectionState<T, TFilter, TSort>
               Align(
                 alignment: Alignment.center,
                 child: CarpenterButton(
-                  type: .outlined,
-                  color: .secondary,
-                  onPressed: widget.controller.loadNext,
-                  child: const Text('Загрузить ещё'),
+                  label: 'Загрузить ещё',
+                  prominence: .outlined,
+                  onInvoke: widget.controller.loadNext,
                 ),
               )
             else if (state is CarpenterCollectionReady<T> &&
@@ -707,7 +711,7 @@ class _CarpenterDataCollectionState<T, TFilter, TSort>
               child: actions == null || actions.isEmpty
                   ? widget.itemBuilder(context, item, currentSelected)
                   : CarpenterCard(
-                      padding: EdgeInsets.zero,
+                      padded: false,
                       child: CarpenterListTile(
                         title: widget.itemBuilder(
                           context,

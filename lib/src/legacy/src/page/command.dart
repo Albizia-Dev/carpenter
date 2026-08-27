@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:carpenter/src/legacy/src/component/button/carpenter_button.dart';
+import 'package:carpenter/src/components/basic/button/button.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
@@ -277,7 +277,6 @@ class CarpenterCommandButton<I> extends StatelessWidget {
           final label = state.execution == CarpenterCommandExecution.executing
               ? '${command.title}…'
               : command.title;
-          final content = child ?? Text(label);
           final useSecondary =
               secondary ??
               command.presentation == CarpenterCommandPresentation.secondary;
@@ -285,23 +284,24 @@ class CarpenterCommandButton<I> extends StatelessWidget {
               command.presentation == CarpenterCommandPresentation.danger;
           if (useDanger) {
             return CarpenterButton(
-              type: .outlined,
-              color: .danger,
-              onPressed: enabled ? () => _executeSafely(command, input) : null,
-              child: content,
+              label: label,
+              prominence: .outlined,
+              colorRole: .danger,
+              onInvoke: enabled ? () => _executeSafely(command, input) : null,
             );
           }
           if (useSecondary) {
             return CarpenterButton(
-              type: .outlined,
-              color: .secondary,
-              onPressed: enabled ? () => _executeSafely(command, input) : null,
-              child: content,
+              label: label,
+              prominence: .outlined,
+              onInvoke: enabled ? () => _executeSafely(command, input) : null,
             );
           }
           return CarpenterButton(
-            onPressed: enabled ? () => _executeSafely(command, input) : null,
-            child: content,
+            label: label,
+            colorRole: .primary,
+            prominence: .high,
+            onInvoke: enabled ? () => _executeSafely(command, input) : null,
           );
         },
       );
@@ -339,7 +339,6 @@ class CarpenterCommandInputButton<I> extends StatelessWidget {
           final label = state.execution == CarpenterCommandExecution.executing
               ? '${command.title}…'
               : command.title;
-          final content = child ?? Text(label);
           Future<void> invoke() async {
             final input = await inputBuilder(context);
             if (input != null) await _executeSafely(command, input);
@@ -350,14 +349,15 @@ class CarpenterCommandInputButton<I> extends StatelessWidget {
               command.presentation == CarpenterCommandPresentation.secondary;
           return useSecondary
               ? CarpenterButton(
-                  type: .outlined,
-                  color: .secondary,
-                  onPressed: enabled ? invoke : null,
-                  child: content,
+                  label: label,
+                  prominence: .outlined,
+                  onInvoke: enabled ? invoke : null,
                 )
               : CarpenterButton(
-                  onPressed: enabled ? invoke : null,
-                  child: content,
+                  label: label,
+                  colorRole: .primary,
+                  prominence: .high,
+                  onInvoke: enabled ? invoke : null,
                 );
         },
       );

@@ -1,4 +1,4 @@
-import 'package:carpenter/src/legacy/src/component/button/carpenter_button.dart';
+import 'package:carpenter/src/components/basic/button/button.dart';
 import 'package:carpenter/src/legacy/src/component/loader/carpenter_loader.dart';
 import 'package:carpenter/src/legacy/src/component/workbench/carpenter_workbench.dart'
     show CarpenterNotice, CarpenterNoticeTone, CarpenterPageLoadingBar;
@@ -77,8 +77,8 @@ class CarpenterPageStateBoundary extends StatelessWidget {
           action: retryCommand == null
               ? null
               : CarpenterButton(
-                  onPressed: () => retryCommand.execute(null),
-                  child: const Text('Повторить'),
+                  label: 'Повторить',
+                  onInvoke: () => retryCommand.execute(null),
                 ),
         ),
       CarpenterPageForbidden(:final reason) => _CenteredState(
@@ -94,8 +94,8 @@ class CarpenterPageStateBoundary extends StatelessWidget {
           action: retryCommand == null
               ? null
               : CarpenterButton(
-                  onPressed: () => retryCommand.execute(null),
-                  child: const Text('Повторить'),
+                  label: 'Повторить',
+                  onInvoke: () => retryCommand.execute(null),
                 ),
         ),
     };
@@ -130,8 +130,8 @@ class _EmptyState extends StatelessWidget {
     action: descriptor.action == null
         ? null
         : CarpenterButton(
-            onPressed: () => descriptor.action!.execute(null),
-            child: Text(descriptor.action!.title),
+            label: descriptor.action!.title,
+            onInvoke: () => descriptor.action!.execute(null),
           ),
   );
 }

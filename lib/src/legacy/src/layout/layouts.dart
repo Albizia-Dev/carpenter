@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:carpenter/src/legacy/src/component/button/carpenter_button.dart';
+import 'package:carpenter/src/components/basic/button/button.dart';
 import 'package:carpenter/src/legacy/src/component/workbench/carpenter_workbench.dart';
 import 'package:carpenter/src/legacy/src/page/restoration.dart';
 import 'package:carpenter/src/legacy/src/root/context.dart';
@@ -119,15 +119,11 @@ class CarpenterTabsLayout<T> extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 4),
                       child: CarpenterButton(
-                        type: .outlined,
-                        color: .secondary,
-                        onPressed: tab.enabled
+                        label: _label(tab),
+                        prominence: .outlined,
+                        onInvoke: tab.enabled
                             ? () => onChanged(tab.value)
                             : null,
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(_label(tab)),
-                        ),
                       ),
                     ),
                 ],
