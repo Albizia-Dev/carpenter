@@ -12,7 +12,9 @@ void main() {
     expect(DemoRoutes.parse(Uri(path: '/settings')).route, DemoRoutes.settings);
   });
 
-  testWidgets('example navigates between application pages', (tester) async {
+  testWidgets('sidebar navigates between top-level application pages', (
+    tester,
+  ) async {
     await tester.binding.setSurfaceSize(const Size(1440, 900));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -28,14 +30,30 @@ void main() {
     await tester.pump();
     expect(find.text('Project portfolio'), findsOneWidget);
 
-    await tester.tap(find.text('Open featured').first);
-    await tester.pump();
-    expect(find.text('Treasury migration'), findsWidgets);
-    expect(find.text('Timeline'), findsOneWidget);
-
     await tester.tap(find.text('Operations').first);
     await tester.pump();
     expect(find.text('Operations lab'), findsOneWidget);
     expect(find.text('Global command hotkeys'), findsOneWidget);
+
+    await tester.tap(find.text('Settings').first);
+    await tester.pump();
+    expect(find.text('Interface density'), findsOneWidget);
+  });
+
+  testWidgets('deep project URL renders through yx navigation', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(1440, 900));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      CarpenterExampleApp(
+        syncRouteInformation: false,
+        initialUri: Uri(path: '/projects/CP-1042'),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('Treasury migration'), findsWidgets);
+    expect(find.text('CP-1042 · Finance platform'), findsOneWidget);
+    expect(find.text('Timeline'), findsOneWidget);
   });
 }
