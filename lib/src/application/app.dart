@@ -110,21 +110,30 @@ final class CarpenterApp extends StatelessWidget {
     return result;
   }
 
-  Widget _host(BuildContext context, Widget? routedChild) => CarpenterHost(
-    shells: _effectiveShells(),
-    modules: modules,
-    platform: platform,
-    locale: locale,
-    child:
-        child ??
-        routedChild ??
-        CarpenterRouteRenderer(
-          routes: _routes,
-          missingRouteBuilder: (context, node) =>
-              missingRouteBuilder?.call(context, node) ??
-              const SizedBox.shrink(),
-        ),
-  );
+  Widget _host(BuildContext context, Widget? routedChild) {
+    final declaredRoutes = _routes;
+    Widget content;
+    if (routerConfig != null) {
+      content = routedChild ?? child ?? const SizedBox.shrink();
+    } else if (child != null) {
+      content = routedChild ?? child!;
+    } else if (declaredRoutes.isNotEmpty) {
+      content = CarpenterRouteRenderer(
+        routes: declaredRoutes,
+        missingRouteBuilder: (context, node) =>
+            missingRouteBuilder?.call(context, node) ?? const SizedBox.shrink(),
+      );
+    } else {
+      content = routedChild ?? const SizedBox.shrink();
+    }
+    return CarpenterHost(
+      shells: _effectiveShells(),
+      modules: modules,
+      platform: platform,
+      locale: locale,
+      child: content,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +150,7 @@ final class CarpenterApp extends StatelessWidget {
     }
     return Application(
       theme: theme,
-      home: child ?? const SizedBox.shrink(),
+      home: child,
       title: title,
       locale: locale,
       debugShowCheckedModeBanner: debugShowCheckedModeBanner,
