@@ -5,6 +5,9 @@ on:
     branches:
       - feat/gravity-icons
 
+permissions:
+  contents: write
+
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -27,10 +30,20 @@ jobs:
         working-directory: widgetbook
         run: flutter pub get
       - name: Format Widgetbook
-        run: dart format --output=none --set-exit-if-changed widgetbook/lib
+        run: dart format widgetbook/lib
       - name: Analyze Widgetbook
         working-directory: widgetbook
         run: dart analyze lib
       - name: Build Widgetbook web
         working-directory: widgetbook
         run: flutter build web --release --base-href /carpenter/
+      - name: Commit formatting
+        run: |
+          git add widgetbook/lib/use_cases/foundation/gravity_icons.dart
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "style: format Gravity icons Widgetbook catalog"
+          git push
