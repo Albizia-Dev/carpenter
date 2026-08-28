@@ -40,9 +40,7 @@ final class _CarpenterCollectionSearchFieldState<T, K, F>
   }
 
   @override
-  void didUpdateWidget(
-    CarpenterCollectionSearchField<T, K, F> oldWidget,
-  ) {
+  void didUpdateWidget(CarpenterCollectionSearchField<T, K, F> oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_syncFromController);

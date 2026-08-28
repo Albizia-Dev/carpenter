@@ -208,10 +208,7 @@ final class _ToggleButtonPreviewState extends State<_ToggleButtonPreview> {
           icon: CarpenterIcons.archive,
           onChanged: (value) => setState(() => _checked = value),
         ),
-        const CarpenterToggleButton(
-          label: 'Disabled',
-          checked: false,
-        ),
+        const CarpenterToggleButton(label: 'Disabled', checked: false),
       ],
     ),
   );
