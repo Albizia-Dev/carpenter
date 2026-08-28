@@ -3,9 +3,9 @@ import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import 'addons/carpenter_addons.dart';
+import 'use_cases/basic/autosuggest.dart';
 import 'use_cases/basic/button.dart';
 import 'use_cases/basic/card_link.dart';
-import 'use_cases/basic/autosuggest.dart';
 import 'use_cases/basic/checkbox.dart';
 import 'use_cases/basic/combo_box.dart';
 import 'use_cases/basic/icon.dart';
@@ -17,24 +17,32 @@ import 'use_cases/basic/status_indicator.dart';
 import 'use_cases/basic/switch.dart';
 import 'use_cases/basic/text.dart';
 import 'use_cases/basic/text_area.dart';
-import 'use_cases/behaviour/dropdown.dart';
 import 'use_cases/behaviour/dialog.dart';
+import 'use_cases/behaviour/dropdown.dart';
 import 'use_cases/behaviour/menu.dart';
 import 'use_cases/behaviour/popover.dart';
-import 'use_cases/behaviour/tooltip.dart';
 import 'use_cases/behaviour/toast.dart';
+import 'use_cases/behaviour/tooltip.dart';
 import 'use_cases/collections/collection_kernel.dart';
 import 'use_cases/collections/content_primitives.dart';
 import 'use_cases/collections/data_list.dart';
+import 'use_cases/collections/filter_bar.dart';
 import 'use_cases/collections/table.dart';
 import 'use_cases/foundation/colors.dart';
+import 'use_cases/foundation/typography.dart';
+import 'use_cases/layout/page_header.dart';
 import 'use_cases/layout/semantic_layout.dart';
+import 'use_cases/patterns/list_report.dart';
 import 'use_cases/patterns/page_patterns.dart';
+import 'use_cases/patterns/page_states.dart';
 import 'use_cases/samples/payment_list.dart';
 
 Widget createCarpenterWidgetbook() => Widgetbook.material(
   directories: [
-    WidgetbookFolder(name: 'Foundation', children: [foundationColorsComponent]),
+    WidgetbookFolder(
+      name: 'Foundation',
+      children: [foundationColorsComponent, foundationTypographyComponent],
+    ),
     WidgetbookFolder(
       name: 'Basic',
       children: [
@@ -70,6 +78,7 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
       name: 'Collections',
       children: [
         collectionKernelComponent,
+        filterBarComponent,
         dataListComponent,
         definitionListComponent,
         tabsComponent,
@@ -80,6 +89,8 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
       name: 'Layout',
       children: [
         applicationShellComponent,
+        pageHeaderComponent,
+        headerActionsComponent,
         toolbarComponent,
         splitViewComponent,
         adaptiveRegionComponent,
@@ -89,7 +100,9 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
     WidgetbookFolder(
       name: 'Page Patterns',
       children: [
+        pageStateComponent,
         collectionPageComponent,
+        listReportComponent,
         objectPageComponent,
         formPageComponent,
         masterDetailPageComponent,

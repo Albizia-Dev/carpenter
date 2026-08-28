@@ -2,21 +2,9 @@ import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+import '../../helpers/collection_fixtures.dart';
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
-
-enum _TableScenario {
-  loaded,
-  initialLoading,
-  refreshing,
-  initialError,
-  refreshError,
-  zero,
-  emptyResult,
-  loadingMore,
-}
-
-enum _TablePagination { cursor, keyset, progressive, unknownTotal }
 
 final tableComponent = WidgetbookComponent(
   name: 'Table',
@@ -35,12 +23,14 @@ Widget _playground(BuildContext context) {
   );
   final scenario = context.knobs.object.dropdown(
     label: 'Snapshot · Scenario',
-    options: _TableScenario.values,
+    options: DemoCollectionScenario.values,
+    initialOption: DemoCollectionScenario.loaded,
     labelBuilder: semanticValueLabel,
   );
   final pagination = context.knobs.object.segmented(
     label: 'Pagination · Contract',
-    options: _TablePagination.values,
+    options: DemoPaginationFixture.values,
+    initialOption: DemoPaginationFixture.cursor,
     labelBuilder: semanticValueLabel,
   );
   final selectionMode = context.knobs.object.segmented(
@@ -78,8 +68,8 @@ Widget _edgeCases(BuildContext context) => preview(
     width: 320,
     child: _TablePreview(
       rowCount: 20,
-      scenario: _TableScenario.refreshError,
-      pagination: _TablePagination.unknownTotal,
+      scenario: DemoCollectionScenario.refreshError,
+      pagination: DemoPaginationFixture.unknownTotal,
       selectionMode: CollectionSelectionMode.multiple,
       resizable: true,
       longText: true,
@@ -100,8 +90,8 @@ final class _TablePreview extends StatefulWidget {
   });
 
   final int rowCount;
-  final _TableScenario scenario;
-  final _TablePagination pagination;
+  final DemoCollectionScenario scenario;
+  final DemoPaginationFixture pagination;
   final CollectionSelectionMode selectionMode;
   final bool resizable;
   final bool longText;
@@ -140,7 +130,11 @@ final class _TablePreviewState extends State<_TablePreview> {
         active: index.isEven,
       ),
     );
-    final snapshot = _snapshot(rows, widget.scenario, widget.pagination);
+    final snapshot = demoCollectionSnapshot<_ExampleRow>(
+      items: rows,
+      scenario: widget.scenario,
+      pagination: widget.pagination,
+    );
     return CarpenterTable<_ExampleRow, int>(
       semanticLabel: 'Example records',
       snapshot: snapshot,
@@ -220,73 +214,6 @@ CollectionSelection<int> _selectionFor(CollectionSelectionMode mode) =>
       CollectionSelectionMode.allMatching =>
         CollectionSelection<int>.allMatching(),
     };
-
-CollectionSnapshot<_ExampleRow> _snapshot(
-  List<_ExampleRow> rows,
-  _TableScenario scenario,
-  _TablePagination pagination,
-) {
-  final pageInfo = switch (pagination) {
-    _TablePagination.cursor => CollectionCursorPageInfo(
-      itemCount: rows.length,
-      nextCursor: 'next',
-    ),
-    _TablePagination.keyset => CollectionKeysetPageInfo<int>(
-      itemCount: rows.length,
-      nextKey: rows.isEmpty ? null : rows.last.id,
-    ),
-    _TablePagination.progressive => CollectionProgressivePageInfo(
-      loadedItems: rows.length,
-      hasMore: true,
-      totalItems: 1000,
-    ),
-    _TablePagination.unknownTotal => CollectionOffsetPageInfo(
-      offset: 0,
-      limit: rows.isEmpty ? 1 : rows.length,
-      itemCount: rows.length,
-      moreAvailable: true,
-    ),
-  };
-  return switch (scenario) {
-    _TableScenario.loaded => CollectionSnapshot(
-      items: rows,
-      pageInfo: pageInfo,
-    ),
-    _TableScenario.initialLoading => CollectionSnapshot.initialLoading(),
-    _TableScenario.refreshing => CollectionSnapshot(
-      items: rows,
-      loadPhase: CollectionLoadPhase.refreshing,
-      freshness: CollectionFreshness.stale,
-      pageInfo: pageInfo,
-    ),
-    _TableScenario.initialError => CollectionSnapshot(
-      initialFailure: const CollectionFailure(
-        error: 'offline',
-        message: 'Initial request failed',
-      ),
-    ),
-    _TableScenario.refreshError => CollectionSnapshot(
-      items: rows,
-      freshness: CollectionFreshness.stale,
-      refreshFailure: const CollectionFailure(
-        error: 'offline',
-        message: 'Refresh failed; rows remain visible',
-      ),
-      pageInfo: pageInfo,
-    ),
-    _TableScenario.zero => CollectionSnapshot(
-      contentState: CollectionContentState.zero,
-    ),
-    _TableScenario.emptyResult => CollectionSnapshot(
-      contentState: CollectionContentState.emptyResult,
-    ),
-    _TableScenario.loadingMore => CollectionSnapshot(
-      items: rows,
-      loadPhase: CollectionLoadPhase.loadingMore,
-      pageInfo: pageInfo,
-    ),
-  };
-}
 
 final class _ExampleRow {
   const _ExampleRow({
