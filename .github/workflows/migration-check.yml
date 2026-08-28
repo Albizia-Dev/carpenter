@@ -59,6 +59,12 @@ jobs:
               'lib/src/page/state_boundary.dart': [
                   ("import '../components/basic/button/button.dart';\n", ''),
               ],
+              'widgetbook/lib/use_cases/basic/migrated_primitives.dart': [
+                  ("""      CarpenterAvatar(\n        child: Icon(CarpenterIcons.account),\n        size: 48,\n        semanticLabel: 'Account',\n      ),""", """      CarpenterAvatar(\n        size: 48,\n        semanticLabel: 'Account',\n        child: Icon(CarpenterIcons.account),\n      ),"""),
+              ],
+              'widgetbook/lib/use_cases/collections/migrated_collections.dart': [
+                  ("""          if (request.cancellation.isCancelled)\n            return CollectionSnapshot<String>.initialLoading();""", """          if (request.cancellation.isCancelled) {\n            return CollectionSnapshot<String>.initialLoading();\n          }"""),
+              ],
           }
 
           for file_name, rules in replacements.items():
