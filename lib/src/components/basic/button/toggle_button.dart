@@ -32,9 +32,9 @@ final class CarpenterToggleButton extends StatelessWidget {
       semanticLabel: semanticLabel ?? label,
       icon: icon,
       size: size,
-      colorRole: checked ? colorRole : ActionColorRole.neutral,
-      prominence: checked ? ActionProminence.high : ActionProminence.outlined,
-      onInvoke: onChanged == null ? null : () => onChanged!(!checked),
+      colorRole: colorRole,
+      prominence: checked ? ActionProminence.filled : ActionProminence.normal,
+      onPressed: onChanged == null ? null : () => onChanged!(!checked),
     ),
   );
 }
