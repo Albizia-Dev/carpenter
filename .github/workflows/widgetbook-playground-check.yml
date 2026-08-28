@@ -29,6 +29,39 @@ jobs:
         working-directory: widgetbook
         run: flutter pub get
 
+      - name: Apply playground fixes
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          p = Path('widgetbook/lib/use_cases/basic/migrated_primitives.dart')
+          s = p.read_text()
+          s = s.replace(
+              """    CarpenterAvatar(\n      initials: content == _AvatarContent.initials ? initials : null,\n      child: content == _AvatarContent.icon\n          ? const Icon(CarpenterIcons.account)\n          : null,\n      size: size,\n      semanticLabel: semanticLabel,\n    ),""",
+              """    CarpenterAvatar(\n      initials: content == _AvatarContent.initials ? initials : null,\n      size: size,\n      semanticLabel: semanticLabel,\n      child: content == _AvatarContent.icon\n          ? const Icon(CarpenterIcons.account)\n          : null,\n    ),""",
+          )
+          p.write_text(s)
+
+          p = Path('widgetbook/lib/use_cases/behaviour/migrated_behaviour.dart')
+          s = p.read_text()
+          s = s.replace(
+              """  final semanticLabel = context.knobs.stringOrNull(\n    label: 'Accessibility · Semantic label',\n    initialValue: 'Bank requisites section',\n    defaultToNull: true,\n  );\n""",
+              "",
+          )
+          s = s.replace("        semanticLabel: semanticLabel,\n", "")
+          p.write_text(s)
+
+          p = Path('widgetbook/lib/use_cases/collections/migrated_collections.dart')
+          s = p.read_text()
+          s = s.replace(
+              "query: const CollectionQuery<String>(search: ''),",
+              "query: CollectionQuery<String>(search: ''),",
+          )
+          s = s.replace('  final Object? value = switch (sample) {', '  final Object value = switch (sample) {')
+          p.write_text(s)
+          PY
+
       - name: Format Widgetbook
         run: dart format widgetbook/lib
 
@@ -39,7 +72,7 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add widgetbook/lib
-            git commit -m "style: format widgetbook playground"
+            git commit -m "fix: clean up widgetbook playground"
             git push origin HEAD:widgetbook-playground
           fi
 
