@@ -118,11 +118,11 @@ final class CarpenterPaginationBar extends StatelessWidget {
             previous,
             for (final item in _pageWindow)
               if (item == null)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: context.units(.25.rem),
                   ),
-                  child: CarpenterText.body('…'),
+                  child: const CarpenterText.body('…'),
                 )
               else
                 CarpenterButton(
