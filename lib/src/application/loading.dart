@@ -94,15 +94,21 @@ final class LoadingCubit extends Cubit<LoadingState>
   }
 
   void _acquire(Object id, Object lease) {
+    if (isClosed) return;
     final leases = _leasesById.putIfAbsent(id, () => <Object>{});
     if (!leases.add(lease)) return;
-    emit(LoadingState._from(_leasesById));
+    _emitSnapshot();
   }
 
   void _release(Object id, Object lease) {
     final leases = _leasesById[id];
     if (leases == null || !leases.remove(lease)) return;
     if (leases.isEmpty) _leasesById.remove(id);
+    _emitSnapshot();
+  }
+
+  void _emitSnapshot() {
+    if (isClosed) return;
     emit(LoadingState._from(_leasesById));
   }
 }
