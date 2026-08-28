@@ -33,6 +33,7 @@ import 'use_cases/collections/migrated_collections.dart';
 import 'use_cases/collections/table.dart';
 import 'use_cases/foundation/colors.dart';
 import 'use_cases/foundation/typography.dart';
+import 'use_cases/layout/adaptive_shell.dart';
 import 'use_cases/layout/migrated_layout.dart';
 import 'use_cases/layout/page_header.dart';
 import 'use_cases/layout/semantic_layout.dart';
@@ -108,6 +109,9 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
     WidgetbookFolder(
       name: 'Layout',
       children: [
+        sidebarComponent,
+        shellHeaderComponent,
+        rootLayoutComponent,
         applicationShellComponent,
         appFrameComponent,
         pageHeaderComponent,
