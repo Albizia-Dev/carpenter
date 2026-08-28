@@ -27,6 +27,7 @@ final class CarpenterAutosuggest<T> extends StatelessWidget {
     this.clearAction,
     this.focusNode,
     this.autofocus = false,
+    this.replaceQueryOnSelection = true,
     this.loadingText = 'Loading',
     this.emptyText = 'No suggestions',
     this.failedText = 'Unable to load suggestions',
@@ -52,6 +53,7 @@ final class CarpenterAutosuggest<T> extends StatelessWidget {
   final CarpenterActionDescriptor? clearAction;
   final FocusNode? focusNode;
   final bool autofocus;
+  final bool replaceQueryOnSelection;
   final String loadingText;
   final String emptyText;
   final String failedText;
@@ -81,5 +83,6 @@ final class CarpenterAutosuggest<T> extends StatelessWidget {
     clearAction: clearAction,
     focusNode: focusNode,
     autofocus: autofocus,
+    replaceQueryOnSelection: replaceQueryOnSelection,
   );
 }
