@@ -1,0 +1,64 @@
+name: Final UI Check
+
+on:
+  push:
+    branches:
+      - widgetbook-ui-fixes
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Finalize contracts and playgrounds
+        run: python3 .github/finalize_ui_fixes.py
+
+      - name: Format
+        run: dart format lib test widgetbook/lib
+
+      - name: Update expected control goldens
+        run: flutter test --update-goldens test/goldens/core_controls_golden_test.dart
+
+      - name: Commit final generated changes
+        shell: bash
+        run: |
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add lib test widgetbook/lib
+            git commit -m "ui: update contracts playgrounds and goldens [skip ci]"
+            git push origin HEAD:widgetbook-ui-fixes
+          fi
+
+      - name: Analyze library
+        run: dart analyze lib
+
+      - name: Test library
+        run: flutter test
+
+      - name: Install Widgetbook dependencies
+        working-directory: widgetbook
+        run: flutter pub get
+
+      - name: Analyze Widgetbook
+        working-directory: widgetbook
+        run: flutter analyze
+
+      - name: Build Widgetbook web
+        working-directory: widgetbook
+        run: flutter build web --release --base-href /carpenter/
