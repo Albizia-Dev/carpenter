@@ -173,12 +173,10 @@ final class _SidebarPreviewState extends State<_SidebarPreview> {
   CarpenterSidebarData get _data => CarpenterSidebarData(
     selectedId: _selected,
     onSelected: (id) => setState(() => _selected = id),
-    header: widget.expanded
-        ? const CarpenterText.title('Carpenter')
-        : const CarpenterIcon(CarpenterIcons.tree),
-    footer: widget.expanded
-        ? const CarpenterText.caption('v0.1 · workspace')
-        : const CarpenterIcon(CarpenterIcons.info),
+    header: const CarpenterText.title('Carpenter'),
+    compactHeader: const CarpenterIcon(CarpenterIcons.tree),
+    footer: const CarpenterText.caption('v0.1 · workspace'),
+    compactFooter: const CarpenterIcon(CarpenterIcons.info),
     sections: [
       CarpenterSidebarSection(
         label: 'Workspace',
@@ -253,7 +251,9 @@ final class _RootPreviewState extends State<_RootPreview> {
     selectedId: _selected,
     onSelected: (id) => setState(() => _selected = id),
     header: const CarpenterText.title('Carpenter'),
+    compactHeader: const CarpenterIcon(CarpenterIcons.tree),
     footer: const CarpenterText.caption('Albizia · workspace'),
+    compactFooter: const CarpenterIcon(CarpenterIcons.info),
     sections: [
       CarpenterSidebarSection(
         label: 'Workspace',
