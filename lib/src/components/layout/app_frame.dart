@@ -28,6 +28,7 @@ final class CarpenterAppFrame extends StatelessWidget {
     this.targetPlatform,
     this.useSafeArea = true,
     this.padding,
+    this.backgroundColor,
   });
 
   final Widget child;
@@ -36,6 +37,7 @@ final class CarpenterAppFrame extends StatelessWidget {
   final TargetPlatform? targetPlatform;
   final bool useSafeArea;
   final EdgeInsetsGeometry? padding;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +49,7 @@ final class CarpenterAppFrame extends StatelessWidget {
     Widget content = Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [if (panel != null) panel, Expanded(child: child)]);
     if (padding != null) content = Padding(padding: padding!, child: content);
     if (useSafeArea) content = SafeArea(child: content);
-    return ColoredBox(color: theme.surface.base, child: content);
+    return ColoredBox(color: backgroundColor ?? theme.surface.base, child: content);
   }
 }
 
@@ -63,23 +65,12 @@ final class CarpenterTopPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.medium);
-    final content = child ?? Row(
-      children: [
-        leading ?? const CarpenterAvatar(initials: 'C', size: 32),
-        SizedBox(width: gap),
-        Expanded(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (title != null) CarpenterText.label(title!, emphasis: TypographyEmphasis.strong),
-              if (subtitle != null) CarpenterText.caption(subtitle!, colorRole: ContentColorRole.secondary),
-            ],
-          ),
-        ),
-        for (final action in actions) ...[SizedBox(width: gap / 2), action],
-      ],
-    );
+    final content = child ?? Row(children: [
+      leading ?? const CarpenterAvatar(initials: 'C', size: 32),
+      SizedBox(width: gap),
+      Expanded(child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [if (title != null) CarpenterText.label(title!, emphasis: TypographyEmphasis.strong), if (subtitle != null) CarpenterText.caption(subtitle!, colorRole: ContentColorRole.secondary)])),
+      for (final action in actions) ...[SizedBox(width: gap / 2), action],
+    ]);
     return DecoratedBox(
       decoration: BoxDecoration(color: theme.surface.subtle, border: Border(bottom: BorderSide(color: theme.overlay.border))),
       child: Padding(padding: EdgeInsets.symmetric(horizontal: gap, vertical: gap * .75), child: content),
