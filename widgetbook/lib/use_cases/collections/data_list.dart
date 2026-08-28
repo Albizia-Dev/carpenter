@@ -28,7 +28,7 @@ Widget _playground(BuildContext context) {
     initialValue: true,
   );
   return SizedBox(
-    height: const Px(520).value,
+    height: context.units(32.5.rem),
     child: _DataListPreview(
       count: count,
       scenario: scenario,

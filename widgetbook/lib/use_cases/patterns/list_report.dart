@@ -29,14 +29,14 @@ Widget _playground(BuildContext context) {
   );
   return layoutViewportPreview(
     context,
-    offHeight: const Px(840),
+    offHeight: const Rem(52.5),
     child: _ListReportPreview(scenario: scenario, rowCount: rows),
   );
 }
 
 Widget _operationalReport(BuildContext context) => layoutViewportPreview(
   context,
-  offHeight: const Px(840),
+  offHeight: const Rem(52.5),
   child: const _ListReportPreview(
     scenario: DemoCollectionScenario.refreshError,
     rowCount: 12,

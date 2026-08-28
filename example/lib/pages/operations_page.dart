@@ -75,7 +75,7 @@ final class _OperationsPageState extends State<OperationsPage> {
     ],
     dismissPolicy: DialogDismissPolicy.outsideAndEscape,
     child: ListView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(context.units(context.units(.09375.rem).rem)),
       children: [
         CarpenterPageHeader(
           title: 'Operations lab',
@@ -94,32 +94,32 @@ final class _OperationsPageState extends State<OperationsPage> {
             ),
           ],
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: context.units(1.5.rem)),
         const CarpenterHotkeyDisplay(
           title: 'Global command hotkeys',
           showCommands: true,
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: context.units(1.5.rem)),
         Wrap(
-          spacing: 16,
-          runSpacing: 16,
+          spacing: context.units(1.rem),
+          runSpacing: context.units(1.rem),
           children: [
             SizedBox(
-              width: 430,
+              width: context.units(26.875.rem),
               child: CarpenterCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const CarpenterText.title('Aggregated loading'),
-                    const SizedBox(height: 8),
+                    SizedBox(height: context.units(.5.rem)),
                     const CarpenterText.body(
                       'Start two operations. The global header remains loading until both finish.',
                       colorRole: ContentColorRole.secondary,
                     ),
-                    const SizedBox(height: 16),
+                    SizedBox(height: context.units(1.rem)),
                     Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
+                      spacing: context.units(.5.rem),
+                      runSpacing: context.units(.5.rem),
                       children: [
                         CarpenterButton.filled(
                           label: 'Run A + B',
@@ -137,7 +137,7 @@ final class _OperationsPageState extends State<OperationsPage> {
               ),
             ),
             SizedBox(
-              width: 430,
+              width: context.units(26.875.rem),
               child: LoadingBoundary(
                 child: const _BlockedRegion(),
                 builder: (context, state, child) => CarpenterCard(
@@ -153,7 +153,7 @@ final class _OperationsPageState extends State<OperationsPage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   const CarpenterLoader(),
-                                  const SizedBox(height: 8),
+                                  SizedBox(height: context.units(.5.rem)),
                                   CarpenterText.body(
                                     '${state.activeCount} local operation(s)',
                                   ),
@@ -169,21 +169,21 @@ final class _OperationsPageState extends State<OperationsPage> {
             ),
           ],
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: context.units(1.5.rem)),
         CarpenterCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const CarpenterText.title('Transient feedback'),
-              const SizedBox(height: 8),
+              SizedBox(height: context.units(.5.rem)),
               const CarpenterText.body(
                 'Toast stacking, semantic roles and controlled dialog presentation.',
                 colorRole: ContentColorRole.secondary,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: context.units(1.rem)),
               Wrap(
-                spacing: 8,
-                runSpacing: 8,
+                spacing: context.units(.5.rem),
+                runSpacing: context.units(.5.rem),
                 children: [
                   CarpenterButton(
                     label: 'Success toast',
@@ -214,7 +214,7 @@ final class _OperationsPageState extends State<OperationsPage> {
             ],
           ),
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: context.units(1.5.rem)),
         const CarpenterNotice(
           title: 'Nearest scope wins',
           message:
@@ -239,12 +239,12 @@ final class _BlockedRegion extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       const CarpenterText.title('Locally blocked region'),
-      const SizedBox(height: 8),
+      SizedBox(height: context.units(.5.rem)),
       const CarpenterText.body(
         'This child does not know that its boundary renders an overlay.',
         colorRole: ContentColorRole.secondary,
       ),
-      const SizedBox(height: 16),
+      SizedBox(height: context.units(1.rem)),
       CarpenterButton(
         label: 'Run local task',
         icon: Icons.lock_clock,

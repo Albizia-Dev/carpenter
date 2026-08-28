@@ -67,8 +67,8 @@ Widget _playground(BuildContext context) {
 }
 
 Widget _edgeCases(BuildContext context) => preview(
-  const SizedBox(
-    width: 180,
+  SizedBox(
+    width: context.units(11.25.rem),
     child: CarpenterStatusIndicator(
       label: 'Ожидает дополнительного согласования',
       role: FeedbackColorRole.warning,

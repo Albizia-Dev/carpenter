@@ -64,8 +64,8 @@ Widget _playground(BuildContext context) {
 }
 
 Widget _edgeCases(BuildContext context) => preview(
-  const SizedBox(
-    width: 320,
+  SizedBox(
+    width: context.units(20.rem),
     child: _TablePreview(
       rowCount: 20,
       scenario: DemoCollectionScenario.refreshError,

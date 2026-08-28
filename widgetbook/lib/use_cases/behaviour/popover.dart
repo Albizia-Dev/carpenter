@@ -55,7 +55,7 @@ Widget _playground(BuildContext context) {
 
 Widget _edgeCases(BuildContext context) => preview(
   SizedBox(
-    height: 520,
+    height: context.units(32.5.rem),
     child: SingleChildScrollView(
       child: Directionality(
         textDirection: TextDirection.rtl,
@@ -116,7 +116,9 @@ final class _NestedPopoverPreviewState extends State<_NestedPopoverPreview> {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 280),
+    padding: EdgeInsets.only(
+      top: context.units(context.units(1.09375.rem).rem),
+    ),
     child: CarpenterPopover(
       open: _outer,
       onOpenChanged: (value) => setState(() => _outer = value),
@@ -129,8 +131,8 @@ final class _NestedPopoverPreviewState extends State<_NestedPopoverPreview> {
         placement: OverlayPlacement.left,
         semanticLabel: 'Вложенный popover',
         anchor: const CarpenterText.label('Открыть вложенный'),
-        content: const SizedBox(
-          width: 180,
+        content: SizedBox(
+          width: context.units(11.25.rem),
           child: CarpenterText.body('Escape закрывает верхний overlay.'),
         ),
       ),

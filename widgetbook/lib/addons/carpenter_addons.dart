@@ -64,7 +64,12 @@ final List<WidgetbookAddon> carpenterAddons = [
     name: 'Carpenter preview',
     builder: (context, child) => UnitsRoot(
       rem: const Px(16),
-      child: Padding(padding: const EdgeInsets.all(24), child: child),
+      child: Builder(
+        builder: (context) => Padding(
+          padding: EdgeInsets.all(context.units(1.5.rem)),
+          child: child,
+        ),
+      ),
     ),
   ),
   TextScaleAddon(min: 1, max: 2, divisions: 4),

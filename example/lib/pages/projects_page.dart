@@ -117,7 +117,7 @@ final class _ProjectsPageState extends State<ProjectsPage> {
     );
 
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(context.units(context.units(.09375.rem).rem)),
       children: [
         CarpenterPageHeader(
           title: 'Project portfolio',
@@ -144,7 +144,7 @@ final class _ProjectsPageState extends State<ProjectsPage> {
             ),
           ],
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: context.units(1.5.rem)),
         CarpenterFilterBar(
           searchController: _searchController,
           searchLabel: 'Find projects',
@@ -177,7 +177,7 @@ final class _ProjectsPageState extends State<ProjectsPage> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: context.units(1.rem)),
         CarpenterTable<DemoProject, String>(
           snapshot: snapshot,
           rowKey: (project) => project.id,
@@ -234,7 +234,7 @@ final class _ProjectsPageState extends State<ProjectsPage> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: context.units(1.rem)),
         CarpenterPaginationBar(
           page: effectivePage,
           totalPages: totalPages,

@@ -29,7 +29,7 @@ Widget _playground(BuildContext context) {
   );
   return layoutViewportPreview(
     context,
-    offHeight: const Px(860),
+    offHeight: const Rem(53.75),
     child: buildPaymentListSample(
       pageSize: pageSize,
       initialSelection: initialSelection,

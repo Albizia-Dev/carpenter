@@ -1,3 +1,4 @@
+import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
 import '../basic/input/input.dart';
@@ -13,13 +14,13 @@ final class CarpenterCollectionSearchField<T, K, F> extends StatefulWidget {
     required this.controller,
     this.label = 'Search',
     this.placeholder,
-    this.width = 520,
+    this.width = const Rem(32.5),
   });
 
   final CollectionLifecycleController<T, K, F> controller;
   final String label;
   final String? placeholder;
-  final double width;
+  final LengthUnit width;
 
   @override
   State<CarpenterCollectionSearchField<T, K, F>> createState() =>
@@ -69,7 +70,7 @@ final class _CarpenterCollectionSearchFieldState<T, K, F>
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    width: widget.width,
+    width: context.units(widget.width),
     child: CarpenterInput(
       controller: _text,
       focusNode: _focusNode,

@@ -426,7 +426,7 @@ final class SizeTokens {
 
   final SizeLayoutTokens layout = const SizeLayoutTokens();
 
-  _i1.Px get zero => const _i1.Px(0.0);
+  _i1.Rem get zero => const _i1.Rem(0.0);
 }
 
 final class SpacingControlTokens {
@@ -502,7 +502,7 @@ final class SpacingSelectionTokens {
 
   _i1.Rem get markInset => const _i1.Rem(0.25);
 
-  _i1.Px get switchInset => const _i1.Px(2.0);
+  _i1.Rem get switchInset => const _i1.Rem(0.125);
 }
 
 final class SpacingOverlayTokens {
@@ -598,7 +598,7 @@ final class SpacingTokens {
 final class ShapeTokens {
   const ShapeTokens();
 
-  _i1.Px get none => const _i1.Px(0.0);
+  _i1.Rem get none => const _i1.Rem(0.0);
 
   _i1.Rem get roundedXsmall => const _i1.Rem(0.25);
 
@@ -620,17 +620,17 @@ final class ShapeTokens {
 final class BorderTokens {
   const BorderTokens();
 
-  _i1.Px get standard => const _i1.Px(1.0);
+  _i1.Rem get standard => const _i1.Rem(0.0625);
 
-  _i1.Px get strong => const _i1.Px(2.0);
+  _i1.Rem get strong => const _i1.Rem(0.125);
 }
 
 final class FocusTokens {
   const FocusTokens();
 
-  _i1.Px get width => const _i1.Px(2.0);
+  _i1.Rem get width => const _i1.Rem(0.125);
 
-  _i1.Px get gap => const _i1.Px(2.0);
+  _i1.Rem get gap => const _i1.Rem(0.125);
 }
 
 final class MotionTooltipTokens {
@@ -841,7 +841,7 @@ final class ComponentActionTokens {
 
   final ComponentActionFontTokens font = const ComponentActionFontTokens();
 
-  _i1.Px get borderWidth => border.standard;
+  _i1.Rem get borderWidth => border.standard;
 }
 
 final class ComponentFieldHeightTokens {
@@ -1120,9 +1120,9 @@ final class ComponentFieldTokens {
   final ComponentFieldSupportingFontTokens supportingFont =
       const ComponentFieldSupportingFontTokens();
 
-  _i1.Px get borderWidth => border.standard;
+  _i1.Rem get borderWidth => border.standard;
 
-  _i1.Px get cursorWidth => border.standard;
+  _i1.Rem get cursorWidth => border.standard;
 }
 
 final class ComponentSelectionLabelGapTokens {
@@ -1283,9 +1283,9 @@ final class ComponentSelectionCheckboxTokens {
   final ComponentSelectionCheckboxMarkInsetTokens markInset =
       const ComponentSelectionCheckboxMarkInsetTokens();
 
-  _i1.Px get borderWidth => border.standard;
+  _i1.Rem get borderWidth => border.standard;
 
-  _i1.Px get markStrokeWidth => border.strong;
+  _i1.Rem get markStrokeWidth => border.strong;
 }
 
 final class ComponentSelectionRadioSizeTokens {
@@ -1325,7 +1325,7 @@ final class ComponentSelectionRadioTokens {
   final ComponentSelectionRadioMarkInsetTokens markInset =
       const ComponentSelectionRadioMarkInsetTokens();
 
-  _i1.Px get borderWidth => border.standard;
+  _i1.Rem get borderWidth => border.standard;
 }
 
 final class ComponentSelectionSwitchTokenWidthTokens {
@@ -1359,15 +1359,15 @@ final class ComponentSelectionSwitchTokenHeightTokens {
 final class ComponentSelectionSwitchTokenInsetTokens {
   const ComponentSelectionSwitchTokenInsetTokens();
 
-  _i1.Px get xsmall => spacing.selection.switchInset;
+  _i1.Rem get xsmall => spacing.selection.switchInset;
 
-  _i1.Px get small => spacing.selection.switchInset;
+  _i1.Rem get small => spacing.selection.switchInset;
 
-  _i1.Px get medium => spacing.selection.switchInset;
+  _i1.Rem get medium => spacing.selection.switchInset;
 
-  _i1.Px get large => spacing.selection.switchInset;
+  _i1.Rem get large => spacing.selection.switchInset;
 
-  _i1.Px get xlarge => spacing.selection.switchInset;
+  _i1.Rem get xlarge => spacing.selection.switchInset;
 }
 
 final class ComponentSelectionSwitchTokenRadiusTokens {
@@ -1399,7 +1399,7 @@ final class ComponentSelectionSwitchTokenTokens {
   final ComponentSelectionSwitchTokenRadiusTokens radius =
       const ComponentSelectionSwitchTokenRadiusTokens();
 
-  _i1.Px get borderWidth => border.standard;
+  _i1.Rem get borderWidth => border.standard;
 }
 
 final class ComponentSelectionTokens {
@@ -1478,7 +1478,7 @@ final class ComponentOverlayTokens {
 
   _i1.Rem get surfaceRadius => shape.rounded;
 
-  _i1.Px get borderWidth => border.standard;
+  _i1.Rem get borderWidth => border.standard;
 
   _i1.Rem get tooltipHorizontalPadding => spacing.overlay.tooltipHorizontal;
 
@@ -1552,7 +1552,7 @@ final class ComponentTableTokens {
 
   _i1.Rem get surfaceRadius => shape.rounded;
 
-  _i1.Px get borderWidth => border.standard;
+  _i1.Rem get borderWidth => border.standard;
 
   _i1.Rem get headerFontSize => font.size.label;
 
@@ -1572,7 +1572,7 @@ final class ComponentPopoverTokens {
 final class ComponentAdaptiveRegionTokens {
   const ComponentAdaptiveRegionTokens();
 
-  _i1.Px get borderWidth => border.standard;
+  _i1.Rem get borderWidth => border.standard;
 }
 
 final class ComponentTokens {

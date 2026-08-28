@@ -87,10 +87,13 @@ Widget _control(BuildContext context) {
           decoration: BoxDecoration(
             color: background,
             border: Border.all(color: theme.overlay.border),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(context.units(.5.rem)),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            padding: EdgeInsets.symmetric(
+              horizontal: context.units(1.rem),
+              vertical: context.units(.75.rem),
+            ),
             child: CarpenterText.body(
               '$label\nenabled=${state.enabled} hovered=${state.hovered} focused=${state.focused} pressed=${state.pressed}',
             ),
@@ -116,10 +119,13 @@ Widget _controlState(BuildContext context) => preview(
         decoration: BoxDecoration(
           color: background,
           border: Border.all(color: theme.overlay.border),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(context.units(.5.rem)),
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: EdgeInsets.symmetric(
+            horizontal: context.units(1.rem),
+            vertical: context.units(.75.rem),
+          ),
           child: CarpenterText.body(
             'enabled=${state.enabled}  hovered=${state.hovered}  focused=${state.focused}  pressed=${state.pressed}',
           ),
@@ -188,7 +194,7 @@ Widget _noticePlayground(BuildContext context) {
 Widget _notices(BuildContext context) => previewColumn([
   for (final tone in CarpenterNoticeTone.values)
     SizedBox(
-      width: 620,
+      width: context.units(38.75.rem),
       child: CarpenterNotice(
         title: tone.name,
         message:
@@ -237,16 +243,16 @@ Widget _expander(BuildContext context) {
 }
 
 Widget _expanderStates(BuildContext context) => previewColumn([
-  const SizedBox(
-    width: 620,
+  SizedBox(
+    width: context.units(38.75.rem),
     child: CarpenterExpander(
       initiallyExpanded: false,
       header: CarpenterText.label('Collapsed'),
       content: CarpenterText.body('Hidden until the section is opened.'),
     ),
   ),
-  const SizedBox(
-    width: 620,
+  SizedBox(
+    width: context.units(38.75.rem),
     child: CarpenterExpander(
       initiallyExpanded: true,
       header: CarpenterText.label('Expanded'),
@@ -459,12 +465,12 @@ final class _CommandInputPreviewState extends State<_CommandInputPreview> {
   @override
   Widget build(BuildContext context) => preview(
     SizedBox(
-      width: 520,
+      width: context.units(32.5.rem),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           CarpenterInput(controller: _reason, label: 'Reason'),
-          const SizedBox(height: 12),
+          SizedBox(height: context.units(.75.rem)),
           Align(
             alignment: AlignmentDirectional.centerStart,
             child: CarpenterCommandInputButton<String>(
@@ -476,7 +482,7 @@ final class _CommandInputPreviewState extends State<_CommandInputPreview> {
             ),
           ),
           if (_lastInput != null) ...[
-            const SizedBox(height: 12),
+            SizedBox(height: context.units(.75.rem)),
             CarpenterText.caption('Last input: $_lastInput'),
           ],
         ],
@@ -510,7 +516,7 @@ Widget _hotkeys(BuildContext context) {
   );
   return preview(
     SizedBox(
-      width: 620,
+      width: context.units(38.75.rem),
       child: CarpenterHotkeyScope(
         platform: platform,
         commands: [command],
@@ -570,7 +576,7 @@ final class _SurfacePreviewState extends State<_SurfacePreview> {
   @override
   Widget build(BuildContext context) => SizedBox(
     width: widget.width,
-    height: 480,
+    height: context.units(30.rem),
     child: CarpenterSurfaceHost(
       child: Builder(
         builder: (context) => CarpenterCard(
@@ -592,7 +598,7 @@ final class _SurfacePreviewState extends State<_SurfacePreview> {
   Widget _panel(BuildContext context) => ColoredBox(
     color: CarpenterTheme.of(context).overlay.background,
     child: Padding(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(context.units(context.units(.09375.rem).rem)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -600,7 +606,7 @@ final class _SurfacePreviewState extends State<_SurfacePreview> {
             widget.title,
             emphasis: TypographyEmphasis.strong,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.units(.75.rem)),
           CarpenterText.body(widget.body),
           const Spacer(),
           Align(

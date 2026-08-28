@@ -50,7 +50,7 @@ final class CarpenterLink extends StatelessWidget {
         final radius = BorderRadius.circular(
           context.units(theme.shapes.radius(ShapeRole.rounded)),
         );
-        final focusPadding = context.units(const Px(3));
+        final focusPadding = context.units(const Rem(.1875));
         final content = Row(
           mainAxisSize: MainAxisSize.min,
           children: [

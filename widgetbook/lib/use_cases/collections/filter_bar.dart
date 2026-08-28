@@ -54,8 +54,8 @@ Widget _playground(BuildContext context) {
 }
 
 Widget _alignmentStress(BuildContext context) => preview(
-  const SizedBox(
-    width: 920,
+  SizedBox(
+    width: context.units(57.5.rem),
     child: _FilterBarPreview(
       activeFilters: 2,
       filterCount: 3,
@@ -66,8 +66,8 @@ Widget _alignmentStress(BuildContext context) => preview(
 );
 
 Widget _responsiveStates(BuildContext context) => previewColumn([
-  const SizedBox(
-    width: 320,
+  SizedBox(
+    width: context.units(20.rem),
     child: _FilterBarPreview(
       activeFilters: 3,
       filterCount: 3,
@@ -75,8 +75,8 @@ Widget _responsiveStates(BuildContext context) => previewColumn([
       labeledSearch: true,
     ),
   ),
-  const SizedBox(
-    width: 720,
+  SizedBox(
+    width: context.units(45.rem),
     child: _FilterBarPreview(
       activeFilters: 1,
       filterCount: 2,
@@ -84,8 +84,8 @@ Widget _responsiveStates(BuildContext context) => previewColumn([
       labeledSearch: true,
     ),
   ),
-  const SizedBox(
-    width: 1080,
+  SizedBox(
+    width: context.units(67.5.rem),
     child: _FilterBarPreview(
       activeFilters: 0,
       filterCount: 4,

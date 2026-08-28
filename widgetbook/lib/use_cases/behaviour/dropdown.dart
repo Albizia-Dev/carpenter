@@ -108,7 +108,7 @@ final class _DropdownPreviewState extends State<_DropdownPreview> {
           ),
         ],
       ),
-      const SizedBox(height: 16),
+      SizedBox(height: context.units(1.rem)),
       CarpenterText.caption('Последнее действие: $_last'),
     ],
   );

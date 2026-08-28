@@ -62,7 +62,10 @@ final class CarpenterExplorerPage extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    SizedBox(width: 250, child: navigation),
+                    SizedBox(
+                      width: context.units(15.625.rem),
+                      child: navigation,
+                    ),
                     SizedBox(width: gap),
                     Expanded(child: content),
                     if (inspector != null) ...[

@@ -141,8 +141,8 @@ final class _ToastPreviewState extends State<_ToastPreview> {
       child: Align(
         alignment: Alignment.topLeft,
         child: Wrap(
-          spacing: 8,
-          runSpacing: 8,
+          spacing: context.units(.5.rem),
+          runSpacing: context.units(.5.rem),
           children: [
             CarpenterButton(label: 'Показать toast', onPressed: _showOne),
             CarpenterButton.outlined(

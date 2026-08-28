@@ -93,7 +93,7 @@ final class CarpenterPaginationBar extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth < 480) {
+        if (constraints.maxWidth < context.units(30.rem)) {
           return Row(
             children: [
               previous,
@@ -118,9 +118,11 @@ final class CarpenterPaginationBar extends StatelessWidget {
             previous,
             for (final item in _pageWindow)
               if (item == null)
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4),
-                  child: CarpenterText.body('…'),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: context.units(.25.rem),
+                  ),
+                  child: const CarpenterText.body('…'),
                 )
               else
                 CarpenterButton(

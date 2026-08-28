@@ -284,7 +284,7 @@ final class CarpenterTimeline extends StatelessWidget {
             child: CarpenterCard(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final compact = constraints.maxWidth < 480;
+                  final compact = constraints.maxWidth < context.units(30.rem);
                   final timestamp = CarpenterText.caption(
                     item.timestamp.toLocal().toIso8601String(),
                     colorRole: ContentColorRole.muted,

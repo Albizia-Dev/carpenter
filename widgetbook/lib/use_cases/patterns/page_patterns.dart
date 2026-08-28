@@ -54,7 +54,7 @@ final masterDetailPageComponent = WidgetbookComponent(
 
 Widget _networkCollectionCase(BuildContext context) => layoutViewportPreview(
   context,
-  offHeight: const Px(840),
+  offHeight: const Rem(52.5),
   child: buildNetworkCollectionPageDemo(),
 );
 

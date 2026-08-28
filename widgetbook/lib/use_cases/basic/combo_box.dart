@@ -122,7 +122,7 @@ final class _ComboPreviewState extends State<_ComboPreview> {
           }),
         ),
       ),
-      const SizedBox(height: 12),
+      SizedBox(height: context.units(.75.rem)),
       CarpenterText.caption(
         'query="${_controller.text}" · value=${_value ?? '—'} · options=${_options.length}',
       ),

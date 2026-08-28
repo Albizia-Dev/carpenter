@@ -85,7 +85,7 @@ final class _CarpenterPageSectionState extends State<CarpenterPageSection> {
                 ],
               );
               if (actions.isEmpty) return heading;
-              return constraints.maxWidth < 520
+              return constraints.maxWidth < context.units(32.5.rem)
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -120,14 +120,15 @@ final class CarpenterActionBar extends StatelessWidget {
     super.key,
     this.primary = const [],
     this.secondary = const [],
-    this.compactBreakpoint = 640,
+    this.compactBreakpoint = const Rem(40),
   });
   final List<Widget> primary;
   final List<Widget> secondary;
-  final double compactBreakpoint;
+  final LengthUnit compactBreakpoint;
   @override
   Widget build(BuildContext context) {
     final gap = context.units(CarpenterTheme.of(context).spacing.small);
+    final compactBreakpoint = context.units(this.compactBreakpoint);
     return LayoutBuilder(
       builder: (context, constraints) => Wrap(
         alignment: constraints.maxWidth < compactBreakpoint
@@ -145,19 +146,22 @@ final class CarpenterFilterControl extends StatelessWidget {
   const CarpenterFilterControl({
     super.key,
     required this.child,
-    this.width = 180,
+    this.width = const Rem(11.25),
   });
   final Widget child;
-  final double width;
+  final LengthUnit width;
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) => SizedBox(
-      width: constraints.maxWidth.isFinite
-          ? width.clamp(0, constraints.maxWidth).toDouble()
-          : width,
-      child: child,
-    ),
-  );
+  Widget build(BuildContext context) {
+    final width = context.units(this.width);
+    return LayoutBuilder(
+      builder: (context, constraints) => SizedBox(
+        width: constraints.maxWidth.isFinite
+            ? width.clamp(0, constraints.maxWidth).toDouble()
+            : width,
+        child: child,
+      ),
+    );
+  }
 }
 
 final class CarpenterCollectionGroupHeader extends StatelessWidget {
@@ -198,7 +202,8 @@ final class CarpenterCollectionGroupHeader extends StatelessWidget {
     );
     if (action == null) return details;
     return LayoutBuilder(
-      builder: (context, constraints) => constraints.maxWidth < 520
+      builder: (context, constraints) =>
+          constraints.maxWidth < context.units(32.5.rem)
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -286,10 +291,10 @@ final class CarpenterInteractionOverlay extends StatelessWidget {
       if (active) Positioned.fill(child: overlay),
       if (error != null)
         Positioned(
-          top: 12,
-          right: 12,
+          top: context.units(.75.rem),
+          right: context.units(.75.rem),
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
+            constraints: BoxConstraints(maxWidth: context.units(26.25.rem)),
             child: CarpenterNotice(
               title: 'Action failed',
               message: error,
@@ -324,16 +329,17 @@ final class CarpenterSelectionBar<T> extends StatelessWidget {
       ];
       return CarpenterCard(
         child: LayoutBuilder(
-          builder: (context, constraints) => constraints.maxWidth < 520
+          builder: (context, constraints) =>
+              constraints.maxWidth < context.units(32.5.rem)
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     CarpenterText.body('Selected: ${controller.length}'),
-                    const SizedBox(height: 8),
+                    SizedBox(height: context.units(.5.rem)),
                     Wrap(
                       alignment: WrapAlignment.end,
-                      spacing: 8,
-                      runSpacing: 8,
+                      spacing: context.units(.5.rem),
+                      runSpacing: context.units(.5.rem),
                       children: all,
                     ),
                   ],
@@ -488,28 +494,31 @@ final class CarpenterDialogCollectionBody extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      if (header != null) ...[header!, const SizedBox(height: 12)],
+      if (header != null) ...[
+        header!,
+        SizedBox(height: context.units(.75.rem)),
+      ],
       if (error != null) ...[
         CarpenterNotice(
           title: 'Error',
           message: error,
           tone: CarpenterNoticeTone.danger,
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: context.units(.5.rem)),
       ],
       if (loading) ...[
         const Align(
           alignment: AlignmentDirectional.centerStart,
           child: CarpenterLoader(),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: context.units(.5.rem)),
       ],
       Expanded(
         child: unavailable
             ? Center(child: CarpenterText.body(unavailableMessage))
             : collection,
       ),
-      if (footer != null) ...[const SizedBox(height: 8), footer!],
+      if (footer != null) ...[SizedBox(height: context.units(.5.rem)), footer!],
     ],
   );
 }
@@ -537,7 +546,7 @@ final class CarpenterSelectableCollection<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListView.separated(
     itemCount: items.length,
-    separatorBuilder: (_, _) => const SizedBox(height: 8),
+    separatorBuilder: (_, _) => SizedBox(height: context.units(.5.rem)),
     itemBuilder: (context, index) {
       final item = items[index];
       return CarpenterCard(
@@ -557,7 +566,7 @@ final class CarpenterSelectableCollection<T> extends StatelessWidget {
                       value == CheckboxValue.checked,
                     ),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: context.units(.625.rem)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -566,13 +575,13 @@ final class CarpenterSelectableCollection<T> extends StatelessWidget {
                     title(item),
                     emphasis: TypographyEmphasis.strong,
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: context.units(.25.rem)),
                   CarpenterText.body(
                     subtitle(item),
                     colorRole: ContentColorRole.secondary,
                   ),
                   if (details != null) ...[
-                    const SizedBox(height: 6),
+                    SizedBox(height: context.units(.375.rem)),
                     details!(item),
                   ],
                 ],

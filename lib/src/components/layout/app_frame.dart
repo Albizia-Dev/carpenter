@@ -96,7 +96,7 @@ final class CarpenterTopPanel extends StatelessWidget {
         child ??
         Row(
           children: [
-            leading ?? const CarpenterAvatar(initials: 'C', size: 32),
+            leading ?? const CarpenterAvatar(initials: 'C', size: Rem(2)),
             SizedBox(width: gap),
             Expanded(
               child: Column(
@@ -122,7 +122,12 @@ final class CarpenterTopPanel extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.surface.subtle,
-        border: Border(bottom: BorderSide(color: theme.overlay.border)),
+        border: Border(
+          bottom: BorderSide(
+            color: theme.overlay.border,
+            width: context.units(theme.shapes.borderWidth),
+          ),
+        ),
       ),
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: gap, vertical: gap * .75),

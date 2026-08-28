@@ -28,8 +28,8 @@ Widget _playground(BuildContext context) {
   );
   return preview(
     SizedBox(
-      width: 520,
-      height: 320,
+      width: context.units(32.5.rem),
+      height: context.units(20.rem),
       child: CarpenterPageStatePresentation(
         kind: kind,
         title: _title(kind),
@@ -53,8 +53,8 @@ Widget _playground(BuildContext context) {
 Widget _matrix(BuildContext context) => previewColumn([
   for (final kind in CarpenterPageStateKind.values)
     SizedBox(
-      width: 520,
-      height: 220,
+      width: context.units(32.5.rem),
+      height: context.units(13.75.rem),
       child: DecoratedBox(
         decoration: BoxDecoration(
           border: Border.all(color: CarpenterTheme.of(context).overlay.border),

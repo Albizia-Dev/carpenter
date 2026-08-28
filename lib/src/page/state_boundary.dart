@@ -6,6 +6,7 @@ import '../components/behaviour/notice.dart';
 import '../foundation/roles.dart';
 import '../foundation/theme.dart';
 import 'state.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 /// Standard rendering of infrastructure-level page states.
 final class CarpenterPageStateBoundary extends StatelessWidget {
@@ -60,7 +61,7 @@ final class CarpenterPageStateBoundary extends StatelessWidget {
               children: [
                 const CarpenterLoader(),
                 if (message != null) ...[
-                  const SizedBox(height: 12),
+                  SizedBox(height: context.units(.75.rem)),
                   Text(message),
                 ],
               ],
@@ -128,7 +129,7 @@ final class _CenteredState extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Center(
     child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 560),
+      constraints: BoxConstraints(maxWidth: context.units(35.rem)),
       child: CarpenterNotice(
         title: title,
         message: message,

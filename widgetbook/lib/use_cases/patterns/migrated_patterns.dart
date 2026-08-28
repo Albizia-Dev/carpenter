@@ -411,7 +411,7 @@ final class _WorkflowPreviewState extends State<_WorkflowPreview> {
   @override
   Widget build(BuildContext context) => SizedBox(
     width: widget.width,
-    height: 620,
+    height: context.units(38.75.rem),
     child: CarpenterWorkflowPage<int, Map<String, Object?>>(
       descriptor: CarpenterPageDescriptor(
         id: const CarpenterPageId('approval.workflow'),
@@ -536,7 +536,7 @@ Widget _explorer(BuildContext context) {
       ),
       inspector: showInspector
           ? SizedBox(
-              width: 240,
+              width: context.units(15.rem),
               child: CarpenterCard(
                 child: CarpenterInspector(
                   value: {

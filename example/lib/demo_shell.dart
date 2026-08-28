@@ -152,7 +152,7 @@ final class _Brand extends StatelessWidget {
     children: [
       const CarpenterAvatar(initials: 'C', size: 32),
       if (expanded) ...[
-        const SizedBox(width: 10),
+        SizedBox(width: context.units(.625.rem)),
         const Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -186,7 +186,7 @@ final class _Account extends StatelessWidget {
     children: [
       const CarpenterAvatar(initials: 'NC', size: 32),
       if (expanded) ...[
-        const SizedBox(width: 10),
+        SizedBox(width: context.units(.625.rem)),
         const Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

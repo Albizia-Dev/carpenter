@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../foundation/roles.dart';
@@ -9,13 +10,13 @@ import '../../foundation/theme.dart';
 final class CarpenterLoader extends StatefulWidget {
   const CarpenterLoader({
     super.key,
-    this.size = 24,
-    this.strokeWidth = 2.5,
+    this.size = const Rem(1.5),
+    this.strokeWidth = const Rem(.15625),
     this.semanticLabel = 'Loading',
   });
 
-  final double size;
-  final double strokeWidth;
+  final LengthUnit size;
+  final LengthUnit strokeWidth;
   final String semanticLabel;
 
   @override
@@ -50,6 +51,8 @@ final class _CarpenterLoaderState extends State<CarpenterLoader>
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
+    final extent = context.units(widget.size);
+    final strokeWidth = context.units(widget.strokeWidth);
     final accent = theme.actions
         .resolve(
           ActionColorRole.primary,
@@ -61,7 +64,7 @@ final class _CarpenterLoaderState extends State<CarpenterLoader>
       label: widget.semanticLabel,
       liveRegion: true,
       child: SizedBox.square(
-        dimension: widget.size,
+        dimension: extent,
         child: AnimatedBuilder(
           animation: _controller,
           builder: (context, _) => Transform.rotate(
@@ -70,7 +73,7 @@ final class _CarpenterLoaderState extends State<CarpenterLoader>
               painter: _LoaderPainter(
                 color: accent,
                 track: theme.surface.subtle,
-                strokeWidth: widget.strokeWidth,
+                strokeWidth: strokeWidth,
               ),
             ),
           ),

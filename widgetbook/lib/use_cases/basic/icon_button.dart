@@ -66,8 +66,8 @@ Widget _colorRoles(BuildContext context) => preview(
 
 Widget _shapeMatrix(BuildContext context) => preview(
   Wrap(
-    spacing: 16,
-    runSpacing: 16,
+    spacing: context.units(1.rem),
+    runSpacing: context.units(1.rem),
     children: [
       for (final start in ShapeRole.values)
         for (final end in ShapeRole.values)
@@ -82,7 +82,7 @@ Widget _shapeMatrix(BuildContext context) => preview(
                 colorRole: ActionColorRole.primary,
                 onPressed: _noop,
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: context.units(.25.rem)),
               CarpenterText.caption('${start.name} → ${end.name}'),
             ],
           ),

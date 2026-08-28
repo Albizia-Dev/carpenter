@@ -194,7 +194,7 @@ final class _LifecyclePreviewState extends State<_LifecyclePreview> {
   @override
   Widget build(BuildContext context) => SizedBox(
     width: widget.width,
-    height: 520,
+    height: context.units(32.5.rem),
     child: ListenableBuilder(
       listenable: _controller,
       builder: (context, _) => Column(
@@ -206,7 +206,7 @@ final class _LifecyclePreviewState extends State<_LifecyclePreview> {
             placeholder: widget.placeholder,
             width: widget.width,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.units(.75.rem)),
           Expanded(
             child: CarpenterDataList<String, String>(
               snapshot: _controller.snapshot,
@@ -224,10 +224,10 @@ final class _LifecyclePreviewState extends State<_LifecyclePreview> {
               ),
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.units(.75.rem)),
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: context.units(.5.rem),
+            runSpacing: context.units(.5.rem),
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               CarpenterButton(
@@ -321,8 +321,8 @@ Widget _listTilePlayground(BuildContext context) {
 }
 
 Widget _listTiles(BuildContext context) => previewColumn([
-  const SizedBox(
-    width: 600,
+  SizedBox(
+    width: context.units(37.5.rem),
     child: CarpenterListTile(
       title: CarpenterText.label('Plain record'),
       subtitle: CarpenterText.body(
@@ -332,7 +332,7 @@ Widget _listTiles(BuildContext context) => previewColumn([
     ),
   ),
   SizedBox(
-    width: 600,
+    width: context.units(37.5.rem),
     child: CarpenterListTile(
       selected: true,
       title: const CarpenterText.label('Selected record'),
@@ -343,15 +343,15 @@ Widget _listTiles(BuildContext context) => previewColumn([
       onInvoke: () {},
     ),
   ),
-  const SizedBox(
-    width: 600,
+  SizedBox(
+    width: context.units(37.5.rem),
     child: CarpenterListTile(
       title: CarpenterText.label('Disabled record'),
       subtitle: CarpenterText.caption('No onInvoke callback'),
     ),
   ),
   SizedBox(
-    width: 360,
+    width: context.units(22.5.rem),
     child: CarpenterListTile(
       leading: const CarpenterAvatar(initials: 'AB', size: 32),
       title: const CarpenterText.label(
@@ -412,33 +412,33 @@ Widget _pagination(BuildContext context) {
 }
 
 Widget _paginationScenarios(BuildContext context) => previewColumn([
-  const _PaginationPreview(
+  _PaginationPreview(
     initialPage: 1,
     totalPages: 3,
     siblingCount: 1,
     leading: 'Small result set',
-    width: 720,
+    width: context.units(45.rem),
   ),
-  const _PaginationPreview(
+  _PaginationPreview(
     initialPage: 18,
     totalPages: 37,
     siblingCount: 1,
     leading: '1–50 of 1,842 records',
-    width: 900,
+    width: context.units(56.25.rem),
   ),
-  const _PaginationPreview(
+  _PaginationPreview(
     initialPage: 243,
     totalPages: 500,
     siblingCount: 2,
     leading: 'Large data set',
-    width: 1100,
+    width: context.units(68.75.rem),
   ),
-  const _PaginationPreview(
+  _PaginationPreview(
     initialPage: 18,
     totalPages: 37,
     siblingCount: 1,
     leading: null,
-    width: 360,
+    width: context.units(22.5.rem),
   ),
 ]);
 

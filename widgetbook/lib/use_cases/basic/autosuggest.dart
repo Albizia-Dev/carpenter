@@ -99,7 +99,7 @@ final class _AutosuggestPreviewState extends State<_AutosuggestPreview> {
         label: widget.label,
         replaceQueryOnSelection: widget.replaceOnSelection,
       ),
-      const SizedBox(height: 16),
+      SizedBox(height: context.units(1.rem)),
       CarpenterText.caption(
         'query="${_controller.text}" · selected=${_selected ?? '—'} · suggestions=${_suggestions.length}',
       ),

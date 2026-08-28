@@ -1,0 +1,93 @@
+name: REM Audit
+
+on:
+  push:
+    branches:
+      - rem-units
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Audit hardcoded dimensions
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+
+          roots = [Path('lib'), Path('widgetbook/lib'), Path('example/lib')]
+          viewport_file = Path('widgetbook/lib/addons/carpenter_addons.dart')
+          generated = Path('lib/src/foundation/tokens/carpenter.mordant.g.dart')
+
+          patterns = {
+              'edge_insets': re.compile(r'EdgeInsets(?:Directional)?\.(?:all|symmetric|only|fromLTRB)\([^\n]*\d'),
+              'sized_box': re.compile(r'SizedBox(?:\.square)?\([^\n]*(?:width|height|dimension)\s*:\s*-?\d'),
+              'geometry_named': re.compile(r'\b(?:width|height|minWidth|maxWidth|minHeight|maxHeight|spacing|runSpacing|gap|radius|fontSize|iconSize|strokeWidth|thickness|indent|endIndent|dimension)\s*:\s*-?\d'),
+              'radius': re.compile(r'(?:Radius|BorderRadius)\.[A-Za-z]+\([^\n]*\d'),
+              'constraints': re.compile(r'(?:BoxConstraints|Size)\([^\n]*\d'),
+              'positioned': re.compile(r'Positioned\([^\n]*(?:left|right|top|bottom|width|height)\s*:\s*-?\d'),
+              'breakpoint': re.compile(r'(?:constraints|size)\.(?:maxWidth|maxHeight|width|height)\s*[<>]=?\s*\d'),
+              'geometry_fields': re.compile(r'\bfinal\s+double\s+(?:size|width|height|minWidth|maxWidth|minHeight|maxHeight|gap|radius|fontSize|iconSize|strokeWidth|thickness|indent|endIndent)\s*;'),
+              'geometry_defaults': re.compile(r'\bthis\.(?:size|width|height|minWidth|maxWidth|minHeight|maxHeight|gap|radius|fontSize|iconSize|strokeWidth|thickness|indent|endIndent)\s*=\s*-?\d'),
+              'canvas_geometry': re.compile(r'(?:drawCircle|deflate|inflate)\([^\n]*,\s*-?\d|\.\.strokeWidth\s*=\s*-?\d'),
+          }
+
+          findings = 0
+          for category, pattern in patterns.items():
+              print(f'\n=== {category} ===')
+              count = 0
+              for root in roots:
+                  if not root.exists():
+                      continue
+                  for path in sorted(root.rglob('*.dart')):
+                      if path == generated:
+                          continue
+                      for line_no, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):
+                          if path == viewport_file and (
+                              'ViewportData(' in line or
+                              'width:' in line or
+                              'height:' in line or
+                              'pixelRatio:' in line or
+                              'rem: const Px(16)' in line
+                          ):
+                              continue
+                          if pattern.search(line) and '.px' not in line and '.rem' not in line and 'context.units' not in line and 'LengthUnit' not in line:
+                              print(f'{path}:{line_no}:{line.strip()}')
+                              count += 1
+              print(f'COUNT {category}: {count}')
+              findings += count
+
+          print('\n=== px tokens ===')
+          px_count = 0
+          token_root = Path('lib/src/foundation/tokens')
+          for path in sorted(token_root.glob('*.yaml')):
+              for line_no, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):
+                  if re.search(r'(?<![\w.])-?\d+(?:\.\d+)?px\b', line):
+                      print(f'{path}:{line_no}:{line.strip()}')
+                      px_count += 1
+          print(f'COUNT px_tokens: {px_count}')
+          findings += px_count
+
+          print('\n=== explicit px in Dart ===')
+          dart_px_count = 0
+          for root in roots:
+              if not root.exists():
+                  continue
+              for path in sorted(root.rglob('*.dart')):
+                  if path == generated:
+                      continue
+                  for line_no, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):
+                      if path == viewport_file and 'rem: const Px(16)' in line:
+                          continue
+                      if re.search(r'\b(?:Px\s*\(|\d+(?:\.\d+)?\.px\b)', line):
+                          print(f'{path}:{line_no}:{line.strip()}')
+                          dart_px_count += 1
+          print(f'COUNT dart_px: {dart_px_count}')
+          findings += dart_px_count
+
+          print(f'\nTOTAL FINDINGS: {findings}')
+          PY

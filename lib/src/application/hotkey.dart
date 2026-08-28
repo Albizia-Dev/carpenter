@@ -7,6 +7,7 @@ import '../components/basic/status_indicator.dart';
 import '../components/basic/text.dart';
 import '../foundation/roles.dart';
 import 'command.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 extension CarpenterCommandPlatformShortcuts on CarpenterCommand<dynamic> {
   List<ShortcutActivator> shortcutsFor(TargetPlatform platform) {
@@ -321,10 +322,10 @@ final class CarpenterHotkeyDisplay extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CarpenterText.title(title),
-          const SizedBox(height: 8),
+          SizedBox(height: context.units(.5.rem)),
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: context.units(.5.rem),
+            runSpacing: context.units(.5.rem),
             children: [
               CarpenterStatusIndicator(
                 label: pressed,
@@ -338,10 +339,10 @@ final class CarpenterHotkeyDisplay extends StatelessWidget {
             ],
           ),
           if (showCommands && commands.isNotEmpty) ...[
-            const SizedBox(height: 12),
+            SizedBox(height: context.units(.75.rem)),
             for (final command in commands)
               Padding(
-                padding: const EdgeInsets.only(bottom: 6),
+                padding: EdgeInsets.only(bottom: context.units(.375.rem)),
                 child: CarpenterText.body(
                   '${command.title}  ${command.shortcutsFor(formatter.platform).map(formatter.formatActivator).join(' / ')}',
                 ),
