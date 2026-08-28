@@ -1,0 +1,44 @@
+name: REM Audit
+
+on:
+  push:
+    branches:
+      - rem-units
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Audit hardcoded dimensions
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+
+          roots = [Path('lib'), Path('widgetbook/lib'), Path('example/lib')]
+          patterns = {
+              'edge_insets': re.compile(r'EdgeInsets(?:Directional)?\.(?:all|symmetric|only|fromLTRB)\([^\n]*\d'),
+              'sized_box': re.compile(r'SizedBox\([^\n]*(?:width|height)\s*:\s*-?\d'),
+              'geometry': re.compile(r'\b(?:width|height|minWidth|maxWidth|minHeight|maxHeight|spacing|runSpacing|gap|radius|fontSize|iconSize|strokeWidth|thickness|indent|endIndent)\s*:\s*-?\d'),
+              'radius': re.compile(r'(?:Radius|BorderRadius)\.[A-Za-z]+\([^\n]*\d'),
+              'constraints': re.compile(r'(?:BoxConstraints|Size)\([^\n]*\d'),
+              'positioned': re.compile(r'Positioned\([^\n]*(?:left|right|top|bottom|width|height)\s*:\s*-?\d'),
+          }
+
+          for category, pattern in patterns.items():
+              print(f'\n=== {category} ===')
+              count = 0
+              for root in roots:
+                  if not root.exists():
+                      continue
+                  for path in sorted(root.rglob('*.dart')):
+                      for line_no, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):
+                          if pattern.search(line) and '.px' not in line and '.rem' not in line and 'context.units' not in line:
+                              print(f'{path}:{line_no}:{line.strip()}')
+                              count += 1
+              print(f'COUNT {category}: {count}')
+          PY
