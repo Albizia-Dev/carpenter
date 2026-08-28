@@ -57,6 +57,8 @@ final List<WidgetbookAddon> carpenterAddons = [
   ),
   ViewportAddon(_carpenterViewports),
   ZoomAddon(),
+  // Widgetbook 3.25 exposes animation timing as experimental.
+  // ignore: experimental_member_use
   TimeDilationAddon(),
   BuilderAddon(
     name: 'Carpenter preview',
