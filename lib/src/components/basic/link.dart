@@ -50,49 +50,46 @@ final class CarpenterLink extends StatelessWidget {
         final radius = BorderRadius.circular(
           context.units(theme.shapes.radius(ShapeRole.rounded)),
         );
+        final focusPadding = context.units(const Px(3));
+        final content = Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                size: context.units(theme.sizes.actionIcon(ControlSize.small)),
+                color: style.icon,
+              ),
+              SizedBox(
+                width: context.units(
+                  theme.spacing.actionGap(ControlSize.small),
+                ),
+              ),
+            ],
+            Flexible(
+              child: Text(
+                label,
+                style: theme.typography
+                    .resolve(
+                      context,
+                      TypographyRole.body,
+                      TypographyEmphasis.medium,
+                    )
+                    .copyWith(
+                      color: style.foreground,
+                      decoration: TextDecoration.underline,
+                      decorationColor: style.foreground,
+                    ),
+              ),
+            ),
+          ],
+        );
         return FocusRing(
           visible: states.contains(WidgetState.focused) && showFocusHighlight,
           borderRadius: radius,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: style.background,
-              borderRadius: radius,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (icon != null) ...[
-                  Icon(
-                    icon,
-                    size: context.units(
-                      theme.sizes.actionIcon(ControlSize.small),
-                    ),
-                    color: style.icon,
-                  ),
-                  SizedBox(
-                    width: context.units(
-                      theme.spacing.actionGap(ControlSize.small),
-                    ),
-                  ),
-                ],
-                Flexible(
-                  child: Text(
-                    label,
-                    style: theme.typography
-                        .resolve(
-                          context,
-                          TypographyRole.body,
-                          TypographyEmphasis.medium,
-                        )
-                        .copyWith(
-                          color: style.foreground,
-                          decoration: TextDecoration.underline,
-                          decorationColor: style.foreground,
-                        ),
-                  ),
-                ),
-              ],
-            ),
+          child: Padding(
+            padding: EdgeInsets.all(focusPadding),
+            child: content,
           ),
         );
       },
