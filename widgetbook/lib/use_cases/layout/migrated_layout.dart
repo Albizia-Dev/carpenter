@@ -234,9 +234,8 @@ final class _TabsLayoutPreviewState extends State<_TabsLayoutPreview> {
             value: 'audit',
             label: 'Audit',
             visible: widget.auditVisible,
-            builder: (_) => const CarpenterCard(
-              child: CarpenterText.body('Audit trail'),
-            ),
+            builder: (_) =>
+                const CarpenterCard(child: CarpenterText.body('Audit trail')),
           ),
         ],
       ),
@@ -282,7 +281,14 @@ Widget _splitLayout(BuildContext context) {
   );
 
   return _SplitPreview(
-    key: ValueKey((ratio, breakpoint, width, resizable, showInspector, narrowRegion)),
+    key: ValueKey((
+      ratio,
+      breakpoint,
+      width,
+      resizable,
+      showInspector,
+      narrowRegion,
+    )),
     ratio: ratio,
     breakpoint: breakpoint,
     width: width,

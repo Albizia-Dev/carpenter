@@ -58,10 +58,7 @@ Widget _record(BuildContext context) {
     label: 'Data · Amount',
     initialValue: '125,000.40 ₽',
   );
-  final owner = context.knobs.string(
-    label: 'Data · Owner',
-    initialValue: 'NC',
-  );
+  final owner = context.knobs.string(label: 'Data · Owner', initialValue: 'NC');
   final showPrimaryAction = context.knobs.boolean(
     label: 'Actions · Primary',
     initialValue: true,
@@ -263,7 +260,9 @@ final class _DemoEditorFieldsState extends State<_DemoEditorFields> {
   late final TextEditingController _name = TextEditingController(
     text: widget.name,
   );
-  late final TextEditingController _inn = TextEditingController(text: widget.inn);
+  late final TextEditingController _inn = TextEditingController(
+    text: widget.inn,
+  );
 
   @override
   void didUpdateWidget(_DemoEditorFields oldWidget) {

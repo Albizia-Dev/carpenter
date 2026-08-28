@@ -48,7 +48,9 @@ final hotkeyComponent = WidgetbookComponent(
 
 final surfaceHostComponent = WidgetbookComponent(
   name: 'Surface Host',
-  useCases: [WidgetbookUseCase(name: 'Playground', builder: _surfacePlayground)],
+  useCases: [
+    WidgetbookUseCase(name: 'Playground', builder: _surfacePlayground),
+  ],
 );
 
 Widget _control(BuildContext context) {
@@ -323,7 +325,9 @@ final class _CommandPreviewState extends State<_CommandPreview> {
       id: 'widgetbook.command',
       title: widget.title,
       presentation: widget.presentation,
-      shortcuts: const [SingleActivator(LogicalKeyboardKey.keyS, control: true)],
+      shortcuts: const [
+        SingleActivator(LogicalKeyboardKey.keyS, control: true),
+      ],
       execute: (_) async {
         await Future<void>.delayed(widget.delay);
         if (widget.fail) throw StateError('Simulated command failure');

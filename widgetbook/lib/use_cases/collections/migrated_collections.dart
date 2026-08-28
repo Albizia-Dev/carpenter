@@ -7,11 +7,14 @@ import 'package:widgetbook/widgetbook.dart';
 import '../../helpers/preview.dart';
 
 enum _CollectionFailureMode { none, initial, query, refresh, loadMore }
+
 enum _InspectorSample { nested, compact, empty, list }
 
 final collectionLifecycleComponent = WidgetbookComponent(
   name: 'Collection Lifecycle',
-  useCases: [WidgetbookUseCase(name: 'Playground', builder: _lifecyclePlayground)],
+  useCases: [
+    WidgetbookUseCase(name: 'Playground', builder: _lifecyclePlayground),
+  ],
 );
 
 final listTileComponent = WidgetbookComponent(
@@ -162,14 +165,15 @@ final class _LifecyclePreviewState extends State<_LifecyclePreview> {
         },
       );
 
-  bool _shouldFail(CollectionRequestReason reason) => switch (
-    widget.failureMode
-  ) {
+  bool _shouldFail(
+    CollectionRequestReason reason,
+  ) => switch (widget.failureMode) {
     _CollectionFailureMode.none => false,
     _CollectionFailureMode.initial => reason == CollectionRequestReason.initial,
     _CollectionFailureMode.query => reason == CollectionRequestReason.query,
     _CollectionFailureMode.refresh => reason == CollectionRequestReason.refresh,
-    _CollectionFailureMode.loadMore => reason == CollectionRequestReason.loadMore,
+    _CollectionFailureMode.loadMore =>
+      reason == CollectionRequestReason.loadMore,
   };
 
   @override
@@ -301,7 +305,9 @@ Widget _listTilePlayground(BuildContext context) {
         trailing: showTrailing
             ? CarpenterTag(
                 label: selected ? 'Selected' : 'Pending',
-                tone: selected ? CarpenterTagTone.info : CarpenterTagTone.neutral,
+                tone: selected
+                    ? CarpenterTagTone.info
+                    : CarpenterTagTone.neutral,
               )
             : null,
         selected: selected,
@@ -357,20 +363,24 @@ Widget _listTiles(BuildContext context) => previewColumn([
 ]);
 
 Widget _pagination(BuildContext context) {
-  final totalPages = context.knobs.double.slider(
-    label: 'Data · Total pages',
-    initialValue: 17,
-    min: 1,
-    max: 100,
-    divisions: 99,
-  ).round();
-  final initialPage = context.knobs.double.slider(
-    label: 'Data · Initial page',
-    initialValue: 4,
-    min: 1,
-    max: 100,
-    divisions: 99,
-  ).round();
+  final totalPages = context.knobs.double
+      .slider(
+        label: 'Data · Total pages',
+        initialValue: 17,
+        min: 1,
+        max: 100,
+        divisions: 99,
+      )
+      .round();
+  final initialPage = context.knobs.double
+      .slider(
+        label: 'Data · Initial page',
+        initialValue: 4,
+        min: 1,
+        max: 100,
+        divisions: 99,
+      )
+      .round();
   final leading = context.knobs.stringOrNull(
     label: 'Content · Leading text',
     initialValue: '132 records',
@@ -481,11 +491,7 @@ Widget _inspector(BuildContext context) {
         {'type': 'contract', 'id': 'CTR-22'},
       ],
     },
-    _InspectorSample.compact => {
-      'id': 'CTR-22',
-      'owner': 'NC',
-      'active': true,
-    },
+    _InspectorSample.compact => {'id': 'CTR-22', 'owner': 'NC', 'active': true},
     _InspectorSample.empty => const <String, Object?>{},
     _InspectorSample.list => const [
       {'name': 'INV-440', 'status': 'pending'},
