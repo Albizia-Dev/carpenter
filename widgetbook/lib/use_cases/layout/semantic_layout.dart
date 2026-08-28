@@ -45,7 +45,7 @@ final masterDetailComponent = WidgetbookComponent(
 
 Widget _workspaceCase(BuildContext context) => layoutViewportPreview(
   context,
-  offHeight: const Px(840),
+  offHeight: const Rem(52.5),
   child: buildInvoiceWorkspaceDemo(),
 );
 

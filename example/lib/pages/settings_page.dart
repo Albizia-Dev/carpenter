@@ -1,7 +1,6 @@
 import 'package:carpenter/carpenter.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 final class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key, required this.toaster});

@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/preview.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 final appFrameComponent = WidgetbookComponent(
   name: 'App Frame',
@@ -348,7 +347,7 @@ final class _SplitPreviewState extends State<_SplitPreview> {
           child: CarpenterText.body('Primary work area'),
         ),
         inspector: widget.showInspector
-            ? const SizedBox(
+            ? SizedBox(
                 width: context.units(13.75.rem),
                 child: CarpenterCard(
                   child: CarpenterInspector(

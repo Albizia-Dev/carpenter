@@ -78,7 +78,7 @@ final class _CarpenterSurfaceHostState extends State<CarpenterSurfaceHost>
         final narrow = constraints.maxWidth < widget.sidePanelBreakpoint;
         final fullPage =
             narrow || request.kind == CarpenterSurfaceKind.fullPage;
-        final minWidth = constraints.maxWidth < 320
+        final minWidth = constraints.maxWidth < context.units(20.rem)
             ? constraints.maxWidth
             : 320.0;
         final width = request.kind == CarpenterSurfaceKind.inline

@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 
 import '../demo_data.dart';
 import '../demo_routes.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 enum _ProjectTab { details, timeline }
 

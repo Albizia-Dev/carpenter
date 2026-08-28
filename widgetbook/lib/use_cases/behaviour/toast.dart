@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/labels.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 final toastComponent = WidgetbookComponent(
   name: 'Toast',

@@ -1,6 +1,6 @@
 focus:
-  width: 2px
-  gap: 2px
+  width: .125rem
+  gap: .125rem
 
 motion:
   reduced: 0ms

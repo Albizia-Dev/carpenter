@@ -6,7 +6,6 @@ import 'package:widgetbook/widgetbook.dart';
 import '../../helpers/curated_icons.dart';
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 final iconButtonComponent = WidgetbookComponent(
   name: 'Icon Button',

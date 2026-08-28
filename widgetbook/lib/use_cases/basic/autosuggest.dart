@@ -4,7 +4,6 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 final autosuggestComponent = WidgetbookComponent(
   name: 'Autosuggest',

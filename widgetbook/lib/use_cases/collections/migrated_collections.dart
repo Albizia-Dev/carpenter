@@ -5,7 +5,6 @@ import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/preview.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 enum _CollectionFailureMode { none, initial, query, refresh, loadMore }
 
@@ -322,7 +321,7 @@ Widget _listTilePlayground(BuildContext context) {
 }
 
 Widget _listTiles(BuildContext context) => previewColumn([
-  const SizedBox(
+  SizedBox(
     width: context.units(37.5.rem),
     child: CarpenterListTile(
       title: CarpenterText.label('Plain record'),
@@ -344,7 +343,7 @@ Widget _listTiles(BuildContext context) => previewColumn([
       onInvoke: () {},
     ),
   ),
-  const SizedBox(
+  SizedBox(
     width: context.units(37.5.rem),
     child: CarpenterListTile(
       title: CarpenterText.label('Disabled record'),
@@ -413,28 +412,28 @@ Widget _pagination(BuildContext context) {
 }
 
 Widget _paginationScenarios(BuildContext context) => previewColumn([
-  const _PaginationPreview(
+  _PaginationPreview(
     initialPage: 1,
     totalPages: 3,
     siblingCount: 1,
     leading: 'Small result set',
     width: context.units(45.rem),
   ),
-  const _PaginationPreview(
+  _PaginationPreview(
     initialPage: 18,
     totalPages: 37,
     siblingCount: 1,
     leading: '1–50 of 1,842 records',
     width: context.units(56.25.rem),
   ),
-  const _PaginationPreview(
+  _PaginationPreview(
     initialPage: 243,
     totalPages: 500,
     siblingCount: 2,
     leading: 'Large data set',
     width: context.units(68.75.rem),
   ),
-  const _PaginationPreview(
+  _PaginationPreview(
     initialPage: 18,
     totalPages: 37,
     siblingCount: 1,

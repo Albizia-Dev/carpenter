@@ -130,7 +130,7 @@ final class _InspectorField extends StatelessWidget {
             emphasis: TypographyEmphasis.strong,
             colorRole: ContentColorRole.secondary,
           );
-          if (constraints.maxWidth < 420)
+          if (constraints.maxWidth < context.units(26.25.rem))
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

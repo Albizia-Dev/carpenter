@@ -82,7 +82,7 @@ final class _CheckboxIndicator extends StatelessWidget {
       ControlSize.small => context.units(theme.shapes.checkboxRadius(sizeRole)),
       ControlSize.medium ||
       ControlSize.large ||
-      ControlSize.xlarge => context.units(const Px(2)),
+      ControlSize.xlarge => context.units(const Rem(.125)),
     };
     return AnimatedContainer(
       duration: theme.motion.transitionDuration(context),

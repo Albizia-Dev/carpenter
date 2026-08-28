@@ -4,7 +4,6 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 final popoverComponent = WidgetbookComponent(
   name: 'Popover',
@@ -132,7 +131,7 @@ final class _NestedPopoverPreviewState extends State<_NestedPopoverPreview> {
         placement: OverlayPlacement.left,
         semanticLabel: 'Вложенный popover',
         anchor: const CarpenterText.label('Открыть вложенный'),
-        content: const SizedBox(
+        content: SizedBox(
           width: context.units(11.25.rem),
           child: CarpenterText.body('Escape закрывает верхний overlay.'),
         ),

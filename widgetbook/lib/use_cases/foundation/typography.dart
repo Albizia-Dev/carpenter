@@ -4,7 +4,6 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 final foundationTypographyComponent = WidgetbookComponent(
   name: 'Typography',
@@ -45,25 +44,25 @@ Widget _scale(BuildContext context) => preview(
 );
 
 Widget _contentStress(BuildContext context) => previewColumn([
-  const SizedBox(
+  SizedBox(
     width: context.units(17.5.rem),
     child: CarpenterText.body(
       'Длинный русский текст для проверки переноса, плотности и поведения типографики в узком рабочем интерфейсе.',
     ),
   ),
-  const SizedBox(
+  SizedBox(
     width: context.units(17.5.rem),
     child: CarpenterText.body(
       'A deliberately long English sentence used to expose wrapping and density differences between scripts.',
     ),
   ),
-  const SizedBox(
+  SizedBox(
     width: context.units(11.25.rem),
     child: CarpenterText.body(
       'оченьдлинноесловобезпробеловкотороенедолжноломатькомпоновку',
     ),
   ),
-  const Directionality(
+  Directionality(
     textDirection: TextDirection.rtl,
     child: SizedBox(
       width: context.units(17.5.rem),

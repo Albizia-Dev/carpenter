@@ -1,7 +1,6 @@
 import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 enum _EditorScenario {
   ready,

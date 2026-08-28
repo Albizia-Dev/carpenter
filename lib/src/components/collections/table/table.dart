@@ -568,7 +568,10 @@ final class _HeaderCell<T> extends StatelessWidget {
                 currentWidth: width,
                 minimumWidth: minimumWidth,
                 maximumWidth: maximumWidth,
-                onChanged: (value) => onWidthChanged!(column.id, Px(value)),
+                onChanged: (value) => onWidthChanged!(
+                  column.id,
+                  Rem(value / context.units(1.rem)),
+                ),
               ),
             ),
         ],

@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/preview.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 final filterBarComponent = WidgetbookComponent(
   name: 'Filter Bar',
@@ -55,7 +54,7 @@ Widget _playground(BuildContext context) {
 }
 
 Widget _alignmentStress(BuildContext context) => preview(
-  const SizedBox(
+  SizedBox(
     width: context.units(57.5.rem),
     child: _FilterBarPreview(
       activeFilters: 2,
@@ -67,7 +66,7 @@ Widget _alignmentStress(BuildContext context) => preview(
 );
 
 Widget _responsiveStates(BuildContext context) => previewColumn([
-  const SizedBox(
+  SizedBox(
     width: context.units(20.rem),
     child: _FilterBarPreview(
       activeFilters: 3,
@@ -76,7 +75,7 @@ Widget _responsiveStates(BuildContext context) => previewColumn([
       labeledSearch: true,
     ),
   ),
-  const SizedBox(
+  SizedBox(
     width: context.units(45.rem),
     child: _FilterBarPreview(
       activeFilters: 1,
@@ -85,7 +84,7 @@ Widget _responsiveStates(BuildContext context) => previewColumn([
       labeledSearch: true,
     ),
   ),
-  const SizedBox(
+  SizedBox(
     width: context.units(67.5.rem),
     child: _FilterBarPreview(
       activeFilters: 0,

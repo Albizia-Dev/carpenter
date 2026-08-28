@@ -6,7 +6,6 @@ import 'package:widgetbook/widgetbook.dart';
 import '../../helpers/curated_icons.dart';
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 final buttonComponent = WidgetbookComponent(
   name: 'Button',
@@ -214,7 +213,7 @@ Widget _states(BuildContext context) => previewColumn([
 ]);
 
 Widget _edgeCases(BuildContext context) => previewColumn([
-  const SizedBox(
+  SizedBox(
     width: context.units(35.rem),
     child: CarpenterButton(label: 'Tight wide parent', onPressed: _noop),
   ),

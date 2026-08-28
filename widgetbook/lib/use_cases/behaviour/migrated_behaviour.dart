@@ -6,7 +6,6 @@ import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/preview.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 enum _SurfaceKind { inline, sidePanel }
 
@@ -244,7 +243,7 @@ Widget _expander(BuildContext context) {
 }
 
 Widget _expanderStates(BuildContext context) => previewColumn([
-  const SizedBox(
+  SizedBox(
     width: context.units(38.75.rem),
     child: CarpenterExpander(
       initiallyExpanded: false,
@@ -252,7 +251,7 @@ Widget _expanderStates(BuildContext context) => previewColumn([
       content: CarpenterText.body('Hidden until the section is opened.'),
     ),
   ),
-  const SizedBox(
+  SizedBox(
     width: context.units(38.75.rem),
     child: CarpenterExpander(
       initiallyExpanded: true,

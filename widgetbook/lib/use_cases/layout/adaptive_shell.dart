@@ -5,7 +5,6 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/layout_viewport.dart';
 import '../../helpers/preview.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 final sidebarComponent = WidgetbookComponent(
   name: 'Sidebar',
@@ -60,7 +59,7 @@ Widget _sidebarMatrix(BuildContext context) => preview(
     height: context.units(38.75.rem),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: const [
+      children: [
         _SidebarPreview(expanded: true),
         SizedBox(width: context.units(1.5.rem)),
         _SidebarPreview(expanded: false),
@@ -116,21 +115,24 @@ Widget _headerPlayground(BuildContext context) {
 
 Widget _rootPlayground(BuildContext context) => layoutViewportPreview(
   context,
-  offHeight: const Px(720),
+  offHeight: const Rem(45),
   child: const _RootPreview(),
 );
 
 Widget _desktopRoot(BuildContext context) => layoutViewportFrame(
+  context,
   preset: LayoutViewportPreset.desktopSmall,
   child: const _RootPreview(),
 );
 
 Widget _tabletRoot(BuildContext context) => layoutViewportFrame(
+  context,
   preset: LayoutViewportPreset.tabletPortrait,
   child: const _RootPreview(initialOpen: true),
 );
 
 Widget _mobileRoot(BuildContext context) => layoutViewportFrame(
+  context,
   preset: LayoutViewportPreset.mobilePortrait,
   child: const _RootPreview(initialOpen: true),
 );

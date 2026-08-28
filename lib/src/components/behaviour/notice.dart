@@ -78,7 +78,7 @@ final class CarpenterNotice extends StatelessWidget {
                   ),
               ];
               if (actions.isEmpty) return details;
-              if (constraints.maxWidth < 520) {
+              if (constraints.maxWidth < context.units(32.5.rem)) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [

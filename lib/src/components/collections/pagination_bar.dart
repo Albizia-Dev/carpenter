@@ -93,7 +93,7 @@ final class CarpenterPaginationBar extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth < 480) {
+        if (constraints.maxWidth < context.units(30.rem)) {
           return Row(
             children: [
               previous,

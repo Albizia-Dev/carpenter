@@ -4,7 +4,6 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 final textComponent = WidgetbookComponent(
   name: 'Text',
@@ -91,7 +90,7 @@ Widget _playground(BuildContext context) {
 
 Widget _edgeCases(BuildContext context) => previewColumn([
   SizedBox(width: context.units(13.75.rem), child: CarpenterText.body('')),
-  const SizedBox(
+  SizedBox(
     width: context.units(13.75.rem),
     child: CarpenterText.body(
       'Счёт на оплату по долгосрочному договору технического обслуживания',
@@ -99,7 +98,7 @@ Widget _edgeCases(BuildContext context) => previewColumn([
       overflow: TextOverflow.ellipsis,
     ),
   ),
-  const SizedBox(
+  SizedBox(
     width: context.units(10.rem),
     child: CarpenterText.body(
       'оченьдлинноесловобезпробеловдляпроверкипереноса',

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 
 import 'demo_commands.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 final class DemoShell extends StatefulWidget {
   const DemoShell({

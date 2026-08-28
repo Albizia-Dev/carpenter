@@ -4,7 +4,6 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 enum _AvatarContent { initials, icon, image }
 
@@ -87,7 +86,7 @@ Widget _avatarPlayground(BuildContext context) {
 }
 
 Widget _avatarMatrix(BuildContext context) => preview(
-  const Wrap(
+  Wrap(
     spacing: context.units(.75.rem),
     runSpacing: context.units(.75.rem),
     crossAxisAlignment: WrapCrossAlignment.center,
@@ -98,7 +97,7 @@ Widget _avatarMatrix(BuildContext context) => preview(
       CarpenterAvatar(initials: 'ERP', size: 64),
       CarpenterAvatar(initials: 'XL', size: 96),
       CarpenterAvatar(
-        size: 48,
+        size: const Rem(3),
         semanticLabel: 'Account',
         child: Icon(CarpenterIcons.account),
       ),
@@ -115,17 +114,17 @@ Widget _activityPlayground(BuildContext context) {
     divisions: 100,
   );
   final width = context.knobs.double.slider(
-    label: 'Progress · Width',
-    initialValue: 320,
-    min: 80,
-    max: 720,
+    label: 'Progress · Width (rem)',
+    initialValue: 20,
+    min: 5,
+    max: 45,
     divisions: 32,
   );
   final height = context.knobs.double.slider(
-    label: 'Progress · Height',
-    initialValue: 4,
-    min: 2,
-    max: 16,
+    label: 'Progress · Height (rem)',
+    initialValue: .25,
+    min: .125,
+    max: 1,
     divisions: 14,
   );
   final showLoader = context.knobs.boolean(
@@ -133,17 +132,17 @@ Widget _activityPlayground(BuildContext context) {
     initialValue: true,
   );
   final loaderSize = context.knobs.double.slider(
-    label: 'Loader · Size',
-    initialValue: 24,
-    min: 12,
-    max: 64,
+    label: 'Loader · Size (rem)',
+    initialValue: 1.5,
+    min: .75,
+    max: 4,
     divisions: 26,
   );
   final strokeWidth = context.knobs.double.slider(
-    label: 'Loader · Stroke',
-    initialValue: 2.5,
-    min: 1,
-    max: 8,
+    label: 'Loader · Stroke (rem)',
+    initialValue: .15625,
+    min: .0625,
+    max: .5,
     divisions: 14,
   );
   final semanticLabel = context.knobs.string(
@@ -152,12 +151,13 @@ Widget _activityPlayground(BuildContext context) {
   );
 
   return previewColumn([
-    if (showLoader) CarpenterLoader(size: loaderSize, strokeWidth: strokeWidth),
+    if (showLoader)
+      CarpenterLoader(size: loaderSize.rem, strokeWidth: strokeWidth.rem),
     SizedBox(
-      width: width,
+      width: context.units(width.rem),
       child: CarpenterProgress(
         value: value,
-        height: height,
+        height: height.rem,
         semanticLabel: semanticLabel,
       ),
     ),
@@ -166,29 +166,29 @@ Widget _activityPlayground(BuildContext context) {
 }
 
 Widget _activitySizes(BuildContext context) => previewColumn([
-  const Wrap(
+  Wrap(
     spacing: context.units(1.rem),
     runSpacing: context.units(1.rem),
     crossAxisAlignment: WrapCrossAlignment.center,
     children: [
-      CarpenterLoader(size: 12, strokeWidth: 1.5),
-      CarpenterLoader(size: 16, strokeWidth: 2),
-      CarpenterLoader(size: 24, strokeWidth: 2.5),
-      CarpenterLoader(size: 32, strokeWidth: 3),
-      CarpenterLoader(size: 48, strokeWidth: 4),
+      CarpenterLoader(size: const Rem(.75), strokeWidth: const Rem(.09375)),
+      CarpenterLoader(size: const Rem(1), strokeWidth: const Rem(.125)),
+      CarpenterLoader(size: const Rem(1.5), strokeWidth: const Rem(.15625)),
+      CarpenterLoader(size: const Rem(2), strokeWidth: const Rem(.1875)),
+      CarpenterLoader(size: const Rem(3), strokeWidth: const Rem(.25)),
     ],
   ),
   SizedBox(
     width: context.units(7.5.rem),
-    child: CarpenterProgress(value: .18, height: context.units(.125.rem)),
+    child: CarpenterProgress(value: .18, height: const Rem(.125)),
   ),
   SizedBox(
     width: context.units(15.rem),
-    child: CarpenterProgress(value: .50, height: context.units(.25.rem)),
+    child: CarpenterProgress(value: .50, height: const Rem(.25)),
   ),
   SizedBox(
     width: context.units(30.rem),
-    child: CarpenterProgress(value: .82, height: context.units(.5.rem)),
+    child: CarpenterProgress(value: .82, height: const Rem(.5)),
   ),
 ]);
 
@@ -202,25 +202,25 @@ Widget _colorPicker(BuildContext context) {
     initialValue: true,
   );
   final paletteHeight = context.knobs.double.slider(
-    label: 'Appearance · Palette height',
-    initialValue: 160,
-    min: 80,
-    max: 320,
+    label: 'Appearance · Palette height (rem)',
+    initialValue: 10,
+    min: 5,
+    max: 20,
     divisions: 24,
   );
   final width = context.knobs.double.slider(
-    label: 'Appearance · Width',
-    initialValue: 620,
-    min: 280,
-    max: 900,
+    label: 'Appearance · Width (rem)',
+    initialValue: 38.75,
+    min: 17.5,
+    max: 56.25,
     divisions: 31,
   );
 
   return _ColorPickerPreview(
     initialValue: initialValue,
     enabled: enabled,
-    paletteHeight: paletteHeight,
-    width: width,
+    paletteHeight: paletteHeight.rem,
+    width: width.rem,
   );
 }
 
@@ -234,8 +234,8 @@ final class _ColorPickerPreview extends StatefulWidget {
 
   final Color initialValue;
   final bool enabled;
-  final double paletteHeight;
-  final double width;
+  final LengthUnit paletteHeight;
+  final LengthUnit width;
 
   @override
   State<_ColorPickerPreview> createState() => _ColorPickerPreviewState();
@@ -255,7 +255,7 @@ final class _ColorPickerPreviewState extends State<_ColorPickerPreview> {
   @override
   Widget build(BuildContext context) => preview(
     SizedBox(
-      width: widget.width,
+      width: context.units(widget.width),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

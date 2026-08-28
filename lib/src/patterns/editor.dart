@@ -199,7 +199,9 @@ final class CarpenterFieldGroup extends StatelessWidget {
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
       final gap = context.units(CarpenterTheme.of(context).spacing.medium);
-      final effective = constraints.maxWidth < 640 ? 1 : columns;
+      final effective = constraints.maxWidth < context.units(40.rem)
+          ? 1
+          : columns;
       final width = (constraints.maxWidth - (effective - 1) * gap) / effective;
       return Wrap(
         spacing: gap,

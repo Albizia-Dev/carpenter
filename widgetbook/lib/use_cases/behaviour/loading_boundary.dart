@@ -5,7 +5,6 @@ import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/preview.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 enum _LoadingPresentation {
   headerProgress,
@@ -130,7 +129,7 @@ final class _PresentationFrame extends StatelessWidget {
         children: [
           header,
           if (state.isLoading)
-            const CarpenterProgress(
+            CarpenterProgress(
               value: .6,
               height: context.units(.1875.rem),
               semanticLabel: 'Page loading',
@@ -160,7 +159,7 @@ final class _PresentationFrame extends StatelessWidget {
           header,
           Expanded(
             child: state.isLoading
-                ? const Padding(
+                ? Padding(
                     padding: EdgeInsets.all(
                       context.units(context.units(.078125.rem).rem),
                     ),
@@ -326,7 +325,7 @@ final class _NestedBoundaryDemo extends StatelessWidget {
           ),
         ),
         if (outerState.isLoading)
-          const CarpenterProgress(value: .6, height: context.units(.1875.rem)),
+          CarpenterProgress(value: .6, height: context.units(.1875.rem)),
         Expanded(
           child: Padding(
             padding: EdgeInsets.all(

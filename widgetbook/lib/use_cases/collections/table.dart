@@ -5,7 +5,6 @@ import 'package:widgetbook/widgetbook.dart';
 import '../../helpers/collection_fixtures.dart';
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 final tableComponent = WidgetbookComponent(
   name: 'Table',
@@ -65,7 +64,7 @@ Widget _playground(BuildContext context) {
 }
 
 Widget _edgeCases(BuildContext context) => preview(
-  const SizedBox(
+  SizedBox(
     width: context.units(20.rem),
     child: _TablePreview(
       rowCount: 20,

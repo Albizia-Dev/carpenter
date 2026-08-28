@@ -85,7 +85,7 @@ final class _CarpenterPageSectionState extends State<CarpenterPageSection> {
                 ],
               );
               if (actions.isEmpty) return heading;
-              return constraints.maxWidth < 520
+              return constraints.maxWidth < context.units(32.5.rem)
                   ? Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -120,14 +120,15 @@ final class CarpenterActionBar extends StatelessWidget {
     super.key,
     this.primary = const [],
     this.secondary = const [],
-    this.compactBreakpoint = 640,
+    this.compactBreakpoint = const Rem(40),
   });
   final List<Widget> primary;
   final List<Widget> secondary;
-  final double compactBreakpoint;
+  final LengthUnit compactBreakpoint;
   @override
   Widget build(BuildContext context) {
     final gap = context.units(CarpenterTheme.of(context).spacing.small);
+    final compactBreakpoint = context.units(this.compactBreakpoint);
     return LayoutBuilder(
       builder: (context, constraints) => Wrap(
         alignment: constraints.maxWidth < compactBreakpoint
@@ -145,19 +146,22 @@ final class CarpenterFilterControl extends StatelessWidget {
   const CarpenterFilterControl({
     super.key,
     required this.child,
-    this.width = 180,
+    this.width = const Rem(11.25),
   });
   final Widget child;
-  final double width;
+  final LengthUnit width;
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) => SizedBox(
-      width: constraints.maxWidth.isFinite
-          ? width.clamp(0, constraints.maxWidth).toDouble()
-          : width,
-      child: child,
-    ),
-  );
+  Widget build(BuildContext context) {
+    final width = context.units(this.width);
+    return LayoutBuilder(
+      builder: (context, constraints) => SizedBox(
+        width: constraints.maxWidth.isFinite
+            ? width.clamp(0, constraints.maxWidth).toDouble()
+            : width,
+        child: child,
+      ),
+    );
+  }
 }
 
 final class CarpenterCollectionGroupHeader extends StatelessWidget {
@@ -198,7 +202,8 @@ final class CarpenterCollectionGroupHeader extends StatelessWidget {
     );
     if (action == null) return details;
     return LayoutBuilder(
-      builder: (context, constraints) => constraints.maxWidth < 520
+      builder: (context, constraints) =>
+          constraints.maxWidth < context.units(32.5.rem)
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -286,8 +291,8 @@ final class CarpenterInteractionOverlay extends StatelessWidget {
       if (active) Positioned.fill(child: overlay),
       if (error != null)
         Positioned(
-          top: 12,
-          right: 12,
+          top: context.units(.75.rem),
+          right: context.units(.75.rem),
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: context.units(26.25.rem)),
             child: CarpenterNotice(
@@ -324,7 +329,8 @@ final class CarpenterSelectionBar<T> extends StatelessWidget {
       ];
       return CarpenterCard(
         child: LayoutBuilder(
-          builder: (context, constraints) => constraints.maxWidth < 520
+          builder: (context, constraints) =>
+              constraints.maxWidth < context.units(32.5.rem)
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
