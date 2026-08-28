@@ -115,7 +115,7 @@ final class _LifecyclePreview extends StatefulWidget {
 final class _LifecyclePreviewState extends State<_LifecyclePreview> {
   late final CollectionLifecycleController<String, String, String> _controller =
       CollectionLifecycleController<String, String, String>(
-        query: const CollectionQuery<String>(search: ''),
+        query: CollectionQuery<String>(search: ''),
         keyOf: (item) => item,
         searchDebounce: widget.debounce,
         load: (query, request) async {
@@ -480,7 +480,7 @@ Widget _inspector(BuildContext context) {
     divisions: 36,
   );
 
-  final Object? value = switch (sample) {
+  final Object value = switch (sample) {
     _InspectorSample.nested => {
       'id': 'payment-103',
       'status': 'pending',

@@ -68,11 +68,11 @@ Widget _avatarPlayground(BuildContext context) {
   return preview(
     CarpenterAvatar(
       initials: content == _AvatarContent.initials ? initials : null,
+      size: size,
+      semanticLabel: semanticLabel,
       child: content == _AvatarContent.icon
           ? const Icon(CarpenterIcons.account)
           : null,
-      size: size,
-      semanticLabel: semanticLabel,
     ),
   );
 }

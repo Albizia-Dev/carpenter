@@ -212,11 +212,6 @@ Widget _expander(BuildContext context) {
     label: 'State · Initially expanded',
     initialValue: true,
   );
-  final semanticLabel = context.knobs.stringOrNull(
-    label: 'Accessibility · Semantic label',
-    initialValue: 'Bank requisites section',
-    defaultToNull: true,
-  );
   final width = context.knobs.double.slider(
     label: 'Layout · Width',
     initialValue: 620,
@@ -231,7 +226,6 @@ Widget _expander(BuildContext context) {
       child: CarpenterExpander(
         key: ValueKey(expanded),
         initiallyExpanded: expanded,
-        semanticLabel: semanticLabel,
         header: CarpenterText.label(
           header,
           emphasis: TypographyEmphasis.strong,
