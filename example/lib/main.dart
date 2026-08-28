@@ -1,237 +1,174 @@
+import 'dart:async';
+
 import 'package:carpenter/carpenter.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
-void main() => runApp(const CoreComponentsExample());
+import 'demo_commands.dart';
+import 'demo_routes.dart';
+import 'demo_shell.dart';
+import 'pages/dashboard_page.dart';
+import 'pages/operations_page.dart';
+import 'pages/project_page.dart';
+import 'pages/projects_page.dart';
+import 'pages/settings_page.dart';
 
-final class CoreComponentsExample extends StatelessWidget {
-  const CoreComponentsExample({super.key});
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const CarpenterExampleApp());
+}
+
+final class CarpenterExampleApp extends StatefulWidget {
+  const CarpenterExampleApp({
+    super.key,
+    this.syncRouteInformation = true,
+    this.initialUri,
+  });
+
+  final bool syncRouteInformation;
+  final Uri? initialUri;
 
   @override
-  Widget build(BuildContext context) {
-    final carpenterTheme = CarpenterThemeData.light();
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: UnitsRoot(
-        rem: const Px(16),
-        child: CarpenterTheme(
-          data: carpenterTheme,
-          child: Builder(
-            builder: (context) => Scaffold(
-              backgroundColor: carpenterTheme.surface.base,
-              body: const SafeArea(child: _CoreComponentsScreen()),
-            ),
-          ),
-        ),
-      ),
+  State<CarpenterExampleApp> createState() => _CarpenterExampleAppState();
+}
+
+final class _CarpenterExampleAppState extends State<CarpenterExampleApp> {
+  late final RouteNodeStateManager _navigation;
+  late final DemoNavigator _navigator;
+  late final CarpenterToasterController _toaster;
+  late final DemoCommands _commands;
+  late final CarpenterModule _module;
+  CarpenterRouteInformationSync? _routeInformationSync;
+
+  @override
+  void initState() {
+    super.initState();
+    final initialUri =
+        widget.initialUri ??
+        (widget.syncRouteInformation
+            ? CarpenterRouteInformationSync.initialUri
+            : Uri(path: '/'));
+    _navigation = RouteNodeStateManager(
+      routeNode: DemoRoutes.parse(initialUri),
     );
+    _navigator = DemoNavigator(_navigation);
+    _toaster = CarpenterToasterController();
+    _commands = DemoCommands(navigator: _navigator, toaster: _toaster);
+    _module = _ExampleModule(_buildRoutes());
+
+    if (widget.syncRouteInformation) {
+      _routeInformationSync = CarpenterRouteInformationSync(
+        navigation: _navigation,
+        parse: DemoRoutes.parse,
+        convert: DemoRoutes.serialize,
+      )..attach();
+    }
   }
-}
 
-enum _ExamplePlan { starter, team, enterprise }
+  List<CarpenterRoute> _buildRoutes() => [
+    CarpenterRoute(
+      route: DemoRoutes.dashboard,
+      shell: (context, child) => _shell(
+        selectedId: 'dashboard',
+        title: 'Overview',
+        subtitle: 'Carpenter example workspace',
+        child: child,
+      ),
+      page: (context) => DashboardPage(
+        navigator: _navigator,
+        commands: _commands,
+        toaster: _toaster,
+      ),
+    ),
+    CarpenterRoute(
+      route: DemoRoutes.projects,
+      shell: (context, child) => _shell(
+        selectedId: 'projects',
+        title: 'Projects',
+        subtitle: 'Collection patterns and navigation',
+        child: child,
+      ),
+      page: (context) => ProjectsPage(navigator: _navigator, toaster: _toaster),
+    ),
+    CarpenterRoute(
+      route: DemoRoutes.project,
+      shell: (context, child) => _shell(
+        selectedId: 'projects',
+        title: context.arguments['id'] ?? 'Project',
+        subtitle: 'Record composition',
+        child: child,
+      ),
+      page: (context) => ProjectPage(
+        projectId: context.arguments['id'] ?? 'CP-1042',
+        navigator: _navigator,
+        toaster: _toaster,
+      ),
+    ),
+    CarpenterRoute(
+      route: DemoRoutes.operations,
+      shell: (context, child) => _shell(
+        selectedId: 'operations',
+        title: 'Operations',
+        subtitle: 'Loading, overlays, feedback and hotkeys',
+        child: child,
+      ),
+      page: (context) => OperationsPage(toaster: _toaster),
+    ),
+    CarpenterRoute(
+      route: DemoRoutes.settings,
+      shell: (context, child) => _shell(
+        selectedId: 'settings',
+        title: 'Settings',
+        subtitle: 'Controlled form state',
+        child: child,
+      ),
+      page: (context) => SettingsPage(toaster: _toaster),
+    ),
+  ];
 
-final class _CoreComponentsScreen extends StatefulWidget {
-  const _CoreComponentsScreen();
+  Widget _shell({
+    required String selectedId,
+    required String title,
+    required String subtitle,
+    required Widget child,
+  }) => DemoShell(
+    selectedId: selectedId,
+    title: title,
+    subtitle: subtitle,
+    commands: _commands,
+    toaster: _toaster,
+    child: child,
+  );
 
   @override
-  State<_CoreComponentsScreen> createState() => _CoreComponentsScreenState();
-}
-
-final class _CoreComponentsScreenState extends State<_CoreComponentsScreen> {
-  final _nameController = TextEditingController(text: 'Carpenter');
-  final _notesController = TextEditingController(
-    text: 'Semantic controls\nControlled state',
+  Widget build(BuildContext context) => CarpenterApp(
+    title: 'Carpenter Example',
+    theme: CarpenterThemeData.light(),
+    shells: [CarpenterRouterShell(navigation: _navigation)],
+    modules: [_module],
+    commands: _commands.all,
+    debugShowCheckedModeBanner: false,
   );
-  var _checkbox = CheckboxValue.mixed;
-  var _plan = _ExamplePlan.team;
-  var _notifications = true;
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _notesController.dispose();
+    if (_routeInformationSync case final sync?) {
+      unawaited(sync.dispose());
+    }
+    _commands.dispose();
+    _toaster.dispose();
+    unawaited(_navigation.close());
     super.dispose();
   }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(32),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const CarpenterText('Core components', role: TypographyRole.display),
-          const SizedBox(height: 32),
-          const _Section(
-            title: 'Typography',
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CarpenterText.title('Semantic title'),
-                CarpenterText.body('Body text follows inherited scaling.'),
-                CarpenterText.caption(
-                  'Muted supporting text',
-                  colorRole: ContentColorRole.muted,
-                ),
-              ],
-            ),
-          ),
-          const _Section(
-            title: 'Icons',
-            child: Row(
-              children: [
-                CarpenterIcon(Icons.home, semanticLabel: 'Home'),
-                CarpenterIcon(
-                  Icons.star,
-                  colorRole: ContentColorRole.secondary,
-                ),
-                CarpenterIcon(Icons.info, size: IconSize.large),
-              ],
-            ),
-          ),
-          const _Section(
-            title: 'Statuses',
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                CarpenterStatusIndicator(
-                  label: 'Ready',
-                  role: FeedbackColorRole.success,
-                ),
-                CarpenterStatusIndicator(
-                  label: 'Needs attention',
-                  role: FeedbackColorRole.warning,
-                ),
-                CarpenterStatusIndicator(
-                  label: 'Failed',
-                  role: FeedbackColorRole.danger,
-                ),
-              ],
-            ),
-          ),
-          const _Section(
-            title: 'Buttons',
-            child: Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                CarpenterButton(
-                  label: 'Save',
-                  icon: Icons.save,
-                  colorRole: ActionColorRole.primary,
-                  prominence: ActionProminence.high,
-                  onInvoke: _noop,
-                ),
-                CarpenterButton(label: 'Disabled'),
-                CarpenterButton(
-                  label: 'Synchronizing',
-                  executionPhase: ActionExecutionPhase.running,
-                  onInvoke: _noop,
-                ),
-              ],
-            ),
-          ),
-          _Section(
-            title: 'Fields',
-            child: Column(
-              children: [
-                CarpenterInput(
-                  controller: _nameController,
-                  label: 'Project name',
-                  description: 'Uses the shared semantic field contract',
-                  leadingIcon: Icons.edit,
-                ),
-                const SizedBox(height: 12),
-                CarpenterTextArea(
-                  controller: _notesController,
-                  label: 'Notes',
-                  minLines: 2,
-                  maxLines: 4,
-                ),
-              ],
-            ),
-          ),
-          _Section(
-            title: 'Value controls',
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CarpenterCheckbox(
-                  value: _checkbox,
-                  label: 'Include archived records',
-                  onChanged: (value) => setState(() => _checkbox = value),
-                ),
-                CarpenterRadioGroup<_ExamplePlan>(
-                  value: _plan,
-                  onChanged: (value) => setState(() => _plan = value),
-                  children: const [
-                    CarpenterRadio(
-                      value: _ExamplePlan.starter,
-                      label: 'Starter',
-                    ),
-                    CarpenterRadio(value: _ExamplePlan.team, label: 'Team'),
-                    CarpenterRadio(
-                      value: _ExamplePlan.enterprise,
-                      label: 'Enterprise',
-                    ),
-                  ],
-                ),
-                CarpenterSwitch(
-                  value: _notifications,
-                  label: 'Notifications',
-                  onChanged: (value) => setState(() => _notifications = value),
-                ),
-              ],
-            ),
-          ),
-          const _Section(
-            title: 'Icon buttons',
-            child: Row(
-              children: [
-                CarpenterIconButton(
-                  icon: Icons.add,
-                  semanticLabel: 'Add',
-                  onInvoke: _noop,
-                ),
-                CarpenterIconButton(
-                  icon: Icons.delete,
-                  semanticLabel: 'Delete',
-                  colorRole: ActionColorRole.danger,
-                  onInvoke: _noop,
-                ),
-                CarpenterIconButton(
-                  icon: Icons.sync,
-                  semanticLabel: 'Synchronizing',
-                  executionPhase: ActionExecutionPhase.running,
-                  onInvoke: _noop,
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
-final class _Section extends StatelessWidget {
-  const _Section({required this.title, required this.child});
+final class _ExampleModule extends CarpenterModuleBase {
+  const _ExampleModule(this._routes);
 
-  final String title;
-  final Widget child;
+  final List<CarpenterRoute> _routes;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 24),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CarpenterText.title(title, emphasis: TypographyEmphasis.strong),
-        const SizedBox(height: 12),
-        child,
-      ],
-    ),
-  );
-}
+  String get id => 'carpenter.example.workspace';
 
-void _noop() {}
+  @override
+  List<CarpenterRoute> get routes => _routes;
+}
