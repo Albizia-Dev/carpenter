@@ -56,93 +56,114 @@ final class ActionControl extends StatelessWidget {
       theme.spacing.actionVerticalPadding(size),
     );
     final iconDimension = context.units(theme.sizes.actionIcon(size));
-    final startRadius = Radius.circular(
-      context.units(theme.shapes.radiusForAction(shape.start, size)),
+    final zero = context.units(theme.sizes.zero);
+
+    Radius radiusFor(ShapeRole role) => Radius.circular(
+      role == ShapeRole.circular
+          ? controlDimension / 2
+          : context.units(theme.shapes.radiusForAction(role, size)),
     );
-    final endRadius = Radius.circular(
-      context.units(theme.shapes.radiusForAction(shape.end, size)),
-    );
+
+    final startRadius = radiusFor(shape.start);
+    final endRadius = radiusFor(shape.end);
     final borderRadius = BorderRadiusDirectional.only(
       topStart: startRadius,
       bottomStart: startRadius,
       topEnd: endRadius,
       bottomEnd: endRadius,
     ).resolve(Directionality.of(context));
-    final zero = context.units(theme.sizes.zero);
 
-    return Semantics(
-      container: true,
-      button: true,
-      enabled: onInvoke != null,
-      label: semanticLabel,
-      value: _running ? 'running' : null,
-      liveRegion: _running,
-      onTap: _running ? null : onInvoke,
-      excludeSemantics: true,
-      child: InteractiveRegion(
-        onActivate: onInvoke,
-        activationBlocked: _running,
-        focusNode: focusNode,
-        autofocus: autofocus,
-        builder: (context, states, showFocusHighlight) {
-          final style = theme.actions.resolve(colorRole, prominence, states);
-          final content = ExcludeSemantics(
-            child: childBuilder(context, style, iconDimension),
-          );
-          final visual = FocusRing(
-            visible: states.contains(WidgetState.focused) && showFocusHighlight,
-            borderRadius: borderRadius,
-            child: AnimatedContainer(
-              duration: theme.motion.transitionDuration(context),
-              curve: theme.motion.stateCurve,
-              constraints: BoxConstraints(
-                minWidth: iconOnly ? controlDimension : zero,
-              ),
-              height: controlDimension,
-              decoration: BoxDecoration(
-                color: style.background,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final fillTightParent = !iconOnly && constraints.hasTightWidth;
+        return Semantics(
+          container: true,
+          button: true,
+          enabled: onInvoke != null,
+          label: semanticLabel,
+          value: _running ? 'running' : null,
+          liveRegion: _running,
+          onTap: _running ? null : onInvoke,
+          excludeSemantics: true,
+          child: InteractiveRegion(
+            onActivate: onInvoke,
+            activationBlocked: _running,
+            focusNode: focusNode,
+            autofocus: autofocus,
+            builder: (context, states, showFocusHighlight) {
+              final visualStates = _running && states.contains(WidgetState.disabled)
+                  ? ({...states}..remove(WidgetState.disabled))
+                  : states;
+              final style = theme.actions.resolve(
+                colorRole,
+                prominence,
+                visualStates,
+              );
+              final content = ExcludeSemantics(
+                child: childBuilder(context, style, iconDimension),
+              );
+              final visual = FocusRing(
+                visible:
+                    states.contains(WidgetState.focused) && showFocusHighlight,
                 borderRadius: borderRadius,
-                border: Border.all(
-                  color: style.border,
-                  width: context.units(theme.shapes.actionBorderWidth),
-                ),
-              ),
-              child: ClipRRect(
-                borderRadius: borderRadius,
-                child: Stack(
-                  fit: StackFit.passthrough,
-                  children: [
-                    if (_running)
-                      Positioned.fill(
-                        child: LoadingBackground(color: style.loadingAccent),
-                      ),
-                    Padding(
-                      padding: iconOnly
-                          ? EdgeInsets.all(zero)
-                          : EdgeInsets.symmetric(
-                              horizontal: horizontalPadding,
-                              vertical: verticalPadding,
-                            ),
-                      child: Align(
-                        widthFactor: 1,
-                        heightFactor: 1,
-                        child: content,
-                      ),
+                child: AnimatedContainer(
+                  duration: theme.motion.transitionDuration(context),
+                  curve: theme.motion.stateCurve,
+                  width: fillTightParent ? double.infinity : null,
+                  constraints: BoxConstraints(
+                    minWidth: iconOnly ? controlDimension : zero,
+                  ),
+                  height: controlDimension,
+                  decoration: BoxDecoration(
+                    color: style.background,
+                    borderRadius: borderRadius,
+                    border: Border.all(
+                      color: style.border,
+                      width: context.units(theme.shapes.actionBorderWidth),
                     ),
-                  ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: borderRadius,
+                    child: Stack(
+                      fit: StackFit.passthrough,
+                      children: [
+                        if (_running)
+                          Positioned.fill(
+                            child: LoadingBackground(color: style.loadingAccent),
+                          ),
+                        Padding(
+                          padding: iconOnly
+                              ? EdgeInsets.all(zero)
+                              : EdgeInsets.symmetric(
+                                  horizontal: horizontalPadding,
+                                  vertical: verticalPadding,
+                                ),
+                          child: Align(
+                            widthFactor: fillTightParent ? null : 1,
+                            heightFactor: 1,
+                            child: content,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          );
-          return ConstrainedBox(
-            constraints: BoxConstraints(
-              minWidth: iconOnly ? minimumTarget : zero,
-              minHeight: minimumTarget,
-            ),
-            child: Align(widthFactor: 1, heightFactor: 1, child: visual),
-          );
-        },
-      ),
+              );
+              return ConstrainedBox(
+                constraints: BoxConstraints(
+                  minWidth: iconOnly ? minimumTarget : zero,
+                  minHeight: minimumTarget,
+                ),
+                child: Align(
+                  widthFactor: fillTightParent ? null : 1,
+                  heightFactor: 1,
+                  child: visual,
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }
