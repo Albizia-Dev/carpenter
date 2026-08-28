@@ -85,6 +85,17 @@ void main() {
     expect(cubit.state.isLoading, isFalse);
   });
 
+  test('tracked work may finish after the cubit is closed', () async {
+    final cubit = LoadingCubit();
+    final operation = Completer<int>();
+    final result = cubit.track(() => operation.future, id: 'detached');
+
+    await cubit.close();
+    operation.complete(7);
+
+    expect(await result, 7);
+  });
+
   testWidgets('nearest loading boundary intercepts descendant operations', (
     tester,
   ) async {
