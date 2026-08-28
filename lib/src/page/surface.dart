@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -21,14 +22,14 @@ final class CarpenterSurfaceHost extends StatefulWidget {
     super.key,
     required this.child,
     this.openPage,
-    this.sidePanelWidth = 720,
-    this.sidePanelBreakpoint = 900,
+    this.sidePanelWidth = const Rem(45),
+    this.sidePanelBreakpoint = const Rem(56.25),
     this.sidePanelAlignment = Alignment.centerRight,
   });
   final Widget child;
   final CarpenterPageSurfaceOpener? openPage;
-  final double sidePanelWidth;
-  final double sidePanelBreakpoint;
+  final LengthUnit sidePanelWidth;
+  final LengthUnit sidePanelBreakpoint;
   final Alignment sidePanelAlignment;
 
   @override
@@ -69,60 +70,65 @@ final class _CarpenterSurfaceHostState extends State<CarpenterSurfaceHost>
   }
 
   @override
-  Widget build(BuildContext context) => CarpenterSurfaceScope(
-    controller: this,
-    child: LayoutBuilder(
-      builder: (context, constraints) {
-        final request = _request;
-        if (request == null) return widget.child;
-        final narrow = constraints.maxWidth < widget.sidePanelBreakpoint;
-        final fullPage =
-            narrow || request.kind == CarpenterSurfaceKind.fullPage;
-        final minWidth = constraints.maxWidth < context.units(20.rem)
-            ? constraints.maxWidth
-            : 320.0;
-        final width = request.kind == CarpenterSurfaceKind.inline
-            ? constraints.maxWidth.clamp(minWidth, 760).toDouble()
-            : widget.sidePanelWidth
-                  .clamp(minWidth, constraints.maxWidth)
-                  .toDouble();
-        return CallbackShortcuts(
-          bindings: {const SingleActivator(LogicalKeyboardKey.escape): _close},
-          child: Focus(
-            autofocus: true,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                widget.child,
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: _close,
-                  child: ColoredBox(
-                    color: CarpenterTheme.of(context).overlay.scrim,
-                  ),
-                ),
-                Align(
-                  alignment: fullPage
-                      ? Alignment.center
-                      : request.kind == CarpenterSurfaceKind.inline
-                      ? Alignment.center
-                      : widget.sidePanelAlignment,
-                  child: SizedBox(
-                    width: fullPage ? constraints.maxWidth : width,
-                    height: constraints.maxHeight,
-                    child: CarpenterSurfaceCloseScope(
-                      close: _close,
-                      child: Builder(builder: request.builder),
+  Widget build(BuildContext context) {
+    final sidePanelWidth = context.units(widget.sidePanelWidth);
+    final sidePanelBreakpoint = context.units(widget.sidePanelBreakpoint);
+    final compactMinWidth = context.units(20.rem);
+    final inlineMaxWidth = context.units(47.5.rem);
+
+    return CarpenterSurfaceScope(
+      controller: this,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final request = _request;
+          if (request == null) return widget.child;
+          final narrow = constraints.maxWidth < sidePanelBreakpoint;
+          final fullPage =
+              narrow || request.kind == CarpenterSurfaceKind.fullPage;
+          final minWidth = constraints.maxWidth < compactMinWidth
+              ? constraints.maxWidth
+              : compactMinWidth;
+          final width = request.kind == CarpenterSurfaceKind.inline
+              ? constraints.maxWidth.clamp(minWidth, inlineMaxWidth).toDouble()
+              : sidePanelWidth.clamp(minWidth, constraints.maxWidth).toDouble();
+          return CallbackShortcuts(
+            bindings: {const SingleActivator(LogicalKeyboardKey.escape): _close},
+            child: Focus(
+              autofocus: true,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  widget.child,
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: _close,
+                    child: ColoredBox(
+                      color: CarpenterTheme.of(context).overlay.scrim,
                     ),
                   ),
-                ),
-              ],
+                  Align(
+                    alignment: fullPage
+                        ? Alignment.center
+                        : request.kind == CarpenterSurfaceKind.inline
+                        ? Alignment.center
+                        : widget.sidePanelAlignment,
+                    child: SizedBox(
+                      width: fullPage ? constraints.maxWidth : width,
+                      height: constraints.maxHeight,
+                      child: CarpenterSurfaceCloseScope(
+                        close: _close,
+                        child: Builder(builder: request.builder),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        );
-      },
-    ),
-  );
+          );
+        },
+      ),
+    );
+  }
 
   @override
   void dispose() {
