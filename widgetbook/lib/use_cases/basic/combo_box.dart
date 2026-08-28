@@ -27,9 +27,15 @@ Widget _playground(BuildContext context) {
   );
   final optionCount = context.knobs.int.slider(
     label: 'Data · Options',
-    initialValue: 8,
+    initialValue: 12,
     min: 0,
     max: 30,
+  );
+  final placement = context.knobs.object.segmented(
+    label: 'Overlay · Placement',
+    options: OverlayPlacement.values,
+    initialOption: OverlayPlacement.bottomStart,
+    labelBuilder: semanticValueLabel,
   );
   return preview(
     _ComboPreview(
@@ -37,6 +43,7 @@ Widget _playground(BuildContext context) {
       state: state,
       enabled: enabled,
       optionCount: optionCount,
+      placement: placement,
     ),
   );
 }
@@ -47,11 +54,14 @@ final class _ComboPreview extends StatefulWidget {
     required this.state,
     required this.enabled,
     required this.optionCount,
+    required this.placement,
   });
   final String label;
   final OptionsLoadState state;
   final bool enabled;
   final int optionCount;
+  final OverlayPlacement placement;
+
   @override
   State<_ComboPreview> createState() => _ComboPreviewState();
 }
@@ -60,6 +70,24 @@ final class _ComboPreviewState extends State<_ComboPreview> {
   final _controller = TextEditingController();
   int? _value;
   var _open = false;
+
+  List<CarpenterOption<int>> get _options {
+    final query = _controller.text.trim().toLowerCase();
+    return [
+          for (var index = 1; index <= widget.optionCount; index++)
+            CarpenterOption(
+              id: index,
+              value: index,
+              label: 'Контрагент $index',
+            ),
+        ]
+        .where(
+          (option) =>
+              query.isEmpty || option.label.toLowerCase().contains(query),
+        )
+        .toList();
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -67,30 +95,37 @@ final class _ComboPreviewState extends State<_ComboPreview> {
   }
 
   @override
-  Widget build(BuildContext context) => CarpenterComboBox<int>(
-    controller: _controller,
-    value: _value,
-    onChanged: widget.enabled
-        ? (value) => setState(() => _value = value)
-        : null,
-    onQueryChanged: widget.enabled ? (_) => setState(() {}) : null,
-    open: _open,
-    onOpenChanged: (value) => setState(() => _open = value),
-    options: [
-      for (var index = 1; index <= widget.optionCount; index++)
-        CarpenterOption(id: index, value: index, label: 'Контрагент $index'),
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      CarpenterComboBox<int>(
+        controller: _controller,
+        value: _value,
+        onChanged: widget.enabled
+            ? (value) => setState(() => _value = value)
+            : null,
+        onQueryChanged: widget.enabled ? (_) => setState(() {}) : null,
+        open: _open,
+        onOpenChanged: (value) => setState(() => _open = value),
+        options: _options,
+        loadState: widget.state,
+        label: widget.label,
+        placement: widget.placement,
+        clearAction: CarpenterActionDescriptor(
+          id: 'clear',
+          label: 'Очистить',
+          semanticLabel: 'Очистить выбор',
+          icon: Icons.close,
+          onInvoke: () => setState(() {
+            _controller.clear();
+            _value = null;
+          }),
+        ),
+      ),
+      const SizedBox(height: 12),
+      CarpenterText.caption(
+        'query="${_controller.text}" · value=${_value ?? '—'} · options=${_options.length}',
+      ),
     ],
-    loadState: widget.state,
-    label: widget.label,
-    clearAction: CarpenterActionDescriptor(
-      id: 'clear',
-      label: 'Очистить',
-      semanticLabel: 'Очистить выбор',
-      icon: Icons.close,
-      onInvoke: () => setState(() {
-        _controller.clear();
-        _value = null;
-      }),
-    ),
   );
 }

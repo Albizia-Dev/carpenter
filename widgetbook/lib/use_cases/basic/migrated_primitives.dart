@@ -5,7 +5,7 @@ import 'package:widgetbook/widgetbook.dart';
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
 
-enum _AvatarContent { initials, icon }
+enum _AvatarContent { initials, icon, image }
 
 final avatarComponent = WidgetbookComponent(
   name: 'Avatar',
@@ -52,6 +52,10 @@ Widget _avatarPlayground(BuildContext context) {
     label: 'Content · Initials',
     initialValue: 'NC',
   );
+  final imageUrl = context.knobs.string(
+    label: 'Content · Image URL',
+    initialValue: 'https://avatars.githubusercontent.com/u/9919?v=4',
+  );
   final size = context.knobs.double.slider(
     label: 'Appearance · Size',
     initialValue: 40,
@@ -67,7 +71,11 @@ Widget _avatarPlayground(BuildContext context) {
 
   return preview(
     CarpenterAvatar(
-      initials: content == _AvatarContent.initials ? initials : null,
+      initials: content == _AvatarContent.icon ? null : initials,
+      foregroundImage:
+          content == _AvatarContent.image && imageUrl.trim().isNotEmpty
+          ? NetworkImage(imageUrl.trim())
+          : null,
       size: size,
       semanticLabel: semanticLabel,
       child: content == _AvatarContent.icon

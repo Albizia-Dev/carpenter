@@ -32,6 +32,7 @@ String semanticValueLabel(Object value) => switch (value) {
   ActionProminence.outlined => 'Outlined',
   ActionProminence.low => 'Low',
   ActionProminence.high => 'High',
+  ActionProminence.filled => 'Filled',
   ControlSize.xsmall => 'Extra small',
   ControlSize.small => 'Small',
   ControlSize.medium => 'Medium',

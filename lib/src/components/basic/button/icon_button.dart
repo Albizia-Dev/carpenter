@@ -8,33 +8,41 @@ final class CarpenterIconButton extends StatelessWidget {
     super.key,
     required this.icon,
     required this.semanticLabel,
+    this.onPressed,
     this.onInvoke,
     this.colorRole = ActionColorRole.neutral,
     this.prominence = ActionProminence.normal,
     this.size = ControlSize.medium,
-    this.shape = CarpenterShape.circular,
+    this.shape = CarpenterShape.rounded,
     this.executionPhase = ActionExecutionPhase.idle,
     this.focusNode,
     this.autofocus = false,
-  });
+  }) : assert(
+         onPressed == null || onInvoke == null,
+         'Use either onPressed or the compatibility onInvoke callback, not both.',
+       );
 
   CarpenterIconButton.fromAction(
     CarpenterActionDescriptor action, {
     super.key,
     this.prominence = ActionProminence.normal,
     this.size = ControlSize.medium,
-    this.shape = CarpenterShape.circular,
+    this.shape = CarpenterShape.rounded,
     this.executionPhase = ActionExecutionPhase.idle,
     this.focusNode,
     this.autofocus = false,
   }) : assert(action.icon != null, 'Icon action requires an icon.'),
        icon = action.icon!,
        semanticLabel = action.effectiveSemanticLabel,
-       onInvoke = action.onInvoke,
+       onPressed = action.onInvoke,
+       onInvoke = null,
        colorRole = action.colorRole;
 
   final IconData icon;
   final String semanticLabel;
+  final VoidCallback? onPressed;
+
+  /// Compatibility alias for older Carpenter call sites.
   final VoidCallback? onInvoke;
   final ActionColorRole colorRole;
   final ActionProminence prominence;
@@ -44,11 +52,13 @@ final class CarpenterIconButton extends StatelessWidget {
   final FocusNode? focusNode;
   final bool autofocus;
 
+  VoidCallback? get _effectiveOnPressed => onPressed ?? onInvoke;
+
   @override
   Widget build(BuildContext context) {
     return ActionControl(
       semanticLabel: semanticLabel,
-      onInvoke: onInvoke,
+      onInvoke: _effectiveOnPressed,
       colorRole: colorRole,
       prominence: prominence,
       size: size,

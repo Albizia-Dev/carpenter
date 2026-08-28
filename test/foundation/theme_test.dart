@@ -27,13 +27,13 @@ void main() {
       for (final role in ActionColorRole.values) {
         final style = theme.actions.resolve(
           role,
-          ActionProminence.high,
+          ActionProminence.filled,
           const <WidgetState>{},
         );
         expect(
           contrast(style.background, style.foreground),
           greaterThanOrEqualTo(4.5),
-          reason: 'high-prominence ${role.name}',
+          reason: 'filled-prominence ${role.name}',
         );
       }
       for (final role in FeedbackColorRole.values) {
@@ -293,9 +293,24 @@ void main() {
     const rest = <WidgetState>{};
     const hovered = <WidgetState>{WidgetState.hovered};
 
+    final low = actions.resolve(
+      ActionColorRole.primary,
+      ActionProminence.low,
+      rest,
+    );
     final normal = actions.resolve(
       ActionColorRole.primary,
       ActionProminence.normal,
+      rest,
+    );
+    final high = actions.resolve(
+      ActionColorRole.primary,
+      ActionProminence.high,
+      rest,
+    );
+    final filled = actions.resolve(
+      ActionColorRole.primary,
+      ActionProminence.filled,
       rest,
     );
     final ghost = actions.resolve(
@@ -313,24 +328,15 @@ void main() {
       ActionProminence.outlined,
       rest,
     );
-    final low = actions.resolve(
-      ActionColorRole.primary,
-      ActionProminence.low,
-      hovered,
-    );
-    final high = actions.resolve(
-      ActionColorRole.primary,
-      ActionProminence.high,
-      rest,
-    );
 
-    expect(normal.background, isNot(actions.transparent));
+    expect(low.background, isNot(actions.transparent));
+    expect(normal.background, isNot(low.background));
+    expect(high.background, isNot(normal.background));
+    expect(filled.background, isNot(high.background));
     expect(ghost.background, actions.transparent);
     expect(hoveredGhost.background, isNot(actions.transparent));
     expect(outlined.background, actions.transparent);
     expect(outlined.border, isNot(actions.transparent));
-    expect(low.background, isNot(hoveredGhost.background));
-    expect(high.background, isNot(actions.transparent));
   });
 
   test('utility is a complete action color role', () {

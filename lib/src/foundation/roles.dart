@@ -16,7 +16,7 @@ enum ActionColorRole {
   info,
 }
 
-enum ActionProminence { normal, ghost, outlined, low, high }
+enum ActionProminence { normal, ghost, outlined, low, high, filled }
 
 enum ActionColorSlot { background, foreground, icon, border }
 

@@ -85,6 +85,7 @@ final class CarpenterFilterBar extends StatelessWidget {
                     Wrap(
                       spacing: gap,
                       runSpacing: gap,
+                      crossAxisAlignment: WrapCrossAlignment.end,
                       children: filterControls,
                     ),
                   ],
@@ -93,7 +94,7 @@ final class CarpenterFilterBar extends StatelessWidget {
                     Wrap(
                       spacing: gap,
                       runSpacing: gap,
-                      crossAxisAlignment: WrapCrossAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.end,
                       children: supporting,
                     ),
                   ],
@@ -102,7 +103,7 @@ final class CarpenterFilterBar extends StatelessWidget {
             : Wrap(
                 spacing: gap,
                 runSpacing: gap,
-                crossAxisAlignment: WrapCrossAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.end,
                 children: [
                   SizedBox(
                     width: context.units(theme.sizes.layoutFilterSearch),

@@ -463,14 +463,24 @@ final class CarpenterActionTheme {
     Set<WidgetState> states,
   ) {
     if (states.contains(WidgetState.disabled)) {
+      final background = switch (prominence) {
+        ActionProminence.filled => disabledBackground,
+        ActionProminence.high => Color.lerp(
+          transparent,
+          disabledBackground,
+          .72,
+        )!,
+        ActionProminence.normal => Color.lerp(
+          transparent,
+          disabledBackground,
+          .48,
+        )!,
+        ActionProminence.ghost ||
+        ActionProminence.outlined ||
+        ActionProminence.low => transparent,
+      };
       return CarpenterActionStyle(
-        background: switch (prominence) {
-          ActionProminence.high => disabledBackground,
-          ActionProminence.normal => disabledBackground,
-          ActionProminence.ghost ||
-          ActionProminence.outlined ||
-          ActionProminence.low => transparent,
-        },
+        background: background,
         foreground: disabledForeground,
         icon: disabledForeground,
         border: prominence == ActionProminence.outlined
@@ -493,14 +503,23 @@ final class CarpenterActionTheme {
     final active =
         states.contains(WidgetState.hovered) ||
         states.contains(WidgetState.pressed);
+    final lowBackground = Color.lerp(transparent, palette.state, .55)!;
+    final highBackground = Color.lerp(palette.state, palette.strongState, .60)!;
 
     return switch (prominence) {
-      ActionProminence.high => CarpenterActionStyle(
+      ActionProminence.filled => CarpenterActionStyle(
         background: semantic,
         foreground: inverse,
         icon: inverse,
         border: semantic,
         loadingAccent: palette.hovered,
+      ),
+      ActionProminence.high => CarpenterActionStyle(
+        background: active ? palette.strongState : highBackground,
+        foreground: semantic,
+        icon: semantic,
+        border: transparent,
+        loadingAccent: palette.strongState,
       ),
       ActionProminence.normal => CarpenterActionStyle(
         background: active ? palette.strongState : palette.state,
@@ -509,18 +528,18 @@ final class CarpenterActionTheme {
         border: transparent,
         loadingAccent: palette.strongState,
       ),
+      ActionProminence.low => CarpenterActionStyle(
+        background: active ? palette.state : lowBackground,
+        foreground: semantic,
+        icon: semantic,
+        border: transparent,
+        loadingAccent: palette.state,
+      ),
       ActionProminence.outlined => CarpenterActionStyle(
         background: active ? palette.state : transparent,
         foreground: semantic,
         icon: semantic,
         border: semantic,
-        loadingAccent: palette.state,
-      ),
-      ActionProminence.low => CarpenterActionStyle(
-        background: active ? palette.strongState : transparent,
-        foreground: semantic,
-        icon: semantic,
-        border: transparent,
         loadingAccent: palette.state,
       ),
       ActionProminence.ghost => CarpenterActionStyle(

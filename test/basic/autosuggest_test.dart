@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/harness.dart';
 
 void main() {
-  testWidgets('free query is preserved while suggestion can be selected', (
+  testWidgets('free query stays editable and selection replaces query', (
     tester,
   ) async {
     final controller = TextEditingController();
@@ -34,6 +34,6 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     expect(queries, contains('arbitrary'));
     expect(selected?.id, 'a');
-    expect(controller.text, 'arbitrary');
+    expect(controller.text, 'Alpha');
   });
 }

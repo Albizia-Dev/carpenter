@@ -8,6 +8,15 @@ import '../../../foundation/theme.dart';
 import 'toast.dart';
 import 'toaster_controller.dart';
 
+enum CarpenterToastPlacement {
+  topStart,
+  topCenter,
+  topEnd,
+  bottomStart,
+  bottomCenter,
+  bottomEnd,
+}
+
 /// Hosts a bounded visible toast stack and queues the controller remainder.
 final class CarpenterToastRegion extends StatefulWidget {
   const CarpenterToastRegion({
@@ -15,11 +24,13 @@ final class CarpenterToastRegion extends StatefulWidget {
     required this.controller,
     required this.child,
     this.maxVisible = 3,
+    this.placement = CarpenterToastPlacement.topEnd,
   }) : assert(maxVisible > 0);
 
   final CarpenterToasterController controller;
   final Widget child;
   final int maxVisible;
+  final CarpenterToastPlacement placement;
 
   @override
   State<CarpenterToastRegion> createState() => _CarpenterToastRegionState();
@@ -93,36 +104,70 @@ final class _CarpenterToastRegionState extends State<CarpenterToastRegion> {
     super.dispose();
   }
 
+  AlignmentDirectional get _alignment => switch (widget.placement) {
+    CarpenterToastPlacement.topStart => AlignmentDirectional.topStart,
+    CarpenterToastPlacement.topCenter => AlignmentDirectional.topCenter,
+    CarpenterToastPlacement.topEnd => AlignmentDirectional.topEnd,
+    CarpenterToastPlacement.bottomStart => AlignmentDirectional.bottomStart,
+    CarpenterToastPlacement.bottomCenter => AlignmentDirectional.bottomCenter,
+    CarpenterToastPlacement.bottomEnd => AlignmentDirectional.bottomEnd,
+  };
+
+  CrossAxisAlignment get _crossAxisAlignment => switch (widget.placement) {
+    CarpenterToastPlacement.topStart ||
+    CarpenterToastPlacement.bottomStart => CrossAxisAlignment.start,
+    CarpenterToastPlacement.topCenter ||
+    CarpenterToastPlacement.bottomCenter => CrossAxisAlignment.center,
+    CarpenterToastPlacement.topEnd ||
+    CarpenterToastPlacement.bottomEnd => CrossAxisAlignment.end,
+  };
+
+  bool get _bottom => switch (widget.placement) {
+    CarpenterToastPlacement.bottomStart ||
+    CarpenterToastPlacement.bottomCenter ||
+    CarpenterToastPlacement.bottomEnd => true,
+    _ => false,
+  };
+
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final visible = _visible;
     _syncLifetimes(context, visible);
     final inset = context.units(theme.spacing.overlayToastRegionInset);
+    final toastWidgets = <Widget>[
+      for (var index = 0; index < visible.length; index++) ...[
+        _TimedToast(
+          key: ValueKey(visible[index].id),
+          descriptor: visible[index],
+          lifetime: _lifetimes[visible[index].id]!,
+          onDismiss: () => widget.controller.dismiss(visible[index].id),
+        ),
+        if (index != visible.length - 1)
+          SizedBox(height: context.units(theme.spacing.overlayToastGap)),
+      ],
+    ];
     return Stack(
       children: [
         widget.child,
-        PositionedDirectional(
-          top: inset,
-          end: inset,
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                for (var index = 0; index < visible.length; index++) ...[
-                  _TimedToast(
-                    key: ValueKey(visible[index].id),
-                    descriptor: visible[index],
-                    lifetime: _lifetimes[visible[index].id]!,
-                    onDismiss: () =>
-                        widget.controller.dismiss(visible[index].id),
+        Positioned.fill(
+          child: IgnorePointer(
+            ignoring: visible.isEmpty,
+            child: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.all(inset),
+                child: Align(
+                  alignment: _alignment,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: _bottom
+                        ? MainAxisAlignment.end
+                        : MainAxisAlignment.start,
+                    crossAxisAlignment: _crossAxisAlignment,
+                    children: toastWidgets,
                   ),
-                  if (index != visible.length - 1)
-                    SizedBox(
-                      height: context.units(theme.spacing.overlayToastGap),
-                    ),
-                ],
-              ],
+                ),
+              ),
             ),
           ),
         ),

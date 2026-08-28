@@ -27,7 +27,10 @@ final listTileComponent = WidgetbookComponent(
 
 final paginationBarComponent = WidgetbookComponent(
   name: 'Pagination Bar',
-  useCases: [WidgetbookUseCase(name: 'Playground', builder: _pagination)],
+  useCases: [
+    WidgetbookUseCase(name: 'Playground', builder: _pagination),
+    WidgetbookUseCase(name: 'Scenarios', builder: _paginationScenarios),
+  ],
 );
 
 final inspectorComponent = WidgetbookComponent(
@@ -366,51 +369,91 @@ Widget _pagination(BuildContext context) {
   final totalPages = context.knobs.double
       .slider(
         label: 'Data · Total pages',
-        initialValue: 17,
+        initialValue: 37,
         min: 1,
-        max: 100,
-        divisions: 99,
+        max: 500,
+        divisions: 499,
       )
       .round();
   final initialPage = context.knobs.double
       .slider(
         label: 'Data · Initial page',
-        initialValue: 4,
+        initialValue: 18,
         min: 1,
-        max: 100,
-        divisions: 99,
+        max: 500,
+        divisions: 499,
       )
       .round();
+  final siblingCount = context.knobs.int.slider(
+    label: 'Navigation · Sibling pages',
+    initialValue: 1,
+    min: 0,
+    max: 4,
+  );
   final leading = context.knobs.stringOrNull(
     label: 'Content · Leading text',
-    initialValue: '132 records',
+    initialValue: '1–50 of 1,842 records',
     defaultToNull: false,
   );
   final width = context.knobs.double.slider(
     label: 'Layout · Width',
-    initialValue: 640,
+    initialValue: 820,
     min: 260,
-    max: 900,
-    divisions: 32,
+    max: 1200,
+    divisions: 47,
   );
   return _PaginationPreview(
     initialPage: initialPage,
     totalPages: totalPages,
+    siblingCount: siblingCount,
     leading: leading,
     width: width,
   );
 }
 
+Widget _paginationScenarios(BuildContext context) => previewColumn([
+  const _PaginationPreview(
+    initialPage: 1,
+    totalPages: 3,
+    siblingCount: 1,
+    leading: 'Small result set',
+    width: 720,
+  ),
+  const _PaginationPreview(
+    initialPage: 18,
+    totalPages: 37,
+    siblingCount: 1,
+    leading: '1–50 of 1,842 records',
+    width: 900,
+  ),
+  const _PaginationPreview(
+    initialPage: 243,
+    totalPages: 500,
+    siblingCount: 2,
+    leading: 'Large data set',
+    width: 1100,
+  ),
+  const _PaginationPreview(
+    initialPage: 18,
+    totalPages: 37,
+    siblingCount: 1,
+    leading: null,
+    width: 360,
+  ),
+]);
+
 final class _PaginationPreview extends StatefulWidget {
   const _PaginationPreview({
     required this.initialPage,
     required this.totalPages,
+    required this.siblingCount,
     required this.leading,
     required this.width,
   });
 
   final int initialPage;
   final int totalPages;
+  final int siblingCount;
   final String? leading;
   final double width;
 
@@ -444,6 +487,7 @@ final class _PaginationPreviewState extends State<_PaginationPreview> {
       child: CarpenterPaginationBar(
         page: _page,
         totalPages: widget.totalPages,
+        siblingCount: widget.siblingCount,
         leading: widget.leading == null
             ? null
             : CarpenterText.caption(widget.leading!),

@@ -13,6 +13,7 @@ final iconButtonComponent = WidgetbookComponent(
     WidgetbookUseCase(name: 'Playground', builder: _playground),
     WidgetbookUseCase(name: 'Size comparison', builder: _sizeComparison),
     WidgetbookUseCase(name: 'Color roles', builder: _colorRoles),
+    WidgetbookUseCase(name: 'Shape matrix', builder: _shapeMatrix),
     WidgetbookUseCase(name: 'States', builder: _states),
     WidgetbookUseCase(name: 'Accessibility', builder: _accessibility),
   ],
@@ -33,7 +34,7 @@ Widget _sizeComparison(BuildContext context) => preview(
               semanticLabel: '${semanticValueLabel(size)} add action',
               size: size,
               colorRole: ActionColorRole.primary,
-              onInvoke: _noop,
+              onPressed: _noop,
             ),
         ],
       );
@@ -54,12 +55,38 @@ Widget _colorRoles(BuildContext context) => preview(
               icon: Icons.add,
               semanticLabel: '${semanticValueLabel(role)} add action',
               colorRole: role,
-              prominence: ActionProminence.high,
-              onInvoke: _noop,
+              prominence: ActionProminence.filled,
+              onPressed: _noop,
             ),
         ],
       );
     },
+  ),
+);
+
+Widget _shapeMatrix(BuildContext context) => preview(
+  Wrap(
+    spacing: 16,
+    runSpacing: 16,
+    children: [
+      for (final start in ShapeRole.values)
+        for (final end in ShapeRole.values)
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CarpenterIconButton(
+                icon: Icons.add,
+                semanticLabel: '${start.name} to ${end.name}',
+                shape: CarpenterShape(start: start, end: end),
+                prominence: ActionProminence.high,
+                colorRole: ActionColorRole.primary,
+                onPressed: _noop,
+              ),
+              const SizedBox(height: 4),
+              CarpenterText.caption('${start.name} → ${end.name}'),
+            ],
+          ),
+    ],
   ),
 );
 
@@ -93,13 +120,13 @@ Widget _playground(BuildContext context) {
   final startShape = context.knobs.object.segmented(
     label: 'Appearance · Start shape',
     options: ShapeRole.values,
-    initialOption: ShapeRole.circular,
+    initialOption: ShapeRole.rounded,
     labelBuilder: semanticValueLabel,
   );
   final endShape = context.knobs.object.segmented(
     label: 'Appearance · End shape',
     options: ShapeRole.values,
-    initialOption: ShapeRole.circular,
+    initialOption: ShapeRole.rounded,
     labelBuilder: semanticValueLabel,
   );
   final execution = context.knobs.object.segmented(
@@ -121,7 +148,7 @@ Widget _playground(BuildContext context) {
       size: size,
       shape: CarpenterShape(start: startShape, end: endShape),
       executionPhase: execution,
-      onInvoke: enabled ? _noop : null,
+      onPressed: enabled ? _noop : null,
     ),
   );
 }
@@ -130,7 +157,7 @@ Widget _states(BuildContext context) => previewColumn([
   const CarpenterIconButton(
     icon: Icons.add,
     semanticLabel: 'Enabled add',
-    onInvoke: _noop,
+    onPressed: _noop,
   ),
   const CarpenterIconButton(
     icon: Icons.delete,
@@ -140,7 +167,6 @@ Widget _states(BuildContext context) => previewColumn([
     icon: Icons.sync,
     semanticLabel: 'Synchronizing',
     executionPhase: ActionExecutionPhase.running,
-    onInvoke: _noop,
   ),
 ]);
 
@@ -150,7 +176,7 @@ Widget _accessibility(BuildContext context) => previewColumn([
     semanticLabel: 'Удалить договор',
     autofocus: true,
     colorRole: ActionColorRole.danger,
-    onInvoke: _noop,
+    onPressed: _noop,
   ),
   const CarpenterText.body(
     'The visible glyph never replaces the required semantic label.',
