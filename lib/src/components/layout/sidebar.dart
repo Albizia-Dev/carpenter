@@ -51,7 +51,9 @@ final class CarpenterSidebarData {
     this.selectedId,
     this.onSelected,
     this.header,
+    this.compactHeader,
     this.footer,
+    this.compactFooter,
     this.semanticLabel = 'Primary navigation',
   });
 
@@ -59,7 +61,9 @@ final class CarpenterSidebarData {
   final String? selectedId;
   final ValueChanged<String>? onSelected;
   final Widget? header;
+  final Widget? compactHeader;
   final Widget? footer;
+  final Widget? compactFooter;
   final String semanticLabel;
 }
 
@@ -90,6 +94,8 @@ final class CarpenterSidebar extends StatelessWidget {
     final padding = context.units(theme.spacing.small);
     final sectionGap = context.units(theme.spacing.medium);
     final borderWidth = context.units(theme.shapes.borderWidth);
+    final header = expanded ? data.header : data.compactHeader;
+    final footer = expanded ? data.footer : data.compactFooter;
 
     return Semantics(
       container: true,
@@ -108,10 +114,10 @@ final class CarpenterSidebar extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (data.header != null)
+                if (header != null)
                   Padding(
                     padding: EdgeInsets.all(padding),
-                    child: data.header!,
+                    child: header,
                   ),
                 Expanded(
                   child: ListView.separated(
@@ -127,10 +133,10 @@ final class CarpenterSidebar extends StatelessWidget {
                     ),
                   ),
                 ),
-                if (data.footer != null)
+                if (footer != null)
                   Padding(
                     padding: EdgeInsets.all(padding),
-                    child: data.footer!,
+                    child: footer,
                   ),
               ],
             ),
