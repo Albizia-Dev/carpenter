@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
@@ -25,20 +25,6 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-
-      - name: Format changed sources
-        run: dart format lib/src/components/layout/root_layout.dart lib/src/components/layout/sidebar.dart widgetbook/lib/use_cases/layout/adaptive_shell.dart
-
-      - name: Commit formatting
-        shell: bash
-        run: |
-          if ! git diff --quiet; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add lib/src/components/layout/root_layout.dart lib/src/components/layout/sidebar.dart widgetbook/lib/use_cases/layout/adaptive_shell.dart
-            git commit -m "style: format adaptive shell [skip ci]"
-            git push origin HEAD:adaptive-shell
-          fi
 
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib test widgetbook/lib
