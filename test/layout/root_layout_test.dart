@@ -53,6 +53,11 @@ void main() {
   testWidgets('desktop keeps one docked sidebar and can collapse it', (
     tester,
   ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1280, 700);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
     await tester.pumpWidget(_harness(width: 1280, child: const _RootHarness()));
     expect(find.byType(CarpenterSidebar), findsOneWidget);
     expect(find.text('Overview'), findsOneWidget);
