@@ -18,10 +18,7 @@ void main() {
 }
 
 final class CarpenterExampleApp extends StatefulWidget {
-  const CarpenterExampleApp({
-    super.key,
-    this.syncRouteInformation = true,
-  });
+  const CarpenterExampleApp({super.key, this.syncRouteInformation = true});
 
   final bool syncRouteInformation;
 
@@ -83,10 +80,7 @@ final class _CarpenterExampleAppState extends State<CarpenterExampleApp> {
         subtitle: 'Collection patterns and navigation',
         child: child,
       ),
-      page: (context) => ProjectsPage(
-        navigator: _navigator,
-        toaster: _toaster,
-      ),
+      page: (context) => ProjectsPage(navigator: _navigator, toaster: _toaster),
     ),
     CarpenterRoute(
       route: DemoRoutes.project,

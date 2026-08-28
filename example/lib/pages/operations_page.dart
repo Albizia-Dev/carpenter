@@ -51,7 +51,8 @@ final class _OperationsPageState extends State<OperationsPage> {
       CarpenterToastDescriptor(
         id: 'toast-${role.name}',
         title: title,
-        message: 'ToastRegion owns transient presentation, not application state.',
+        message:
+            'ToastRegion owns transient presentation, not application state.',
         role: role,
       ),
     );
@@ -194,18 +195,14 @@ final class _OperationsPageState extends State<OperationsPage> {
                   CarpenterButton(
                     label: 'Warning toast',
                     colorRole: ActionColorRole.warning,
-                    onPressed: () => _toast(
-                      FeedbackColorRole.warning,
-                      'Review required',
-                    ),
+                    onPressed: () =>
+                        _toast(FeedbackColorRole.warning, 'Review required'),
                   ),
                   CarpenterButton(
                     label: 'Danger toast',
                     colorRole: ActionColorRole.danger,
-                    onPressed: () => _toast(
-                      FeedbackColorRole.danger,
-                      'Operation failed',
-                    ),
+                    onPressed: () =>
+                        _toast(FeedbackColorRole.danger, 'Operation failed'),
                   ),
                   CarpenterButton(
                     label: 'Open dialog',

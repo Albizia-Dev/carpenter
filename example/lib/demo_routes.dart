@@ -8,12 +8,14 @@ abstract final class DemoRoutes {
   static const settings = YxRoute(id: 'settings');
 
   static RouteNode parse(Uri uri) {
-    final segments = uri.pathSegments.where((segment) => segment.isNotEmpty).toList();
+    final segments = uri.pathSegments
+        .where((segment) => segment.isNotEmpty)
+        .toList();
     if (segments.isEmpty) return dashboard.toNode();
     return switch (segments.first) {
       'projects' when segments.length > 1 => project.toNode(
-          arguments: <String, String>{'id': segments[1]},
-        ),
+        arguments: <String, String>{'id': segments[1]},
+      ),
       'projects' => projects.toNode(),
       'operations' => operations.toNode(),
       'settings' => settings.toNode(),
@@ -43,10 +45,8 @@ final class DemoNavigator {
   void operations() => go(DemoRoutes.operations);
   void settings() => go(DemoRoutes.settings);
 
-  void project(String id) => go(
-    DemoRoutes.project,
-    arguments: <String, String>{'id': id},
-  );
+  void project(String id) =>
+      go(DemoRoutes.project, arguments: <String, String>{'id': id});
 
   void go(YxRoute route, {Map<String, String>? arguments}) {
     navigation.mutate((_) => route.toNode(arguments: arguments));

@@ -73,9 +73,7 @@ final class _SettingsPageState extends State<SettingsPage> {
             'A controlled form composed from Carpenter fields and value controls.',
         status: CarpenterPageStatus(
           label: _dirty ? 'Unsaved changes' : 'Saved',
-          role: _dirty
-              ? FeedbackColorRole.warning
-              : FeedbackColorRole.success,
+          role: _dirty ? FeedbackColorRole.warning : FeedbackColorRole.success,
         ),
         primaryActions: [
           CarpenterActionDescriptor(

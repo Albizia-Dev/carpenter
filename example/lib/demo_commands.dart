@@ -72,7 +72,8 @@ final class DemoCommands {
              const CarpenterToastDescriptor(
                id: 'command-notification',
                title: 'Global command',
-               message: 'This toast was triggered by a Carpenter hotkey command.',
+               message:
+                   'This toast was triggered by a Carpenter hotkey command.',
                role: FeedbackColorRole.info,
              ),
            );

@@ -95,8 +95,7 @@ final class _DemoShellState extends State<DemoShell> {
           onSidebarExpandedChanged: (value) =>
               setState(() => _sidebarExpanded = value),
           sidebarOpen: _sidebarOpen,
-          onSidebarOpenChanged: (value) =>
-              setState(() => _sidebarOpen = value),
+          onSidebarOpenChanged: (value) => setState(() => _sidebarOpen = value),
           headerBuilder: (context, layout) => SafeArea(
             bottom: false,
             child: Column(
@@ -107,9 +106,7 @@ final class _DemoShellState extends State<DemoShell> {
                   subtitle: widget.subtitle,
                   leading: CarpenterIconButton(
                     icon: layout.isDesktop
-                        ? (_sidebarExpanded
-                              ? Icons.menu_open
-                              : Icons.menu)
+                        ? (_sidebarExpanded ? Icons.menu_open : Icons.menu)
                         : Icons.menu,
                     semanticLabel: layout.isDesktop
                         ? 'Toggle compact sidebar'

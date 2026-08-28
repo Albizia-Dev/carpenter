@@ -53,7 +53,10 @@ final class _ProjectPageState extends State<ProjectPage> {
         CarpenterEntityHeader(
           title: project.name,
           subtitle: '${project.id} · ${project.owner}',
-          status: CarpenterPageStatus(label: project.status, role: project.role),
+          status: CarpenterPageStatus(
+            label: project.status,
+            role: project.role,
+          ),
           metadata: [
             CarpenterStatusIndicator(
               label: '\$${project.amount}',
@@ -162,14 +165,16 @@ final class _ProjectPageState extends State<ProjectPage> {
                   CarpenterTimelineItem(
                     id: 'review',
                     title: 'Review completed',
-                    description: 'Architecture and delivery plan were approved.',
+                    description:
+                        'Architecture and delivery plan were approved.',
                     timestamp: DateTime(2026, 8, 24, 14, 10),
                     leading: const CarpenterAvatar(initials: 'AR', size: 32),
                   ),
                   CarpenterTimelineItem(
                     id: 'sync',
                     title: 'Latest synchronization',
-                    description: 'External data was reconciled with the project.',
+                    description:
+                        'External data was reconciled with the project.',
                     timestamp: DateTime(2026, 8, 28, 11, 45),
                     leading: const CarpenterAvatar(initials: 'SY', size: 32),
                   ),

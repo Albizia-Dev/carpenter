@@ -38,18 +38,20 @@ final class _ProjectsPageState extends State<ProjectsPage> {
 
   List<DemoProject> get _filtered {
     final query = _searchController.text.trim().toLowerCase();
-    final result = demoProjects.where((project) {
-      final matchesQuery =
-          query.isEmpty ||
-          project.id.toLowerCase().contains(query) ||
-          project.name.toLowerCase().contains(query) ||
-          project.owner.toLowerCase().contains(query);
-      final matchesAttention =
-          !_attentionOnly ||
-          project.role == FeedbackColorRole.warning ||
-          project.role == FeedbackColorRole.danger;
-      return matchesQuery && matchesAttention;
-    }).toList(growable: false);
+    final result = demoProjects
+        .where((project) {
+          final matchesQuery =
+              query.isEmpty ||
+              project.id.toLowerCase().contains(query) ||
+              project.name.toLowerCase().contains(query) ||
+              project.owner.toLowerCase().contains(query);
+          final matchesAttention =
+              !_attentionOnly ||
+              project.role == FeedbackColorRole.warning ||
+              project.role == FeedbackColorRole.danger;
+          return matchesQuery && matchesAttention;
+        })
+        .toList(growable: false);
 
     if (_sorting.isEmpty) return result;
     final sort = _sorting.first;
