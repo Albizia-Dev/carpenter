@@ -115,10 +115,7 @@ final class CarpenterSidebar extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (header != null)
-                  Padding(
-                    padding: EdgeInsets.all(padding),
-                    child: header,
-                  ),
+                  Padding(padding: EdgeInsets.all(padding), child: header),
                 Expanded(
                   child: ListView.separated(
                     padding: EdgeInsets.all(padding),
@@ -134,10 +131,7 @@ final class CarpenterSidebar extends StatelessWidget {
                   ),
                 ),
                 if (footer != null)
-                  Padding(
-                    padding: EdgeInsets.all(padding),
-                    child: footer,
-                  ),
+                  Padding(padding: EdgeInsets.all(padding), child: footer),
               ],
             ),
           ),
