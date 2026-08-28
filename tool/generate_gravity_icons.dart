@@ -136,6 +136,20 @@ void main() {
   final file = File(_outputFile);
   file.parent.createSync(recursive: true);
   file.writeAsStringSync(output.toString());
+
+  final formatResult = Process.runSync(
+    Platform.resolvedExecutable,
+    ['format', _outputFile],
+    runInShell: Platform.isWindows,
+  );
+  if (formatResult.exitCode != 0) {
+    stderr
+      ..write(formatResult.stdout)
+      ..write(formatResult.stderr);
+    exitCode = formatResult.exitCode;
+    return;
+  }
+
   stdout.writeln('Generated ${names.length} Gravity icons -> $_outputFile');
 }
 
