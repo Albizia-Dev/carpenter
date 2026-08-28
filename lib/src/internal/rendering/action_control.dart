@@ -73,19 +73,19 @@ final class ActionControl extends StatelessWidget {
       bottomEnd: endRadius,
     ).resolve(Directionality.of(context));
 
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final fillTightParent = !iconOnly && constraints.hasTightWidth;
-        return Semantics(
-          container: true,
-          button: true,
-          enabled: onInvoke != null,
-          label: semanticLabel,
-          value: _running ? 'running' : null,
-          liveRegion: _running,
-          onTap: _running ? null : onInvoke,
-          excludeSemantics: true,
-          child: InteractiveRegion(
+    return Semantics(
+      container: true,
+      button: true,
+      enabled: onInvoke != null,
+      label: semanticLabel,
+      value: _running ? 'running' : null,
+      liveRegion: _running,
+      onTap: _running ? null : onInvoke,
+      excludeSemantics: true,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final fillTightParent = !iconOnly && constraints.hasTightWidth;
+          return InteractiveRegion(
             onActivate: onInvoke,
             activationBlocked: _running,
             focusNode: focusNode,
@@ -164,9 +164,9 @@ final class ActionControl extends StatelessWidget {
                 ),
               );
             },
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
