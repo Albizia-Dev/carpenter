@@ -20,6 +20,7 @@ dependencies:
   bloc: ^9.2.1
   carpenter_mordant: ^0.4.1
   carpenter_units: ^0.3.0
+  flutter_svg: ^2.3.0
   yx_navigation: ^1.0.0
 
 dev_dependencies:
@@ -30,3 +31,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: false
+  assets:
+    - assets/icons/gravity/
