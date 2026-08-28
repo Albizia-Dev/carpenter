@@ -36,13 +36,20 @@ final class CarpenterListTile extends StatelessWidget {
       child: InteractiveRegion(
         onActivate: onInvoke,
         builder: (context, states, showFocusHighlight) {
-          final active = states.contains(WidgetState.hovered) || states.contains(WidgetState.pressed) || states.contains(WidgetState.focused);
+          final active =
+              states.contains(WidgetState.hovered) ||
+              states.contains(WidgetState.pressed) ||
+              states.contains(WidgetState.focused);
           return AnimatedContainer(
             duration: theme.motion.transitionDuration(context),
             curve: theme.motion.stateCurve,
             padding: EdgeInsets.symmetric(horizontal: gap, vertical: gap * .75),
             decoration: BoxDecoration(
-              color: selected ? theme.overlay.selected : active ? theme.overlay.hovered : const Color(0x00000000),
+              color: selected
+                  ? theme.overlay.selected
+                  : active
+                  ? theme.overlay.hovered
+                  : const Color(0x00000000),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -54,7 +61,10 @@ final class CarpenterListTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       title,
-                      if (subtitle != null) ...[SizedBox(height: gap / 2), subtitle!],
+                      if (subtitle != null) ...[
+                        SizedBox(height: gap / 2),
+                        subtitle!,
+                      ],
                     ],
                   ),
                 ),

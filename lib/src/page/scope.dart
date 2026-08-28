@@ -21,7 +21,8 @@ final class CarpenterPageScope extends InheritedWidget {
   final List<CarpenterPageCapability> capabilities;
 
   static CarpenterPageScope of(BuildContext context) {
-    final scope = context.dependOnInheritedWidgetOfExactType<CarpenterPageScope>();
+    final scope = context
+        .dependOnInheritedWidgetOfExactType<CarpenterPageScope>();
     assert(scope != null, 'No CarpenterPageScope found in context.');
     return scope!;
   }
@@ -34,5 +35,9 @@ final class CarpenterPageScope extends InheritedWidget {
   }
 
   @override
-  bool updateShouldNotify(CarpenterPageScope oldWidget) => descriptor != oldWidget.descriptor || controller != oldWidget.controller || commands != oldWidget.commands || capabilities != oldWidget.capabilities;
+  bool updateShouldNotify(CarpenterPageScope oldWidget) =>
+      descriptor != oldWidget.descriptor ||
+      controller != oldWidget.controller ||
+      commands != oldWidget.commands ||
+      capabilities != oldWidget.capabilities;
 }

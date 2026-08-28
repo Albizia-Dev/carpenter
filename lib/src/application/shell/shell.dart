@@ -8,7 +8,10 @@ final class CarpenterShellConfigureContext {
 }
 
 final class CarpenterShellBuildContext {
-  const CarpenterShellBuildContext({required this.runtime, required this.buildContext});
+  const CarpenterShellBuildContext({
+    required this.runtime,
+    required this.buildContext,
+  });
   final CarpenterRuntime runtime;
   final BuildContext buildContext;
 }
@@ -30,7 +33,8 @@ abstract class CarpenterShellBase implements CarpenterShell {
   @override
   Set<Type> get provides => const {};
   @override
-  CarpenterRuntime configure(CarpenterShellConfigureContext context) => context.runtime;
+  CarpenterRuntime configure(CarpenterShellConfigureContext context) =>
+      context.runtime;
   @override
   Widget wrap(CarpenterShellBuildContext context, Widget child) => child;
 }

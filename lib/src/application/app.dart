@@ -49,7 +49,8 @@ final class CarpenterApp extends StatelessWidget {
   final List<CarpenterShell> shells;
   final List<CarpenterModule> modules;
   final List<CarpenterRoute> routes;
-  final Widget Function(BuildContext context, Object? node)? missingRouteBuilder;
+  final Widget Function(BuildContext context, Object? node)?
+  missingRouteBuilder;
   final List<CarpenterCommand<void>> commands;
   final CarpenterHotkeyCommandCallback? onHotkeyCommand;
   final CarpenterHotkeyController? hotkeyController;
@@ -67,16 +68,45 @@ final class CarpenterApp extends StatelessWidget {
   final String? title;
   final bool debugShowCheckedModeBanner;
 
-  List<CarpenterRoute> get _routes => [...routes, for (final module in modules) ...module.routes];
+  List<CarpenterRoute> get _routes => [
+    ...routes,
+    for (final module in modules) ...module.routes,
+  ];
 
   List<CarpenterShell> _effectiveShells() {
     final result = <CarpenterShell>[...shells];
-    final provided = <Type>{for (final shell in shells) ...shell.provides, for (final module in modules) for (final shell in module.shells) ...shell.provides};
-    if (enableHotkeys && !provided.contains(CarpenterHotkeyRuntime) && (commands.isNotEmpty || onHotkeyCommand != null || hotkeyController != null)) {
-      result.add(CarpenterHotkeyShell(commands: commands, onCommand: onHotkeyCommand, controller: hotkeyController, platform: platform, trackPressedKeys: trackPressedKeys, autofocus: autofocusHotkeys));
+    final provided = <Type>{
+      for (final shell in shells) ...shell.provides,
+      for (final module in modules)
+        for (final shell in module.shells) ...shell.provides,
+    };
+    if (enableHotkeys &&
+        !provided.contains(CarpenterHotkeyRuntime) &&
+        (commands.isNotEmpty ||
+            onHotkeyCommand != null ||
+            hotkeyController != null)) {
+      result.add(
+        CarpenterHotkeyShell(
+          commands: commands,
+          onCommand: onHotkeyCommand,
+          controller: hotkeyController,
+          platform: platform,
+          trackPressedKeys: trackPressedKeys,
+          autofocus: autofocusHotkeys,
+        ),
+      );
     }
     if (useFrame && !provided.contains(CarpenterFrameRuntime)) {
-      result.add(CarpenterFrameShell(topPanelBuilder: topPanelBuilder, desktopTopPanelBuilder: desktopTopPanelBuilder, targetPlatform: platform, useSafeArea: useSafeArea, padding: framePadding, backgroundColor: backgroundColor));
+      result.add(
+        CarpenterFrameShell(
+          topPanelBuilder: topPanelBuilder,
+          desktopTopPanelBuilder: desktopTopPanelBuilder,
+          targetPlatform: platform,
+          useSafeArea: useSafeArea,
+          padding: framePadding,
+          backgroundColor: backgroundColor,
+        ),
+      );
     }
     return result;
   }
@@ -86,10 +116,15 @@ final class CarpenterApp extends StatelessWidget {
     modules: modules,
     platform: platform,
     locale: locale,
-    child: child ?? routedChild ?? CarpenterRouteRenderer(
-      routes: _routes,
-      missingRouteBuilder: (context, node) => missingRouteBuilder?.call(context, node) ?? const SizedBox.shrink(),
-    ),
+    child:
+        child ??
+        routedChild ??
+        CarpenterRouteRenderer(
+          routes: _routes,
+          missingRouteBuilder: (context, node) =>
+              missingRouteBuilder?.call(context, node) ??
+              const SizedBox.shrink(),
+        ),
   );
 
   @override

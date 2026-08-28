@@ -17,7 +17,11 @@ final class CarpenterRestorationCapability implements CarpenterPageCapability {
 }
 
 final class CarpenterDropCapability<T> implements CarpenterPageCapability {
-  const CarpenterDropCapability({required this.canAccept, required this.execute, this.previewBuilder});
+  const CarpenterDropCapability({
+    required this.canAccept,
+    required this.execute,
+    this.previewBuilder,
+  });
   final bool Function(T data) canAccept;
   final Future<void> Function(T data) execute;
   final Widget Function(BuildContext context, T data)? previewBuilder;
@@ -25,8 +29,12 @@ final class CarpenterDropCapability<T> implements CarpenterPageCapability {
 
 enum CarpenterSelectionMode { single, multiple }
 
-final class CarpenterSelectionController<T> extends ChangeNotifier implements CarpenterPageCapability {
-  CarpenterSelectionController({required this.identity, this.mode = CarpenterSelectionMode.multiple});
+final class CarpenterSelectionController<T> extends ChangeNotifier
+    implements CarpenterPageCapability {
+  CarpenterSelectionController({
+    required this.identity,
+    this.mode = CarpenterSelectionMode.multiple,
+  });
   final Object Function(T item) identity;
   final CarpenterSelectionMode mode;
   final Set<Object> _selected = {};
@@ -40,8 +48,12 @@ final class CarpenterSelectionController<T> extends ChangeNotifier implements Ca
     if (mode == CarpenterSelectionMode.single) _selected.clear();
     if (_selected.add(id)) notifyListeners();
   }
+
   void toggle(T item) => isSelected(item) ? deselect(item) : select(item);
-  void deselect(T item) { if (_selected.remove(identity(item))) notifyListeners(); }
+  void deselect(T item) {
+    if (_selected.remove(identity(item))) notifyListeners();
+  }
+
   void selectVisible(Iterable<T> items) {
     if (mode == CarpenterSelectionMode.single) {
       final iterator = items.iterator;
@@ -54,5 +66,11 @@ final class CarpenterSelectionController<T> extends ChangeNotifier implements Ca
     }
     notifyListeners();
   }
-  void clear() { if (_selected.isNotEmpty) { _selected.clear(); notifyListeners(); } }
+
+  void clear() {
+    if (_selected.isNotEmpty) {
+      _selected.clear();
+      notifyListeners();
+    }
+  }
 }

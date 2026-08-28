@@ -17,15 +17,23 @@ final class CarpenterRouterShell extends CarpenterShellBase {
 
   @override
   CarpenterRuntime configure(CarpenterShellConfigureContext context) =>
-      context.runtime.extend(CarpenterRouterRuntime(navigation: navigation, root: navigation.state));
+      context.runtime.extend(
+        CarpenterRouterRuntime(navigation: navigation, root: navigation.state),
+      );
 
   @override
-  Widget wrap(CarpenterShellBuildContext context, Widget child) => StreamBuilder<RouteNode?>(
-    stream: navigation.stream,
-    initialData: navigation.state,
-    builder: (buildContext, snapshot) => CarpenterRuntimeScope(
-      runtime: context.runtime.extend(CarpenterRouterRuntime(navigation: navigation, root: snapshot.data ?? navigation.state)),
-      child: child,
-    ),
-  );
+  Widget wrap(CarpenterShellBuildContext context, Widget child) =>
+      StreamBuilder<RouteNode?>(
+        stream: navigation.stream,
+        initialData: navigation.state,
+        builder: (buildContext, snapshot) => CarpenterRuntimeScope(
+          runtime: context.runtime.extend(
+            CarpenterRouterRuntime(
+              navigation: navigation,
+              root: snapshot.data ?? navigation.state,
+            ),
+          ),
+          child: child,
+        ),
+      );
 }

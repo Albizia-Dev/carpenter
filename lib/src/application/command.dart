@@ -10,7 +10,9 @@ import '../foundation/roles.dart';
 extension type const CarpenterCommandId(String value) {}
 
 enum CarpenterCommandVisibility { visible, hidden }
+
 enum CarpenterCommandExecution { idle, executing, failed }
+
 enum CarpenterCommandPresentation { primary, secondary, danger, automatic }
 
 abstract interface class CarpenterCommandEffect {
@@ -90,7 +92,8 @@ abstract interface class CarpenterCommand<I> {
   Future<CarpenterCommandResult> execute(I input);
 }
 
-final class CarpenterCommandController<I> extends ValueNotifier<CarpenterCommandState>
+final class CarpenterCommandController<I>
+    extends ValueNotifier<CarpenterCommandState>
     implements CarpenterCommand<I> {
   CarpenterCommandController({
     required this.id,
@@ -108,7 +111,8 @@ final class CarpenterCommandController<I> extends ValueNotifier<CarpenterCommand
     this.presentation = CarpenterCommandPresentation.automatic,
     this.effects = const [],
     CarpenterCommandState initialState = const CarpenterCommandState(),
-  }) : _execute = execute ?? ((_) => const CarpenterCommandResult()), super(initialState);
+  }) : _execute = execute ?? ((_) => const CarpenterCommandResult()),
+       super(initialState);
 
   @override
   final String id;
@@ -146,32 +150,52 @@ final class CarpenterCommandController<I> extends ValueNotifier<CarpenterCommand
     required bool enabled,
     String? disabledReason,
   }) {
-    value = value.copyWith(visibility: visibility, enabled: enabled, disabledReason: disabledReason);
+    value = value.copyWith(
+      visibility: visibility,
+      enabled: enabled,
+      disabledReason: disabledReason,
+    );
   }
 
   @override
   Future<CarpenterCommandResult> execute(I input) async {
-    if (!value.enabled || value.visibility == CarpenterCommandVisibility.hidden || value.execution == CarpenterCommandExecution.executing) {
+    if (!value.enabled ||
+        value.visibility == CarpenterCommandVisibility.hidden ||
+        value.execution == CarpenterCommandExecution.executing) {
       throw StateError(value.disabledReason ?? 'Command $id is unavailable.');
     }
-    value = value.copyWith(execution: CarpenterCommandExecution.executing, clearError: true);
+    value = value.copyWith(
+      execution: CarpenterCommandExecution.executing,
+      clearError: true,
+    );
     try {
       final result = await _execute(input);
-      value = value.copyWith(execution: CarpenterCommandExecution.idle, clearError: true);
+      value = value.copyWith(
+        execution: CarpenterCommandExecution.idle,
+        clearError: true,
+      );
       return result;
     } catch (error) {
-      value = value.copyWith(execution: CarpenterCommandExecution.failed, error: error);
+      value = value.copyWith(
+        execution: CarpenterCommandExecution.failed,
+        error: error,
+      );
       rethrow;
     }
   }
 }
 
 final class CarpenterCommandScope extends InheritedWidget {
-  const CarpenterCommandScope({super.key, required this.commands, required super.child});
+  const CarpenterCommandScope({
+    super.key,
+    required this.commands,
+    required super.child,
+  });
 
   final List<CarpenterCommand<dynamic>> commands;
 
-  static CarpenterCommandScope? maybeOf(BuildContext context) => context.dependOnInheritedWidgetOfExactType<CarpenterCommandScope>();
+  static CarpenterCommandScope? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<CarpenterCommandScope>();
   static CarpenterCommandScope of(BuildContext context) {
     final scope = maybeOf(context);
     assert(scope != null, 'No CarpenterCommandScope found in context.');
@@ -186,11 +210,16 @@ final class CarpenterCommandScope extends InheritedWidget {
   }
 
   @override
-  bool updateShouldNotify(CarpenterCommandScope oldWidget) => !listEquals(commands, oldWidget.commands);
+  bool updateShouldNotify(CarpenterCommandScope oldWidget) =>
+      !listEquals(commands, oldWidget.commands);
 }
 
 final class CarpenterCommandBinding<I> {
-  const CarpenterCommandBinding({required this.command, required this.input, this.shortcuts});
+  const CarpenterCommandBinding({
+    required this.command,
+    required this.input,
+    this.shortcuts,
+  });
   final CarpenterCommand<I> command;
   final I input;
   final List<ShortcutActivator>? shortcuts;
@@ -202,7 +231,11 @@ final class _CarpenterCommandIntent extends Intent {
 }
 
 final class CarpenterCommandShortcutScope extends StatelessWidget {
-  const CarpenterCommandShortcutScope({super.key, required this.bindings, required this.child});
+  const CarpenterCommandShortcutScope({
+    super.key,
+    required this.bindings,
+    required this.child,
+  });
   final List<CarpenterCommandBinding<dynamic>> bindings;
   final Widget child;
 
@@ -211,7 +244,9 @@ final class CarpenterCommandShortcutScope extends StatelessWidget {
     final shortcuts = <ShortcutActivator, Intent>{};
     for (final binding in bindings) {
       final state = binding.command.state.value;
-      if (!state.enabled || state.visibility == CarpenterCommandVisibility.hidden) continue;
+      if (!state.enabled ||
+          state.visibility == CarpenterCommandVisibility.hidden)
+        continue;
       for (final activator in binding.shortcuts ?? binding.command.shortcuts) {
         shortcuts[activator] = _CarpenterCommandIntent(() async {
           await binding.command.execute(binding.input);
@@ -230,31 +265,46 @@ final class CarpenterCommandShortcutScope extends StatelessWidget {
 }
 
 final class CarpenterCommandButton<I> extends StatelessWidget {
-  const CarpenterCommandButton({super.key, required this.command, required this.input});
+  const CarpenterCommandButton({
+    super.key,
+    required this.command,
+    required this.input,
+  });
   final CarpenterCommand<I> command;
   final I input;
 
   @override
-  Widget build(BuildContext context) => ValueListenableBuilder<CarpenterCommandState>(
-    valueListenable: command.state,
-    builder: (context, state, _) {
-      if (state.visibility == CarpenterCommandVisibility.hidden) return const SizedBox.shrink();
-      final presentation = command.presentation;
-      return CarpenterButton(
-        label: state.execution == CarpenterCommandExecution.executing ? '${command.title}…' : command.title,
-        onInvoke: state.enabled && state.execution != CarpenterCommandExecution.executing ? () => command.execute(input) : null,
-        colorRole: presentation == CarpenterCommandPresentation.danger ? ActionColorRole.danger : ActionColorRole.primary,
-        prominence: presentation == CarpenterCommandPresentation.primary
-            ? ActionProminence.high
-            : presentation == CarpenterCommandPresentation.danger
+  Widget build(BuildContext context) =>
+      ValueListenableBuilder<CarpenterCommandState>(
+        valueListenable: command.state,
+        builder: (context, state, _) {
+          if (state.visibility == CarpenterCommandVisibility.hidden)
+            return const SizedBox.shrink();
+          final presentation = command.presentation;
+          return CarpenterButton(
+            label: state.execution == CarpenterCommandExecution.executing
+                ? '${command.title}…'
+                : command.title,
+            onInvoke:
+                state.enabled &&
+                    state.execution != CarpenterCommandExecution.executing
+                ? () => command.execute(input)
+                : null,
+            colorRole: presentation == CarpenterCommandPresentation.danger
+                ? ActionColorRole.danger
+                : ActionColorRole.primary,
+            prominence: presentation == CarpenterCommandPresentation.primary
+                ? ActionProminence.high
+                : presentation == CarpenterCommandPresentation.danger
                 ? ActionProminence.outlined
                 : ActionProminence.outlined,
-        executionPhase: switch (state.execution) {
-          CarpenterCommandExecution.idle => ActionExecutionPhase.idle,
-          CarpenterCommandExecution.executing => ActionExecutionPhase.running,
-          CarpenterCommandExecution.failed => ActionExecutionPhase.failed,
+            executionPhase: switch (state.execution) {
+              CarpenterCommandExecution.idle => ActionExecutionPhase.idle,
+              CarpenterCommandExecution.executing =>
+                ActionExecutionPhase.running,
+              CarpenterCommandExecution.failed => ActionExecutionPhase.failed,
+            },
+          );
         },
       );
-    },
-  );
 }

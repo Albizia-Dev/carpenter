@@ -23,11 +23,13 @@ final class CarpenterRouteInformationSync with WidgetsBindingObserver {
   StreamSubscription<RouteNode?>? _subscription;
   Uri? _lastUri;
 
-  static Uri get initialUri => Uri.parse(WidgetsBinding.instance.platformDispatcher.defaultRouteName);
+  static Uri get initialUri =>
+      Uri.parse(WidgetsBinding.instance.platformDispatcher.defaultRouteName);
 
   void attach() {
     WidgetsBinding.instance.addObserver(this);
-    if (useMultiEntryHistory) unawaited(SystemNavigator.selectMultiEntryHistory());
+    if (useMultiEntryHistory)
+      unawaited(SystemNavigator.selectMultiEntryHistory());
     _reportRouteInformation(navigation.state, replace: true);
     _subscription = navigation.stream.listen(_onRouteChanged);
   }
@@ -39,19 +41,24 @@ final class CarpenterRouteInformationSync with WidgetsBindingObserver {
   }
 
   @override
-  Future<bool> didPushRouteInformation(RouteInformation routeInformation) async {
+  Future<bool> didPushRouteInformation(
+    RouteInformation routeInformation,
+  ) async {
     final nextTree = parse(routeInformation.uri);
     _lastUri = convert(nextTree);
     navigation.mutate((_) => nextTree);
     return true;
   }
 
-  void _onRouteChanged(RouteNode? node) => _reportRouteInformation(node, replace: false);
+  void _onRouteChanged(RouteNode? node) =>
+      _reportRouteInformation(node, replace: false);
 
   void _reportRouteInformation(RouteNode? node, {required bool replace}) {
     final uri = convert(node);
     if (_lastUri?.toString() == uri.toString()) return;
     _lastUri = uri;
-    unawaited(SystemNavigator.routeInformationUpdated(uri: uri, replace: replace));
+    unawaited(
+      SystemNavigator.routeInformationUpdated(uri: uri, replace: replace),
+    );
   }
 }

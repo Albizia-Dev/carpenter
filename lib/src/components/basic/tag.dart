@@ -8,7 +8,11 @@ enum CarpenterTagTone { neutral, success, warning, danger, info }
 
 /// Compact semantic tag backed by the current status-indicator primitive.
 final class CarpenterTag extends StatelessWidget {
-  const CarpenterTag({super.key, required this.label, this.tone = CarpenterTagTone.neutral});
+  const CarpenterTag({
+    super.key,
+    required this.label,
+    this.tone = CarpenterTagTone.neutral,
+  });
 
   final String label;
   final CarpenterTagTone tone;

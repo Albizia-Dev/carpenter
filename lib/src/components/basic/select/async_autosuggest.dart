@@ -8,10 +8,19 @@ import 'autosuggest.dart';
 final class CarpenterSearchCancellation extends ChangeNotifier {
   bool _cancelled = false;
   bool get isCancelled => _cancelled;
-  void cancel() { if (!_cancelled) { _cancelled = true; notifyListeners(); } }
+  void cancel() {
+    if (!_cancelled) {
+      _cancelled = true;
+      notifyListeners();
+    }
+  }
 }
 
-typedef CarpenterSuggestionLoader<T> = Future<List<CarpenterOption<T>>> Function(String query, CarpenterSearchCancellation cancellation);
+typedef CarpenterSuggestionLoader<T> =
+    Future<List<CarpenterOption<T>>> Function(
+      String query,
+      CarpenterSearchCancellation cancellation,
+    );
 
 /// Async lifecycle wrapper for CarpenterAutosuggest with debounce and stale-result protection.
 final class CarpenterAsyncAutosuggest<T> extends StatefulWidget {
@@ -35,10 +44,12 @@ final class CarpenterAsyncAutosuggest<T> extends StatefulWidget {
   final FieldAvailability availability;
 
   @override
-  State<CarpenterAsyncAutosuggest<T>> createState() => _CarpenterAsyncAutosuggestState<T>();
+  State<CarpenterAsyncAutosuggest<T>> createState() =>
+      _CarpenterAsyncAutosuggestState<T>();
 }
 
-final class _CarpenterAsyncAutosuggestState<T> extends State<CarpenterAsyncAutosuggest<T>> {
+final class _CarpenterAsyncAutosuggestState<T>
+    extends State<CarpenterAsyncAutosuggest<T>> {
   final TextEditingController _controller = TextEditingController();
   Timer? _timer;
   CarpenterSearchCancellation? _cancellation;
@@ -83,13 +94,15 @@ final class _CarpenterAsyncAutosuggestState<T> extends State<CarpenterAsyncAutos
     });
     try {
       final result = await widget.load(query, cancellation);
-      if (!mounted || generation != _generation || cancellation.isCancelled) return;
+      if (!mounted || generation != _generation || cancellation.isCancelled)
+        return;
       setState(() {
         _suggestions = result;
         _loadState = OptionsLoadState.ready;
       });
     } catch (_) {
-      if (!mounted || generation != _generation || cancellation.isCancelled) return;
+      if (!mounted || generation != _generation || cancellation.isCancelled)
+        return;
       setState(() => _loadState = OptionsLoadState.failed);
     }
   }

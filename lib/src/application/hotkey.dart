@@ -18,7 +18,8 @@ extension CarpenterCommandPlatformShortcuts on CarpenterCommand<dynamic> {
       TargetPlatform.android => androidShortcuts ?? shortcuts,
       TargetPlatform.fuchsia => fuchsiaShortcuts ?? shortcuts,
     };
-    if (platform != TargetPlatform.macOS && platform != TargetPlatform.iOS) return selected;
+    if (platform != TargetPlatform.macOS && platform != TargetPlatform.iOS)
+      return selected;
     return selected.map(_macOSActivator).toList(growable: false);
   }
 }
@@ -47,7 +48,10 @@ final class CarpenterHotkeySnapshot {
     this.phase,
   });
 
-  static const empty = CarpenterHotkeySnapshot(logicalKeys: {}, physicalKeys: {});
+  static const empty = CarpenterHotkeySnapshot(
+    logicalKeys: {},
+    physicalKeys: {},
+  );
   final Set<LogicalKeyboardKey> logicalKeys;
   final Set<PhysicalKeyboardKey> physicalKeys;
   final LogicalKeyboardKey? lastLogicalKey;
@@ -90,20 +94,38 @@ final class CarpenterHotkeyFormatter {
     return parts.join(_separator);
   }
 
-  String formatPressedKeys(Iterable<LogicalKeyboardKey> keys) => keys.map(_key).where((value) => value.isNotEmpty).join(_separator);
+  String formatPressedKeys(Iterable<LogicalKeyboardKey> keys) =>
+      keys.map(_key).where((value) => value.isNotEmpty).join(_separator);
 
-  bool get _apple => platform == TargetPlatform.macOS || platform == TargetPlatform.iOS;
+  bool get _apple =>
+      platform == TargetPlatform.macOS || platform == TargetPlatform.iOS;
   String get _separator => _apple ? '' : '+';
-  String get _meta => _apple ? '⌘' : platform == TargetPlatform.linux ? 'Super' : 'Win';
+  String get _meta => _apple
+      ? '⌘'
+      : platform == TargetPlatform.linux
+      ? 'Super'
+      : 'Win';
   String get _control => _apple ? '⌃' : 'Ctrl';
   String get _alt => _apple ? '⌥' : 'Alt';
   String get _shift => _apple ? '⇧' : 'Shift';
 
   String _key(LogicalKeyboardKey key) {
-    if (key == LogicalKeyboardKey.meta || key == LogicalKeyboardKey.metaLeft || key == LogicalKeyboardKey.metaRight) return _meta;
-    if (key == LogicalKeyboardKey.control || key == LogicalKeyboardKey.controlLeft || key == LogicalKeyboardKey.controlRight) return _control;
-    if (key == LogicalKeyboardKey.alt || key == LogicalKeyboardKey.altLeft || key == LogicalKeyboardKey.altRight) return _alt;
-    if (key == LogicalKeyboardKey.shift || key == LogicalKeyboardKey.shiftLeft || key == LogicalKeyboardKey.shiftRight) return _shift;
+    if (key == LogicalKeyboardKey.meta ||
+        key == LogicalKeyboardKey.metaLeft ||
+        key == LogicalKeyboardKey.metaRight)
+      return _meta;
+    if (key == LogicalKeyboardKey.control ||
+        key == LogicalKeyboardKey.controlLeft ||
+        key == LogicalKeyboardKey.controlRight)
+      return _control;
+    if (key == LogicalKeyboardKey.alt ||
+        key == LogicalKeyboardKey.altLeft ||
+        key == LogicalKeyboardKey.altRight)
+      return _alt;
+    if (key == LogicalKeyboardKey.shift ||
+        key == LogicalKeyboardKey.shiftLeft ||
+        key == LogicalKeyboardKey.shiftRight)
+      return _shift;
     if (key == LogicalKeyboardKey.enter) return 'Enter';
     if (key == LogicalKeyboardKey.escape) return 'Esc';
     if (key == LogicalKeyboardKey.space) return 'Space';
@@ -112,7 +134,11 @@ final class CarpenterHotkeyFormatter {
     if (key == LogicalKeyboardKey.arrowDown) return '↓';
     if (key == LogicalKeyboardKey.arrowLeft) return '←';
     final label = key.keyLabel;
-    return label.length == 1 ? label.toUpperCase() : label.isNotEmpty ? label : key.debugName ?? '';
+    return label.length == 1
+        ? label.toUpperCase()
+        : label.isNotEmpty
+        ? label
+        : key.debugName ?? '';
   }
 }
 
@@ -121,7 +147,8 @@ final class _HotkeyIntent extends Intent {
   final CarpenterCommand<void> command;
 }
 
-typedef CarpenterHotkeyCommandCallback = void Function(CarpenterCommand<void> command);
+typedef CarpenterHotkeyCommandCallback =
+    void Function(CarpenterCommand<void> command);
 
 final class CarpenterHotkeyScope extends StatefulWidget {
   const CarpenterHotkeyScope({
@@ -146,22 +173,28 @@ final class CarpenterHotkeyScope extends StatefulWidget {
   final bool autofocus;
 
   static _HotkeyBinding _bindingOf(BuildContext context) {
-    final binding = context.dependOnInheritedWidgetOfExactType<_HotkeyBinding>();
+    final binding = context
+        .dependOnInheritedWidgetOfExactType<_HotkeyBinding>();
     assert(binding != null, 'No CarpenterHotkeyScope found in context.');
     return binding!;
   }
 
-  static CarpenterHotkeySnapshot snapshotOf(BuildContext context) => _bindingOf(context).controller.snapshot;
-  static CarpenterHotkeyController controllerOf(BuildContext context) => _bindingOf(context).controller;
-  static List<CarpenterCommand<void>> commandsOf(BuildContext context) => _bindingOf(context).commands;
-  static CarpenterHotkeyFormatter formatterOf(BuildContext context) => _bindingOf(context).formatter;
+  static CarpenterHotkeySnapshot snapshotOf(BuildContext context) =>
+      _bindingOf(context).controller.snapshot;
+  static CarpenterHotkeyController controllerOf(BuildContext context) =>
+      _bindingOf(context).controller;
+  static List<CarpenterCommand<void>> commandsOf(BuildContext context) =>
+      _bindingOf(context).commands;
+  static CarpenterHotkeyFormatter formatterOf(BuildContext context) =>
+      _bindingOf(context).formatter;
 
   @override
   State<CarpenterHotkeyScope> createState() => _CarpenterHotkeyScopeState();
 }
 
 final class _CarpenterHotkeyScopeState extends State<CarpenterHotkeyScope> {
-  late CarpenterHotkeyController _controller = widget.controller ?? CarpenterHotkeyController();
+  late CarpenterHotkeyController _controller =
+      widget.controller ?? CarpenterHotkeyController();
   late bool _ownsController = widget.controller == null;
   TargetPlatform get _platform => widget.platform ?? defaultTargetPlatform;
 
@@ -189,13 +222,15 @@ final class _CarpenterHotkeyScopeState extends State<CarpenterHotkeyScope> {
       KeyUpEvent() => CarpenterHotkeyPhase.up,
       _ => null,
     };
-    _controller.setSnapshot(CarpenterHotkeySnapshot(
-      logicalKeys: HardwareKeyboard.instance.logicalKeysPressed,
-      physicalKeys: HardwareKeyboard.instance.physicalKeysPressed,
-      lastLogicalKey: event.logicalKey,
-      lastPhysicalKey: event.physicalKey,
-      phase: phase,
-    ));
+    _controller.setSnapshot(
+      CarpenterHotkeySnapshot(
+        logicalKeys: HardwareKeyboard.instance.logicalKeysPressed,
+        physicalKeys: HardwareKeyboard.instance.physicalKeysPressed,
+        lastLogicalKey: event.logicalKey,
+        lastPhysicalKey: event.physicalKey,
+        phase: phase,
+      ),
+    );
     return false;
   }
 
@@ -211,17 +246,22 @@ final class _CarpenterHotkeyScopeState extends State<CarpenterHotkeyScope> {
     final shortcuts = <ShortcutActivator, Intent>{};
     for (final command in widget.commands) {
       final state = command.state.value;
-      if (!widget.enabled || !state.enabled || state.visibility == CarpenterCommandVisibility.hidden) continue;
+      if (!widget.enabled ||
+          !state.enabled ||
+          state.visibility == CarpenterCommandVisibility.hidden)
+        continue;
       for (final activator in command.shortcutsFor(_platform)) {
         shortcuts[activator] = _HotkeyIntent(command);
       }
     }
     return Actions(
       actions: <Type, Action<Intent>>{
-        _HotkeyIntent: CallbackAction<_HotkeyIntent>(onInvoke: (intent) {
-          widget.onCommand?.call(intent.command);
-          return intent.command.execute(null);
-        }),
+        _HotkeyIntent: CallbackAction<_HotkeyIntent>(
+          onInvoke: (intent) {
+            widget.onCommand?.call(intent.command);
+            return intent.command.execute(null);
+          },
+        ),
       },
       child: Shortcuts(
         shortcuts: shortcuts,
@@ -239,18 +279,32 @@ final class _CarpenterHotkeyScopeState extends State<CarpenterHotkeyScope> {
   }
 }
 
-final class _HotkeyBinding extends InheritedNotifier<CarpenterHotkeyController> {
-  const _HotkeyBinding({required this.controller, required this.commands, required this.formatter, required super.child}) : super(notifier: controller);
+final class _HotkeyBinding
+    extends InheritedNotifier<CarpenterHotkeyController> {
+  const _HotkeyBinding({
+    required this.controller,
+    required this.commands,
+    required this.formatter,
+    required super.child,
+  }) : super(notifier: controller);
   final CarpenterHotkeyController controller;
   final List<CarpenterCommand<void>> commands;
   final CarpenterHotkeyFormatter formatter;
 
   @override
-  bool updateShouldNotify(_HotkeyBinding oldWidget) => controller != oldWidget.controller || commands != oldWidget.commands || formatter.platform != oldWidget.formatter.platform || super.updateShouldNotify(oldWidget);
+  bool updateShouldNotify(_HotkeyBinding oldWidget) =>
+      controller != oldWidget.controller ||
+      commands != oldWidget.commands ||
+      formatter.platform != oldWidget.formatter.platform ||
+      super.updateShouldNotify(oldWidget);
 }
 
 final class CarpenterHotkeyDisplay extends StatelessWidget {
-  const CarpenterHotkeyDisplay({super.key, this.title = 'Hotkeys', this.showCommands = true});
+  const CarpenterHotkeyDisplay({
+    super.key,
+    this.title = 'Hotkeys',
+    this.showCommands = true,
+  });
   final String title;
   final bool showCommands;
 
@@ -259,7 +313,9 @@ final class CarpenterHotkeyDisplay extends StatelessWidget {
     final snapshot = CarpenterHotkeyScope.snapshotOf(context);
     final commands = CarpenterHotkeyScope.commandsOf(context);
     final formatter = CarpenterHotkeyScope.formatterOf(context);
-    final pressed = snapshot.hasPressedKeys ? formatter.formatPressedKeys(snapshot.logicalKeys) : 'Nothing pressed';
+    final pressed = snapshot.hasPressedKeys
+        ? formatter.formatPressedKeys(snapshot.logicalKeys)
+        : 'Nothing pressed';
     return CarpenterCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -270,8 +326,15 @@ final class CarpenterHotkeyDisplay extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              CarpenterStatusIndicator(label: pressed, role: FeedbackColorRole.info),
-              if (snapshot.phase != null) CarpenterStatusIndicator(label: snapshot.phase!.name, role: FeedbackColorRole.neutral),
+              CarpenterStatusIndicator(
+                label: pressed,
+                role: FeedbackColorRole.info,
+              ),
+              if (snapshot.phase != null)
+                CarpenterStatusIndicator(
+                  label: snapshot.phase!.name,
+                  role: FeedbackColorRole.neutral,
+                ),
             ],
           ),
           if (showCommands && commands.isNotEmpty) ...[

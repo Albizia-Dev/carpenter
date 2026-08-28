@@ -38,26 +38,44 @@ final class CarpenterExplorerPage extends StatelessWidget {
     return CarpenterPage(
       descriptor: descriptor,
       state: state,
-      header: header ?? CarpenterPageHeader(title: descriptor.title, actions: search),
-      body: LayoutBuilder(builder: (context, constraints) {
-        if (constraints.maxWidth < breakpoint) {
-          return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            if (search != null) ...[search!, SizedBox(height: gap)],
-            compactNavigation ?? navigation,
-            SizedBox(height: gap),
-            Expanded(child: content),
-          ]);
-        }
-        return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          if (search != null) ...[search!, SizedBox(height: gap)],
-          Expanded(child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            SizedBox(width: 250, child: navigation),
-            SizedBox(width: gap),
-            Expanded(child: content),
-            if (inspector != null) ...[SizedBox(width: gap), inspector!],
-          ])),
-        ]);
-      }),
+      header:
+          header ??
+          CarpenterPageHeader(title: descriptor.title, actions: search),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          if (constraints.maxWidth < breakpoint) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (search != null) ...[search!, SizedBox(height: gap)],
+                compactNavigation ?? navigation,
+                SizedBox(height: gap),
+                Expanded(child: content),
+              ],
+            );
+          }
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (search != null) ...[search!, SizedBox(height: gap)],
+              Expanded(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(width: 250, child: navigation),
+                    SizedBox(width: gap),
+                    Expanded(child: content),
+                    if (inspector != null) ...[
+                      SizedBox(width: gap),
+                      inspector!,
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

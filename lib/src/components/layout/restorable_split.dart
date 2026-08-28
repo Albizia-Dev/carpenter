@@ -37,43 +37,64 @@ final class CarpenterAdaptiveSplitLayout extends StatefulWidget {
   final String restorationKey;
 
   @override
-  State<CarpenterAdaptiveSplitLayout> createState() => _CarpenterAdaptiveSplitLayoutState();
+  State<CarpenterAdaptiveSplitLayout> createState() =>
+      _CarpenterAdaptiveSplitLayoutState();
 }
 
-final class _CarpenterAdaptiveSplitLayoutState extends State<CarpenterAdaptiveSplitLayout> {
+final class _CarpenterAdaptiveSplitLayoutState
+    extends State<CarpenterAdaptiveSplitLayout> {
   late double _ratio = widget.initialRatio.clamp(.1, .9).toDouble();
 
   @override
-  void initState() { super.initState(); unawaited(_restore()); }
+  void initState() {
+    super.initState();
+    unawaited(_restore());
+  }
+
   Future<void> _restore() async {
     final value = await widget.restoration?.read<double>(widget.restorationKey);
-    if (mounted && value != null) setState(() => _ratio = value.clamp(.1, .9).toDouble());
+    if (mounted && value != null)
+      setState(() => _ratio = value.clamp(.1, .9).toDouble());
   }
+
   void _changed(double value) {
     setState(() => _ratio = value);
-    unawaited(widget.restoration?.write<double>(widget.restorationKey, value) ?? Future<void>.value());
+    unawaited(
+      widget.restoration?.write<double>(widget.restorationKey, value) ??
+          Future<void>.value(),
+    );
   }
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(builder: (context, constraints) {
-    final minimum = widget.minPrimaryWidth + widget.minSecondaryWidth;
-    if (constraints.maxWidth < widget.breakpoint || constraints.maxWidth < minimum) {
-      return switch (widget.narrowRegion) {
-        CarpenterSplitNarrowRegion.primary => widget.primary,
-        CarpenterSplitNarrowRegion.secondary => widget.secondary,
-        CarpenterSplitNarrowRegion.inspector => widget.inspector ?? widget.secondary,
-      };
-    }
-    final secondary = widget.inspector == null
-        ? widget.secondary
-        : Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Expanded(child: widget.secondary), widget.inspector!]);
-    return CarpenterSplitView(
-      primary: widget.primary,
-      secondary: secondary,
-      position: _ratio,
-      minimumPosition: widget.minPrimaryWidth / constraints.maxWidth,
-      maximumPosition: 1 - widget.minSecondaryWidth / constraints.maxWidth,
-      onPositionChanged: widget.resizable ? _changed : null,
-    );
-  });
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final minimum = widget.minPrimaryWidth + widget.minSecondaryWidth;
+      if (constraints.maxWidth < widget.breakpoint ||
+          constraints.maxWidth < minimum) {
+        return switch (widget.narrowRegion) {
+          CarpenterSplitNarrowRegion.primary => widget.primary,
+          CarpenterSplitNarrowRegion.secondary => widget.secondary,
+          CarpenterSplitNarrowRegion.inspector =>
+            widget.inspector ?? widget.secondary,
+        };
+      }
+      final secondary = widget.inspector == null
+          ? widget.secondary
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(child: widget.secondary),
+                widget.inspector!,
+              ],
+            );
+      return CarpenterSplitView(
+        primary: widget.primary,
+        secondary: secondary,
+        position: _ratio,
+        minimumPosition: widget.minPrimaryWidth / constraints.maxWidth,
+        maximumPosition: 1 - widget.minSecondaryWidth / constraints.maxWidth,
+        onPositionChanged: widget.resizable ? _changed : null,
+      );
+    },
+  );
 }

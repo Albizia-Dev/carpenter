@@ -55,8 +55,14 @@ final class CarpenterPage extends StatelessWidget {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.layoutSection);
     final permission = descriptor.permission;
-    final effectiveState = permission != null && !permission.granted ? CarpenterPageForbidden(reason: permission.reason) : pageState;
-    final pageCommands = <CarpenterCommand<dynamic>>[...?(controller?.pageCommands), ...commands, for (final binding in commandBindings) binding.command];
+    final effectiveState = permission != null && !permission.granted
+        ? CarpenterPageForbidden(reason: permission.reason)
+        : pageState;
+    final pageCommands = <CarpenterCommand<dynamic>>[
+      ...?(controller?.pageCommands),
+      ...commands,
+      for (final binding in commandBindings) binding.command,
+    ];
     Widget content = ColoredBox(
       color: theme.surface.base,
       child: SafeArea(
@@ -64,7 +70,9 @@ final class CarpenterPage extends StatelessWidget {
           children: [
             Positioned.fill(
               child: Padding(
-                padding: EdgeInsets.all(context.units(theme.spacing.layoutPage)),
+                padding: EdgeInsets.all(
+                  context.units(theme.spacing.layoutPage),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -73,7 +81,12 @@ final class CarpenterPage extends StatelessWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          Expanded(child: CarpenterPageStateBoundary(state: effectiveState, child: body)),
+                          Expanded(
+                            child: CarpenterPageStateBoundary(
+                              state: effectiveState,
+                              child: body,
+                            ),
+                          ),
                           if (aside != null) ...[SizedBox(width: gap), aside!],
                         ],
                       ),
@@ -89,7 +102,17 @@ final class CarpenterPage extends StatelessWidget {
       ),
     );
     content = CarpenterCommandScope(commands: pageCommands, child: content);
-    if (commandBindings.isNotEmpty) content = CarpenterCommandShortcutScope(bindings: commandBindings, child: content);
-    return CarpenterPageScope(descriptor: descriptor, controller: controller, commands: pageCommands, capabilities: capabilities, child: content);
+    if (commandBindings.isNotEmpty)
+      content = CarpenterCommandShortcutScope(
+        bindings: commandBindings,
+        child: content,
+      );
+    return CarpenterPageScope(
+      descriptor: descriptor,
+      controller: controller,
+      commands: pageCommands,
+      capabilities: capabilities,
+      child: content,
+    );
   }
 }

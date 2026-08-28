@@ -49,7 +49,11 @@ final class _CarpenterDateInputState extends State<CarpenterDateInput> {
             setState(() => _open = false);
           },
         ),
-      CarpenterActionDescriptor(id: 'date.cancel', label: 'Cancel', onInvoke: () => setState(() => _open = false)),
+      CarpenterActionDescriptor(
+        id: 'date.cancel',
+        label: 'Cancel',
+        onInvoke: () => setState(() => _open = false),
+      ),
     ],
     content: CarpenterCalendar(
       selected: widget.value,
@@ -61,7 +65,9 @@ final class _CarpenterDateInputState extends State<CarpenterDateInput> {
       },
     ),
     child: CarpenterButton(
-      label: widget.value == null ? widget.placeholder : carpenterFormatDate(widget.value!),
+      label: widget.value == null
+          ? widget.placeholder
+          : carpenterFormatDate(widget.value!),
       prominence: ActionProminence.outlined,
       onInvoke: widget.enabled ? () => setState(() => _open = true) : null,
     ),

@@ -40,7 +40,9 @@ final class CarpenterNotice extends StatelessWidget {
     final gap = context.units(theme.spacing.medium);
     return Semantics(
       container: true,
-      liveRegion: tone == CarpenterNoticeTone.danger || tone == CarpenterNoticeTone.warning,
+      liveRegion:
+          tone == CarpenterNoticeTone.danger ||
+          tone == CarpenterNoticeTone.warning,
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: feedback.background,
@@ -55,7 +57,10 @@ final class CarpenterNotice extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CarpenterText.label(title, emphasis: TypographyEmphasis.strong),
+                  CarpenterText.label(
+                    title,
+                    emphasis: TypographyEmphasis.strong,
+                  ),
                   if (message != null) ...[
                     SizedBox(height: gap / 2),
                     CarpenterText.body(message!),
@@ -79,7 +84,12 @@ final class CarpenterNotice extends StatelessWidget {
                   children: [
                     details,
                     SizedBox(height: gap),
-                    Wrap(spacing: gap, runSpacing: gap, alignment: WrapAlignment.end, children: actions),
+                    Wrap(
+                      spacing: gap,
+                      runSpacing: gap,
+                      alignment: WrapAlignment.end,
+                      children: actions,
+                    ),
                   ],
                 );
               }

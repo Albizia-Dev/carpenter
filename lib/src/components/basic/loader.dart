@@ -8,7 +8,12 @@ import '../../foundation/theme.dart';
 
 /// Indeterminate circular activity indicator without Material dependency.
 final class CarpenterLoader extends StatefulWidget {
-  const CarpenterLoader({super.key, this.size = 24, this.strokeWidth = 2.5, this.semanticLabel = 'Loading'});
+  const CarpenterLoader({
+    super.key,
+    this.size = 24,
+    this.strokeWidth = 2.5,
+    this.semanticLabel = 'Loading',
+  });
 
   final double size;
   final double strokeWidth;
@@ -46,11 +51,13 @@ final class _CarpenterLoaderState extends State<CarpenterLoader>
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
-    final accent = theme.actions.resolve(
-      ActionColorRole.primary,
-      ActionProminence.high,
-      const <WidgetState>{},
-    ).background;
+    final accent = theme.actions
+        .resolve(
+          ActionColorRole.primary,
+          ActionProminence.high,
+          const <WidgetState>{},
+        )
+        .background;
     return Semantics(
       label: widget.semanticLabel,
       liveRegion: true,
@@ -75,7 +82,11 @@ final class _CarpenterLoaderState extends State<CarpenterLoader>
 }
 
 final class _LoaderPainter extends CustomPainter {
-  const _LoaderPainter({required this.color, required this.track, required this.strokeWidth});
+  const _LoaderPainter({
+    required this.color,
+    required this.track,
+    required this.strokeWidth,
+  });
 
   final Color color;
   final Color track;
@@ -106,5 +117,7 @@ final class _LoaderPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_LoaderPainter oldDelegate) =>
-      oldDelegate.color != color || oldDelegate.track != track || oldDelegate.strokeWidth != strokeWidth;
+      oldDelegate.color != color ||
+      oldDelegate.track != track ||
+      oldDelegate.strokeWidth != strokeWidth;
 }

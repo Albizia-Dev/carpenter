@@ -37,15 +37,21 @@ final class CarpenterFrameShell extends CarpenterShellBase {
   @override
   Set<Type> get provides => const {CarpenterFrameRuntime};
   @override
-  CarpenterRuntime configure(CarpenterShellConfigureContext context) => context.runtime.extend(CarpenterFrameRuntime(platform: targetPlatform ?? context.runtime.core.platform));
+  CarpenterRuntime configure(CarpenterShellConfigureContext context) =>
+      context.runtime.extend(
+        CarpenterFrameRuntime(
+          platform: targetPlatform ?? context.runtime.core.platform,
+        ),
+      );
   @override
-  Widget wrap(CarpenterShellBuildContext context, Widget child) => CarpenterAppFrame(
-    topPanelBuilder: topPanelBuilder,
-    desktopTopPanelBuilder: desktopTopPanelBuilder,
-    targetPlatform: targetPlatform,
-    useSafeArea: useSafeArea,
-    padding: padding,
-    backgroundColor: backgroundColor,
-    child: child,
-  );
+  Widget wrap(CarpenterShellBuildContext context, Widget child) =>
+      CarpenterAppFrame(
+        topPanelBuilder: topPanelBuilder,
+        desktopTopPanelBuilder: desktopTopPanelBuilder,
+        targetPlatform: targetPlatform,
+        useSafeArea: useSafeArea,
+        padding: padding,
+        backgroundColor: backgroundColor,
+        child: child,
+      );
 }

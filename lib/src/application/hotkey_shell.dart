@@ -6,7 +6,11 @@ import 'runtime/runtime.dart';
 import 'shell/shell.dart';
 
 final class CarpenterHotkeyRuntime {
-  const CarpenterHotkeyRuntime({required this.controller, required this.commands, required this.platform});
+  const CarpenterHotkeyRuntime({
+    required this.controller,
+    required this.commands,
+    required this.platform,
+  });
   final CarpenterHotkeyController controller;
   final List<CarpenterCommand<void>> commands;
   final TargetPlatform platform;
@@ -38,12 +42,19 @@ final class CarpenterHotkeyShell extends CarpenterShellBase {
   @override
   Set<Type> get provides => const {CarpenterHotkeyRuntime};
 
-  CarpenterHotkeyController get _controller => controller ?? CarpenterHotkeyController();
+  CarpenterHotkeyController get _controller =>
+      controller ?? CarpenterHotkeyController();
 
   @override
   CarpenterRuntime configure(CarpenterShellConfigureContext context) {
     final target = platform ?? context.runtime.core.platform;
-    return context.runtime.extend(CarpenterHotkeyRuntime(controller: _controller, commands: commands, platform: target));
+    return context.runtime.extend(
+      CarpenterHotkeyRuntime(
+        controller: _controller,
+        commands: commands,
+        platform: target,
+      ),
+    );
   }
 
   @override

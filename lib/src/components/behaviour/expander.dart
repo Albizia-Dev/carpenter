@@ -31,7 +31,8 @@ final class _CarpenterExpanderState extends State<CarpenterExpander> {
   @override
   void didUpdateWidget(CarpenterExpander oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.initiallyExpanded != widget.initiallyExpanded) _expanded = widget.initiallyExpanded;
+    if (oldWidget.initiallyExpanded != widget.initiallyExpanded)
+      _expanded = widget.initiallyExpanded;
   }
 
   void _toggle() {
@@ -65,7 +66,10 @@ final class _CarpenterExpanderState extends State<CarpenterExpander> {
             curve: theme.motion.stateCurve,
             alignment: Alignment.topCenter,
             child: _expanded
-                ? Padding(padding: EdgeInsets.only(top: gap), child: widget.content)
+                ? Padding(
+                    padding: EdgeInsets.only(top: gap),
+                    child: widget.content,
+                  )
                 : const SizedBox(width: double.infinity),
           ),
         ],

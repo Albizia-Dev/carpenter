@@ -91,7 +91,16 @@ final class _CarpenterColorPickerState extends State<CarpenterColorPicker> {
     final red = int.tryParse(_red.text);
     final green = int.tryParse(_green.text);
     final blue = int.tryParse(_blue.text);
-    final valid = red != null && green != null && blue != null && red >= 0 && red <= 255 && green >= 0 && green <= 255 && blue >= 0 && blue <= 255;
+    final valid =
+        red != null &&
+        green != null &&
+        blue != null &&
+        red >= 0 &&
+        red <= 255 &&
+        green >= 0 &&
+        green <= 255 &&
+        blue >= 0 &&
+        blue <= 255;
     setState(() => _rgbError = valid ? null : 'RGB values must be 0–255');
     if (valid) _emit(Color.fromARGB(255, red, green, blue), syncRgb: false);
   }
@@ -125,9 +134,18 @@ final class _CarpenterColorPickerState extends State<CarpenterColorPicker> {
                 final size = Size(constraints.maxWidth, widget.paletteHeight);
                 return GestureDetector(
                   behavior: HitTestBehavior.opaque,
-                  onPanDown: widget.enabled ? (event) => _setSaturationValue(event.localPosition, size) : null,
-                  onPanUpdate: widget.enabled ? (event) => _setSaturationValue(event.localPosition, size) : null,
-                  child: CustomPaint(size: size, painter: _SaturationValuePainter(_hsv)),
+                  onPanDown: widget.enabled
+                      ? (event) =>
+                            _setSaturationValue(event.localPosition, size)
+                      : null,
+                  onPanUpdate: widget.enabled
+                      ? (event) =>
+                            _setSaturationValue(event.localPosition, size)
+                      : null,
+                  child: CustomPaint(
+                    size: size,
+                    painter: _SaturationValuePainter(_hsv),
+                  ),
                 );
               },
             ),
@@ -138,9 +156,18 @@ final class _CarpenterColorPickerState extends State<CarpenterColorPicker> {
             child: LayoutBuilder(
               builder: (context, constraints) => GestureDetector(
                 behavior: HitTestBehavior.opaque,
-                onPanDown: widget.enabled ? (event) => _setHue(event.localPosition.dx, constraints.maxWidth) : null,
-                onPanUpdate: widget.enabled ? (event) => _setHue(event.localPosition.dx, constraints.maxWidth) : null,
-                child: CustomPaint(size: Size(constraints.maxWidth, 24), painter: _HuePainter(_hsv.hue)),
+                onPanDown: widget.enabled
+                    ? (event) =>
+                          _setHue(event.localPosition.dx, constraints.maxWidth)
+                    : null,
+                onPanUpdate: widget.enabled
+                    ? (event) =>
+                          _setHue(event.localPosition.dx, constraints.maxWidth)
+                    : null,
+                child: CustomPaint(
+                  size: Size(constraints.maxWidth, 24),
+                  painter: _HuePainter(_hsv.hue),
+                ),
               ),
             ),
           ),
@@ -150,18 +177,26 @@ final class _CarpenterColorPickerState extends State<CarpenterColorPicker> {
               final hex = CarpenterInput(
                 controller: _hex,
                 label: 'HEX',
-                availability: widget.enabled ? FieldAvailability.enabled : FieldAvailability.disabled,
+                availability: widget.enabled
+                    ? FieldAvailability.enabled
+                    : FieldAvailability.disabled,
                 errorText: _hexError,
                 onChanged: _onHexChanged,
               );
               final rgb = Row(
                 children: [
-                  for (final entry in [('R', _red), ('G', _green), ('B', _blue)]) ...[
+                  for (final entry in [
+                    ('R', _red),
+                    ('G', _green),
+                    ('B', _blue),
+                  ]) ...[
                     Expanded(
                       child: CarpenterInput(
                         controller: entry.$2,
                         label: entry.$1,
-                        availability: widget.enabled ? FieldAvailability.enabled : FieldAvailability.disabled,
+                        availability: widget.enabled
+                            ? FieldAvailability.enabled
+                            : FieldAvailability.disabled,
                         errorText: entry.$1 == 'B' ? _rgbError : null,
                         keyboardType: TextInputType.number,
                         onChanged: _onRgbChanged,
@@ -172,9 +207,22 @@ final class _CarpenterColorPickerState extends State<CarpenterColorPicker> {
                 ],
               );
               if (constraints.maxWidth < 520) {
-                return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [hex, SizedBox(height: gap), rgb]);
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    hex,
+                    SizedBox(height: gap),
+                    rgb,
+                  ],
+                );
               }
-              return Row(children: [Expanded(flex: 2, child: hex), SizedBox(width: gap), Expanded(flex: 3, child: rgb)]);
+              return Row(
+                children: [
+                  Expanded(flex: 2, child: hex),
+                  SizedBox(width: gap),
+                  Expanded(flex: 3, child: rgb),
+                ],
+              );
             },
           ),
         ],
@@ -206,17 +254,45 @@ final class _SaturationValuePainter extends CustomPainter {
     final rect = Offset.zero & size;
     canvas.save();
     canvas.clipRRect(RRect.fromRectAndRadius(rect, const Radius.circular(8)));
-    canvas.drawRect(rect, Paint()..color = HSVColor.fromAHSV(1, color.hue, 1, 1).toColor());
-    canvas.drawRect(rect, Paint()..shader = const LinearGradient(colors: [Color(0xffffffff), Color(0x00ffffff)]).createShader(rect));
-    canvas.drawRect(rect, Paint()..shader = const LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0x00000000), Color(0xff000000)]).createShader(rect));
+    canvas.drawRect(
+      rect,
+      Paint()..color = HSVColor.fromAHSV(1, color.hue, 1, 1).toColor(),
+    );
+    canvas.drawRect(
+      rect,
+      Paint()
+        ..shader = const LinearGradient(
+          colors: [Color(0xffffffff), Color(0x00ffffff)],
+        ).createShader(rect),
+    );
+    canvas.drawRect(
+      rect,
+      Paint()
+        ..shader = const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0x00000000), Color(0xff000000)],
+        ).createShader(rect),
+    );
     canvas.restore();
-    final point = Offset(color.saturation * size.width, (1 - color.value) * size.height);
+    final point = Offset(
+      color.saturation * size.width,
+      (1 - color.value) * size.height,
+    );
     canvas.drawCircle(point, 7, Paint()..color = const Color(0xffffffff));
-    canvas.drawCircle(point, 7, Paint()..style = PaintingStyle.stroke..strokeWidth = 2..color = const Color(0xff111827));
+    canvas.drawCircle(
+      point,
+      7,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2
+        ..color = const Color(0xff111827),
+    );
   }
 
   @override
-  bool shouldRepaint(_SaturationValuePainter oldDelegate) => oldDelegate.color != color;
+  bool shouldRepaint(_SaturationValuePainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 final class _HuePainter extends CustomPainter {
@@ -228,10 +304,24 @@ final class _HuePainter extends CustomPainter {
     final rect = Offset.zero & size;
     canvas.drawRRect(
       RRect.fromRectAndRadius(rect, const Radius.circular(8)),
-      Paint()..shader = const LinearGradient(colors: [Color(0xffff0000), Color(0xffffff00), Color(0xff00ff00), Color(0xff00ffff), Color(0xff0000ff), Color(0xffff00ff), Color(0xffff0000)]).createShader(rect),
+      Paint()
+        ..shader = const LinearGradient(
+          colors: [
+            Color(0xffff0000),
+            Color(0xffffff00),
+            Color(0xff00ff00),
+            Color(0xff00ffff),
+            Color(0xff0000ff),
+            Color(0xffff00ff),
+            Color(0xffff0000),
+          ],
+        ).createShader(rect),
     );
     final x = hue / 360 * size.width;
-    canvas.drawRect(Rect.fromCenter(center: Offset(x, size.height / 2), width: 3, height: 30), Paint()..color = const Color(0xffffffff));
+    canvas.drawRect(
+      Rect.fromCenter(center: Offset(x, size.height / 2), width: 3, height: 30),
+      Paint()..color = const Color(0xffffffff),
+    );
   }
 
   @override

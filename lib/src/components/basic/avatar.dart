@@ -33,9 +33,13 @@ final class CarpenterAvatar extends StatelessWidget {
       child: SizedBox.square(
         dimension: size,
         child: DecoratedBox(
-          decoration: BoxDecoration(color: style.background, shape: BoxShape.circle),
+          decoration: BoxDecoration(
+            color: style.background,
+            shape: BoxShape.circle,
+          ),
           child: Center(
-            child: child ??
+            child:
+                child ??
                 CarpenterText.label(
                   initials!,
                   emphasis: TypographyEmphasis.strong,

@@ -8,7 +8,8 @@ import '../basic/text.dart';
 
 typedef CarpenterInspectorLabelBuilder = String Function(String key);
 typedef CarpenterInspectorScalarBuilder = String Function(Object? value);
-typedef CarpenterInspectorFieldFilter = bool Function(String key, Object? value);
+typedef CarpenterInspectorFieldFilter =
+    bool Function(String key, Object? value);
 
 /// Recursive readable presentation for map/list payloads and diagnostic data.
 final class CarpenterInspector extends StatelessWidget {
@@ -28,7 +29,8 @@ final class CarpenterInspector extends StatelessWidget {
   final String emptyMessage;
 
   String _label(String key) => labelBuilder?.call(key) ?? key;
-  String _scalar(Object? value) => scalarBuilder?.call(value) ?? value?.toString() ?? '—';
+  String _scalar(Object? value) =>
+      scalarBuilder?.call(value) ?? value?.toString() ?? '—';
 
   @override
   Widget build(BuildContext context) => _InspectorValue(
@@ -41,7 +43,13 @@ final class CarpenterInspector extends StatelessWidget {
 }
 
 final class _InspectorValue extends StatelessWidget {
-  const _InspectorValue({required this.value, required this.label, required this.scalar, required this.fieldFilter, required this.emptyMessage});
+  const _InspectorValue({
+    required this.value,
+    required this.label,
+    required this.scalar,
+    required this.fieldFilter,
+    required this.emptyMessage,
+  });
   final Object? value;
   final String Function(String key) label;
   final String Function(Object? value) scalar;
@@ -51,14 +59,31 @@ final class _InspectorValue extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (value is Map) {
-      final entries = (value as Map).entries.where((entry) {
-        final key = '${entry.key}';
-        return fieldFilter?.call(key, entry.value) ?? (entry.value != null && '${entry.value}'.isNotEmpty);
-      }).toList(growable: false);
+      final entries = (value as Map).entries
+          .where((entry) {
+            final key = '${entry.key}';
+            return fieldFilter?.call(key, entry.value) ??
+                (entry.value != null && '${entry.value}'.isNotEmpty);
+          })
+          .toList(growable: false);
       if (entries.isEmpty) return CarpenterText.body(emptyMessage);
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [for (final entry in entries) _InspectorField(label: label('${entry.key}'), value: entry.value is Map || entry.value is List ? CarpenterInspector(value: entry.value, labelBuilder: label, scalarBuilder: scalar, fieldFilter: fieldFilter, emptyMessage: emptyMessage) : CarpenterText.body(scalar(entry.value)))],
+        children: [
+          for (final entry in entries)
+            _InspectorField(
+              label: label('${entry.key}'),
+              value: entry.value is Map || entry.value is List
+                  ? CarpenterInspector(
+                      value: entry.value,
+                      labelBuilder: label,
+                      scalarBuilder: scalar,
+                      fieldFilter: fieldFilter,
+                      emptyMessage: emptyMessage,
+                    )
+                  : CarpenterText.body(scalar(entry.value)),
+            ),
+        ],
       );
     }
     if (value is List) {
@@ -66,7 +91,21 @@ final class _InspectorValue extends StatelessWidget {
       if (items.isEmpty) return CarpenterText.body(emptyMessage);
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [for (final item in items) Padding(padding: const EdgeInsets.only(bottom: 8), child: CarpenterCard(child: CarpenterInspector(value: item, labelBuilder: label, scalarBuilder: scalar, fieldFilter: fieldFilter, emptyMessage: emptyMessage)))],
+        children: [
+          for (final item in items)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: CarpenterCard(
+                child: CarpenterInspector(
+                  value: item,
+                  labelBuilder: label,
+                  scalarBuilder: scalar,
+                  fieldFilter: fieldFilter,
+                  emptyMessage: emptyMessage,
+                ),
+              ),
+            ),
+        ],
       );
     }
     return CarpenterText.body(scalar(value));
@@ -86,9 +125,28 @@ final class _InspectorField extends StatelessWidget {
       padding: EdgeInsets.only(bottom: gap),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final labelWidget = CarpenterText.label(label, emphasis: TypographyEmphasis.strong, colorRole: ContentColorRole.secondary);
-          if (constraints.maxWidth < 420) return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [labelWidget, SizedBox(height: gap / 2), value]);
-          return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [SizedBox(width: 210, child: labelWidget), SizedBox(width: gap), Expanded(child: value)]);
+          final labelWidget = CarpenterText.label(
+            label,
+            emphasis: TypographyEmphasis.strong,
+            colorRole: ContentColorRole.secondary,
+          );
+          if (constraints.maxWidth < 420)
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                labelWidget,
+                SizedBox(height: gap / 2),
+                value,
+              ],
+            );
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(width: 210, child: labelWidget),
+              SizedBox(width: gap),
+              Expanded(child: value),
+            ],
+          );
         },
       ),
     );

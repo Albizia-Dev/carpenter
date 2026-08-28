@@ -4,7 +4,8 @@ import 'module/module.dart';
 import 'runtime/runtime.dart';
 import 'shell/shell.dart';
 
-typedef CarpenterHostBuilder = Widget Function(BuildContext context, Widget child);
+typedef CarpenterHostBuilder =
+    Widget Function(BuildContext context, Widget child);
 
 /// Hosts Carpenter application capabilities independently from app/routing setup.
 final class CarpenterHost extends StatelessWidget {
@@ -28,8 +29,13 @@ final class CarpenterHost extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final targetPlatform = platform ?? defaultTargetPlatform;
-    final effectiveShells = <CarpenterShell>[...shells, for (final module in modules) ...module.shells];
-    final base = CarpenterRuntime().extend(CarpenterCoreRuntime(platform: targetPlatform, locale: locale));
+    final effectiveShells = <CarpenterShell>[
+      ...shells,
+      for (final module in modules) ...module.shells,
+    ];
+    final base = CarpenterRuntime().extend(
+      CarpenterCoreRuntime(platform: targetPlatform, locale: locale),
+    );
     final runtime = _compile(base, effectiveShells);
     _validateModules(runtime);
     return CarpenterRuntimeScope(
@@ -38,7 +44,13 @@ final class CarpenterHost extends StatelessWidget {
         builder: (context) {
           var content = builder?.call(context, child) ?? child;
           for (final shell in effectiveShells.reversed) {
-            content = shell.wrap(CarpenterShellBuildContext(runtime: runtime, buildContext: context), content);
+            content = shell.wrap(
+              CarpenterShellBuildContext(
+                runtime: runtime,
+                buildContext: context,
+              ),
+              content,
+            );
           }
           return content;
         },
@@ -46,22 +58,42 @@ final class CarpenterHost extends StatelessWidget {
     );
   }
 
-  CarpenterRuntime _compile(CarpenterRuntime base, List<CarpenterShell> shells) {
+  CarpenterRuntime _compile(
+    CarpenterRuntime base,
+    List<CarpenterShell> shells,
+  ) {
     var runtime = base;
     for (final shell in shells) {
-      final missing = shell.requires.where((type) => !runtime.contains(type)).toList();
-      if (missing.isNotEmpty) throw StateError('Carpenter shell "${shell.id}" requires missing capabilities: ${missing.join(', ')}.');
-      runtime = shell.configure(CarpenterShellConfigureContext(runtime: runtime));
-      final absent = shell.provides.where((type) => !runtime.contains(type)).toList();
-      if (absent.isNotEmpty) throw StateError('Carpenter shell "${shell.id}" declared but did not provide: ${absent.join(', ')}.');
+      final missing = shell.requires
+          .where((type) => !runtime.contains(type))
+          .toList();
+      if (missing.isNotEmpty)
+        throw StateError(
+          'Carpenter shell "${shell.id}" requires missing capabilities: ${missing.join(', ')}.',
+        );
+      runtime = shell.configure(
+        CarpenterShellConfigureContext(runtime: runtime),
+      );
+      final absent = shell.provides
+          .where((type) => !runtime.contains(type))
+          .toList();
+      if (absent.isNotEmpty)
+        throw StateError(
+          'Carpenter shell "${shell.id}" declared but did not provide: ${absent.join(', ')}.',
+        );
     }
     return runtime;
   }
 
   void _validateModules(CarpenterRuntime runtime) {
     for (final module in modules) {
-      final missing = module.requires.where((type) => !runtime.contains(type)).toList();
-      if (missing.isNotEmpty) throw StateError('Carpenter module "${module.id}" requires missing capabilities: ${missing.join(', ')}.');
+      final missing = module.requires
+          .where((type) => !runtime.contains(type))
+          .toList();
+      if (missing.isNotEmpty)
+        throw StateError(
+          'Carpenter module "${module.id}" requires missing capabilities: ${missing.join(', ')}.',
+        );
     }
   }
 }

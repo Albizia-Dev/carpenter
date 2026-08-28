@@ -29,9 +29,21 @@ final class CarpenterPaginationBar extends StatelessWidget {
     final buttons = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        CarpenterButton(label: '‹', semanticLabel: 'Previous page', size: ControlSize.small, prominence: ActionProminence.ghost, onInvoke: page <= 1 ? null : () => onPageChanged(page - 1)),
+        CarpenterButton(
+          label: '‹',
+          semanticLabel: 'Previous page',
+          size: ControlSize.small,
+          prominence: ActionProminence.ghost,
+          onInvoke: page <= 1 ? null : () => onPageChanged(page - 1),
+        ),
         SizedBox(width: gap),
-        CarpenterButton(label: '›', semanticLabel: 'Next page', size: ControlSize.small, prominence: ActionProminence.ghost, onInvoke: page >= totalPages ? null : () => onPageChanged(page + 1)),
+        CarpenterButton(
+          label: '›',
+          semanticLabel: 'Next page',
+          size: ControlSize.small,
+          prominence: ActionProminence.ghost,
+          onInvoke: page >= totalPages ? null : () => onPageChanged(page + 1),
+        ),
       ],
     );
     return LayoutBuilder(
@@ -46,7 +58,14 @@ final class CarpenterPaginationBar extends StatelessWidget {
             ],
           );
         }
-        return Row(children: [if (leading != null) Expanded(child: leading!), label, SizedBox(width: gap), buttons]);
+        return Row(
+          children: [
+            if (leading != null) Expanded(child: leading!),
+            label,
+            SizedBox(width: gap),
+            buttons,
+          ],
+        );
       },
     );
   }

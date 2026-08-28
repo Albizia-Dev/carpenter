@@ -12,17 +12,34 @@ enum CollectionRequestReason { initial, query, refresh, loadMore }
 final class CollectionRequestCancellation extends ChangeNotifier {
   bool _cancelled = false;
   bool get isCancelled => _cancelled;
-  void cancel() { if (!_cancelled) { _cancelled = true; notifyListeners(); } }
+  void cancel() {
+    if (!_cancelled) {
+      _cancelled = true;
+      notifyListeners();
+    }
+  }
 }
 
 final class CollectionLoadRequest {
-  const CollectionLoadRequest({required this.reason, required this.cancellation});
+  const CollectionLoadRequest({
+    required this.reason,
+    required this.cancellation,
+  });
   final CollectionRequestReason reason;
   final CollectionRequestCancellation cancellation;
 }
 
-typedef CollectionLifecycleLoader<T, F> = Future<CollectionSnapshot<T>> Function(CollectionQuery<F> query, CollectionLoadRequest request);
-typedef CollectionLoadMore<T, F> = Future<CollectionSnapshot<T>> Function(CollectionQuery<F> query, CollectionSnapshot<T> current, CollectionLoadRequest request);
+typedef CollectionLifecycleLoader<T, F> =
+    Future<CollectionSnapshot<T>> Function(
+      CollectionQuery<F> query,
+      CollectionLoadRequest request,
+    );
+typedef CollectionLoadMore<T, F> =
+    Future<CollectionSnapshot<T>> Function(
+      CollectionQuery<F> query,
+      CollectionSnapshot<T> current,
+      CollectionLoadRequest request,
+    );
 
 /// Full collection lifecycle controller: debounce, cancellation, stale-response protection, refresh and progressive loading.
 final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
@@ -60,7 +77,9 @@ final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
     if ((_query.search ?? '') == normalized) return;
     _searchTimer?.cancel();
     _searchTimer = Timer(searchDebounce, () {
-      _query = normalized.isEmpty ? _query.copyWith(clearSearch: true) : _query.copyWith(search: normalized);
+      _query = normalized.isEmpty
+          ? _query.copyWith(clearSearch: true)
+          : _query.copyWith(search: normalized);
       _run(CollectionRequestReason.query);
     });
   }
@@ -70,7 +89,8 @@ final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
     if (load) await _run(CollectionRequestReason.query);
   }
 
-  Future<void> setPage(CollectionPageRequest page) => updateQuery(_query.copyWith(page: page));
+  Future<void> setPage(CollectionPageRequest page) =>
+      updateQuery(_query.copyWith(page: page));
 
   Future<void> _run(CollectionRequestReason reason) async {
     final generation = ++_generation;
@@ -81,13 +101,23 @@ final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
     _snapshot = _snapshot.beginRefresh();
     notifyListeners();
     try {
-      final result = await _load(_query, CollectionLoadRequest(reason: reason, cancellation: cancellation));
+      final result = await _load(
+        _query,
+        CollectionLoadRequest(reason: reason, cancellation: cancellation),
+      );
       if (generation != _generation || cancellation.isCancelled) return;
-      _snapshot = result.copyWith(loadPhase: CollectionLoadPhase.ready, freshness: CollectionFreshness.current, clearInitialFailure: true, clearRefreshFailure: true);
+      _snapshot = result.copyWith(
+        loadPhase: CollectionLoadPhase.ready,
+        freshness: CollectionFreshness.current,
+        clearInitialFailure: true,
+        clearRefreshFailure: true,
+      );
       notifyListeners();
     } catch (error, stackTrace) {
       if (generation != _generation || cancellation.isCancelled) return;
-      _snapshot = _snapshot.withLoadFailure(CollectionFailure(error: error, stackTrace: stackTrace));
+      _snapshot = _snapshot.withLoadFailure(
+        CollectionFailure(error: error, stackTrace: stackTrace),
+      );
       notifyListeners();
     }
   }
@@ -104,13 +134,27 @@ final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
     _snapshot = current.beginLoadingMore();
     notifyListeners();
     try {
-      final result = await loader(_query, current, CollectionLoadRequest(reason: CollectionRequestReason.loadMore, cancellation: cancellation));
+      final result = await loader(
+        _query,
+        current,
+        CollectionLoadRequest(
+          reason: CollectionRequestReason.loadMore,
+          cancellation: cancellation,
+        ),
+      );
       if (generation != _generation || cancellation.isCancelled) return;
-      _snapshot = result.copyWith(loadPhase: CollectionLoadPhase.ready, clearRefreshFailure: true);
+      _snapshot = result.copyWith(
+        loadPhase: CollectionLoadPhase.ready,
+        clearRefreshFailure: true,
+      );
       notifyListeners();
     } catch (error, stackTrace) {
       if (generation != _generation || cancellation.isCancelled) return;
-      _snapshot = current.copyWith(loadPhase: CollectionLoadPhase.ready, freshness: CollectionFreshness.stale, refreshFailure: CollectionFailure(error: error, stackTrace: stackTrace));
+      _snapshot = current.copyWith(
+        loadPhase: CollectionLoadPhase.ready,
+        freshness: CollectionFreshness.stale,
+        refreshFailure: CollectionFailure(error: error, stackTrace: stackTrace),
+      );
       notifyListeners();
     }
   }
