@@ -11,7 +11,6 @@ import 'hotkey_shell.dart';
 import 'module/module.dart';
 import 'navigation/route.dart';
 import 'navigation/router.dart';
-import 'runtime/runtime.dart';
 import 'shell/shell.dart';
 
 /// High-level Carpenter application host using the current theme/runtime stack.

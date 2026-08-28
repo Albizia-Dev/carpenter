@@ -44,7 +44,7 @@ final class CarpenterPage extends StatelessWidget {
     final pageController = controller;
     if (pageController != null) {
       return ValueListenableBuilder<CarpenterPageState>(
-        valueListenable: pageController as ValueListenable<CarpenterPageState>,
+        valueListenable: pageController,
         builder: (context, current, _) => _build(context, current),
       );
     }

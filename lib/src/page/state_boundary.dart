@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-import '../components/basic/button/button.dart';
 import '../components/basic/loader.dart';
 import '../components/basic/progress.dart';
 import '../components/behaviour/notice.dart';
