@@ -56,7 +56,8 @@ Widget _playground(BuildContext context) {
                 snapshot.initialFailure != null ||
                     snapshot.refreshFailure != null
                 ? FeedbackColorRole.danger
-                : snapshot.isRefreshing || snapshot.isLoadingMore
+                : snapshot.isRefreshing ||
+                      snapshot.loadPhase == CollectionLoadPhase.loadingMore
                 ? FeedbackColorRole.info
                 : FeedbackColorRole.neutral,
           ),
