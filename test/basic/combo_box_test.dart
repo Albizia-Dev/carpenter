@@ -44,7 +44,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(selected, 1);
     expect(controller.text, 'Alpha');
-    expect(queries.last, 'Alpha');
+    expect(queries, ['Al']);
   });
 
   testWidgets('open menu does not block pointer editing in its input', (
@@ -86,43 +86,44 @@ void main() {
     expect(controller.selection.baseOffset, lessThan(controller.text.length));
   });
 
-  testWidgets('pointer selection updates value, query and closes menu', (
-    tester,
-  ) async {
-    final controller = TextEditingController();
-    addTearDown(controller.dispose);
-    var open = true;
-    int? selected;
-    final queries = <String>[];
-    late StateSetter update;
-    await tester.pumpWidget(
-      carpenterOverlayHarness(
-        StatefulBuilder(
-          builder: (context, setState) {
-            update = setState;
-            return CarpenterComboBox<int>(
-              controller: controller,
-              value: selected,
-              onChanged: (value) => update(() => selected = value),
-              onQueryChanged: queries.add,
-              open: open,
-              onOpenChanged: (value) => update(() => open = value),
-              options: firstOptions,
-            );
-          },
+  testWidgets(
+    'pointer selection updates value and closes menu without query echo',
+    (tester) async {
+      final controller = TextEditingController();
+      addTearDown(controller.dispose);
+      var open = true;
+      int? selected;
+      final queries = <String>[];
+      late StateSetter update;
+      await tester.pumpWidget(
+        carpenterOverlayHarness(
+          StatefulBuilder(
+            builder: (context, setState) {
+              update = setState;
+              return CarpenterComboBox<int>(
+                controller: controller,
+                value: selected,
+                onChanged: (value) => update(() => selected = value),
+                onQueryChanged: queries.add,
+                open: open,
+                onOpenChanged: (value) => update(() => open = value),
+                options: firstOptions,
+              );
+            },
+          ),
         ),
-      ),
-    );
-    await tester.pumpAndSettle();
+      );
+      await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Bravo').last);
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Bravo').last);
+      await tester.pumpAndSettle();
 
-    expect(selected, 2);
-    expect(controller.text, 'Bravo');
-    expect(queries, ['Bravo']);
-    expect(open, isFalse);
-  });
+      expect(selected, 2);
+      expect(controller.text, 'Bravo');
+      expect(queries, isEmpty);
+      expect(open, isFalse);
+    },
+  );
 
   testWidgets('IME composing is not intercepted by suggestion activation', (
     tester,

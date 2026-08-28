@@ -34,14 +34,14 @@ final foundationColorsComponent = WidgetbookComponent(
 Widget _palettes(BuildContext context) => preview(
   _PaletteCatalog(
     families: [
-      _PaletteFamily('neutral', palette.neutral),
-      _PaletteFamily('brand', palette.brand),
-      _PaletteFamily('secondary', palette.secondary),
-      _PaletteFamily('success', palette.success),
-      _PaletteFamily('warning', palette.warning),
-      _PaletteFamily('danger', palette.danger),
-      _PaletteFamily('info', palette.info),
-      _PaletteFamily('utility', palette.utility),
+      _PaletteFamily('neutral', (weight) => palette.neutral[weight]),
+      _PaletteFamily('brand', (weight) => palette.brand[weight]),
+      _PaletteFamily('secondary', (weight) => palette.secondary[weight]),
+      _PaletteFamily('success', (weight) => palette.success[weight]),
+      _PaletteFamily('warning', (weight) => palette.warning[weight]),
+      _PaletteFamily('danger', (weight) => palette.danger[weight]),
+      _PaletteFamily('info', (weight) => palette.info[weight]),
+      _PaletteFamily('utility', (weight) => palette.utility[weight]),
     ],
   ),
 );
@@ -330,10 +330,10 @@ Widget _selectionRoles(BuildContext context) => preview(
 );
 
 final class _PaletteFamily {
-  const _PaletteFamily(this.name, this.values);
+  const _PaletteFamily(this.name, this.colorAt);
 
   final String name;
-  final dynamic values;
+  final Color Function(int weight) colorAt;
 }
 
 final class _PaletteCatalog extends StatelessWidget {
@@ -359,8 +359,8 @@ final class _PaletteCatalog extends StatelessWidget {
                 _ColorSwatch(
                   color: _NamedColor(
                     '${family.name}[$weight]',
-                    family.values[weight] as Color,
-                    _contrastFor(family.values[weight] as Color),
+                    family.colorAt(weight),
+                    _contrastFor(family.colorAt(weight)),
                   ),
                   compact: true,
                 ),

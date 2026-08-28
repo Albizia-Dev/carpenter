@@ -85,6 +85,7 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
     super.initState();
     _attachFocusNode();
     _syncOptions();
+    _syncSelectedQuery();
   }
 
   @override
@@ -94,7 +95,10 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
       _detachFocusNode(oldWidget.focusNode);
       _attachFocusNode();
     }
+    final selectedChanged =
+        oldWidget.selectedOptionId != widget.selectedOptionId;
     _syncOptions();
+    if (selectedChanged) _syncSelectedQuery();
   }
 
   void _attachFocusNode() {
@@ -127,6 +131,21 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
     );
     final selected = widget.selectedOptionId;
     if (selected != null) _navigation.highlight(selected);
+  }
+
+  void _syncSelectedQuery() {
+    if (!widget.replaceQueryOnSelection) return;
+    final selected = widget.selectedOptionId;
+    if (selected == null) return;
+    for (final option in widget.options) {
+      if (option.id != selected) continue;
+      if (widget.controller.text == option.label) return;
+      widget.controller.value = TextEditingValue(
+        text: option.label,
+        selection: TextSelection.collapsed(offset: option.label.length),
+      );
+      return;
+    }
   }
 
   CarpenterOption<T>? get _highlighted {
