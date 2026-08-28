@@ -6,7 +6,13 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/preview.dart';
 
-enum _LoadingPresentation { headerProgress, overlay, skeleton, blockedRegion, none }
+enum _LoadingPresentation {
+  headerProgress,
+  overlay,
+  skeleton,
+  blockedRegion,
+  none,
+}
 
 final loadingBoundaryComponent = WidgetbookComponent(
   name: 'Loading Boundary',
@@ -127,7 +133,12 @@ final class _PresentationFrame extends StatelessWidget {
       _LoadingPresentation.overlay => Stack(
         fit: StackFit.expand,
         children: [
-          Column(children: [header, Expanded(child: body)]),
+          Column(
+            children: [
+              header,
+              Expanded(child: body),
+            ],
+          ),
           if (state.isLoading)
             ColoredBox(
               color: theme.overlay.scrim,
@@ -170,7 +181,10 @@ final class _PresentationFrame extends StatelessWidget {
       ),
       _LoadingPresentation.none => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [header, Expanded(child: body)],
+        children: [
+          header,
+          Expanded(child: body),
+        ],
       ),
     };
   }
@@ -299,9 +313,10 @@ final class _NestedBoundaryDemo extends StatelessWidget {
             ),
           ),
         ),
-        if (outerState.isLoading)
-          const CarpenterProgress(value: .6, height: 3),
-        Expanded(child: Padding(padding: const EdgeInsets.all(20), child: child)),
+        if (outerState.isLoading) const CarpenterProgress(value: .6, height: 3),
+        Expanded(
+          child: Padding(padding: const EdgeInsets.all(20), child: child),
+        ),
       ],
     ),
     child: LoadingBoundary(

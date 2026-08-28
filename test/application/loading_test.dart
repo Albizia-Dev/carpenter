@@ -5,46 +5,52 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('loading cubit aggregates operations and start finish are idempotent', () async {
-    final cubit = LoadingCubit();
-    addTearDown(cubit.close);
+  test(
+    'loading cubit aggregates operations and start finish are idempotent',
+    () async {
+      final cubit = LoadingCubit();
+      addTearDown(cubit.close);
 
-    cubit.start('save');
-    cubit.start('save');
-    expect(cubit.state.activeCount, 1);
-    expect(cubit.state.isActive('save'), isTrue);
+      cubit.start('save');
+      cubit.start('save');
+      expect(cubit.state.activeCount, 1);
+      expect(cubit.state.isActive('save'), isTrue);
 
-    cubit.start('refresh');
-    expect(cubit.state.activeCount, 2);
+      cubit.start('refresh');
+      expect(cubit.state.activeCount, 2);
 
-    cubit.finish('save');
-    cubit.finish('save');
-    expect(cubit.state.isLoading, isTrue);
-    expect(cubit.state.activeOperations, contains('refresh'));
+      cubit.finish('save');
+      cubit.finish('save');
+      expect(cubit.state.isLoading, isTrue);
+      expect(cubit.state.activeOperations, contains('refresh'));
 
-    cubit.finish('refresh');
-    expect(cubit.state.isLoading, isFalse);
-  });
+      cubit.finish('refresh');
+      expect(cubit.state.isLoading, isFalse);
+    },
+  );
 
-  test('track keeps loading until every concurrent operation finishes', () async {
-    final cubit = LoadingCubit();
-    addTearDown(cubit.close);
-    final first = Completer<int>();
-    final second = Completer<int>();
+  test(
+    'track keeps loading until every concurrent operation finishes',
+    () async {
+      final cubit = LoadingCubit();
+      addTearDown(cubit.close);
+      final first = Completer<int>();
+      final second = Completer<int>();
 
-    final firstResult = cubit.track(() => first.future, id: 'first');
-    final secondResult = cubit.track(() => second.future, id: 'second');
-    expect(cubit.state.activeCount, 2);
+      final firstResult = cubit.track(() => first.future, id: 'first');
+      final secondResult = cubit.track(() => second.future, id: 'second');
+      expect(cubit.state.activeCount, 2);
 
-    first.complete(1);
-    expect(await firstResult, 1);
-    expect(cubit.state.isLoading, isTrue);
-    expect(cubit.state.activeOperations, contains('second'));
+      first.complete(1);
+      expect(await firstResult, 1);
+      expect(cubit.state.isLoading, isTrue);
+      expect(cubit.state.activeOperations, contains('second'));
 
-    second.complete(2);
-    expect(await secondResult, 2);
-    expect(cubit.state.isLoading, isFalse);
-  });
+      second.complete(2);
+      expect(await secondResult, 2);
+      expect(cubit.state.isLoading, isFalse);
+    },
+  );
 
   test('repeated tracked ids keep independent leases', () async {
     final cubit = LoadingCubit();
