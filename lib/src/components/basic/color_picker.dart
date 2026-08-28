@@ -13,13 +13,13 @@ final class CarpenterColorPicker extends StatefulWidget {
     required this.value,
     required this.onChanged,
     this.enabled = true,
-    this.paletteHeight = 160,
+    this.paletteHeight = const Rem(10),
   });
 
   final Color value;
   final ValueChanged<Color> onChanged;
   final bool enabled;
-  final double paletteHeight;
+  final LengthUnit paletteHeight;
 
   @override
   State<CarpenterColorPicker> createState() => _CarpenterColorPickerState();
@@ -121,6 +121,14 @@ final class _CarpenterColorPickerState extends State<CarpenterColorPicker> {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.medium);
+    final paletteHeight = context.units(widget.paletteHeight);
+    final hueHeight = context.units(1.5.rem);
+    final surfaceRadius = context.units(.5.rem);
+    final handleRadius = context.units(.4375.rem);
+    final hueMarkerWidth = context.units(.1875.rem);
+    final hueMarkerHeight = context.units(1.875.rem);
+    final compactBreakpoint = context.units(32.5.rem);
+
     return Semantics(
       label: 'Color picker',
       enabled: widget.enabled,
@@ -131,7 +139,7 @@ final class _CarpenterColorPickerState extends State<CarpenterColorPicker> {
             opacity: widget.enabled ? 1 : .5,
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final size = Size(constraints.maxWidth, widget.paletteHeight);
+                final size = Size(constraints.maxWidth, paletteHeight);
                 return GestureDetector(
                   behavior: HitTestBehavior.opaque,
                   onPanDown: widget.enabled
@@ -144,7 +152,11 @@ final class _CarpenterColorPickerState extends State<CarpenterColorPicker> {
                       : null,
                   child: CustomPaint(
                     size: size,
-                    painter: _SaturationValuePainter(_hsv),
+                    painter: _SaturationValuePainter(
+                      color: _hsv,
+                      surfaceRadius: surfaceRadius,
+                      handleRadius: handleRadius,
+                    ),
                   ),
                 );
               },
@@ -165,8 +177,13 @@ final class _CarpenterColorPickerState extends State<CarpenterColorPicker> {
                           _setHue(event.localPosition.dx, constraints.maxWidth)
                     : null,
                 child: CustomPaint(
-                  size: Size(constraints.maxWidth, 24),
-                  painter: _HuePainter(_hsv.hue),
+                  size: Size(constraints.maxWidth, hueHeight),
+                  painter: _HuePainter(
+                    hue: _hsv.hue,
+                    surfaceRadius: surfaceRadius,
+                    markerWidth: hueMarkerWidth,
+                    markerHeight: hueMarkerHeight,
+                  ),
                 ),
               ),
             ),
@@ -206,7 +223,7 @@ final class _CarpenterColorPickerState extends State<CarpenterColorPicker> {
                   ],
                 ],
               );
-              if (constraints.maxWidth < 520) {
+              if (constraints.maxWidth < compactBreakpoint) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -246,14 +263,23 @@ String carpenterFormatRgbHex(Color color) {
 }
 
 final class _SaturationValuePainter extends CustomPainter {
-  const _SaturationValuePainter(this.color);
+  const _SaturationValuePainter({
+    required this.color,
+    required this.surfaceRadius,
+    required this.handleRadius,
+  });
+
   final HSVColor color;
+  final double surfaceRadius;
+  final double handleRadius;
 
   @override
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
     canvas.save();
-    canvas.clipRRect(RRect.fromRectAndRadius(rect, const Radius.circular(8)));
+    canvas.clipRRect(
+      RRect.fromRectAndRadius(rect, Radius.circular(surfaceRadius)),
+    );
     canvas.drawRect(
       rect,
       Paint()..color = HSVColor.fromAHSV(1, color.hue, 1, 1).toColor(),
@@ -279,10 +305,14 @@ final class _SaturationValuePainter extends CustomPainter {
       color.saturation * size.width,
       (1 - color.value) * size.height,
     );
-    canvas.drawCircle(point, 7, Paint()..color = const Color(0xffffffff));
     canvas.drawCircle(
       point,
-      7,
+      handleRadius,
+      Paint()..color = const Color(0xffffffff),
+    );
+    canvas.drawCircle(
+      point,
+      handleRadius,
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2
@@ -292,18 +322,29 @@ final class _SaturationValuePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_SaturationValuePainter oldDelegate) =>
-      oldDelegate.color != color;
+      oldDelegate.color != color ||
+      oldDelegate.surfaceRadius != surfaceRadius ||
+      oldDelegate.handleRadius != handleRadius;
 }
 
 final class _HuePainter extends CustomPainter {
-  const _HuePainter(this.hue);
+  const _HuePainter({
+    required this.hue,
+    required this.surfaceRadius,
+    required this.markerWidth,
+    required this.markerHeight,
+  });
+
   final double hue;
+  final double surfaceRadius;
+  final double markerWidth;
+  final double markerHeight;
 
   @override
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
     canvas.drawRRect(
-      RRect.fromRectAndRadius(rect, const Radius.circular(8)),
+      RRect.fromRectAndRadius(rect, Radius.circular(surfaceRadius)),
       Paint()
         ..shader = const LinearGradient(
           colors: [
@@ -319,11 +360,19 @@ final class _HuePainter extends CustomPainter {
     );
     final x = hue / 360 * size.width;
     canvas.drawRect(
-      Rect.fromCenter(center: Offset(x, size.height / 2), width: 3, height: 30),
+      Rect.fromCenter(
+        center: Offset(x, size.height / 2),
+        width: markerWidth,
+        height: markerHeight,
+      ),
       Paint()..color = const Color(0xffffffff),
     );
   }
 
   @override
-  bool shouldRepaint(_HuePainter oldDelegate) => oldDelegate.hue != hue;
+  bool shouldRepaint(_HuePainter oldDelegate) =>
+      oldDelegate.hue != hue ||
+      oldDelegate.surfaceRadius != surfaceRadius ||
+      oldDelegate.markerWidth != markerWidth ||
+      oldDelegate.markerHeight != markerHeight;
 }
