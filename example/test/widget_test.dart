@@ -28,7 +28,7 @@ void main() {
     await tester.pump();
     expect(find.text('Project portfolio'), findsOneWidget);
 
-    await tester.tap(find.text('Open').first);
+    await tester.tap(find.text('Open featured').first);
     await tester.pump();
     expect(find.text('Treasury migration'), findsWidgets);
     expect(find.text('Timeline'), findsOneWidget);
