@@ -198,11 +198,6 @@ Widget _semanticTokens(BuildContext context) => preview(
                   theme.feedback.resolve(role).foreground,
                   theme.feedback.resolve(role).background,
                 ),
-                _NamedColor(
-                  'feedback.${role.name}.border',
-                  theme.feedback.resolve(role).border,
-                  theme.surface.base,
-                ),
               ],
             ],
           ),
