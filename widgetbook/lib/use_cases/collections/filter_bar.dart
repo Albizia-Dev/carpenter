@@ -8,6 +8,7 @@ final filterBarComponent = WidgetbookComponent(
   name: 'Filter Bar',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
+    WidgetbookUseCase(name: 'Alignment stress', builder: _alignmentStress),
     WidgetbookUseCase(name: 'Responsive states', builder: _responsiveStates),
   ],
 );
@@ -35,6 +36,10 @@ Widget _playground(BuildContext context) {
     label: 'Actions · Extra actions',
     initialValue: true,
   );
+  final labeledSearch = context.knobs.boolean(
+    label: 'Search · Show label',
+    initialValue: true,
+  );
   return preview(
     SizedBox(
       width: width,
@@ -42,10 +47,23 @@ Widget _playground(BuildContext context) {
         activeFilters: activeFilters,
         filterCount: filters,
         extraActions: extraActions,
+        labeledSearch: labeledSearch,
       ),
     ),
   );
 }
+
+Widget _alignmentStress(BuildContext context) => preview(
+  const SizedBox(
+    width: 920,
+    child: _FilterBarPreview(
+      activeFilters: 2,
+      filterCount: 3,
+      extraActions: true,
+      labeledSearch: true,
+    ),
+  ),
+);
 
 Widget _responsiveStates(BuildContext context) => previewColumn([
   const SizedBox(
@@ -54,6 +72,7 @@ Widget _responsiveStates(BuildContext context) => previewColumn([
       activeFilters: 3,
       filterCount: 3,
       extraActions: true,
+      labeledSearch: true,
     ),
   ),
   const SizedBox(
@@ -62,6 +81,7 @@ Widget _responsiveStates(BuildContext context) => previewColumn([
       activeFilters: 1,
       filterCount: 2,
       extraActions: true,
+      labeledSearch: true,
     ),
   ),
   const SizedBox(
@@ -70,6 +90,7 @@ Widget _responsiveStates(BuildContext context) => previewColumn([
       activeFilters: 0,
       filterCount: 4,
       extraActions: false,
+      labeledSearch: false,
     ),
   ),
 ]);
@@ -79,11 +100,13 @@ final class _FilterBarPreview extends StatefulWidget {
     required this.activeFilters,
     required this.filterCount,
     required this.extraActions,
+    required this.labeledSearch,
   });
 
   final int activeFilters;
   final int filterCount;
   final bool extraActions;
+  final bool labeledSearch;
 
   @override
   State<_FilterBarPreview> createState() => _FilterBarPreviewState();
@@ -101,17 +124,17 @@ final class _FilterBarPreviewState extends State<_FilterBarPreview> {
   @override
   Widget build(BuildContext context) => CarpenterFilterBar(
     searchController: _searchController,
+    searchLabel: widget.labeledSearch ? 'Search' : '',
     searchPlaceholder: 'Number, customer or purpose',
     onSearchChanged: (_) => setState(() {}),
     activeFilterCount:
         widget.activeFilters + (_searchController.text.isEmpty ? 0 : 1),
     filterControls: [
       for (var index = 0; index < widget.filterCount; index++)
-        CarpenterButton(
+        CarpenterButton.outlined(
           label: index.isEven ? 'Status ${index + 1}' : 'Period ${index + 1}',
-          size: ControlSize.small,
-          prominence: ActionProminence.outlined,
-          onInvoke: () {},
+          size: ControlSize.medium,
+          onPressed: () {},
         ),
     ],
     clearAction: CarpenterActionDescriptor(
