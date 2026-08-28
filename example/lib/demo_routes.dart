@@ -49,6 +49,8 @@ final class DemoNavigator {
       go(DemoRoutes.project, arguments: <String, String>{'id': id});
 
   void go(YxRoute route, {Map<String, String>? arguments}) {
-    navigation.mutate((_) => route.toNode(arguments: arguments));
+    navigation.mutate(
+      (_) => route.toNode(arguments: arguments ?? const <String, String>{}),
+    );
   }
 }
