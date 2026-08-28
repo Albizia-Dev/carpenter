@@ -11,6 +11,7 @@ import 'toolbar.dart';
 @immutable
 final class CarpenterPageStatus {
   const CarpenterPageStatus({required this.label, required this.role});
+
   final String label;
   final FeedbackColorRole role;
 }
@@ -89,7 +90,7 @@ final class CarpenterPageHeader extends StatelessWidget {
         label: semanticLabel ?? title,
         child: viewport == CarpenterViewportClass.narrow
             ? Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: .stretch,
                 children: [
                   titleBlock,
                   if (actionWidget != null) ...[
@@ -99,13 +100,11 @@ final class CarpenterPageHeader extends StatelessWidget {
                 ],
               )
             : Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: .start,
+                mainAxisAlignment: .spaceBetween,
                 children: [
                   Expanded(child: titleBlock),
-                  if (actionWidget != null) ...[
-                    SizedBox(width: gap),
-                    Flexible(child: actionWidget),
-                  ],
+                  if (actionWidget != null) Flexible(child: actionWidget),
                 ],
               ),
       );

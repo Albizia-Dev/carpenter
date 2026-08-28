@@ -63,7 +63,7 @@ final class _CarpenterToolbarState extends State<CarpenterToolbar> {
         child: Align(
           alignment: widget.alignment,
           child: Row(
-            mainAxisSize: MainAxisSize.max,
+            mainAxisSize: MainAxisSize.min,
             children: [
               for (var index = 0; index < layout.visible.length; index++) ...[
                 if (index > 0) _gap(context),
@@ -201,6 +201,7 @@ final class _CarpenterToolbarState extends State<CarpenterToolbar> {
 
 final class _ToolbarAction extends StatelessWidget {
   const _ToolbarAction({required this.item});
+
   final CarpenterToolbarItem item;
 
   @override
@@ -222,6 +223,7 @@ final class _ToolbarAction extends StatelessWidget {
 
 final class _ToolbarLayout {
   const _ToolbarLayout({required this.visible, required this.overflow});
+
   final List<CarpenterToolbarItem> visible;
   final List<CarpenterToolbarItem> overflow;
 }
