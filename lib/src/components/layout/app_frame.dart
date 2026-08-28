@@ -20,47 +20,55 @@ final class CarpenterTopPanelContext {
 }
 
 typedef CarpenterTopPanelBuilder =
-    Widget Function(BuildContext context, CarpenterTopPanelContext frame);
+    Widget Function(BuildContext context, CarpenterTopPanelContext panel);
 
+/// Lightweight cross-platform frame retained for apps that do not need ApplicationShell regions.
 final class CarpenterAppFrame extends StatelessWidget {
   const CarpenterAppFrame({
     super.key,
-    required this.body,
-    this.topPanel,
-    this.sidebar,
-    this.bottomBar,
+    required this.child,
+    this.topPanelBuilder,
+    this.desktopTopPanelBuilder,
+    this.targetPlatform,
+    this.useSafeArea = true,
+    this.padding,
+    this.backgroundColor,
   });
 
-  final Widget body;
-  final CarpenterTopPanelBuilder? topPanel;
-  final Widget? sidebar;
-  final Widget? bottomBar;
+  final Widget child;
+  final CarpenterTopPanelBuilder? topPanelBuilder;
+  final CarpenterTopPanelBuilder? desktopTopPanelBuilder;
+  final TargetPlatform? targetPlatform;
+  final bool useSafeArea;
+  final EdgeInsetsGeometry? padding;
+  final Color? backgroundColor;
 
   @override
   Widget build(BuildContext context) {
-    final frame = CarpenterTopPanelContext(
-      targetPlatform: defaultTargetPlatform,
-      framePlatform: switch (defaultTargetPlatform) {
-        TargetPlatform.android ||
-        TargetPlatform.iOS => CarpenterFramePlatform.touch,
-        _ => CarpenterFramePlatform.desktop,
-      },
+    final theme = CarpenterTheme.of(context);
+    final platform = targetPlatform ?? defaultTargetPlatform;
+    final panelContext = CarpenterTopPanelContext(
+      targetPlatform: platform,
+      framePlatform: _isDesktop(platform)
+          ? CarpenterFramePlatform.desktop
+          : CarpenterFramePlatform.touch,
     );
-    final header = topPanel?.call(context, frame);
-    final main = Row(
+    final panelBuilder = panelContext.isDesktop
+        ? desktopTopPanelBuilder ?? topPanelBuilder
+        : topPanelBuilder;
+    final panel = panelBuilder?.call(context, panelContext);
+    Widget content = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (sidebar != null) sidebar!,
-        Expanded(child: body),
+        if (panel != null) panel,
+        Expanded(child: child),
       ],
     );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        if (header != null) header,
-        Expanded(child: main),
-        if (bottomBar != null) bottomBar!,
-      ],
+    if (padding != null) content = Padding(padding: padding!, child: content);
+    if (useSafeArea) content = SafeArea(child: content);
+    return ColoredBox(
+      color: backgroundColor ?? theme.surface.base,
+      child: content,
     );
   }
 }
@@ -74,7 +82,6 @@ final class CarpenterTopPanel extends StatelessWidget {
     this.actions = const [],
     this.child,
   });
-
   final String? title;
   final String? subtitle;
   final Widget? leading;
@@ -109,18 +116,15 @@ final class CarpenterTopPanel extends StatelessWidget {
                 ],
               ),
             ),
-            if (actions.isNotEmpty) ...[
-              SizedBox(width: gap),
-              Wrap(spacing: gap / 2, runSpacing: gap / 2, children: actions),
-            ],
+            for (final action in actions) ...[SizedBox(width: gap / 2), action],
           ],
         );
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: theme.surface.base,
+        color: theme.surface.subtle,
         border: Border(
           bottom: BorderSide(
-            color: theme.surface.border,
+            color: theme.overlay.border,
             width: context.units(theme.shapes.borderWidth),
           ),
         ),
@@ -132,3 +136,10 @@ final class CarpenterTopPanel extends StatelessWidget {
     );
   }
 }
+
+bool _isDesktop(TargetPlatform platform) => switch (platform) {
+  TargetPlatform.macOS ||
+  TargetPlatform.windows ||
+  TargetPlatform.linux => true,
+  _ => false,
+};
