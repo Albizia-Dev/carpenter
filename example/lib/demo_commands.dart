@@ -1,5 +1,6 @@
 import 'package:carpenter/carpenter.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart' show SingleActivator;
 
 import 'demo_routes.dart';
 
