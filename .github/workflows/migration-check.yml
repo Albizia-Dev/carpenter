@@ -6,7 +6,7 @@ on:
       - migrate-previous-components
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   verify:
@@ -29,8 +29,19 @@ jobs:
         working-directory: widgetbook
         run: flutter pub get
 
-      - name: Check formatting
-        run: dart format --output=none --set-exit-if-changed lib widgetbook/lib
+      - name: Format migration additions
+        run: dart format lib widgetbook/lib
+
+      - name: Commit formatter changes
+        shell: bash
+        run: |
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add lib widgetbook/lib
+            git commit -m "style: format final migration additions"
+            git push origin HEAD:migrate-previous-components
+          fi
 
       - name: Analyze library
         run: dart analyze lib
