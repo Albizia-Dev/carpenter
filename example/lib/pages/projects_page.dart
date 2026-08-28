@@ -54,7 +54,7 @@ final class _ProjectsPageState extends State<ProjectsPage> {
     if (_sorting.isEmpty) return result;
     final sort = _sorting.first;
     result.sort((a, b) {
-      final comparison = switch (sort.field) {
+      final comparison = switch (sort.id) {
         'name' => a.name.compareTo(b.name),
         'owner' => a.owner.compareTo(b.owner),
         'amount' => a.amount.compareTo(b.amount),
