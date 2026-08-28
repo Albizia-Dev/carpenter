@@ -125,6 +125,8 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
         (option) => MenuNavigationItem(key: option.id, enabled: option.enabled),
       ),
     );
+    final selected = widget.selectedOptionId;
+    if (selected != null) _navigation.highlight(selected);
   }
 
   CarpenterOption<T>? get _highlighted {
@@ -144,6 +146,7 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
 
   void _select(CarpenterOption<T> option) {
     if (!_enabled || !option.enabled) return;
+    _navigation.highlight(option.id);
     if (widget.replaceQueryOnSelection) {
       final value = TextEditingValue(
         text: option.label,
@@ -151,11 +154,18 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
       );
       if (widget.controller.value != value) {
         widget.controller.value = value;
-        widget.onQueryChanged?.call(option.label);
       }
     }
     widget.onSelected?.call(option);
     widget.onOpenChanged(false);
+  }
+
+  void _queryChanged(String query) {
+    if (_navigation.highlightedKey != null) {
+      setState(() => _navigation.highlightedKey = null);
+    }
+    widget.onQueryChanged?.call(query);
+    if (_enabled && !widget.open) widget.onOpenChanged(true);
   }
 
   KeyEventResult _handleKey(FocusNode node, KeyEvent event) {
@@ -225,10 +235,7 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
           trailingAction: effectiveAvailability == FieldAvailability.enabled
               ? widget.clearAction
               : null,
-          onChanged: (query) {
-            widget.onQueryChanged?.call(query);
-            if (_enabled && !widget.open) widget.onOpenChanged(true);
-          },
+          onChanged: _queryChanged,
           focusNode: _focusNode,
           autofocus: widget.autofocus,
         ),
