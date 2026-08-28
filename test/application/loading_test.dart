@@ -46,6 +46,28 @@ void main() {
     expect(cubit.state.isLoading, isFalse);
   });
 
+  test('repeated tracked ids keep independent leases', () async {
+    final cubit = LoadingCubit();
+    addTearDown(cubit.close);
+    final first = Completer<void>();
+    final second = Completer<void>();
+
+    final firstResult = cubit.track(() => first.future, id: 'save');
+    final secondResult = cubit.track(() => second.future, id: 'save');
+    expect(cubit.state.activeOperations, <Object>{'save'});
+    expect(cubit.state.activeCount, 2);
+    expect(cubit.state.countFor('save'), 2);
+
+    first.complete();
+    await firstResult;
+    expect(cubit.state.isActive('save'), isTrue);
+    expect(cubit.state.activeCount, 1);
+
+    second.complete();
+    await secondResult;
+    expect(cubit.state.isLoading, isFalse);
+  });
+
   test('track clears loading and rethrows operation errors', () async {
     final cubit = LoadingCubit();
     addTearDown(cubit.close);
