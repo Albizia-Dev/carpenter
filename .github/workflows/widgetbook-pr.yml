@@ -9,13 +9,18 @@ on:
       - 'widgetbook/**'
       - '.github/workflows/widgetbook-pr.yml'
 
+permissions:
+  contents: write
+
 jobs:
   widgetbook:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout PR branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -30,9 +35,19 @@ jobs:
         working-directory: widgetbook
         run: flutter pub get
 
-      - name: Check Widgetbook code style
+      - name: Format Widgetbook
         working-directory: widgetbook
-        run: dart format --output=none --set-exit-if-changed lib
+        run: dart format lib
+
+      - name: Commit formatting
+        run: |
+          if ! git diff --quiet -- widgetbook/lib; then
+            git config user.name github-actions[bot]
+            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+            git add widgetbook/lib
+            git commit -m "style: format widgetbook"
+            git push
+          fi
 
       - name: Analyze Widgetbook
         working-directory: widgetbook
