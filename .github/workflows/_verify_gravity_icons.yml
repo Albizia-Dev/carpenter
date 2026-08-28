@@ -1,0 +1,36 @@
+name: Verify Gravity icons
+
+on:
+  push:
+    branches:
+      - feat/gravity-icons
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Install package dependencies
+        run: flutter pub get
+      - name: Verify generated icon catalog
+        run: |
+          cp lib/src/components/basic/gravity_icons.g.dart /tmp/gravity_icons.g.dart
+          dart run tool/generate_gravity_icons.dart
+          diff -u /tmp/gravity_icons.g.dart lib/src/components/basic/gravity_icons.g.dart
+      - name: Analyze library
+        run: dart analyze lib
+      - name: Install Widgetbook dependencies
+        working-directory: widgetbook
+        run: flutter pub get
+      - name: Format Widgetbook
+        run: dart format --output=none --set-exit-if-changed widgetbook/lib
+      - name: Analyze Widgetbook
+        working-directory: widgetbook
+        run: dart analyze lib
+      - name: Build Widgetbook web
+        working-directory: widgetbook
+        run: flutter build web --release --base-href /carpenter/
