@@ -18,9 +18,14 @@ void main() {
 }
 
 final class CarpenterExampleApp extends StatefulWidget {
-  const CarpenterExampleApp({super.key, this.syncRouteInformation = true});
+  const CarpenterExampleApp({
+    super.key,
+    this.syncRouteInformation = true,
+    this.initialUri,
+  });
 
   final bool syncRouteInformation;
+  final Uri? initialUri;
 
   @override
   State<CarpenterExampleApp> createState() => _CarpenterExampleAppState();
@@ -37,9 +42,11 @@ final class _CarpenterExampleAppState extends State<CarpenterExampleApp> {
   @override
   void initState() {
     super.initState();
-    final initialUri = widget.syncRouteInformation
-        ? CarpenterRouteInformationSync.initialUri
-        : Uri(path: '/');
+    final initialUri =
+        widget.initialUri ??
+        (widget.syncRouteInformation
+            ? CarpenterRouteInformationSync.initialUri
+            : Uri(path: '/'));
     _navigation = RouteNodeStateManager(
       routeNode: DemoRoutes.parse(initialUri),
     );
