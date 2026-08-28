@@ -9,10 +9,11 @@ final class CarpenterButton extends StatelessWidget {
   const CarpenterButton({
     super.key,
     required this.label,
+    this.onPressed,
     this.onInvoke,
     this.icon,
     this.iconPosition = CarpenterActionIconPosition.leading,
-    this.colorRole = ActionColorRole.neutral,
+    this.colorRole = ActionColorRole.primary,
     this.prominence = ActionProminence.normal,
     this.size = ControlSize.medium,
     this.shape = CarpenterShape.rounded,
@@ -20,7 +21,70 @@ final class CarpenterButton extends StatelessWidget {
     this.focusNode,
     this.autofocus = false,
     this.semanticLabel,
-  });
+  }) : assert(
+         onPressed == null || onInvoke == null,
+         'Use either onPressed or the compatibility onInvoke callback, not both.',
+       );
+
+  const CarpenterButton.filled({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.onInvoke,
+    this.icon,
+    this.iconPosition = CarpenterActionIconPosition.leading,
+    this.colorRole = ActionColorRole.primary,
+    this.size = ControlSize.medium,
+    this.shape = CarpenterShape.rounded,
+    this.executionPhase = ActionExecutionPhase.idle,
+    this.focusNode,
+    this.autofocus = false,
+    this.semanticLabel,
+  }) : prominence = ActionProminence.filled,
+       assert(
+         onPressed == null || onInvoke == null,
+         'Use either onPressed or the compatibility onInvoke callback, not both.',
+       );
+
+  const CarpenterButton.outlined({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.onInvoke,
+    this.icon,
+    this.iconPosition = CarpenterActionIconPosition.leading,
+    this.colorRole = ActionColorRole.primary,
+    this.size = ControlSize.medium,
+    this.shape = CarpenterShape.rounded,
+    this.executionPhase = ActionExecutionPhase.idle,
+    this.focusNode,
+    this.autofocus = false,
+    this.semanticLabel,
+  }) : prominence = ActionProminence.outlined,
+       assert(
+         onPressed == null || onInvoke == null,
+         'Use either onPressed or the compatibility onInvoke callback, not both.',
+       );
+
+  const CarpenterButton.text({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.onInvoke,
+    this.icon,
+    this.iconPosition = CarpenterActionIconPosition.leading,
+    this.colorRole = ActionColorRole.primary,
+    this.size = ControlSize.medium,
+    this.shape = CarpenterShape.rounded,
+    this.executionPhase = ActionExecutionPhase.idle,
+    this.focusNode,
+    this.autofocus = false,
+    this.semanticLabel,
+  }) : prominence = ActionProminence.ghost,
+       assert(
+         onPressed == null || onInvoke == null,
+         'Use either onPressed or the compatibility onInvoke callback, not both.',
+       );
 
   CarpenterButton.fromAction(
     CarpenterActionDescriptor action, {
@@ -33,12 +97,16 @@ final class CarpenterButton extends StatelessWidget {
     this.focusNode,
     this.autofocus = false,
   }) : label = action.label,
-       onInvoke = action.onInvoke,
+       onPressed = action.onInvoke,
+       onInvoke = null,
        icon = action.icon,
        semanticLabel = action.semanticLabel,
        colorRole = action.colorRole;
 
   final String label;
+  final VoidCallback? onPressed;
+
+  /// Compatibility alias for older Carpenter call sites.
   final VoidCallback? onInvoke;
   final IconData? icon;
   final CarpenterActionIconPosition iconPosition;
@@ -51,11 +119,13 @@ final class CarpenterButton extends StatelessWidget {
   final bool autofocus;
   final String? semanticLabel;
 
+  VoidCallback? get _effectiveOnPressed => onPressed ?? onInvoke;
+
   @override
   Widget build(BuildContext context) {
     return ActionControl(
       semanticLabel: semanticLabel ?? label,
-      onInvoke: onInvoke,
+      onInvoke: _effectiveOnPressed,
       colorRole: colorRole,
       prominence: prominence,
       size: size,
@@ -101,36 +171,33 @@ final class _ButtonContent extends StatelessWidget {
         .action(context, size, TypographyEmphasis.medium)
         .copyWith(color: style.foreground);
 
-    Widget paragraph() {
-      final hasGlyph = icon != null;
-      final glyph = WidgetSpan(
-        alignment: PlaceholderAlignment.middle,
-        child: SizedBox.square(
-          dimension: iconDimension,
-          child: Icon(icon, size: iconDimension, color: style.icon),
-        ),
-      );
-      final spacer = WidgetSpan(child: SizedBox(width: gap));
-      final spans = <InlineSpan>[
-        if (hasGlyph && iconPosition == CarpenterActionIconPosition.leading)
-          glyph,
-        if (hasGlyph && iconPosition == CarpenterActionIconPosition.leading)
-          spacer,
-        TextSpan(text: label),
-        if (hasGlyph && iconPosition == CarpenterActionIconPosition.trailing)
-          spacer,
-        if (hasGlyph && iconPosition == CarpenterActionIconPosition.trailing)
-          glyph,
-      ];
-      return Text.rich(
-        TextSpan(style: textStyle, children: spans),
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        textAlign: TextAlign.center,
-        textWidthBasis: TextWidthBasis.longestLine,
-      );
-    }
+    final hasGlyph = icon != null;
+    final glyph = WidgetSpan(
+      alignment: PlaceholderAlignment.middle,
+      child: SizedBox.square(
+        dimension: iconDimension,
+        child: Icon(icon, size: iconDimension, color: style.icon),
+      ),
+    );
+    final spacer = WidgetSpan(child: SizedBox(width: gap));
+    final spans = <InlineSpan>[
+      if (hasGlyph && iconPosition == CarpenterActionIconPosition.leading)
+        glyph,
+      if (hasGlyph && iconPosition == CarpenterActionIconPosition.leading)
+        spacer,
+      TextSpan(text: label),
+      if (hasGlyph && iconPosition == CarpenterActionIconPosition.trailing)
+        spacer,
+      if (hasGlyph && iconPosition == CarpenterActionIconPosition.trailing)
+        glyph,
+    ];
 
-    return paragraph();
+    return Text.rich(
+      TextSpan(style: textStyle, children: spans),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+      textAlign: TextAlign.center,
+      textWidthBasis: TextWidthBasis.longestLine,
+    );
   }
 }
