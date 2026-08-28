@@ -66,8 +66,9 @@ final class _ListReportPreviewState extends State<_ListReportPreview> {
   @override
   void initState() {
     super.initState();
-    if (widget.selected)
+    if (widget.selected) {
       _selection = CollectionSelection<int>.multiple(const [1, 2]);
+    }
   }
 
   @override
