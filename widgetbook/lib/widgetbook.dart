@@ -20,6 +20,7 @@ import 'use_cases/basic/text.dart';
 import 'use_cases/basic/text_area.dart';
 import 'use_cases/behaviour/dialog.dart';
 import 'use_cases/behaviour/dropdown.dart';
+import 'use_cases/behaviour/loading_boundary.dart';
 import 'use_cases/behaviour/menu.dart';
 import 'use_cases/behaviour/migrated_behaviour.dart';
 import 'use_cases/behaviour/popover.dart';
@@ -78,6 +79,7 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
       name: 'Behaviour',
       children: [
         controlComponent,
+        loadingBoundaryComponent,
         popoverComponent,
         menuComponent,
         dropdownComponent,
