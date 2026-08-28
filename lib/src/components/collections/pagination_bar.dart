@@ -125,7 +125,9 @@ final class CarpenterPaginationBar extends StatelessWidget {
               else
                 CarpenterButton(
                   label: '$item',
-                  semanticLabel: item == page ? 'Current page $item' : 'Page $item',
+                  semanticLabel: item == page
+                      ? 'Current page $item'
+                      : 'Page $item',
                   size: ControlSize.small,
                   prominence: item == page
                       ? ActionProminence.filled

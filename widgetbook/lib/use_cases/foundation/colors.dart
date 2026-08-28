@@ -5,7 +5,21 @@ import 'package:widgetbook/widgetbook.dart';
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
 
-const _weights = <int>[0, 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1000];
+const _weights = <int>[
+  0,
+  50,
+  100,
+  200,
+  300,
+  400,
+  500,
+  600,
+  700,
+  800,
+  900,
+  950,
+  1000,
+];
 
 final foundationColorsComponent = WidgetbookComponent(
   name: 'Colors',
@@ -41,17 +55,57 @@ Widget _semanticTokens(BuildContext context) => preview(
           _ColorSection(
             title: 'surface.* / overlay.*',
             colors: [
-              _NamedColor('surface.base', theme.surface.base, theme.content.primary),
-              _NamedColor('surface.subtle', theme.surface.subtle, theme.content.primary),
-              _NamedColor('overlay.background', theme.overlay.background, theme.overlay.foreground),
-              _NamedColor('overlay.foreground', theme.overlay.foreground, theme.surface.base),
-              _NamedColor('overlay.supporting', theme.overlay.supporting, theme.overlay.background),
-              _NamedColor('overlay.border', theme.overlay.border, theme.surface.base),
-              _NamedColor('overlay.hovered', theme.overlay.hovered, theme.overlay.foreground),
-              _NamedColor('overlay.selected', theme.overlay.selected, theme.overlay.foreground),
+              _NamedColor(
+                'surface.base',
+                theme.surface.base,
+                theme.content.primary,
+              ),
+              _NamedColor(
+                'surface.subtle',
+                theme.surface.subtle,
+                theme.content.primary,
+              ),
+              _NamedColor(
+                'overlay.background',
+                theme.overlay.background,
+                theme.overlay.foreground,
+              ),
+              _NamedColor(
+                'overlay.foreground',
+                theme.overlay.foreground,
+                theme.surface.base,
+              ),
+              _NamedColor(
+                'overlay.supporting',
+                theme.overlay.supporting,
+                theme.overlay.background,
+              ),
+              _NamedColor(
+                'overlay.border',
+                theme.overlay.border,
+                theme.surface.base,
+              ),
+              _NamedColor(
+                'overlay.hovered',
+                theme.overlay.hovered,
+                theme.overlay.foreground,
+              ),
+              _NamedColor(
+                'overlay.selected',
+                theme.overlay.selected,
+                theme.overlay.foreground,
+              ),
               _NamedColor('overlay.scrim', theme.overlay.scrim, palette.white),
-              _NamedColor('overlay.tooltip.background', theme.overlay.tooltipBackground, theme.overlay.tooltipForeground),
-              _NamedColor('overlay.tooltip.foreground', theme.overlay.tooltipForeground, theme.overlay.tooltipBackground),
+              _NamedColor(
+                'overlay.tooltip.background',
+                theme.overlay.tooltipBackground,
+                theme.overlay.tooltipForeground,
+              ),
+              _NamedColor(
+                'overlay.tooltip.foreground',
+                theme.overlay.tooltipForeground,
+                theme.overlay.tooltipBackground,
+              ),
             ],
           ),
           _ColorSection(
@@ -68,17 +122,61 @@ Widget _semanticTokens(BuildContext context) => preview(
           _ColorSection(
             title: 'field.*',
             colors: [
-              _NamedColor('field.background', theme.fields.background, theme.fields.foreground),
-              _NamedColor('field.backgroundHovered', theme.fields.backgroundHovered, theme.fields.foreground),
-              _NamedColor('field.backgroundDisabled', theme.fields.backgroundDisabled, theme.fields.disabledForeground),
-              _NamedColor('field.foreground', theme.fields.foreground, theme.fields.background),
-              _NamedColor('field.placeholder', theme.fields.placeholder, theme.fields.background),
-              _NamedColor('field.border', theme.fields.border, theme.surface.base),
-              _NamedColor('field.borderHovered', theme.fields.borderHovered, theme.surface.base),
-              _NamedColor('field.borderFocused', theme.fields.borderFocused, theme.surface.base),
-              _NamedColor('field.borderError', theme.fields.borderError, theme.surface.base),
-              _NamedColor('field.error', theme.fields.error, theme.surface.base),
-              _NamedColor('field.selection', theme.fields.selection, theme.fields.foreground),
+              _NamedColor(
+                'field.background',
+                theme.fields.background,
+                theme.fields.foreground,
+              ),
+              _NamedColor(
+                'field.backgroundHovered',
+                theme.fields.backgroundHovered,
+                theme.fields.foreground,
+              ),
+              _NamedColor(
+                'field.backgroundDisabled',
+                theme.fields.backgroundDisabled,
+                theme.fields.disabledForeground,
+              ),
+              _NamedColor(
+                'field.foreground',
+                theme.fields.foreground,
+                theme.fields.background,
+              ),
+              _NamedColor(
+                'field.placeholder',
+                theme.fields.placeholder,
+                theme.fields.background,
+              ),
+              _NamedColor(
+                'field.border',
+                theme.fields.border,
+                theme.surface.base,
+              ),
+              _NamedColor(
+                'field.borderHovered',
+                theme.fields.borderHovered,
+                theme.surface.base,
+              ),
+              _NamedColor(
+                'field.borderFocused',
+                theme.fields.borderFocused,
+                theme.surface.base,
+              ),
+              _NamedColor(
+                'field.borderError',
+                theme.fields.borderError,
+                theme.surface.base,
+              ),
+              _NamedColor(
+                'field.error',
+                theme.fields.error,
+                theme.surface.base,
+              ),
+              _NamedColor(
+                'field.selection',
+                theme.fields.selection,
+                theme.fields.foreground,
+              ),
             ],
           ),
           for (final role in ActionColorRole.values)
@@ -112,9 +210,21 @@ Widget _semanticTokens(BuildContext context) => preview(
             title: 'focus / disabled',
             colors: [
               _NamedColor('focus.color', theme.focus.color, theme.surface.base),
-              _NamedColor('action.disabledBackground', theme.actions.disabledBackground, theme.actions.disabledForeground),
-              _NamedColor('action.disabledForeground', theme.actions.disabledForeground, theme.surface.base),
-              _NamedColor('content.disabled', theme.content.disabled, theme.surface.base),
+              _NamedColor(
+                'action.disabledBackground',
+                theme.actions.disabledBackground,
+                theme.actions.disabledForeground,
+              ),
+              _NamedColor(
+                'action.disabledForeground',
+                theme.actions.disabledForeground,
+                theme.surface.base,
+              ),
+              _NamedColor(
+                'content.disabled',
+                theme.content.disabled,
+                theme.surface.base,
+              ),
             ],
           ),
         ],
@@ -137,11 +247,31 @@ List<_NamedColor> _actionTokenColors(
     ActionColorRole.info => theme.actions.info,
   };
   return [
-    _NamedColor('action.${role.name}.normal', rolePalette.normal, theme.surface.base),
-    _NamedColor('action.${role.name}.hovered', rolePalette.hovered, theme.surface.base),
-    _NamedColor('action.${role.name}.pressed', rolePalette.pressed, theme.surface.base),
-    _NamedColor('action.${role.name}.state', rolePalette.state, rolePalette.normal),
-    _NamedColor('action.${role.name}.strongState', rolePalette.strongState, rolePalette.normal),
+    _NamedColor(
+      'action.${role.name}.normal',
+      rolePalette.normal,
+      theme.surface.base,
+    ),
+    _NamedColor(
+      'action.${role.name}.hovered',
+      rolePalette.hovered,
+      theme.surface.base,
+    ),
+    _NamedColor(
+      'action.${role.name}.pressed',
+      rolePalette.pressed,
+      theme.surface.base,
+    ),
+    _NamedColor(
+      'action.${role.name}.state',
+      rolePalette.state,
+      rolePalette.normal,
+    ),
+    _NamedColor(
+      'action.${role.name}.strongState',
+      rolePalette.strongState,
+      rolePalette.normal,
+    ),
   ];
 }
 

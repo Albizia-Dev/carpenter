@@ -91,7 +91,8 @@ final class ActionControl extends StatelessWidget {
             focusNode: focusNode,
             autofocus: autofocus,
             builder: (context, states, showFocusHighlight) {
-              final visualStates = _running && states.contains(WidgetState.disabled)
+              final visualStates =
+                  _running && states.contains(WidgetState.disabled)
                   ? ({...states}..remove(WidgetState.disabled))
                   : states;
               final style = theme.actions.resolve(
@@ -129,7 +130,9 @@ final class ActionControl extends StatelessWidget {
                       children: [
                         if (_running)
                           Positioned.fill(
-                            child: LoadingBackground(color: style.loadingAccent),
+                            child: LoadingBackground(
+                              color: style.loadingAccent,
+                            ),
                           ),
                         Padding(
                           padding: iconOnly

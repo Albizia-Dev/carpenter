@@ -74,9 +74,18 @@ final class _ComboPreviewState extends State<_ComboPreview> {
   List<CarpenterOption<int>> get _options {
     final query = _controller.text.trim().toLowerCase();
     return [
-      for (var index = 1; index <= widget.optionCount; index++)
-        CarpenterOption(id: index, value: index, label: 'Контрагент $index'),
-    ].where((option) => query.isEmpty || option.label.toLowerCase().contains(query)).toList();
+          for (var index = 1; index <= widget.optionCount; index++)
+            CarpenterOption(
+              id: index,
+              value: index,
+              label: 'Контрагент $index',
+            ),
+        ]
+        .where(
+          (option) =>
+              query.isEmpty || option.label.toLowerCase().contains(query),
+        )
+        .toList();
   }
 
   @override

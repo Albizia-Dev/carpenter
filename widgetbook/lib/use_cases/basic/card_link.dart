@@ -35,9 +35,7 @@ Widget _cardPlayground(BuildContext context) {
     label: 'Layout · Default padding',
     initialValue: true,
   );
-  final customPadding = context.knobs.boolean(
-    label: 'Layout · Custom padding',
-  );
+  final customPadding = context.knobs.boolean(label: 'Layout · Custom padding');
   final padding = context.knobs.double.slider(
     label: 'Layout · Padding',
     initialValue: 16,
@@ -115,16 +113,10 @@ Widget _cardPlayground(BuildContext context) {
               ],
             ),
             const SizedBox(height: 8),
-            CarpenterText.body(
-              body,
-              colorRole: ContentColorRole.secondary,
-            ),
+            CarpenterText.body(body, colorRole: ContentColorRole.secondary),
             if (showAction) ...[
               const SizedBox(height: 16),
-              CarpenterButton.text(
-                label: 'Open details',
-                onPressed: () {},
-              ),
+              CarpenterButton.text(label: 'Open details', onPressed: () {}),
             ],
           ],
         ),
@@ -152,9 +144,7 @@ Widget _linkPlayground(BuildContext context) {
     initialOption: ActionColorRole.utility,
     labelBuilder: semanticValueLabel,
   );
-  final autofocus = context.knobs.boolean(
-    label: 'Accessibility · Autofocus',
-  );
+  final autofocus = context.knobs.boolean(label: 'Accessibility · Autofocus');
   return preview(
     CarpenterLink(
       label: label,

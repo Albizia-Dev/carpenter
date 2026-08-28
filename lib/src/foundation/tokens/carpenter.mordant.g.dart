@@ -782,29 +782,29 @@ final class ComponentActionRadiusTokens {
 final class ComponentActionFontSizeTokens {
   const ComponentActionFontSizeTokens();
 
-  _i1.Rem get xsmall => font.size.label;
+  _i1.Rem get xsmall => const _i1.Rem(0.75);
 
-  _i1.Rem get small => font.size.label;
+  _i1.Rem get small => const _i1.Rem(0.8125);
 
-  _i1.Rem get medium => font.size.label;
+  _i1.Rem get medium => const _i1.Rem(0.875);
 
-  _i1.Rem get large => font.size.label;
+  _i1.Rem get large => const _i1.Rem(0.9375);
 
-  _i1.Rem get xlarge => font.size.label;
+  _i1.Rem get xlarge => const _i1.Rem(1.0);
 }
 
 final class ComponentActionFontLineHeightTokens {
   const ComponentActionFontLineHeightTokens();
 
-  _i1.Rem get xsmall => font.lineHeight.label;
+  _i1.Rem get xsmall => const _i1.Rem(1.0);
 
-  _i1.Rem get small => font.lineHeight.label;
+  _i1.Rem get small => const _i1.Rem(1.125);
 
-  _i1.Rem get medium => font.lineHeight.label;
+  _i1.Rem get medium => const _i1.Rem(1.25);
 
-  _i1.Rem get large => font.lineHeight.label;
+  _i1.Rem get large => const _i1.Rem(1.375);
 
-  _i1.Rem get xlarge => font.lineHeight.label;
+  _i1.Rem get xlarge => const _i1.Rem(1.5);
 }
 
 final class ComponentActionFontTokens {
@@ -973,29 +973,29 @@ final class ComponentFieldRadiusTokens {
 final class ComponentFieldInputFontSizeTokens {
   const ComponentFieldInputFontSizeTokens();
 
-  _i1.Rem get xsmall => component.action.font.size.xsmall;
+  _i1.Rem get xsmall => const _i1.Rem(0.8125);
 
-  _i1.Rem get small => component.action.font.size.small;
+  _i1.Rem get small => const _i1.Rem(0.875);
 
-  _i1.Rem get medium => component.action.font.size.medium;
+  _i1.Rem get medium => const _i1.Rem(0.9375);
 
-  _i1.Rem get large => component.action.font.size.large;
+  _i1.Rem get large => const _i1.Rem(1.0);
 
-  _i1.Rem get xlarge => component.action.font.size.xlarge;
+  _i1.Rem get xlarge => const _i1.Rem(1.0625);
 }
 
 final class ComponentFieldInputFontLineHeightTokens {
   const ComponentFieldInputFontLineHeightTokens();
 
-  _i1.Rem get xsmall => component.action.font.lineHeight.xsmall;
+  _i1.Rem get xsmall => const _i1.Rem(1.125);
 
-  _i1.Rem get small => component.action.font.lineHeight.small;
+  _i1.Rem get small => const _i1.Rem(1.25);
 
-  _i1.Rem get medium => component.action.font.lineHeight.medium;
+  _i1.Rem get medium => const _i1.Rem(1.375);
 
-  _i1.Rem get large => component.action.font.lineHeight.large;
+  _i1.Rem get large => const _i1.Rem(1.5);
 
-  _i1.Rem get xlarge => component.action.font.lineHeight.xlarge;
+  _i1.Rem get xlarge => const _i1.Rem(1.625);
 }
 
 final class ComponentFieldInputFontTokens {

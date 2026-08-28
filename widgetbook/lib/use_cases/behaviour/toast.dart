@@ -144,10 +144,7 @@ final class _ToastPreviewState extends State<_ToastPreview> {
           spacing: 8,
           runSpacing: 8,
           children: [
-            CarpenterButton(
-              label: 'Показать toast',
-              onPressed: _showOne,
-            ),
+            CarpenterButton(label: 'Показать toast', onPressed: _showOne),
             CarpenterButton.outlined(
               label: 'Burst ×${widget.burstSize}',
               onPressed: () {

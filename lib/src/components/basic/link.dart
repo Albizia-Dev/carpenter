@@ -87,10 +87,7 @@ final class CarpenterLink extends StatelessWidget {
         return FocusRing(
           visible: states.contains(WidgetState.focused) && showFocusHighlight,
           borderRadius: radius,
-          child: Padding(
-            padding: EdgeInsets.all(focusPadding),
-            child: content,
-          ),
+          child: Padding(padding: EdgeInsets.all(focusPadding), child: content),
         );
       },
     ),

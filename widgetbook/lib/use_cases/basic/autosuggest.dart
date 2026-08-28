@@ -64,9 +64,14 @@ final class _AutosuggestPreviewState extends State<_AutosuggestPreview> {
   List<CarpenterOption<int>> get _suggestions {
     final query = _controller.text.trim().toLowerCase();
     return [
-      for (var index = 1; index <= widget.count; index++)
-        CarpenterOption(id: index, value: index, label: 'Подсказка $index'),
-    ].where((option) => query.isEmpty || option.label.toLowerCase().contains(query)).toList();
+          for (var index = 1; index <= widget.count; index++)
+            CarpenterOption(id: index, value: index, label: 'Подсказка $index'),
+        ]
+        .where(
+          (option) =>
+              query.isEmpty || option.label.toLowerCase().contains(query),
+        )
+        .toList();
   }
 
   @override

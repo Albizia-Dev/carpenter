@@ -51,18 +51,18 @@ component:
 
     font:
       size:
-        xsmall: "${font.size.label}"
-        small: "${font.size.label}"
-        medium: "${font.size.label}"
-        large: "${font.size.label}"
-        xlarge: "${font.size.label}"
+        xsmall: 0.75rem
+        small: 0.8125rem
+        medium: 0.875rem
+        large: 0.9375rem
+        xlarge: 1rem
 
       lineHeight:
-        xsmall: "${font.lineHeight.label}"
-        small: "${font.lineHeight.label}"
-        medium: "${font.lineHeight.label}"
-        large: "${font.lineHeight.label}"
-        xlarge: "${font.lineHeight.label}"
+        xsmall: 1rem
+        small: 1.125rem
+        medium: 1.25rem
+        large: 1.375rem
+        xlarge: 1.5rem
 
     borderWidth: "${border.standard}"
 
@@ -132,18 +132,18 @@ component:
 
     inputFont:
       size:
-        xsmall: "${component.action.font.size.xsmall}"
-        small: "${component.action.font.size.small}"
-        medium: "${component.action.font.size.medium}"
-        large: "${component.action.font.size.large}"
-        xlarge: "${component.action.font.size.xlarge}"
+        xsmall: 0.8125rem
+        small: 0.875rem
+        medium: 0.9375rem
+        large: 1rem
+        xlarge: 1.0625rem
 
       lineHeight:
-        xsmall: "${component.action.font.lineHeight.xsmall}"
-        small: "${component.action.font.lineHeight.small}"
-        medium: "${component.action.font.lineHeight.medium}"
-        large: "${component.action.font.lineHeight.large}"
-        xlarge: "${component.action.font.lineHeight.xlarge}"
+        xsmall: 1.125rem
+        small: 1.25rem
+        medium: 1.375rem
+        large: 1.5rem
+        xlarge: 1.625rem
 
     labelFont:
       size:

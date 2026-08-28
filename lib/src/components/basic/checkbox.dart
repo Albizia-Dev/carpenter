@@ -78,10 +78,11 @@ final class _CheckboxIndicator extends StatelessWidget {
     final inset = context.units(theme.spacing.checkboxMarkInset(sizeRole));
     final strokeWidth = context.units(theme.shapes.checkboxBorderWidth);
     final radius = switch (sizeRole) {
-      ControlSize.xsmall || ControlSize.small =>
-        context.units(theme.shapes.checkboxRadius(sizeRole)),
-      ControlSize.medium || ControlSize.large || ControlSize.xlarge =>
-        context.units(const Px(2)),
+      ControlSize.xsmall ||
+      ControlSize.small => context.units(theme.shapes.checkboxRadius(sizeRole)),
+      ControlSize.medium ||
+      ControlSize.large ||
+      ControlSize.xlarge => context.units(const Px(2)),
     };
     return AnimatedContainer(
       duration: theme.motion.transitionDuration(context),

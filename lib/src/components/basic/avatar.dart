@@ -32,7 +32,8 @@ final class CarpenterAvatar extends StatelessWidget {
       ActionProminence.filled,
       const <WidgetState>{},
     );
-    final fallback = child ??
+    final fallback =
+        child ??
         (initials != null
             ? CarpenterText.label(
                 initials!,

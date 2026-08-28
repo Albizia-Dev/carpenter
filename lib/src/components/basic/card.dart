@@ -35,7 +35,8 @@ final class CarpenterCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final radius = context.units(theme.shapes.radius(shape));
-    final effectivePadding = padding ??
+    final effectivePadding =
+        padding ??
         (padded
             ? EdgeInsets.all(context.units(theme.spacing.large))
             : EdgeInsets.zero);
