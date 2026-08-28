@@ -56,7 +56,8 @@ CollectionSnapshot<T> demoCollectionSnapshot<T>({
       items: items,
       pageInfo: pageInfo,
     ),
-    DemoCollectionScenario.initialLoading => CollectionSnapshot<T>.initialLoading(),
+    DemoCollectionScenario.initialLoading =>
+      CollectionSnapshot<T>.initialLoading(),
     DemoCollectionScenario.refreshing => CollectionSnapshot<T>(
       items: items,
       loadPhase: CollectionLoadPhase.refreshing,

@@ -66,7 +66,8 @@ final class _ListReportPreviewState extends State<_ListReportPreview> {
   @override
   void initState() {
     super.initState();
-    if (widget.selected) _selection = CollectionSelection<int>.multiple(const [1, 2]);
+    if (widget.selected)
+      _selection = CollectionSelection<int>.multiple(const [1, 2]);
   }
 
   @override
@@ -133,7 +134,8 @@ final class _ListReportPreviewState extends State<_ListReportPreview> {
         rowKey: (row) => row.id,
         rowSemanticLabel: (row) => '${row.name}, ${row.amount} rubles',
         selection: _selection,
-        onSelectionChanged: (selection) => setState(() => _selection = selection),
+        onSelectionChanged: (selection) =>
+            setState(() => _selection = selection),
         columns: [
           CarpenterTableColumn<_ReportRow>.text(
             id: 'name',

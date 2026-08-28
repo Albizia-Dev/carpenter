@@ -66,7 +66,9 @@ Widget _contentStress(BuildContext context) => previewColumn([
     textDirection: TextDirection.rtl,
     child: SizedBox(
       width: 280,
-      child: CarpenterText.body('نص طويل لاختبار اتجاه الكتابة من اليمين إلى اليسار'),
+      child: CarpenterText.body(
+        'نص طويل لاختبار اتجاه الكتابة من اليمين إلى اليسار',
+      ),
     ),
   ),
   const CarpenterText.body('Статусы: ✓ ⚠ ⛔ · 1 234 567,89 ₽ · №1542'),

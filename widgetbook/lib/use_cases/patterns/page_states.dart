@@ -83,8 +83,10 @@ String _title(CarpenterPageStateKind kind) => switch (kind) {
 };
 
 String _description(CarpenterPageStateKind kind) => switch (kind) {
-  CarpenterPageStateKind.initialLoading => 'The initial request is in progress.',
+  CarpenterPageStateKind.initialLoading =>
+    'The initial request is in progress.',
   CarpenterPageStateKind.zero => 'Create the first record to start working.',
   CarpenterPageStateKind.emptyResult => 'Change or clear the active filters.',
-  CarpenterPageStateKind.initialError => 'Check the connection and retry the request.',
+  CarpenterPageStateKind.initialError =>
+    'Check the connection and retry the request.',
 };

@@ -50,15 +50,27 @@ Widget _playground(BuildContext context) {
 Widget _responsiveStates(BuildContext context) => previewColumn([
   const SizedBox(
     width: 320,
-    child: _FilterBarPreview(activeFilters: 3, filterCount: 3, extraActions: true),
+    child: _FilterBarPreview(
+      activeFilters: 3,
+      filterCount: 3,
+      extraActions: true,
+    ),
   ),
   const SizedBox(
     width: 720,
-    child: _FilterBarPreview(activeFilters: 1, filterCount: 2, extraActions: true),
+    child: _FilterBarPreview(
+      activeFilters: 1,
+      filterCount: 2,
+      extraActions: true,
+    ),
   ),
   const SizedBox(
     width: 1080,
-    child: _FilterBarPreview(activeFilters: 0, filterCount: 4, extraActions: false),
+    child: _FilterBarPreview(
+      activeFilters: 0,
+      filterCount: 4,
+      extraActions: false,
+    ),
   ),
 ]);
 
@@ -91,7 +103,8 @@ final class _FilterBarPreviewState extends State<_FilterBarPreview> {
     searchController: _searchController,
     searchPlaceholder: 'Number, customer or purpose',
     onSearchChanged: (_) => setState(() {}),
-    activeFilterCount: widget.activeFilters + (_searchController.text.isEmpty ? 0 : 1),
+    activeFilterCount:
+        widget.activeFilters + (_searchController.text.isEmpty ? 0 : 1),
     filterControls: [
       for (var index = 0; index < widget.filterCount; index++)
         CarpenterButton(

@@ -15,7 +15,9 @@ final pageHeaderComponent = WidgetbookComponent(
 
 final headerActionsComponent = WidgetbookComponent(
   name: 'Header Actions',
-  useCases: [WidgetbookUseCase(name: 'Playground', builder: _actionsPlayground)],
+  useCases: [
+    WidgetbookUseCase(name: 'Playground', builder: _actionsPlayground),
+  ],
 );
 
 Widget _pageHeaderPlayground(BuildContext context) {
@@ -60,7 +62,10 @@ Widget _pageHeaderPlayground(BuildContext context) {
         breadcrumbs: const CarpenterText.caption('Treasury / Payments'),
         primaryActions: [
           for (var index = 0; index < primaryCount; index++)
-            _action('primary-$index', index == 0 ? 'Approve' : 'Primary ${index + 1}'),
+            _action(
+              'primary-$index',
+              index == 0 ? 'Approve' : 'Primary ${index + 1}',
+            ),
         ],
         secondaryActions: [
           for (var index = 0; index < secondaryCount; index++)
@@ -76,7 +81,8 @@ Widget _pageHeaderStress(BuildContext context) => layoutViewportPreview(
   child: Align(
     alignment: AlignmentDirectional.topStart,
     child: CarpenterPageHeader(
-      title: 'Very long structured document title that must remain usable in a narrow operational workspace',
+      title:
+          'Very long structured document title that must remain usable in a narrow operational workspace',
       subtitle:
           'A deliberately verbose subtitle with contextual metadata, ownership information and a description long enough to exercise wrapping.',
       status: const CarpenterPageStatus(
