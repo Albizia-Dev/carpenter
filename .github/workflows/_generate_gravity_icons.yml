@@ -1,0 +1,27 @@
+name: Generate Gravity icon catalog
+
+on:
+  push:
+    branches:
+      - feat/gravity-icons
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+      - run: dart run tool/generate_gravity_icons.dart
+      - name: Commit generated catalog
+        run: |
+          git add lib/src/components/basic/gravity_icons.g.dart
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "build: regenerate Gravity icon catalog"
+          git push
