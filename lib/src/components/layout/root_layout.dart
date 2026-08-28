@@ -161,7 +161,9 @@ final class CarpenterRootLayout extends StatelessWidget {
         sections: sidebar.sections,
         selectedId: sidebar.selectedId,
         header: sidebar.header,
+        compactHeader: sidebar.compactHeader,
         footer: sidebar.footer,
+        compactFooter: sidebar.compactFooter,
         semanticLabel: sidebar.semanticLabel,
         onSelected: (id) {
           sidebar.onSelected?.call(id);
