@@ -2,20 +2,9 @@ import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+import '../../helpers/collection_fixtures.dart';
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
-
-enum _CollectionScenario {
-  initialLoading,
-  loaded,
-  refreshing,
-  initialError,
-  refreshError,
-  zero,
-  emptyResult,
-}
-
-enum _PaginationFixture { cursor, keyset, progressive, unknownTotal }
 
 final collectionKernelComponent = WidgetbookComponent(
   name: 'Collection Kernel',
@@ -25,13 +14,14 @@ final collectionKernelComponent = WidgetbookComponent(
 Widget _playground(BuildContext context) {
   final scenario = context.knobs.object.dropdown(
     label: 'Snapshot · Scenario',
-    options: _CollectionScenario.values,
-    initialOption: _CollectionScenario.refreshing,
+    options: DemoCollectionScenario.values,
+    initialOption: DemoCollectionScenario.refreshing,
     labelBuilder: semanticValueLabel,
   );
   final pagination = context.knobs.object.segmented(
     label: 'Pagination · Contract',
-    options: _PaginationFixture.values,
+    options: DemoPaginationFixture.values,
+    initialOption: DemoPaginationFixture.cursor,
     labelBuilder: semanticValueLabel,
   );
   final selectionMode = context.knobs.object.segmented(
@@ -44,7 +34,11 @@ Widget _playground(BuildContext context) {
     label: 'Mutation · Optimistic',
     initialValue: true,
   );
-  final snapshot = _snapshot(scenario, pagination);
+  final snapshot = demoCollectionSnapshot<String>(
+    items: const ['Alpha', 'Beta', 'Gamma'],
+    scenario: scenario,
+    pagination: pagination,
+  );
   final selection = _selection(selectionMode);
   final mutation = optimistic
       ? CollectionMutationState<int>().running([2], optimistic: true)
@@ -62,7 +56,7 @@ Widget _playground(BuildContext context) {
                 snapshot.initialFailure != null ||
                     snapshot.refreshFailure != null
                 ? FeedbackColorRole.danger
-                : snapshot.isRefreshing
+                : snapshot.isRefreshing || snapshot.isLoadingMore
                 ? FeedbackColorRole.info
                 : FeedbackColorRole.neutral,
           ),
@@ -88,69 +82,6 @@ Widget _playground(BuildContext context) {
       ),
     ),
   );
-}
-
-CollectionSnapshot<String> _snapshot(
-  _CollectionScenario scenario,
-  _PaginationFixture pagination,
-) {
-  final pageInfo = switch (pagination) {
-    _PaginationFixture.cursor => const CollectionCursorPageInfo(
-      itemCount: 3,
-      nextCursor: 'opaque-next',
-    ),
-    _PaginationFixture.keyset => const CollectionKeysetPageInfo<int>(
-      itemCount: 3,
-      nextKey: 103,
-    ),
-    _PaginationFixture.progressive => const CollectionProgressivePageInfo(
-      loadedItems: 3,
-      hasMore: true,
-      totalItems: 30,
-    ),
-    _PaginationFixture.unknownTotal => const CollectionOffsetPageInfo(
-      offset: 0,
-      limit: 3,
-      itemCount: 3,
-      moreAvailable: true,
-    ),
-  };
-  const items = ['Alpha', 'Beta', 'Gamma'];
-  return switch (scenario) {
-    _CollectionScenario.initialLoading =>
-      CollectionSnapshot<String>.initialLoading(),
-    _CollectionScenario.loaded => CollectionSnapshot<String>(
-      items: items,
-      pageInfo: pageInfo,
-    ),
-    _CollectionScenario.refreshing => CollectionSnapshot<String>(
-      items: items,
-      loadPhase: CollectionLoadPhase.refreshing,
-      freshness: CollectionFreshness.stale,
-      pageInfo: pageInfo,
-    ),
-    _CollectionScenario.initialError => CollectionSnapshot<String>(
-      initialFailure: const CollectionFailure(
-        error: 'network',
-        message: 'Initial load failed',
-      ),
-    ),
-    _CollectionScenario.refreshError => CollectionSnapshot<String>(
-      items: items,
-      freshness: CollectionFreshness.stale,
-      refreshFailure: const CollectionFailure(
-        error: 'network',
-        message: 'Refresh failed; data retained',
-      ),
-      pageInfo: pageInfo,
-    ),
-    _CollectionScenario.zero => CollectionSnapshot<String>(
-      contentState: CollectionContentState.zero,
-    ),
-    _CollectionScenario.emptyResult => CollectionSnapshot<String>(
-      contentState: CollectionContentState.emptyResult,
-    ),
-  };
 }
 
 CollectionSelection<int> _selection(CollectionSelectionMode mode) =>
