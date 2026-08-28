@@ -65,9 +65,9 @@ Widget _avatarMatrix(BuildContext context) => preview(
       CarpenterAvatar(initials: 'CD', size: 40),
       CarpenterAvatar(initials: 'ERP', size: 64),
       CarpenterAvatar(
-        child: Icon(CarpenterIcons.account),
         size: 48,
         semanticLabel: 'Account',
+        child: Icon(CarpenterIcons.account),
       ),
     ],
   ),

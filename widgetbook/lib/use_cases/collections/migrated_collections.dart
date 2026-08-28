@@ -51,8 +51,9 @@ final class _LifecyclePreviewState extends State<_LifecyclePreview> {
         load: (query, request) async {
           final generation = ++_request;
           await Future<void>.delayed(const Duration(milliseconds: 550));
-          if (request.cancellation.isCancelled)
+          if (request.cancellation.isCancelled) {
             return CollectionSnapshot<String>.initialLoading();
+          }
           final search = (query.search ?? '').toLowerCase();
           final source = [
             'Invoice 001',
