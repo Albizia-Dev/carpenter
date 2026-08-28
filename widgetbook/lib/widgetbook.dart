@@ -11,6 +11,7 @@ import 'use_cases/basic/combo_box.dart';
 import 'use_cases/basic/icon.dart';
 import 'use_cases/basic/icon_button.dart';
 import 'use_cases/basic/input.dart';
+import 'use_cases/basic/migrated_primitives.dart';
 import 'use_cases/basic/radio_group.dart';
 import 'use_cases/basic/select.dart';
 import 'use_cases/basic/status_indicator.dart';
@@ -20,6 +21,7 @@ import 'use_cases/basic/text_area.dart';
 import 'use_cases/behaviour/dialog.dart';
 import 'use_cases/behaviour/dropdown.dart';
 import 'use_cases/behaviour/menu.dart';
+import 'use_cases/behaviour/migrated_behaviour.dart';
 import 'use_cases/behaviour/popover.dart';
 import 'use_cases/behaviour/toast.dart';
 import 'use_cases/behaviour/tooltip.dart';
@@ -27,12 +29,15 @@ import 'use_cases/collections/collection_kernel.dart';
 import 'use_cases/collections/content_primitives.dart';
 import 'use_cases/collections/data_list.dart';
 import 'use_cases/collections/filter_bar.dart';
+import 'use_cases/collections/migrated_collections.dart';
 import 'use_cases/collections/table.dart';
 import 'use_cases/foundation/colors.dart';
 import 'use_cases/foundation/typography.dart';
+import 'use_cases/layout/migrated_layout.dart';
 import 'use_cases/layout/page_header.dart';
 import 'use_cases/layout/semantic_layout.dart';
 import 'use_cases/patterns/list_report.dart';
+import 'use_cases/patterns/migrated_patterns.dart';
 import 'use_cases/patterns/page_patterns.dart';
 import 'use_cases/patterns/page_states.dart';
 import 'use_cases/samples/payment_list.dart';
@@ -48,13 +53,18 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
       children: [
         textComponent,
         iconComponent,
+        avatarComponent,
         statusIndicatorComponent,
+        activityComponent,
         buttonComponent,
         iconButtonComponent,
+        toggleButtonComponent,
         cardComponent,
         linkComponent,
         inputComponent,
         textAreaComponent,
+        dateInputComponent,
+        colorPickerComponent,
         checkboxComponent,
         radioGroupComponent,
         switchComponent,
@@ -66,33 +76,46 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
     WidgetbookFolder(
       name: 'Behaviour',
       children: [
+        controlComponent,
         popoverComponent,
         menuComponent,
         dropdownComponent,
         tooltipComponent,
         toastComponent,
         dialogComponent,
+        noticeComponent,
+        expanderComponent,
+        commandComponent,
+        hotkeyComponent,
+        surfaceHostComponent,
       ],
     ),
     WidgetbookFolder(
       name: 'Collections',
       children: [
         collectionKernelComponent,
+        collectionLifecycleComponent,
         filterBarComponent,
         dataListComponent,
+        listTileComponent,
         definitionListComponent,
         tabsComponent,
+        paginationBarComponent,
         tableComponent,
+        inspectorComponent,
       ],
     ),
     WidgetbookFolder(
       name: 'Layout',
       children: [
         applicationShellComponent,
+        appFrameComponent,
         pageHeaderComponent,
         headerActionsComponent,
         toolbarComponent,
         splitViewComponent,
+        restorableSplitComponent,
+        tabsLayoutComponent,
         adaptiveRegionComponent,
         masterDetailComponent,
       ],
@@ -104,8 +127,12 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
         collectionPageComponent,
         listReportComponent,
         objectPageComponent,
+        recordPatternComponent,
         formPageComponent,
+        editorPatternComponent,
         masterDetailPageComponent,
+        explorerPatternComponent,
+        workflowPatternComponent,
       ],
     ),
     WidgetbookFolder(name: 'Samples', children: [paymentListSampleComponent]),
