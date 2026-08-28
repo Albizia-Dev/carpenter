@@ -58,6 +58,7 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
         activityComponent,
         buttonComponent,
         iconButtonComponent,
+        toggleButtonComponent,
         cardComponent,
         linkComponent,
         inputComponent,
@@ -75,6 +76,7 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
     WidgetbookFolder(
       name: 'Behaviour',
       children: [
+        controlComponent,
         popoverComponent,
         menuComponent,
         dropdownComponent,

@@ -91,7 +91,6 @@ final class _LifecyclePreviewState extends State<_LifecyclePreview> {
           );
         },
       );
-  final TextEditingController _search = TextEditingController();
 
   @override
   void initState() {
@@ -101,7 +100,6 @@ final class _LifecyclePreviewState extends State<_LifecyclePreview> {
 
   @override
   void dispose() {
-    _search.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -115,11 +113,9 @@ final class _LifecyclePreviewState extends State<_LifecyclePreview> {
       builder: (context, _) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          CarpenterInput(
-            controller: _search,
-            label: 'Search',
+          CarpenterCollectionSearchField<String, String, String>(
+            controller: _controller,
             placeholder: 'Type quickly to exercise cancellation',
-            onChanged: _controller.updateSearch,
           ),
           const SizedBox(height: 12),
           Expanded(

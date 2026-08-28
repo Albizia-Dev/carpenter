@@ -40,6 +40,16 @@ final dateInputComponent = WidgetbookComponent(
   ],
 );
 
+final toggleButtonComponent = WidgetbookComponent(
+  name: 'Toggle Button',
+  useCases: [
+    WidgetbookUseCase(
+      name: 'Interactive',
+      builder: (_) => const _ToggleButtonPreview(),
+    ),
+  ],
+);
+
 Widget _avatarPlayground(BuildContext context) {
   final initials = context.knobs.string(
     label: 'Content · Initials',
@@ -172,6 +182,37 @@ final class _DateInputPreviewState extends State<_DateInputPreview> {
           ),
         ],
       ),
+    ),
+  );
+}
+
+final class _ToggleButtonPreview extends StatefulWidget {
+  const _ToggleButtonPreview();
+
+  @override
+  State<_ToggleButtonPreview> createState() => _ToggleButtonPreviewState();
+}
+
+final class _ToggleButtonPreviewState extends State<_ToggleButtonPreview> {
+  bool _checked = true;
+
+  @override
+  Widget build(BuildContext context) => preview(
+    Wrap(
+      spacing: 12,
+      runSpacing: 12,
+      children: [
+        CarpenterToggleButton(
+          label: 'Archived',
+          checked: _checked,
+          icon: CarpenterIcons.archive,
+          onChanged: (value) => setState(() => _checked = value),
+        ),
+        const CarpenterToggleButton(
+          label: 'Disabled',
+          checked: false,
+        ),
+      ],
     ),
   );
 }

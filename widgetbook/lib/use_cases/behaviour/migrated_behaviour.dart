@@ -7,6 +7,11 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/preview.dart';
 
+final controlComponent = WidgetbookComponent(
+  name: 'Control',
+  useCases: [WidgetbookUseCase(name: 'Interaction state', builder: _control)],
+);
+
 final noticeComponent = WidgetbookComponent(
   name: 'Notice',
   useCases: [
@@ -27,6 +32,10 @@ final commandComponent = WidgetbookComponent(
       name: 'Execution states',
       builder: (_) => const _CommandPreview(),
     ),
+    WidgetbookUseCase(
+      name: 'Collect input',
+      builder: (_) => const _CommandInputPreview(),
+    ),
   ],
 );
 
@@ -43,6 +52,34 @@ final surfaceHostComponent = WidgetbookComponent(
       builder: (_) => const _SurfacePreview(),
     ),
   ],
+);
+
+Widget _control(BuildContext context) => preview(
+  CarpenterControl(
+    semanticLabel: 'Custom interactive region',
+    onTap: () {},
+    builder: (context, state) {
+      final theme = CarpenterTheme.of(context);
+      final background = state.pressed
+          ? theme.overlay.selected
+          : state.hovered || state.focused
+          ? theme.overlay.hovered
+          : theme.surface.subtle;
+      return DecoratedBox(
+        decoration: BoxDecoration(
+          color: background,
+          border: Border.all(color: theme.overlay.border),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: CarpenterText.body(
+            'enabled=${state.enabled}  hovered=${state.hovered}  focused=${state.focused}  pressed=${state.pressed}',
+          ),
+        ),
+      );
+    },
+  ),
 );
 
 Widget _notices(BuildContext context) => previewColumn([
@@ -149,6 +186,66 @@ final class _CommandPreviewState extends State<_CommandPreview> {
           ),
         ),
       ],
+    ),
+  );
+}
+
+final class _CommandInputPreview extends StatefulWidget {
+  const _CommandInputPreview();
+
+  @override
+  State<_CommandInputPreview> createState() => _CommandInputPreviewState();
+}
+
+final class _CommandInputPreviewState extends State<_CommandInputPreview> {
+  final TextEditingController _reason = TextEditingController(
+    text: 'Incorrect requisites',
+  );
+  String? _lastInput;
+  late final CarpenterCommandController<String> _reject =
+      CarpenterCommandController<String>(
+        id: 'approval.reject',
+        title: 'Reject',
+        presentation: CarpenterCommandPresentation.danger,
+        execute: (input) async {
+          await Future<void>.delayed(const Duration(milliseconds: 500));
+          if (mounted) setState(() => _lastInput = input);
+          return CarpenterCommandResult(message: input);
+        },
+      );
+
+  @override
+  void dispose() {
+    _reason.dispose();
+    _reject.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => preview(
+    SizedBox(
+      width: 520,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          CarpenterInput(controller: _reason, label: 'Reason'),
+          const SizedBox(height: 12),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: CarpenterCommandInputButton<String>(
+              command: _reject,
+              inputBuilder: (_) async {
+                final value = _reason.text.trim();
+                return value.isEmpty ? null : value;
+              },
+            ),
+          ),
+          if (_lastInput != null) ...[
+            const SizedBox(height: 12),
+            CarpenterText.caption('Last input: $_lastInput'),
+          ],
+        ],
+      ),
     ),
   );
 }

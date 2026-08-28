@@ -7,6 +7,7 @@ export 'package:yx_navigation/yx_navigation.dart';
 // Application runtime and integration.
 export 'src/application/app.dart';
 export 'src/application/command.dart';
+export 'src/application/command_input_button.dart';
 export 'src/application/frame_shell.dart';
 export 'src/application/host.dart';
 export 'src/application/hotkey.dart';
@@ -23,6 +24,7 @@ export 'src/application/shell/shell.dart';
 export 'src/components/basic/avatar.dart';
 export 'src/components/basic/button/button.dart';
 export 'src/components/basic/button/icon_button.dart';
+export 'src/components/basic/button/toggle_button.dart';
 export 'src/components/basic/calendar.dart';
 export 'src/components/basic/card.dart';
 export 'src/components/basic/checkbox.dart';
@@ -47,6 +49,7 @@ export 'src/components/basic/tag.dart';
 export 'src/components/basic/text.dart';
 
 // Behaviour and transient surfaces.
+export 'src/components/behaviour/control.dart';
 export 'src/components/behaviour/dialog.dart';
 export 'src/components/behaviour/expander.dart';
 export 'src/components/behaviour/menu/dropdown.dart';
@@ -60,6 +63,7 @@ export 'src/components/behaviour/toast/toaster_controller.dart';
 export 'src/components/behaviour/tooltip.dart';
 
 // Collections and content.
+export 'src/components/collections/collection_search_field.dart';
 export 'src/components/collections/contracts/collection_adapter.dart';
 export 'src/components/collections/contracts/collection_event.dart';
 export 'src/components/collections/contracts/collection_lifecycle_controller.dart';
