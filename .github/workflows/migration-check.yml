@@ -1,0 +1,57 @@
+name: Migration Check
+
+on:
+  push:
+    branches:
+      - migrate-previous-components
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: migrate-previous-components
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install package dependencies
+        run: flutter pub get
+
+      - name: Install Widgetbook dependencies
+        working-directory: widgetbook
+        run: flutter pub get
+
+      - name: Format migrated code
+        run: dart format lib widgetbook/lib
+
+      - name: Commit formatter changes
+        shell: bash
+        run: |
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add lib widgetbook/lib
+            git commit -m "style: format migrated code"
+            git push origin HEAD:migrate-previous-components
+          fi
+
+      - name: Analyze library
+        run: dart analyze lib
+
+      - name: Analyze Widgetbook
+        working-directory: widgetbook
+        run: flutter analyze
+
+      - name: Build Widgetbook web
+        working-directory: widgetbook
+        run: flutter build web --release --base-href /carpenter/
