@@ -12,6 +12,7 @@ export 'src/application/frame_shell.dart';
 export 'src/application/host.dart';
 export 'src/application/hotkey.dart';
 export 'src/application/hotkey_shell.dart';
+export 'src/application/loading.dart';
 export 'src/application/module/module.dart';
 export 'src/application/navigation/route.dart';
 export 'src/application/navigation/route_information_sync.dart';
