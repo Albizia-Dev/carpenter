@@ -77,6 +77,12 @@ final class _CheckboxIndicator extends StatelessWidget {
     final theme = CarpenterTheme.of(context);
     final inset = context.units(theme.spacing.checkboxMarkInset(sizeRole));
     final strokeWidth = context.units(theme.shapes.checkboxBorderWidth);
+    final radius = switch (sizeRole) {
+      ControlSize.xsmall || ControlSize.small =>
+        context.units(theme.shapes.checkboxRadius(sizeRole)),
+      ControlSize.medium || ControlSize.large || ControlSize.xlarge =>
+        context.units(const Px(2)),
+    };
     return AnimatedContainer(
       duration: theme.motion.transitionDuration(context),
       curve: theme.motion.stateCurve,
@@ -84,9 +90,7 @@ final class _CheckboxIndicator extends StatelessWidget {
       height: size.height,
       decoration: BoxDecoration(
         color: style.background,
-        borderRadius: BorderRadius.circular(
-          context.units(theme.shapes.checkboxRadius(sizeRole)),
-        ),
+        borderRadius: BorderRadius.circular(radius),
         border: Border.all(color: style.border, width: strokeWidth),
       ),
       child: value == CheckboxValue.unchecked
