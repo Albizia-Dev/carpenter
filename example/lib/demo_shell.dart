@@ -86,7 +86,7 @@ final class _DemoShellState extends State<DemoShell> {
     return CarpenterToastRegion(
       controller: widget.toaster,
       maxVisible: 3,
-      placement: CarpenterToastPlacement.topEnd,
+      placement: CarpenterToastPlacement.bottomEnd,
       child: LoadingBoundary(
         child: widget.child,
         builder: (context, loading, page) => CarpenterRootLayout(
