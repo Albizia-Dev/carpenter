@@ -2,123 +2,6 @@ import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-final recordPatternComponent = WidgetbookComponent(
-  name: 'Record',
-  useCases: [
-    WidgetbookUseCase(name: 'Entity composition', builder: _record),
-    WidgetbookUseCase(name: 'Narrow', builder: _recordNarrow),
-  ],
-);
-
-final editorPatternComponent = WidgetbookComponent(
-  name: 'Editor',
-  useCases: [WidgetbookUseCase(name: 'State matrix', builder: _editor)],
-);
-
-final workflowPatternComponent = WidgetbookComponent(
-  name: 'Workflow',
-  useCases: [
-    WidgetbookUseCase(
-      name: 'Transitions',
-      builder: (_) => const _WorkflowPreview(),
-    ),
-  ],
-);
-
-final explorerPatternComponent = WidgetbookComponent(
-  name: 'Explorer',
-  useCases: [
-    WidgetbookUseCase(name: 'Wide', builder: _explorer),
-    WidgetbookUseCase(name: 'Narrow', builder: _explorerNarrow),
-  ],
-);
-
-Widget _record(BuildContext context) =>
-    SizedBox(width: 980, height: 680, child: _recordPage());
-Widget _recordNarrow(BuildContext context) =>
-    SizedBox(width: 420, height: 680, child: _recordPage());
-
-Widget _recordPage() => CarpenterRecordPage<void>(
-  descriptor: const CarpenterPageDescriptor(
-    id: CarpenterPageId('invoice.440'),
-    title: 'Invoice INV-440',
-    kind: CarpenterPageKind.record,
-  ),
-  header: CarpenterEntityHeader(
-    title: 'Invoice INV-440',
-    subtitle: 'Albizia LLC · 28 August 2026',
-    status: const CarpenterPageStatus(
-      label: 'Awaiting approval',
-      role: FeedbackColorRole.warning,
-    ),
-    metadata: const [
-      CarpenterTag(label: '125,000.40 ₽', tone: CarpenterTagTone.info),
-      CarpenterTag(label: 'Contract CTR-22'),
-    ],
-    primaryActions: [
-      CarpenterActionDescriptor(
-        id: 'approve',
-        label: 'Approve',
-        colorRole: ActionColorRole.primary,
-        onInvoke: () {},
-      ),
-    ],
-    secondaryActions: [
-      CarpenterActionDescriptor(id: 'edit', label: 'Edit', onInvoke: () {}),
-    ],
-  ),
-  summary: const CarpenterRecordSummary(
-    children: [
-      CarpenterRecordMetric(
-        label: 'Amount',
-        value: CarpenterText.title('125,000.40 ₽'),
-      ),
-      CarpenterRecordMetric(
-        label: 'Due date',
-        value: CarpenterText.title('05.09.2026'),
-      ),
-      CarpenterRecordMetric(label: 'Owner', value: CarpenterText.title('NC')),
-    ],
-  ),
-  sections: [
-    CarpenterRecordSection(
-      id: const CarpenterPageSectionId('details'),
-      title: 'Details',
-      child: CarpenterRecordDetails(
-        details: const [
-          CarpenterRecordDetail(
-            label: 'Counterparty',
-            value: CarpenterText.body('Albizia LLC'),
-          ),
-          CarpenterRecordDetail(
-            label: 'Bank account',
-            value: CarpenterText.body('40702810900000000001'),
-          ),
-          CarpenterRecordDetail(
-            label: 'Purpose',
-            value: CarpenterText.body('Payment under contract CTR-22'),
-          ),
-        ],
-      ),
-    ),
-  ],
-  timeline: CarpenterTimeline(
-    items: [
-      CarpenterTimelineItem(
-        id: 1,
-        title: 'Invoice created',
-        timestamp: DateTime(2026, 8, 27, 10, 30),
-        description: 'Imported from external system',
-      ),
-      CarpenterTimelineItem(
-        id: 2,
-        title: 'Sent for approval',
-        timestamp: DateTime(2026, 8, 28, 9, 15),
-      ),
-    ],
-  ),
-);
-
 enum _EditorScenario {
   ready,
   dirty,
@@ -130,13 +13,199 @@ enum _EditorScenario {
   forbidden,
 }
 
+enum _WorkflowStart { review, decision, done }
+
+final recordPatternComponent = WidgetbookComponent(
+  name: 'Record',
+  useCases: [WidgetbookUseCase(name: 'Playground', builder: _record)],
+);
+
+final editorPatternComponent = WidgetbookComponent(
+  name: 'Editor',
+  useCases: [WidgetbookUseCase(name: 'Playground', builder: _editor)],
+);
+
+final workflowPatternComponent = WidgetbookComponent(
+  name: 'Workflow',
+  useCases: [WidgetbookUseCase(name: 'Playground', builder: _workflow)],
+);
+
+final explorerPatternComponent = WidgetbookComponent(
+  name: 'Explorer',
+  useCases: [WidgetbookUseCase(name: 'Playground', builder: _explorer)],
+);
+
+Widget _record(BuildContext context) {
+  final title = context.knobs.string(
+    label: 'Entity · Title',
+    initialValue: 'Invoice INV-440',
+  );
+  final subtitle = context.knobs.string(
+    label: 'Entity · Subtitle',
+    initialValue: 'Albizia LLC · 28 August 2026',
+  );
+  final statusLabel = context.knobs.string(
+    label: 'Status · Label',
+    initialValue: 'Awaiting approval',
+  );
+  final statusRole = context.knobs.object.segmented(
+    label: 'Status · Role',
+    options: FeedbackColorRole.values,
+    initialOption: FeedbackColorRole.warning,
+    labelBuilder: (value) => value.name,
+  );
+  final amount = context.knobs.string(
+    label: 'Data · Amount',
+    initialValue: '125,000.40 ₽',
+  );
+  final owner = context.knobs.string(label: 'Data · Owner', initialValue: 'NC');
+  final showPrimaryAction = context.knobs.boolean(
+    label: 'Actions · Primary',
+    initialValue: true,
+  );
+  final showTimeline = context.knobs.boolean(
+    label: 'Content · Timeline',
+    initialValue: true,
+  );
+  final width = context.knobs.double.slider(
+    label: 'Layout · Width',
+    initialValue: 980,
+    min: 320,
+    max: 1200,
+    divisions: 44,
+  );
+  final height = context.knobs.double.slider(
+    label: 'Layout · Height',
+    initialValue: 680,
+    min: 420,
+    max: 900,
+    divisions: 24,
+  );
+
+  return SizedBox(
+    width: width,
+    height: height,
+    child: CarpenterRecordPage<void>(
+      descriptor: CarpenterPageDescriptor(
+        id: const CarpenterPageId('invoice.440'),
+        title: title,
+        kind: CarpenterPageKind.record,
+      ),
+      header: CarpenterEntityHeader(
+        title: title,
+        subtitle: subtitle,
+        status: CarpenterPageStatus(label: statusLabel, role: statusRole),
+        metadata: [
+          CarpenterTag(label: amount, tone: CarpenterTagTone.info),
+          const CarpenterTag(label: 'Contract CTR-22'),
+        ],
+        primaryActions: showPrimaryAction
+            ? [
+                CarpenterActionDescriptor(
+                  id: 'approve',
+                  label: 'Approve',
+                  colorRole: ActionColorRole.primary,
+                  onInvoke: () {},
+                ),
+              ]
+            : const [],
+        secondaryActions: [
+          CarpenterActionDescriptor(id: 'edit', label: 'Edit', onInvoke: () {}),
+        ],
+      ),
+      summary: CarpenterRecordSummary(
+        children: [
+          CarpenterRecordMetric(
+            label: 'Amount',
+            value: CarpenterText.title(amount),
+          ),
+          const CarpenterRecordMetric(
+            label: 'Due date',
+            value: CarpenterText.title('05.09.2026'),
+          ),
+          CarpenterRecordMetric(
+            label: 'Owner',
+            value: CarpenterText.title(owner),
+          ),
+        ],
+      ),
+      sections: [
+        CarpenterRecordSection(
+          id: const CarpenterPageSectionId('details'),
+          title: 'Details',
+          child: const CarpenterRecordDetails(
+            details: [
+              CarpenterRecordDetail(
+                label: 'Counterparty',
+                value: CarpenterText.body('Albizia LLC'),
+              ),
+              CarpenterRecordDetail(
+                label: 'Bank account',
+                value: CarpenterText.body('40702810900000000001'),
+              ),
+              CarpenterRecordDetail(
+                label: 'Purpose',
+                value: CarpenterText.body('Payment under contract CTR-22'),
+              ),
+            ],
+          ),
+        ),
+      ],
+      timeline: showTimeline
+          ? CarpenterTimeline(
+              items: [
+                CarpenterTimelineItem(
+                  id: 1,
+                  title: 'Invoice created',
+                  timestamp: DateTime(2026, 8, 27, 10, 30),
+                  description: 'Imported from external system',
+                ),
+                CarpenterTimelineItem(
+                  id: 2,
+                  title: 'Sent for approval',
+                  timestamp: DateTime(2026, 8, 28, 9, 15),
+                ),
+              ],
+            )
+          : null,
+    ),
+  );
+}
+
 Widget _editor(BuildContext context) {
-  final scenario = context.knobs.object.dropdown(
-    label: 'Editor · State',
+  final scenario = context.knobs.object.segmented(
+    label: 'State · Editor',
     options: _EditorScenario.values,
     initialOption: _EditorScenario.dirty,
     labelBuilder: (value) => value.name,
   );
+  final title = context.knobs.string(
+    label: 'Content · Title',
+    initialValue: 'Edit counterparty',
+  );
+  final name = context.knobs.string(
+    label: 'Data · Name',
+    initialValue: 'Albizia LLC',
+  );
+  final inn = context.knobs.string(
+    label: 'Data · INN',
+    initialValue: '7712345678',
+  );
+  final width = context.knobs.double.slider(
+    label: 'Layout · Width',
+    initialValue: 900,
+    min: 320,
+    max: 1200,
+    divisions: 44,
+  );
+  final height = context.knobs.double.slider(
+    label: 'Layout · Height',
+    initialValue: 620,
+    min: 420,
+    max: 900,
+    divisions: 24,
+  );
+
   final state = switch (scenario) {
     _EditorScenario.ready => const CarpenterEditorReady(dirty: false),
     _EditorScenario.dirty => const CarpenterEditorReady(dirty: true),
@@ -155,13 +224,14 @@ Widget _editor(BuildContext context) {
     ),
     _EditorScenario.forbidden => const CarpenterEditorForbidden(),
   };
+
   return SizedBox(
-    width: 900,
-    height: 620,
+    width: width,
+    height: height,
     child: CarpenterEditorPage<void>(
-      descriptor: const CarpenterPageDescriptor(
-        id: CarpenterPageId('counterparty.editor'),
-        title: 'Edit counterparty',
+      descriptor: CarpenterPageDescriptor(
+        id: const CarpenterPageId('counterparty.editor'),
+        title: title,
         kind: CarpenterPageKind.editor,
       ),
       editorState: state,
@@ -169,7 +239,7 @@ Widget _editor(BuildContext context) {
         CarpenterPageSection(
           id: const CarpenterPageSectionId('main'),
           title: 'Main information',
-          child: _DemoEditorFields(),
+          child: _DemoEditorFields(name: name, inn: inn),
         ),
       ],
     ),
@@ -177,15 +247,30 @@ Widget _editor(BuildContext context) {
 }
 
 final class _DemoEditorFields extends StatefulWidget {
+  const _DemoEditorFields({required this.name, required this.inn});
+
+  final String name;
+  final String inn;
+
   @override
   State<_DemoEditorFields> createState() => _DemoEditorFieldsState();
 }
 
 final class _DemoEditorFieldsState extends State<_DemoEditorFields> {
-  final TextEditingController _name = TextEditingController(
-    text: 'Albizia LLC',
+  late final TextEditingController _name = TextEditingController(
+    text: widget.name,
   );
-  final TextEditingController _inn = TextEditingController(text: '7712345678');
+  late final TextEditingController _inn = TextEditingController(
+    text: widget.inn,
+  );
+
+  @override
+  void didUpdateWidget(_DemoEditorFields oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.name != widget.name) _name.text = widget.name;
+    if (oldWidget.inn != widget.inn) _inn.text = widget.inn;
+  }
+
   @override
   void dispose() {
     _name.dispose();
@@ -203,8 +288,68 @@ final class _DemoEditorFieldsState extends State<_DemoEditorFields> {
   );
 }
 
+Widget _workflow(BuildContext context) {
+  final start = context.knobs.object.segmented(
+    label: 'State · Start stage',
+    options: _WorkflowStart.values,
+    initialOption: _WorkflowStart.review,
+    labelBuilder: (value) => value.name,
+  );
+  final failTransitions = context.knobs.boolean(
+    label: 'Execution · Fail transitions',
+    initialValue: false,
+  );
+  final delayMs = context.knobs.double.slider(
+    label: 'Execution · Delay (ms)',
+    initialValue: 500,
+    min: 0,
+    max: 2000,
+    divisions: 20,
+  );
+  final title = context.knobs.string(
+    label: 'Content · Title',
+    initialValue: 'Payment approval',
+  );
+  final width = context.knobs.double.slider(
+    label: 'Layout · Width',
+    initialValue: 900,
+    min: 320,
+    max: 1200,
+    divisions: 44,
+  );
+
+  final initialState = switch (start) {
+    _WorkflowStart.review => 0,
+    _WorkflowStart.decision => 1,
+    _WorkflowStart.done => 2,
+  };
+
+  return _WorkflowPreview(
+    key: ValueKey((initialState, failTransitions, delayMs)),
+    initialState: initialState,
+    failTransitions: failTransitions,
+    delay: Duration(milliseconds: delayMs.round()),
+    title: title,
+    width: width,
+  );
+}
+
 final class _WorkflowPreview extends StatefulWidget {
-  const _WorkflowPreview();
+  const _WorkflowPreview({
+    super.key,
+    required this.initialState,
+    required this.failTransitions,
+    required this.delay,
+    required this.title,
+    required this.width,
+  });
+
+  final int initialState;
+  final bool failTransitions;
+  final Duration delay;
+  final String title;
+  final double width;
+
   @override
   State<_WorkflowPreview> createState() => _WorkflowPreviewState();
 }
@@ -212,7 +357,7 @@ final class _WorkflowPreview extends StatefulWidget {
 final class _WorkflowPreviewState extends State<_WorkflowPreview> {
   late final CarpenterWorkflowControllerBase<int, Map<String, Object?>>
   _controller = CarpenterWorkflowControllerBase<int, Map<String, Object?>>(
-    initialState: 0,
+    initialState: widget.initialState,
     context: <String, Object?>{},
     transitions: (state, context) => switch (state) {
       0 => [
@@ -220,8 +365,12 @@ final class _WorkflowPreviewState extends State<_WorkflowPreview> {
           id: const CarpenterWorkflowTransitionId('continue'),
           title: 'Continue',
           canExecute: (_, _) => true,
-          execute: (_) async =>
-              Future<void>.delayed(const Duration(milliseconds: 500)),
+          execute: (_) async {
+            await Future<void>.delayed(widget.delay);
+            if (widget.failTransitions) {
+              throw StateError('Simulated transition failure');
+            }
+          },
         ),
       ],
       1 => [
@@ -229,15 +378,23 @@ final class _WorkflowPreviewState extends State<_WorkflowPreview> {
           id: const CarpenterWorkflowTransitionId('reject'),
           title: 'Reject',
           canExecute: (_, _) => true,
-          execute: (_) async =>
-              Future<void>.delayed(const Duration(milliseconds: 450)),
+          execute: (_) async {
+            await Future<void>.delayed(widget.delay);
+            if (widget.failTransitions) {
+              throw StateError('Simulated transition failure');
+            }
+          },
         ),
         CarpenterWorkflowTransition<int, Map<String, Object?>>(
           id: const CarpenterWorkflowTransitionId('approve'),
           title: 'Approve',
           canExecute: (_, _) => true,
-          execute: (_) async =>
-              Future<void>.delayed(const Duration(milliseconds: 700)),
+          execute: (_) async {
+            await Future<void>.delayed(widget.delay);
+            if (widget.failTransitions) {
+              throw StateError('Simulated transition failure');
+            }
+          },
         ),
       ],
       _ => const [],
@@ -253,12 +410,12 @@ final class _WorkflowPreviewState extends State<_WorkflowPreview> {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    width: 900,
+    width: widget.width,
     height: 620,
     child: CarpenterWorkflowPage<int, Map<String, Object?>>(
-      descriptor: const CarpenterPageDescriptor(
-        id: CarpenterPageId('approval.workflow'),
-        title: 'Payment approval',
+      descriptor: CarpenterPageDescriptor(
+        id: const CarpenterPageId('approval.workflow'),
+        title: widget.title,
         kind: CarpenterPageKind.workflow,
       ),
       controller: _controller,
@@ -314,41 +471,83 @@ final class _WorkflowPreviewState extends State<_WorkflowPreview> {
   );
 }
 
-Widget _explorer(BuildContext context) =>
-    SizedBox(width: 980, height: 620, child: _explorerPage());
-Widget _explorerNarrow(BuildContext context) =>
-    SizedBox(width: 420, height: 620, child: _explorerPage());
+Widget _explorer(BuildContext context) {
+  final title = context.knobs.string(
+    label: 'Content · Title',
+    initialValue: 'Files',
+  );
+  final searchLabel = context.knobs.string(
+    label: 'Content · Search area',
+    initialValue: 'Search files and folders',
+  );
+  final currentFolder = context.knobs.string(
+    label: 'Data · Current folder',
+    initialValue: 'Contracts',
+  );
+  final selectedFile = context.knobs.string(
+    label: 'Data · Selected file',
+    initialValue: 'CTR-22.pdf',
+  );
+  final showInspector = context.knobs.boolean(
+    label: 'Content · Inspector',
+    initialValue: true,
+  );
+  final width = context.knobs.double.slider(
+    label: 'Layout · Width',
+    initialValue: 980,
+    min: 320,
+    max: 1200,
+    divisions: 44,
+  );
+  final height = context.knobs.double.slider(
+    label: 'Layout · Height',
+    initialValue: 620,
+    min: 420,
+    max: 900,
+    divisions: 24,
+  );
 
-Widget _explorerPage() => CarpenterExplorerPage(
-  descriptor: const CarpenterPageDescriptor(
-    id: CarpenterPageId('files.explorer'),
-    title: 'Files',
-    kind: CarpenterPageKind.explorer,
-  ),
-  search: const CarpenterText.caption('Search area'),
-  navigation: const CarpenterCard(
-    child: CarpenterInspector(
-      value: {
-        'folders': ['Contracts', 'Invoices', 'Acts'],
-      },
-    ),
-  ),
-  compactNavigation: const CarpenterCard(
-    child: CarpenterText.body('Current: Contracts'),
-  ),
-  content: const CarpenterCard(
-    child: CarpenterInspector(
-      value: {
-        'files': ['CTR-22.pdf', 'INV-440.pdf', 'ACT-18.pdf'],
-      },
-    ),
-  ),
-  inspector: const SizedBox(
-    width: 240,
-    child: CarpenterCard(
-      child: CarpenterInspector(
-        value: {'name': 'CTR-22.pdf', 'size': '2.4 MB', 'owner': 'NC'},
+  return SizedBox(
+    width: width,
+    height: height,
+    child: CarpenterExplorerPage(
+      descriptor: CarpenterPageDescriptor(
+        id: const CarpenterPageId('files.explorer'),
+        title: title,
+        kind: CarpenterPageKind.explorer,
       ),
+      search: CarpenterText.caption(searchLabel),
+      navigation: const CarpenterCard(
+        child: CarpenterInspector(
+          value: {
+            'folders': ['Contracts', 'Invoices', 'Acts'],
+          },
+        ),
+      ),
+      compactNavigation: CarpenterCard(
+        child: CarpenterText.body('Current: $currentFolder'),
+      ),
+      content: const CarpenterCard(
+        child: CarpenterInspector(
+          value: {
+            'files': ['CTR-22.pdf', 'INV-440.pdf', 'ACT-18.pdf'],
+          },
+        ),
+      ),
+      inspector: showInspector
+          ? SizedBox(
+              width: 240,
+              child: CarpenterCard(
+                child: CarpenterInspector(
+                  value: {
+                    'name': selectedFile,
+                    'size': '2.4 MB',
+                    'owner': 'NC',
+                  },
+                ),
+              ),
+            )
+          : null,
     ),
-  ),
-);
+  );
+}

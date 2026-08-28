@@ -2,6 +2,44 @@ import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+const _carpenterViewports = <ViewportData>[
+  ViewportData(
+    name: 'Phone 360 × 800',
+    width: 360,
+    height: 800,
+    pixelRatio: 1,
+    platform: TargetPlatform.android,
+  ),
+  ViewportData(
+    name: 'Phone 430 × 932',
+    width: 430,
+    height: 932,
+    pixelRatio: 1,
+    platform: TargetPlatform.iOS,
+  ),
+  ViewportData(
+    name: 'Tablet 834 × 1194',
+    width: 834,
+    height: 1194,
+    pixelRatio: 1,
+    platform: TargetPlatform.iOS,
+  ),
+  ViewportData(
+    name: 'Desktop 1280 × 800',
+    width: 1280,
+    height: 800,
+    pixelRatio: 1,
+    platform: TargetPlatform.windows,
+  ),
+  ViewportData(
+    name: 'Desktop 1440 × 900',
+    width: 1440,
+    height: 900,
+    pixelRatio: 1,
+    platform: TargetPlatform.macOS,
+  ),
+];
+
 final List<WidgetbookAddon> carpenterAddons = [
   ThemeAddon<CarpenterThemeData>(
     themes: [
@@ -17,6 +55,11 @@ final List<WidgetbookAddon> carpenterAddons = [
       child: ColoredBox(color: theme.surface.base, child: child),
     ),
   ),
+  ViewportAddon(_carpenterViewports),
+  ZoomAddon(),
+  // Widgetbook 3.25 exposes animation timing as experimental.
+  // ignore: experimental_member_use
+  TimeDilationAddon(),
   BuilderAddon(
     name: 'Carpenter preview',
     builder: (context, child) => UnitsRoot(
