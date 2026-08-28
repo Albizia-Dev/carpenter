@@ -176,7 +176,8 @@ final class _SidebarSection extends StatelessWidget {
         for (var index = 0; index < section.items.length; index++) ...[
           _SidebarTile(
             item: section.items[index],
-            selected: section.items[index].selectable &&
+            selected:
+                section.items[index].selectable &&
                 selectedId == section.items[index].id,
             expanded: expanded,
             onSelected: onSelected,
@@ -275,15 +276,17 @@ final class _SidebarTile extends StatelessWidget {
               color: background,
               borderRadius: radius,
               border: Border.all(
-                color: states.contains(WidgetState.focused) && showFocusHighlight
+                color:
+                    states.contains(WidgetState.focused) && showFocusHighlight
                     ? theme.focus.color
                     : theme.actions.transparent,
                 width: focusWidth,
               ),
             ),
             child: Row(
-              mainAxisAlignment:
-                  expanded ? MainAxisAlignment.start : MainAxisAlignment.center,
+              mainAxisAlignment: expanded
+                  ? MainAxisAlignment.start
+                  : MainAxisAlignment.center,
               children: [
                 CarpenterIcon(
                   item.icon,

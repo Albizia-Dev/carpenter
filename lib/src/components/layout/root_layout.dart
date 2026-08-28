@@ -74,7 +74,8 @@ final class CarpenterRootLayout extends StatelessWidget {
         CarpenterViewportClass.narrow => CarpenterRootLayoutPresentation.mobile,
       };
       final overlayOpen =
-          presentation != CarpenterRootLayoutPresentation.desktop && sidebarOpen;
+          presentation != CarpenterRootLayoutPresentation.desktop &&
+          sidebarOpen;
       final layoutContext = CarpenterRootLayoutContext(
         presentation: presentation,
         sidebarExpanded: sidebarExpanded,
@@ -94,25 +95,25 @@ final class CarpenterRootLayout extends StatelessWidget {
 
       Widget base = switch (presentation) {
         CarpenterRootLayoutPresentation.desktop => Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              CarpenterSidebar(
-                data: _effectiveSidebar(closeOnSelection: false),
-                expanded: sidebarExpanded,
-              ),
-              Expanded(child: rightRegion),
-            ],
-          ),
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            CarpenterSidebar(
+              data: _effectiveSidebar(closeOnSelection: false),
+              expanded: sidebarExpanded,
+            ),
+            Expanded(child: rightRegion),
+          ],
+        ),
         CarpenterRootLayoutPresentation.tablet => Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              CarpenterSidebar(
-                data: _effectiveSidebar(closeOnSelection: false),
-                expanded: false,
-              ),
-              Expanded(child: rightRegion),
-            ],
-          ),
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            CarpenterSidebar(
+              data: _effectiveSidebar(closeOnSelection: false),
+              expanded: false,
+            ),
+            Expanded(child: rightRegion),
+          ],
+        ),
         CarpenterRootLayoutPresentation.mobile => rightRegion,
       };
 

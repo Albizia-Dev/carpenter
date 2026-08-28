@@ -36,7 +36,11 @@ Widget _sidebarPlayground(BuildContext context) {
   );
   final platform = context.knobs.object.segmented(
     label: 'Environment · Platform',
-    options: [TargetPlatform.macOS, TargetPlatform.windows, TargetPlatform.linux],
+    options: [
+      TargetPlatform.macOS,
+      TargetPlatform.windows,
+      TargetPlatform.linux,
+    ],
     initialOption: TargetPlatform.macOS,
     labelBuilder: (value) => value.name,
   );
@@ -167,68 +171,68 @@ final class _SidebarPreviewState extends State<_SidebarPreview> {
   }
 
   CarpenterSidebarData get _data => CarpenterSidebarData(
-        selectedId: _selected,
-        onSelected: (id) => setState(() => _selected = id),
-        header: widget.expanded
-            ? const CarpenterText.title('Carpenter')
-            : const CarpenterIcon(CarpenterIcons.tree),
-        footer: widget.expanded
-            ? const CarpenterText.caption('v0.1 · workspace')
-            : const CarpenterIcon(CarpenterIcons.info),
-        sections: [
-          CarpenterSidebarSection(
-            label: 'Workspace',
-            items: [
-              CarpenterSidebarItem(
-                id: 'overview',
-                label: 'Overview',
-                icon: CarpenterIcons.list,
-                onInvoke: () {},
-              ),
-              CarpenterSidebarItem(
-                id: 'payments',
-                label: 'Payments',
-                icon: CarpenterIcons.paymentCard,
-                command: _paymentsCommand,
-                onInvoke: () {},
-              ),
-              CarpenterSidebarItem(
-                id: 'documents',
-                label: 'Documents',
-                icon: CarpenterIcons.file,
-                onInvoke: () {},
-              ),
-            ],
+    selectedId: _selected,
+    onSelected: (id) => setState(() => _selected = id),
+    header: widget.expanded
+        ? const CarpenterText.title('Carpenter')
+        : const CarpenterIcon(CarpenterIcons.tree),
+    footer: widget.expanded
+        ? const CarpenterText.caption('v0.1 · workspace')
+        : const CarpenterIcon(CarpenterIcons.info),
+    sections: [
+      CarpenterSidebarSection(
+        label: 'Workspace',
+        items: [
+          CarpenterSidebarItem(
+            id: 'overview',
+            label: 'Overview',
+            icon: CarpenterIcons.list,
+            onInvoke: () {},
           ),
-          CarpenterSidebarSection(
-            label: 'Actions',
-            items: [
-              CarpenterSidebarItem(
-                id: 'search',
-                label: 'Search',
-                icon: CarpenterIcons.search,
-                command: _searchCommand,
-                onInvoke: () {},
-                selectable: false,
-              ),
-              CarpenterSidebarItem(
-                id: 'settings',
-                label: 'Settings',
-                icon: CarpenterIcons.edit,
-                onInvoke: () {},
-                selectable: false,
-              ),
-            ],
+          CarpenterSidebarItem(
+            id: 'payments',
+            label: 'Payments',
+            icon: CarpenterIcons.paymentCard,
+            command: _paymentsCommand,
+            onInvoke: () {},
+          ),
+          CarpenterSidebarItem(
+            id: 'documents',
+            label: 'Documents',
+            icon: CarpenterIcons.file,
+            onInvoke: () {},
           ),
         ],
-      );
+      ),
+      CarpenterSidebarSection(
+        label: 'Actions',
+        items: [
+          CarpenterSidebarItem(
+            id: 'search',
+            label: 'Search',
+            icon: CarpenterIcons.search,
+            command: _searchCommand,
+            onInvoke: () {},
+            selectable: false,
+          ),
+          CarpenterSidebarItem(
+            id: 'settings',
+            label: 'Settings',
+            icon: CarpenterIcons.edit,
+            onInvoke: () {},
+            selectable: false,
+          ),
+        ],
+      ),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) => CarpenterSidebar(
-        data: _data,
-        expanded: widget.expanded,
-        targetPlatform: widget.targetPlatform,
-      );
+    data: _data,
+    expanded: widget.expanded,
+    targetPlatform: widget.targetPlatform,
+  );
 }
 
 final class _RootPreview extends StatefulWidget {
@@ -246,104 +250,103 @@ final class _RootPreviewState extends State<_RootPreview> {
   var _selected = 'overview';
 
   CarpenterSidebarData get _sidebar => CarpenterSidebarData(
-        selectedId: _selected,
-        onSelected: (id) => setState(() => _selected = id),
-        header: const CarpenterText.title('Carpenter'),
-        footer: const CarpenterText.caption('Albizia · workspace'),
-        sections: [
-          CarpenterSidebarSection(
-            label: 'Workspace',
-            items: [
-              CarpenterSidebarItem(
-                id: 'overview',
-                label: 'Overview',
-                icon: CarpenterIcons.list,
-                onInvoke: () {},
-              ),
-              CarpenterSidebarItem(
-                id: 'payments',
-                label: 'Payments',
-                icon: CarpenterIcons.paymentCard,
-                onInvoke: () {},
-              ),
-              CarpenterSidebarItem(
-                id: 'documents',
-                label: 'Documents',
-                icon: CarpenterIcons.file,
-                onInvoke: () {},
-              ),
-            ],
+    selectedId: _selected,
+    onSelected: (id) => setState(() => _selected = id),
+    header: const CarpenterText.title('Carpenter'),
+    footer: const CarpenterText.caption('Albizia · workspace'),
+    sections: [
+      CarpenterSidebarSection(
+        label: 'Workspace',
+        items: [
+          CarpenterSidebarItem(
+            id: 'overview',
+            label: 'Overview',
+            icon: CarpenterIcons.list,
+            onInvoke: () {},
           ),
-          CarpenterSidebarSection(
-            label: 'System',
-            items: [
-              CarpenterSidebarItem(
-                id: 'settings',
-                label: 'Settings',
-                icon: CarpenterIcons.edit,
-                onInvoke: () {},
-                selectable: false,
-              ),
-            ],
+          CarpenterSidebarItem(
+            id: 'payments',
+            label: 'Payments',
+            icon: CarpenterIcons.paymentCard,
+            onInvoke: () {},
+          ),
+          CarpenterSidebarItem(
+            id: 'documents',
+            label: 'Documents',
+            icon: CarpenterIcons.file,
+            onInvoke: () {},
           ),
         ],
-      );
+      ),
+      CarpenterSidebarSection(
+        label: 'System',
+        items: [
+          CarpenterSidebarItem(
+            id: 'settings',
+            label: 'Settings',
+            icon: CarpenterIcons.edit,
+            onInvoke: () {},
+            selectable: false,
+          ),
+        ],
+      ),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) => CarpenterRootLayout(
-        sidebar: _sidebar,
-        sidebarOpen: _open,
-        onSidebarOpenChanged: (value) => setState(() => _open = value),
-        sidebarExpanded: _expanded,
-        onSidebarExpandedChanged: (value) =>
-            setState(() => _expanded = value),
-        headerBuilder: (context, layout) => CarpenterTopPanel(
-          title: 'Payments',
-          subtitle: switch (layout.presentation) {
-            CarpenterRootLayoutPresentation.desktop =>
-              'Desktop · permanent navigation',
-            CarpenterRootLayoutPresentation.tablet =>
-              'Tablet · compact rail + overlay',
-            CarpenterRootLayoutPresentation.mobile => 'Mobile · drawer',
-          },
-          leading: CarpenterIconButton(
-            icon: layout.isDesktop
-                ? (layout.sidebarExpanded
-                      ? CarpenterIcons.chevronLeft
-                      : CarpenterIcons.chevronRight)
-                : CarpenterIcons.list,
-            semanticLabel: layout.isDesktop
-                ? 'Toggle compact navigation'
-                : 'Open navigation',
-            size: ControlSize.small,
-            prominence: ActionProminence.ghost,
-            onPressed: layout.isDesktop
-                ? layout.toggleSidebarExpanded
-                : layout.toggleSidebar,
-          ),
-          actions: [
-            CarpenterButton(
-              label: 'Create payment',
-              size: ControlSize.small,
-              prominence: ActionProminence.high,
-              onPressed: () {},
-            ),
-          ],
+    sidebar: _sidebar,
+    sidebarOpen: _open,
+    onSidebarOpenChanged: (value) => setState(() => _open = value),
+    sidebarExpanded: _expanded,
+    onSidebarExpandedChanged: (value) => setState(() => _expanded = value),
+    headerBuilder: (context, layout) => CarpenterTopPanel(
+      title: 'Payments',
+      subtitle: switch (layout.presentation) {
+        CarpenterRootLayoutPresentation.desktop =>
+          'Desktop · permanent navigation',
+        CarpenterRootLayoutPresentation.tablet =>
+          'Tablet · compact rail + overlay',
+        CarpenterRootLayoutPresentation.mobile => 'Mobile · drawer',
+      },
+      leading: CarpenterIconButton(
+        icon: layout.isDesktop
+            ? (layout.sidebarExpanded
+                  ? CarpenterIcons.chevronLeft
+                  : CarpenterIcons.chevronRight)
+            : CarpenterIcons.list,
+        semanticLabel: layout.isDesktop
+            ? 'Toggle compact navigation'
+            : 'Open navigation',
+        size: ControlSize.small,
+        prominence: ActionProminence.ghost,
+        onPressed: layout.isDesktop
+            ? layout.toggleSidebarExpanded
+            : layout.toggleSidebar,
+      ),
+      actions: [
+        CarpenterButton(
+          label: 'Create payment',
+          size: ControlSize.small,
+          prominence: ActionProminence.high,
+          onPressed: () {},
         ),
-        body: ColoredBox(
-          color: CarpenterTheme.of(context).surface.base,
-          child: Center(
-            child: CarpenterCard(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CarpenterText.title('Page content'),
-                  const SizedBox(height: 8),
-                  CarpenterText.body('Selected: $_selected'),
-                ],
-              ),
-            ),
+      ],
+    ),
+    body: ColoredBox(
+      color: CarpenterTheme.of(context).surface.base,
+      child: Center(
+        child: CarpenterCard(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CarpenterText.title('Page content'),
+              const SizedBox(height: 8),
+              CarpenterText.body('Selected: $_selected'),
+            ],
           ),
         ),
-      );
+      ),
+    ),
+  );
 }
