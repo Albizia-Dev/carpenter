@@ -53,6 +53,7 @@ final class _CarpenterLoaderState extends State<CarpenterLoader>
     final theme = CarpenterTheme.of(context);
     final extent = context.units(widget.size);
     final strokeWidth = context.units(widget.strokeWidth);
+    final strokeWidth = context.units(widget.strokeWidth);
     final accent = theme.actions
         .resolve(
           ActionColorRole.primary,

@@ -92,7 +92,9 @@ final class _CarpenterSurfaceHostState extends State<CarpenterSurfaceHost>
               ? constraints.maxWidth.clamp(minWidth, inlineMaxWidth).toDouble()
               : sidePanelWidth.clamp(minWidth, constraints.maxWidth).toDouble();
           return CallbackShortcuts(
-            bindings: {const SingleActivator(LogicalKeyboardKey.escape): _close},
+            bindings: {
+              const SingleActivator(LogicalKeyboardKey.escape): _close,
+            },
             child: Focus(
               autofocus: true,
               child: Stack(

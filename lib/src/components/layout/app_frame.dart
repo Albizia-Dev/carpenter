@@ -41,8 +41,8 @@ final class CarpenterAppFrame extends StatelessWidget {
     final frame = CarpenterTopPanelContext(
       targetPlatform: defaultTargetPlatform,
       framePlatform: switch (defaultTargetPlatform) {
-        TargetPlatform.android || TargetPlatform.iOS =>
-          CarpenterFramePlatform.touch,
+        TargetPlatform.android ||
+        TargetPlatform.iOS => CarpenterFramePlatform.touch,
         _ => CarpenterFramePlatform.desktop,
       },
     );
