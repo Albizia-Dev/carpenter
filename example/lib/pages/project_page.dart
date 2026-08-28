@@ -49,7 +49,7 @@ final class _ProjectPageState extends State<ProjectPage> {
   Widget build(BuildContext context) {
     final project = _project;
     return ListView(
-      padding: EdgeInsets.all(context.units(1.5.rem)),
+      padding: EdgeInsets.all(context.units(context.units(.09375.rem).rem)),
       children: [
         CarpenterEntityHeader(
           title: project.name,

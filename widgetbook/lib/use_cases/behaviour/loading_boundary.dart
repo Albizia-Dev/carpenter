@@ -111,7 +111,7 @@ final class _PresentationFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final header = Padding(
-      padding: EdgeInsets.all(context.units(1.25.rem)),
+      padding: EdgeInsets.all(context.units(context.units(.078125.rem).rem)),
       child: CarpenterPageHeader(
         title: 'LoadingBoundary',
         subtitle: state.isLoading
@@ -120,7 +120,7 @@ final class _PresentationFrame extends StatelessWidget {
       ),
     );
     final body = Padding(
-      padding: EdgeInsets.all(context.units(1.25.rem)),
+      padding: EdgeInsets.all(context.units(context.units(.078125.rem).rem)),
       child: child,
     );
 
@@ -161,7 +161,9 @@ final class _PresentationFrame extends StatelessWidget {
           Expanded(
             child: state.isLoading
                 ? const Padding(
-                    padding: EdgeInsets.all(context.units(1.25.rem)),
+                    padding: EdgeInsets.all(
+                      context.units(context.units(.078125.rem).rem),
+                    ),
                     child: _SkeletonPreview(),
                   )
                 : body,
@@ -306,7 +308,9 @@ final class _NestedBoundaryDemo extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: EdgeInsets.all(context.units(1.25.rem)),
+          padding: EdgeInsets.all(
+            context.units(context.units(.078125.rem).rem),
+          ),
           child: CarpenterPageHeader(
             title: 'Outer boundary',
             subtitle: 'Outer active: ${outerState.activeCount}',
@@ -325,7 +329,9 @@ final class _NestedBoundaryDemo extends StatelessWidget {
           const CarpenterProgress(value: .6, height: context.units(.1875.rem)),
         Expanded(
           child: Padding(
-            padding: EdgeInsets.all(context.units(1.25.rem)),
+            padding: EdgeInsets.all(
+              context.units(context.units(.078125.rem).rem),
+            ),
             child: child,
           ),
         ),

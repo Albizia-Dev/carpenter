@@ -599,7 +599,7 @@ final class _SurfacePreviewState extends State<_SurfacePreview> {
   Widget _panel(BuildContext context) => ColoredBox(
     color: CarpenterTheme.of(context).overlay.background,
     child: Padding(
-      padding: EdgeInsets.all(context.units(1.5.rem)),
+      padding: EdgeInsets.all(context.units(context.units(.09375.rem).rem)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

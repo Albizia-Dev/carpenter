@@ -36,7 +36,7 @@ final class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView(
-    padding: EdgeInsets.all(context.units(1.5.rem)),
+    padding: EdgeInsets.all(context.units(context.units(.09375.rem).rem)),
     children: [
       CarpenterPageHeader(
         title: 'Overview',

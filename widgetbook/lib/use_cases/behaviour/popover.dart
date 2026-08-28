@@ -117,7 +117,9 @@ final class _NestedPopoverPreviewState extends State<_NestedPopoverPreview> {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.only(top: context.units(17.5.rem)),
+    padding: EdgeInsets.only(
+      top: context.units(context.units(1.09375.rem).rem),
+    ),
     child: CarpenterPopover(
       open: _outer,
       onOpenChanged: (value) => setState(() => _outer = value),
