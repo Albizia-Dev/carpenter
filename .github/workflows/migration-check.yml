@@ -31,17 +31,55 @@ jobs:
         working-directory: widgetbook
         run: flutter pub get
 
+      - name: Fix migration diagnostics
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          replacements = {
+              'lib/src/application/host.dart': [
+                  ("import 'package:flutter/widgets.dart';", "import 'package:flutter/foundation.dart';\nimport 'package:flutter/widgets.dart';"),
+              ],
+              'lib/src/page/page.dart': [
+                  ('pageController as ValueListenable<CarpenterPageState>', 'pageController'),
+              ],
+              'lib/src/application/app.dart': [
+                  ("import 'runtime/runtime.dart';\n", ''),
+              ],
+              'lib/src/application/command.dart': [
+                  ("import 'package:flutter/services.dart';\n", ''),
+              ],
+              'lib/src/components/basic/loader.dart': [
+                  ("import 'package:carpenter_units/carpenter_units.dart';\n", ''),
+              ],
+              'lib/src/components/layout/patterns/page_blocks.dart': [
+                  ("import '../../../application/command.dart';\n", ''),
+              ],
+              'lib/src/page/state_boundary.dart': [
+                  ("import '../components/basic/button/button.dart';\n", ''),
+              ],
+          }
+
+          for file_name, rules in replacements.items():
+              path = Path(file_name)
+              text = path.read_text()
+              for old, new in rules:
+                  text = text.replace(old, new)
+              path.write_text(text)
+          PY
+
       - name: Format migrated code
         run: dart format lib widgetbook/lib
 
-      - name: Commit formatter changes
+      - name: Commit automatic fixes
         shell: bash
         run: |
           if ! git diff --quiet; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
             git add lib widgetbook/lib
-            git commit -m "style: format migrated code"
+            git commit -m "fix: resolve migration analyzer diagnostics"
             git push origin HEAD:migrate-previous-components
           fi
 
