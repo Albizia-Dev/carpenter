@@ -1,4 +1,4 @@
-import 'package:carpenter/carpenter.dart';
+import 'package:yx_navigation/yx_navigation.dart';
 
 abstract final class DemoRoutes {
   static const dashboard = YxRoute(id: 'dashboard');
