@@ -1,3 +1,4 @@
+import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../foundation/roles.dart';
@@ -13,7 +14,7 @@ final class CarpenterAvatar extends StatelessWidget {
     this.child,
     this.foregroundImage,
     this.onForegroundImageError,
-    this.size = 40,
+    this.size = const Rem(2.5),
     this.semanticLabel,
   }) : assert(initials != null || child != null || foregroundImage != null);
 
@@ -21,12 +22,13 @@ final class CarpenterAvatar extends StatelessWidget {
   final Widget? child;
   final ImageProvider<Object>? foregroundImage;
   final ImageErrorListener? onForegroundImageError;
-  final double size;
+  final LengthUnit size;
   final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
+    final extent = context.units(size);
     final style = theme.actions.resolve(
       ActionColorRole.primary,
       ActionProminence.filled,
@@ -42,7 +44,7 @@ final class CarpenterAvatar extends StatelessWidget {
               )
             : Icon(
                 CarpenterIcons.account,
-                size: size * .52,
+                size: extent * .52,
                 color: style.foreground,
               ));
 
@@ -51,8 +53,8 @@ final class CarpenterAvatar extends StatelessWidget {
         ? Center(child: fallback)
         : Image(
             image: image,
-            width: size,
-            height: size,
+            width: extent,
+            height: extent,
             fit: BoxFit.cover,
             excludeFromSemantics: true,
             errorBuilder: (context, error, stackTrace) {
@@ -65,7 +67,7 @@ final class CarpenterAvatar extends StatelessWidget {
       image: true,
       label: semanticLabel ?? initials,
       child: SizedBox.square(
-        dimension: size,
+        dimension: extent,
         child: ClipOval(
           child: DecoratedBox(
             decoration: BoxDecoration(
