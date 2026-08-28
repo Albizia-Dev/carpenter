@@ -150,11 +150,10 @@ final class CarpenterApp extends StatelessWidget {
     }
     return Application(
       theme: theme,
-      home: child,
+      home: Builder(builder: (context) => _host(context, null)),
       title: title,
       locale: locale,
       debugShowCheckedModeBanner: debugShowCheckedModeBanner,
-      builder: _host,
     );
   }
 }
