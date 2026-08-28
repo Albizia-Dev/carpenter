@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 
 import '../demo_data.dart';
 import '../demo_routes.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 final class ProjectsPage extends StatefulWidget {
   const ProjectsPage({
@@ -117,7 +118,7 @@ final class _ProjectsPageState extends State<ProjectsPage> {
     );
 
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(context.units(1.5.rem)),
       children: [
         CarpenterPageHeader(
           title: 'Project portfolio',
@@ -144,7 +145,7 @@ final class _ProjectsPageState extends State<ProjectsPage> {
             ),
           ],
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: context.units(1.5.rem)),
         CarpenterFilterBar(
           searchController: _searchController,
           searchLabel: 'Find projects',
@@ -177,7 +178,7 @@ final class _ProjectsPageState extends State<ProjectsPage> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: context.units(1.rem)),
         CarpenterTable<DemoProject, String>(
           snapshot: snapshot,
           rowKey: (project) => project.id,
@@ -234,7 +235,7 @@ final class _ProjectsPageState extends State<ProjectsPage> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: context.units(1.rem)),
         CarpenterPaginationBar(
           page: effectivePage,
           totalPages: totalPages,

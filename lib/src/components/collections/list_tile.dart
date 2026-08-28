@@ -50,7 +50,7 @@ final class CarpenterListTile extends StatelessWidget {
                   : active
                   ? theme.overlay.hovered
                   : const Color(0x00000000),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(context.units(.5.rem)),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,

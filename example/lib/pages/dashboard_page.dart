@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 
 import '../demo_commands.dart';
 import '../demo_routes.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 final class DashboardPage extends StatelessWidget {
   const DashboardPage({
@@ -35,7 +36,7 @@ final class DashboardPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView(
-    padding: const EdgeInsets.all(24),
+    padding: EdgeInsets.all(context.units(1.5.rem)),
     children: [
       CarpenterPageHeader(
         title: 'Overview',
@@ -62,7 +63,7 @@ final class DashboardPage extends StatelessWidget {
           ),
         ],
       ),
-      const SizedBox(height: 24),
+      SizedBox(height: context.units(1.5.rem)),
       const CarpenterRecordSummary(
         children: [
           CarpenterRecordMetric(
@@ -87,7 +88,7 @@ final class DashboardPage extends StatelessWidget {
           ),
         ],
       ),
-      const SizedBox(height: 24),
+      SizedBox(height: context.units(1.5.rem)),
       CarpenterNotice(
         title: 'The example is intentionally interconnected',
         message:
@@ -99,24 +100,24 @@ final class DashboardPage extends StatelessWidget {
           onInvoke: navigator.operations,
         ),
       ),
-      const SizedBox(height: 24),
+      SizedBox(height: context.units(1.5.rem)),
       Wrap(
-        spacing: 16,
-        runSpacing: 16,
+        spacing: context.units(1.rem),
+        runSpacing: context.units(1.rem),
         children: [
           SizedBox(
-            width: 420,
+            width: context.units(26.25.rem),
             child: CarpenterCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const CarpenterText.title('App-level loading'),
-                  const SizedBox(height: 8),
+                  SizedBox(height: context.units(.5.rem)),
                   const CarpenterText.body(
                     'This operation bubbles to the nearest application LoadingBoundary and appears in the global header.',
                     colorRole: ContentColorRole.secondary,
                   ),
-                  const SizedBox(height: 16),
+                  SizedBox(height: context.units(1.rem)),
                   CarpenterButton.filled(
                     label: 'Run synchronization',
                     icon: Icons.sync,
@@ -127,7 +128,7 @@ final class DashboardPage extends StatelessWidget {
             ),
           ),
           SizedBox(
-            width: 420,
+            width: context.units(26.25.rem),
             child: LoadingBoundary(
               child: _LocalOperation(toaster: toaster),
               builder: (context, state, child) => CarpenterCard(
@@ -148,13 +149,13 @@ final class DashboardPage extends StatelessWidget {
           ),
         ],
       ),
-      const SizedBox(height: 24),
+      SizedBox(height: context.units(1.5.rem)),
       CarpenterExpander(
         initiallyExpanded: true,
         header: const CarpenterText.title('Command-driven navigation'),
         content: Wrap(
-          spacing: 12,
-          runSpacing: 12,
+          spacing: context.units(.75.rem),
+          runSpacing: context.units(.75.rem),
           children: [
             CarpenterCommandButton<void>(
               command: commands.dashboard,
@@ -205,12 +206,12 @@ final class _LocalOperation extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       const CarpenterText.title('Nested LoadingBoundary'),
-      const SizedBox(height: 8),
+      SizedBox(height: context.units(.5.rem)),
       const CarpenterText.body(
         'The inner boundary intercepts loading and renders its own overlay instead of touching the application header.',
         colorRole: ContentColorRole.secondary,
       ),
-      const SizedBox(height: 16),
+      SizedBox(height: context.units(1.rem)),
       CarpenterButton(
         label: 'Run local operation',
         icon: Icons.hourglass_bottom,

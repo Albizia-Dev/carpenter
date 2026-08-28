@@ -4,6 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 final textComponent = WidgetbookComponent(
   name: 'Text',
@@ -72,7 +73,7 @@ Widget _playground(BuildContext context) {
 
   return preview(
     SizedBox(
-      width: 420,
+      width: context.units(26.25.rem),
       child: CarpenterText(
         text,
         role: role,
@@ -89,9 +90,9 @@ Widget _playground(BuildContext context) {
 }
 
 Widget _edgeCases(BuildContext context) => previewColumn([
-  const SizedBox(width: 220, child: CarpenterText.body('')),
+  SizedBox(width: context.units(13.75.rem), child: CarpenterText.body('')),
   const SizedBox(
-    width: 220,
+    width: context.units(13.75.rem),
     child: CarpenterText.body(
       'Счёт на оплату по долгосрочному договору технического обслуживания',
       maxLines: 2,
@@ -99,7 +100,7 @@ Widget _edgeCases(BuildContext context) => previewColumn([
     ),
   ),
   const SizedBox(
-    width: 160,
+    width: context.units(10.rem),
     child: CarpenterText.body(
       'оченьдлинноесловобезпробеловдляпроверкипереноса',
     ),

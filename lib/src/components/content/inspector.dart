@@ -94,7 +94,7 @@ final class _InspectorValue extends StatelessWidget {
         children: [
           for (final item in items)
             Padding(
-              padding: const EdgeInsets.only(bottom: 8),
+              padding: EdgeInsets.only(bottom: context.units(.5.rem)),
               child: CarpenterCard(
                 child: CarpenterInspector(
                   value: item,
@@ -142,7 +142,7 @@ final class _InspectorField extends StatelessWidget {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(width: 210, child: labelWidget),
+              SizedBox(width: context.units(13.125.rem), child: labelWidget),
               SizedBox(width: gap),
               Expanded(child: value),
             ],

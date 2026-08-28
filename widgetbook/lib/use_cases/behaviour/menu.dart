@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/preview.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 final menuComponent = WidgetbookComponent(
   name: 'Menu',
@@ -88,7 +89,7 @@ final class _MenuPreviewState extends State<_MenuPreview> {
           ),
         ],
       ),
-      const SizedBox(height: 16),
+      SizedBox(height: context.units(1.rem)),
       CarpenterText.caption('Последнее действие: $_last'),
       const CarpenterText.caption(
         'Проверьте ↑/↓, Home/End, Enter/Space и typeahead.',

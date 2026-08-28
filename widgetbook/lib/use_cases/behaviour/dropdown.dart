@@ -4,6 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 final dropdownComponent = WidgetbookComponent(
   name: 'Dropdown',
@@ -108,7 +109,7 @@ final class _DropdownPreviewState extends State<_DropdownPreview> {
           ),
         ],
       ),
-      const SizedBox(height: 16),
+      SizedBox(height: context.units(1.rem)),
       CarpenterText.caption('Последнее действие: $_last'),
     ],
   );

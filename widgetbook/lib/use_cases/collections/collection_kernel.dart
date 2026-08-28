@@ -5,6 +5,7 @@ import 'package:widgetbook/widgetbook.dart';
 import '../../helpers/collection_fixtures.dart';
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 final collectionKernelComponent = WidgetbookComponent(
   name: 'Collection Kernel',
@@ -46,7 +47,7 @@ Widget _playground(BuildContext context) {
 
   return preview(
     SizedBox(
-      width: 520,
+      width: context.units(32.5.rem),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -61,7 +62,7 @@ Widget _playground(BuildContext context) {
                 ? FeedbackColorRole.info
                 : FeedbackColorRole.neutral,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.units(.75.rem)),
           CarpenterText.body('Items retained: ${snapshot.items.length}'),
           CarpenterText.body(
             'Load: ${semanticValueLabel(snapshot.loadPhase)} · '

@@ -289,7 +289,7 @@ final class CarpenterInteractionOverlay extends StatelessWidget {
           top: 12,
           right: 12,
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 420),
+            constraints: BoxConstraints(maxWidth: context.units(26.25.rem)),
             child: CarpenterNotice(
               title: 'Action failed',
               message: error,
@@ -329,11 +329,11 @@ final class CarpenterSelectionBar<T> extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     CarpenterText.body('Selected: ${controller.length}'),
-                    const SizedBox(height: 8),
+                    SizedBox(height: context.units(.5.rem)),
                     Wrap(
                       alignment: WrapAlignment.end,
-                      spacing: 8,
-                      runSpacing: 8,
+                      spacing: context.units(.5.rem),
+                      runSpacing: context.units(.5.rem),
                       children: all,
                     ),
                   ],
@@ -488,28 +488,31 @@ final class CarpenterDialogCollectionBody extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      if (header != null) ...[header!, const SizedBox(height: 12)],
+      if (header != null) ...[
+        header!,
+        SizedBox(height: context.units(.75.rem)),
+      ],
       if (error != null) ...[
         CarpenterNotice(
           title: 'Error',
           message: error,
           tone: CarpenterNoticeTone.danger,
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: context.units(.5.rem)),
       ],
       if (loading) ...[
         const Align(
           alignment: AlignmentDirectional.centerStart,
           child: CarpenterLoader(),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: context.units(.5.rem)),
       ],
       Expanded(
         child: unavailable
             ? Center(child: CarpenterText.body(unavailableMessage))
             : collection,
       ),
-      if (footer != null) ...[const SizedBox(height: 8), footer!],
+      if (footer != null) ...[SizedBox(height: context.units(.5.rem)), footer!],
     ],
   );
 }
@@ -537,7 +540,7 @@ final class CarpenterSelectableCollection<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ListView.separated(
     itemCount: items.length,
-    separatorBuilder: (_, _) => const SizedBox(height: 8),
+    separatorBuilder: (_, _) => SizedBox(height: context.units(.5.rem)),
     itemBuilder: (context, index) {
       final item = items[index];
       return CarpenterCard(
@@ -557,7 +560,7 @@ final class CarpenterSelectableCollection<T> extends StatelessWidget {
                       value == CheckboxValue.checked,
                     ),
             ),
-            const SizedBox(width: 10),
+            SizedBox(width: context.units(.625.rem)),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -566,13 +569,13 @@ final class CarpenterSelectableCollection<T> extends StatelessWidget {
                     title(item),
                     emphasis: TypographyEmphasis.strong,
                   ),
-                  const SizedBox(height: 4),
+                  SizedBox(height: context.units(.25.rem)),
                   CarpenterText.body(
                     subtitle(item),
                     colorRole: ContentColorRole.secondary,
                   ),
                   if (details != null) ...[
-                    const SizedBox(height: 6),
+                    SizedBox(height: context.units(.375.rem)),
                     details!(item),
                   ],
                 ],

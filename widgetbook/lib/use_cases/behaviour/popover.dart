@@ -4,6 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 final popoverComponent = WidgetbookComponent(
   name: 'Popover',
@@ -55,7 +56,7 @@ Widget _playground(BuildContext context) {
 
 Widget _edgeCases(BuildContext context) => preview(
   SizedBox(
-    height: 520,
+    height: context.units(32.5.rem),
     child: SingleChildScrollView(
       child: Directionality(
         textDirection: TextDirection.rtl,
@@ -116,7 +117,7 @@ final class _NestedPopoverPreviewState extends State<_NestedPopoverPreview> {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.only(top: 280),
+    padding: EdgeInsets.only(top: context.units(17.5.rem)),
     child: CarpenterPopover(
       open: _outer,
       onOpenChanged: (value) => setState(() => _outer = value),
@@ -130,7 +131,7 @@ final class _NestedPopoverPreviewState extends State<_NestedPopoverPreview> {
         semanticLabel: 'Вложенный popover',
         anchor: const CarpenterText.label('Открыть вложенный'),
         content: const SizedBox(
-          width: 180,
+          width: context.units(11.25.rem),
           child: CarpenterText.body('Escape закрывает верхний overlay.'),
         ),
       ),

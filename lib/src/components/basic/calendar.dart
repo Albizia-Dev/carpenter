@@ -121,7 +121,7 @@ final class _CarpenterCalendarState extends State<CarpenterCalendar> {
             final selected =
                 widget.selected != null && _sameDate(date, widget.selected!);
             return Padding(
-              padding: const EdgeInsets.all(2),
+              padding: EdgeInsets.all(context.units(.125.rem)),
               child: CarpenterButton(
                 label: '${date.day}',
                 semanticLabel: carpenterFormatDate(date),

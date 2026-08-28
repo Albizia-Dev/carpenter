@@ -5,6 +5,7 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/layout_viewport.dart';
 import '../../helpers/preview.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 final sidebarComponent = WidgetbookComponent(
   name: 'Sidebar',
@@ -48,7 +49,7 @@ Widget _sidebarPlayground(BuildContext context) {
   return preview(
     SizedBox(
       width: width,
-      height: 620,
+      height: context.units(38.75.rem),
       child: _SidebarPreview(expanded: expanded, targetPlatform: platform),
     ),
   );
@@ -56,12 +57,12 @@ Widget _sidebarPlayground(BuildContext context) {
 
 Widget _sidebarMatrix(BuildContext context) => preview(
   SizedBox(
-    height: 620,
+    height: context.units(38.75.rem),
     child: Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: const [
         _SidebarPreview(expanded: true),
-        SizedBox(width: 24),
+        SizedBox(width: context.units(1.5.rem)),
         _SidebarPreview(expanded: false),
       ],
     ),
@@ -86,7 +87,7 @@ Widget _headerPlayground(BuildContext context) {
   );
   return preview(
     SizedBox(
-      width: 840,
+      width: context.units(52.5.rem),
       child: CarpenterTopPanel(
         title: title,
         subtitle: subtitle,
@@ -341,7 +342,7 @@ final class _RootPreviewState extends State<_RootPreview> {
             mainAxisSize: MainAxisSize.min,
             children: [
               CarpenterText.title('Page content'),
-              const SizedBox(height: 8),
+              SizedBox(height: context.units(.5.rem)),
               CarpenterText.body('Selected: $_selected'),
             ],
           ),

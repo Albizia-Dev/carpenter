@@ -5,6 +5,7 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 final cardComponent = WidgetbookComponent(
   name: 'Card',
@@ -112,10 +113,10 @@ Widget _cardPlayground(BuildContext context) {
                   ),
               ],
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: context.units(.5.rem)),
             CarpenterText.body(body, colorRole: ContentColorRole.secondary),
             if (showAction) ...[
-              const SizedBox(height: 16),
+              SizedBox(height: context.units(1.rem)),
               CarpenterButton.text(label: 'Open details', onPressed: () {}),
             ],
           ],

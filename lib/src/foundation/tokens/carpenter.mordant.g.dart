@@ -502,7 +502,7 @@ final class SpacingSelectionTokens {
 
   _i1.Rem get markInset => const _i1.Rem(0.25);
 
-  _i1.Px get switchInset => const _i1.Px(2.0);
+  _i1.Rem get switchInset => const _i1.Rem(0.125);
 }
 
 final class SpacingOverlayTokens {
@@ -1359,15 +1359,15 @@ final class ComponentSelectionSwitchTokenHeightTokens {
 final class ComponentSelectionSwitchTokenInsetTokens {
   const ComponentSelectionSwitchTokenInsetTokens();
 
-  _i1.Px get xsmall => spacing.selection.switchInset;
+  _i1.Rem get xsmall => spacing.selection.switchInset;
 
-  _i1.Px get small => spacing.selection.switchInset;
+  _i1.Rem get small => spacing.selection.switchInset;
 
-  _i1.Px get medium => spacing.selection.switchInset;
+  _i1.Rem get medium => spacing.selection.switchInset;
 
-  _i1.Px get large => spacing.selection.switchInset;
+  _i1.Rem get large => spacing.selection.switchInset;
 
-  _i1.Px get xlarge => spacing.selection.switchInset;
+  _i1.Rem get xlarge => spacing.selection.switchInset;
 }
 
 final class ComponentSelectionSwitchTokenRadiusTokens {

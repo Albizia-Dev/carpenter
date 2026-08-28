@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 
 import '../demo_data.dart';
 import '../demo_routes.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 enum _ProjectTab { details, timeline }
 
@@ -48,7 +49,7 @@ final class _ProjectPageState extends State<ProjectPage> {
   Widget build(BuildContext context) {
     final project = _project;
     return ListView(
-      padding: const EdgeInsets.all(24),
+      padding: EdgeInsets.all(context.units(1.5.rem)),
       children: [
         CarpenterEntityHeader(
           title: project.name,
@@ -84,7 +85,7 @@ final class _ProjectPageState extends State<ProjectPage> {
             ),
           ],
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: context.units(1.5.rem)),
         CarpenterRecordSummary(
           children: [
             CarpenterRecordMetric(
@@ -106,9 +107,9 @@ final class _ProjectPageState extends State<ProjectPage> {
             ),
           ],
         ),
-        const SizedBox(height: 24),
+        SizedBox(height: context.units(1.5.rem)),
         CarpenterProgress(value: project.progress),
-        const SizedBox(height: 24),
+        SizedBox(height: context.units(1.5.rem)),
         CarpenterRecordTabs<_ProjectTab>(
           value: _tab,
           onChanged: (value) => setState(() => _tab = value),

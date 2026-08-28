@@ -83,13 +83,15 @@ final class CarpenterTabsLayout<T> extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
-              width: 240,
+              width: context.units(15.rem),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   for (final tab in visible)
                     Padding(
-                      padding: EdgeInsets.only(bottom: gap / 2),
+                      padding: EdgeInsets.only(
+                        bottom: gap / context.units(.125.rem),
+                      ),
                       child: CarpenterButton(
                         label: _label(tab),
                         prominence: tab.value == selected.value

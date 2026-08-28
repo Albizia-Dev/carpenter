@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/preview.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 final appFrameComponent = WidgetbookComponent(
   name: 'App Frame',
@@ -95,8 +96,8 @@ Widget _appFrame(BuildContext context) {
 
 Widget _appFrameMatrix(BuildContext context) => previewColumn([
   SizedBox(
-    width: 760,
-    height: 260,
+    width: context.units(47.5.rem),
+    height: context.units(16.25.rem),
     child: CarpenterAppFrame(
       targetPlatform: TargetPlatform.macOS,
       topPanelBuilder: (context, panel) => CarpenterTopPanel(
@@ -107,8 +108,8 @@ Widget _appFrameMatrix(BuildContext context) => previewColumn([
     ),
   ),
   SizedBox(
-    width: 390,
-    height: 260,
+    width: context.units(24.375.rem),
+    height: context.units(16.25.rem),
     child: CarpenterAppFrame(
       targetPlatform: TargetPlatform.android,
       topPanelBuilder: (context, panel) => CarpenterTopPanel(
@@ -206,7 +207,7 @@ final class _TabsLayoutPreviewState extends State<_TabsLayoutPreview> {
   Widget build(BuildContext context) => preview(
     SizedBox(
       width: widget.width,
-      height: 420,
+      height: context.units(26.25.rem),
       child: CarpenterTabsLayout<String>(
         value: _tab,
         orientation: widget.orientation,
@@ -333,7 +334,7 @@ final class _SplitPreviewState extends State<_SplitPreview> {
   Widget build(BuildContext context) => preview(
     SizedBox(
       width: widget.width,
-      height: 460,
+      height: context.units(28.75.rem),
       child: CarpenterAdaptiveSplitLayout(
         restoration: _restoration,
         initialRatio: widget.ratio,
@@ -348,7 +349,7 @@ final class _SplitPreviewState extends State<_SplitPreview> {
         ),
         inspector: widget.showInspector
             ? const SizedBox(
-                width: 220,
+                width: context.units(13.75.rem),
                 child: CarpenterCard(
                   child: CarpenterInspector(
                     value: {'status': 'ready', 'owner': 'Nikolai'},

@@ -47,7 +47,7 @@ final class CarpenterNotice extends StatelessWidget {
         decoration: BoxDecoration(
           color: feedback.background,
           border: Border.all(color: feedback.foreground.withValues(alpha: .35)),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(context.units(.5.rem)),
         ),
         child: Padding(
           padding: EdgeInsets.all(gap),

@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/preview.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 enum _LoadingPresentation {
   headerProgress,
@@ -40,8 +41,8 @@ Widget _presentation(BuildContext context) {
 
   return preview(
     SizedBox(
-      width: 820,
-      height: 520,
+      width: context.units(51.25.rem),
+      height: context.units(32.5.rem),
       child: LoadingBoundary(
         builder: (context, state, child) => _PresentationFrame(
           presentation: presentation,
@@ -56,7 +57,7 @@ Widget _presentation(BuildContext context) {
 
 Widget _aggregation(BuildContext context) => preview(
   SizedBox(
-    width: 760,
+    width: context.units(47.5.rem),
     child: LoadingBoundary(
       builder: (context, state, child) => CarpenterCard(
         child: Column(
@@ -65,7 +66,7 @@ Widget _aggregation(BuildContext context) => preview(
             CarpenterText.title(
               state.isLoading ? 'Loading · ${state.activeCount}' : 'Idle',
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: context.units(.5.rem)),
             CarpenterText.body(
               state.activeOperations.isEmpty
                   ? 'No active operations.'
@@ -74,7 +75,7 @@ Widget _aggregation(BuildContext context) => preview(
                         .join(' · '),
               colorRole: ContentColorRole.secondary,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: context.units(1.rem)),
             child,
           ],
         ),
@@ -85,11 +86,15 @@ Widget _aggregation(BuildContext context) => preview(
 );
 
 Widget _nested(BuildContext context) => preview(
-  SizedBox(width: 820, height: 500, child: const _NestedBoundaryDemo()),
+  SizedBox(
+    width: context.units(51.25.rem),
+    height: context.units(31.25.rem),
+    child: const _NestedBoundaryDemo(),
+  ),
 );
 
 Widget _noScope(BuildContext context) =>
-    preview(const SizedBox(width: 700, child: _NoScopeDemo()));
+    preview(SizedBox(width: context.units(43.75.rem), child: _NoScopeDemo()));
 
 final class _PresentationFrame extends StatelessWidget {
   const _PresentationFrame({
@@ -106,7 +111,7 @@ final class _PresentationFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final header = Padding(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(context.units(1.25.rem)),
       child: CarpenterPageHeader(
         title: 'LoadingBoundary',
         subtitle: state.isLoading
@@ -114,7 +119,10 @@ final class _PresentationFrame extends StatelessWidget {
             : 'Idle · child owns no loading presentation',
       ),
     );
-    final body = Padding(padding: const EdgeInsets.all(20), child: child);
+    final body = Padding(
+      padding: EdgeInsets.all(context.units(1.25.rem)),
+      child: child,
+    );
 
     return switch (presentation) {
       _LoadingPresentation.headerProgress => Column(
@@ -124,7 +132,7 @@ final class _PresentationFrame extends StatelessWidget {
           if (state.isLoading)
             const CarpenterProgress(
               value: .6,
-              height: 3,
+              height: context.units(.1875.rem),
               semanticLabel: 'Page loading',
             ),
           Expanded(child: body),
@@ -153,7 +161,7 @@ final class _PresentationFrame extends StatelessWidget {
           Expanded(
             child: state.isLoading
                 ? const Padding(
-                    padding: EdgeInsets.all(20),
+                    padding: EdgeInsets.all(context.units(1.25.rem)),
                     child: _SkeletonPreview(),
                   )
                 : body,
@@ -201,15 +209,15 @@ final class _LoadingActions extends StatelessWidget {
         const CarpenterText.body(
           'The child only calls context.loading. Change the presentation knob above without touching this widget.',
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: context.units(.5.rem)),
         const CarpenterText.caption(
           "context.loading.track(() => repository.save(), id: 'save-profile')",
           colorRole: ContentColorRole.secondary,
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: context.units(1.25.rem)),
         Wrap(
-          spacing: 12,
-          runSpacing: 12,
+          spacing: context.units(.75.rem),
+          runSpacing: context.units(.75.rem),
           children: [
             CarpenterButton.filled(
               label: 'Track save · 2s',
@@ -249,8 +257,8 @@ final class _AggregationControls extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Wrap(
-    spacing: 12,
-    runSpacing: 12,
+    spacing: context.units(.75.rem),
+    runSpacing: context.units(.75.rem),
     children: [
       CarpenterButton(
         label: 'Start A',
@@ -298,7 +306,7 @@ final class _NestedBoundaryDemo extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(context.units(1.25.rem)),
           child: CarpenterPageHeader(
             title: 'Outer boundary',
             subtitle: 'Outer active: ${outerState.activeCount}',
@@ -313,9 +321,13 @@ final class _NestedBoundaryDemo extends StatelessWidget {
             ),
           ),
         ),
-        if (outerState.isLoading) const CarpenterProgress(value: .6, height: 3),
+        if (outerState.isLoading)
+          const CarpenterProgress(value: .6, height: context.units(.1875.rem)),
         Expanded(
-          child: Padding(padding: const EdgeInsets.all(20), child: child),
+          child: Padding(
+            padding: EdgeInsets.all(context.units(1.25.rem)),
+            child: child,
+          ),
         ),
       ],
     ),
@@ -333,7 +345,7 @@ final class _NestedBoundaryDemo extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const CarpenterLoader(),
-                        const SizedBox(height: 12),
+                        SizedBox(height: context.units(.75.rem)),
                         CarpenterText.body(
                           'Inner active: ${innerState.activeCount}',
                         ),
@@ -350,11 +362,11 @@ final class _NestedBoundaryDemo extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const CarpenterText.title('Inner boundary'),
-            const SizedBox(height: 8),
+            SizedBox(height: context.units(.5.rem)),
             const CarpenterText.body(
               'This operation is captured by the inner boundary. The outer progress bar stays idle.',
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: context.units(1.25.rem)),
             CarpenterButton.filled(
               label: 'Inner operation · 3s',
               onPressed: () => unawaited(
@@ -387,12 +399,12 @@ final class _NoScopeDemoState extends State<_NoScopeDemo> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const CarpenterText.title('No LoadingScope above'),
-        const SizedBox(height: 8),
+        SizedBox(height: context.units(.5.rem)),
         CarpenterText.body(
           'Fallback loading state: ${context.loading.state.isLoading ? 'loading' : 'idle'} · $_status',
           colorRole: ContentColorRole.secondary,
         ),
-        const SizedBox(height: 20),
+        SizedBox(height: context.units(1.25.rem)),
         CarpenterButton.filled(
           label: 'Run operation anyway',
           onPressed: () => unawaited(_run(context)),
@@ -420,13 +432,29 @@ final class _SkeletonPreview extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _SkeletonLine(width: 280, height: 28, color: color),
-        const SizedBox(height: 20),
-        _SkeletonLine(width: double.infinity, height: 72, color: color),
-        const SizedBox(height: 12),
-        _SkeletonLine(width: double.infinity, height: 72, color: color),
-        const SizedBox(height: 12),
-        _SkeletonLine(width: 520, height: 72, color: color),
+        _SkeletonLine(
+          width: context.units(17.5.rem),
+          height: context.units(1.75.rem),
+          color: color,
+        ),
+        SizedBox(height: context.units(1.25.rem)),
+        _SkeletonLine(
+          width: double.infinity,
+          height: context.units(4.5.rem),
+          color: color,
+        ),
+        SizedBox(height: context.units(.75.rem)),
+        _SkeletonLine(
+          width: double.infinity,
+          height: context.units(4.5.rem),
+          color: color,
+        ),
+        SizedBox(height: context.units(.75.rem)),
+        _SkeletonLine(
+          width: context.units(32.5.rem),
+          height: context.units(4.5.rem),
+          color: color,
+        ),
       ],
     );
   }
@@ -452,7 +480,7 @@ final class _SkeletonLine extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(context.units(.5.rem)),
         ),
       ),
     ),

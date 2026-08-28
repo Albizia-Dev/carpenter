@@ -1,6 +1,7 @@
 import 'package:carpenter/carpenter.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 final class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key, required this.toaster});
@@ -65,7 +66,7 @@ final class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) => ListView(
-    padding: const EdgeInsets.all(24),
+    padding: EdgeInsets.all(context.units(1.5.rem)),
     children: [
       CarpenterPageHeader(
         title: 'Settings',
@@ -84,7 +85,7 @@ final class _SettingsPageState extends State<SettingsPage> {
           ),
         ],
       ),
-      const SizedBox(height: 24),
+      SizedBox(height: context.units(1.5.rem)),
       if (_dirty) ...[
         const CarpenterNotice(
           title: 'Unsaved changes',
@@ -92,21 +93,21 @@ final class _SettingsPageState extends State<SettingsPage> {
               'The page owns form state. Loading presentation still belongs to the application boundary.',
           tone: CarpenterNoticeTone.warning,
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: context.units(1.rem)),
       ],
       CarpenterCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const CarpenterText.title('Profile'),
-            const SizedBox(height: 16),
+            SizedBox(height: context.units(1.rem)),
             CarpenterInput(
               controller: _nameController,
               label: 'Display name',
               description: 'Shown in the navigation footer.',
               leadingIcon: Icons.person_outline,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: context.units(1.rem)),
             CarpenterTextArea(
               controller: _notesController,
               label: 'Workspace note',
@@ -116,13 +117,13 @@ final class _SettingsPageState extends State<SettingsPage> {
           ],
         ),
       ),
-      const SizedBox(height: 16),
+      SizedBox(height: context.units(1.rem)),
       CarpenterCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const CarpenterText.title('Preferences'),
-            const SizedBox(height: 16),
+            SizedBox(height: context.units(1.rem)),
             CarpenterSwitch(
               value: _notifications,
               label: 'Enable notifications',
@@ -131,7 +132,7 @@ final class _SettingsPageState extends State<SettingsPage> {
                 _dirty = true;
               }),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: context.units(.75.rem)),
             CarpenterCheckbox(
               value: _includeArchived,
               label: 'Include archived items by default',
@@ -140,12 +141,12 @@ final class _SettingsPageState extends State<SettingsPage> {
                 _dirty = true;
               }),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: context.units(1.rem)),
             const CarpenterText.label(
               'Interface density',
               emphasis: TypographyEmphasis.strong,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: context.units(.5.rem)),
             CarpenterRadioGroup<_DensityPreference>(
               value: _density,
               onChanged: (value) => setState(() {
@@ -166,7 +167,7 @@ final class _SettingsPageState extends State<SettingsPage> {
           ],
         ),
       ),
-      const SizedBox(height: 16),
+      SizedBox(height: context.units(1.rem)),
       Align(
         alignment: AlignmentDirectional.centerEnd,
         child: CarpenterButton.filled(

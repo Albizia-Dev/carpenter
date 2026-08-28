@@ -4,6 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 enum _AvatarContent { initials, icon, image }
 
@@ -87,8 +88,8 @@ Widget _avatarPlayground(BuildContext context) {
 
 Widget _avatarMatrix(BuildContext context) => preview(
   const Wrap(
-    spacing: 12,
-    runSpacing: 12,
+    spacing: context.units(.75.rem),
+    runSpacing: context.units(.75.rem),
     crossAxisAlignment: WrapCrossAlignment.center,
     children: [
       CarpenterAvatar(initials: 'A', size: 24),
@@ -166,8 +167,8 @@ Widget _activityPlayground(BuildContext context) {
 
 Widget _activitySizes(BuildContext context) => previewColumn([
   const Wrap(
-    spacing: 16,
-    runSpacing: 16,
+    spacing: context.units(1.rem),
+    runSpacing: context.units(1.rem),
     crossAxisAlignment: WrapCrossAlignment.center,
     children: [
       CarpenterLoader(size: 12, strokeWidth: 1.5),
@@ -177,9 +178,18 @@ Widget _activitySizes(BuildContext context) => previewColumn([
       CarpenterLoader(size: 48, strokeWidth: 4),
     ],
   ),
-  const SizedBox(width: 120, child: CarpenterProgress(value: .18, height: 2)),
-  const SizedBox(width: 240, child: CarpenterProgress(value: .50, height: 4)),
-  const SizedBox(width: 480, child: CarpenterProgress(value: .82, height: 8)),
+  SizedBox(
+    width: context.units(7.5.rem),
+    child: CarpenterProgress(value: .18, height: context.units(.125.rem)),
+  ),
+  SizedBox(
+    width: context.units(15.rem),
+    child: CarpenterProgress(value: .50, height: context.units(.25.rem)),
+  ),
+  SizedBox(
+    width: context.units(30.rem),
+    child: CarpenterProgress(value: .82, height: context.units(.5.rem)),
+  ),
 ]);
 
 Widget _colorPicker(BuildContext context) {
@@ -255,7 +265,7 @@ final class _ColorPickerPreviewState extends State<_ColorPickerPreview> {
             paletteHeight: widget.paletteHeight,
             onChanged: (value) => setState(() => _value = value),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.units(.75.rem)),
           CarpenterText.caption('Current: ${carpenterFormatRgbHex(_value)}'),
         ],
       ),
@@ -322,7 +332,7 @@ final class _DateInputPreviewState extends State<_DateInputPreview> {
   @override
   Widget build(BuildContext context) => preview(
     SizedBox(
-      width: 360,
+      width: context.units(22.5.rem),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -335,7 +345,7 @@ final class _DateInputPreviewState extends State<_DateInputPreview> {
             allowClear: widget.allowClear,
             onChanged: (value) => setState(() => _value = value),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: context.units(.75.rem)),
           CarpenterText.caption(
             _value == null
                 ? 'No date selected'
@@ -446,8 +456,8 @@ final class _ToggleButtonPreviewState extends State<_ToggleButtonPreview> {
 
 Widget _toggleMatrix(BuildContext context) => preview(
   Wrap(
-    spacing: 12,
-    runSpacing: 12,
+    spacing: context.units(.75.rem),
+    runSpacing: context.units(.75.rem),
     children: [
       for (final role in ActionColorRole.values)
         for (final checked in [false, true])

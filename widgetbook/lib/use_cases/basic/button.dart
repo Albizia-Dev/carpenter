@@ -6,6 +6,7 @@ import 'package:widgetbook/widgetbook.dart';
 import '../../helpers/curated_icons.dart';
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 final buttonComponent = WidgetbookComponent(
   name: 'Button',
@@ -214,7 +215,7 @@ Widget _states(BuildContext context) => previewColumn([
 
 Widget _edgeCases(BuildContext context) => previewColumn([
   const SizedBox(
-    width: 560,
+    width: context.units(35.rem),
     child: CarpenterButton(label: 'Tight wide parent', onPressed: _noop),
   ),
   const CarpenterButton(
@@ -272,7 +273,7 @@ final class _InvocationPreviewState extends State<_InvocationPreview> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       widget.builder(() => setState(() => _count++)),
-      const SizedBox(height: 16),
+      SizedBox(height: context.units(1.rem)),
       CarpenterText.caption('Pressed: $_count'),
     ],
   );

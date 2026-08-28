@@ -4,6 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 final statusIndicatorComponent = WidgetbookComponent(
   name: 'Status Indicator',
@@ -68,7 +69,7 @@ Widget _playground(BuildContext context) {
 
 Widget _edgeCases(BuildContext context) => preview(
   const SizedBox(
-    width: 180,
+    width: context.units(11.25.rem),
     child: CarpenterStatusIndicator(
       label: 'Ожидает дополнительного согласования',
       role: FeedbackColorRole.warning,

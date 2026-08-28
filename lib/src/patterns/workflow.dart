@@ -271,7 +271,7 @@ final class CarpenterSelectionWorkflowStage<TState, TContext, TItem>
       children: [
         for (final item in values)
           Padding(
-            padding: const EdgeInsets.only(bottom: 8),
+            padding: EdgeInsets.only(bottom: context.units(.5.rem)),
             child: itemBuilder(
               context,
               item,
@@ -351,7 +351,7 @@ final class CarpenterWorkflowPage<TState, TContext> extends StatelessWidget {
               if (stage != null) ...[
                 CarpenterText.title(stage.title),
                 if (stage.description != null) ...[
-                  const SizedBox(height: 4),
+                  SizedBox(height: context.units(.25.rem)),
                   CarpenterText.body(
                     stage.description!,
                     colorRole: ContentColorRole.secondary,

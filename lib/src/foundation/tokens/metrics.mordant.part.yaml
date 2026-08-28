@@ -119,7 +119,7 @@ spacing:
     supportingGap: 0.25rem
     groupGap: 0.5rem
     markInset: 0.25rem
-    switchInset: 2px
+    switchInset: 0.125rem
 
   overlay:
     viewportInset: 0.5rem
