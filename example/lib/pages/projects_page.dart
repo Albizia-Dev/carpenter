@@ -135,6 +135,14 @@ final class _ProjectsPageState extends State<ProjectsPage> {
               onInvoke: _refresh,
             ),
           ],
+          secondaryActions: [
+            CarpenterActionDescriptor(
+              id: 'projects.open-featured',
+              label: 'Open featured',
+              icon: Icons.open_in_new,
+              onInvoke: () => widget.navigator.project('CP-1042'),
+            ),
+          ],
         ),
         const SizedBox(height: 24),
         CarpenterFilterBar(
