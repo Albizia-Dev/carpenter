@@ -1,5 +1,6 @@
 import 'package:carpenter/carpenter.dart';
-import 'package:flutter/material.dart' show Icons;
+import 'package:carpenter/gravity_icons.dart';
+
 import 'package:flutter/widgets.dart';
 
 import '../demo_commands.dart';
@@ -49,7 +50,7 @@ final class DashboardPage extends StatelessWidget {
           CarpenterActionDescriptor(
             id: 'dashboard.sync',
             label: 'Synchronize',
-            icon: Icons.sync,
+            icon: GravityIcons.arrows3RotateLeft,
             onInvoke: () => _sync(context),
           ),
         ],
@@ -57,7 +58,7 @@ final class DashboardPage extends StatelessWidget {
           CarpenterActionDescriptor(
             id: 'dashboard.projects',
             label: 'Open projects',
-            icon: Icons.view_list_outlined,
+            icon: GravityIcons.layoutList,
             onInvoke: navigator.projects,
           ),
         ],
@@ -119,7 +120,7 @@ final class DashboardPage extends StatelessWidget {
                   SizedBox(height: context.units(1.rem)),
                   CarpenterButton.filled(
                     label: 'Run synchronization',
-                    icon: Icons.sync,
+                    icon: GravityIcons.arrows3RotateLeft,
                     onPressed: () => _sync(context),
                   ),
                 ],
@@ -213,7 +214,7 @@ final class _LocalOperation extends StatelessWidget {
       SizedBox(height: context.units(1.rem)),
       CarpenterButton(
         label: 'Run local operation',
-        icon: Icons.hourglass_bottom,
+        icon: GravityIcons.hourglass,
         onPressed: () => _run(context),
       ),
     ],

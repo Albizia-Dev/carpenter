@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:carpenter/carpenter.dart';
-import 'package:flutter/material.dart' show Icons;
+import 'package:carpenter/gravity_icons.dart';
+
 import 'package:flutter/widgets.dart';
 
 final class OperationsPage extends StatefulWidget {
@@ -89,7 +90,7 @@ final class _OperationsPageState extends State<OperationsPage> {
             CarpenterActionDescriptor(
               id: 'operations.dialog',
               label: 'Open dialog',
-              icon: Icons.open_in_new,
+              icon: GravityIcons.arrowUpRightFromSquare,
               onInvoke: () => setState(() => _dialogOpen = true),
             ),
           ],
@@ -123,7 +124,7 @@ final class _OperationsPageState extends State<OperationsPage> {
                       children: [
                         CarpenterButton.filled(
                           label: 'Run A + B',
-                          icon: Icons.play_arrow,
+                          icon: GravityIcons.play,
                           onPressed: () => _runConcurrent(context),
                         ),
                         CarpenterButton(
@@ -206,7 +207,7 @@ final class _OperationsPageState extends State<OperationsPage> {
                   ),
                   CarpenterButton(
                     label: 'Open dialog',
-                    icon: Icons.open_in_new,
+                    icon: GravityIcons.arrowUpRightFromSquare,
                     onPressed: () => setState(() => _dialogOpen = true),
                   ),
                 ],
@@ -247,7 +248,7 @@ final class _BlockedRegion extends StatelessWidget {
       SizedBox(height: context.units(1.rem)),
       CarpenterButton(
         label: 'Run local task',
-        icon: Icons.lock_clock,
+        icon: GravityIcons.clock,
         onPressed: () => _run(context),
       ),
     ],

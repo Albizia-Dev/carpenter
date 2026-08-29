@@ -1,5 +1,6 @@
 import 'package:carpenter/carpenter.dart';
-import 'package:flutter/material.dart' show Icons;
+import 'package:carpenter/gravity_icons.dart';
+
 import 'package:flutter/widgets.dart';
 
 final class SettingsPage extends StatefulWidget {
@@ -79,7 +80,7 @@ final class _SettingsPageState extends State<SettingsPage> {
           CarpenterActionDescriptor(
             id: 'settings.save',
             label: 'Save changes',
-            icon: Icons.save_outlined,
+            icon: GravityIcons.floppyDisk,
             onInvoke: _dirty ? _save : null,
           ),
         ],
@@ -104,7 +105,7 @@ final class _SettingsPageState extends State<SettingsPage> {
               controller: _nameController,
               label: 'Display name',
               description: 'Shown in the navigation footer.',
-              leadingIcon: Icons.person_outline,
+              leadingIcon: GravityIcons.person,
             ),
             SizedBox(height: context.units(1.rem)),
             CarpenterTextArea(
@@ -171,7 +172,7 @@ final class _SettingsPageState extends State<SettingsPage> {
         alignment: AlignmentDirectional.centerEnd,
         child: CarpenterButton.filled(
           label: 'Save changes',
-          icon: Icons.save_outlined,
+          icon: GravityIcons.floppyDisk,
           onPressed: _dirty ? _save : null,
         ),
       ),

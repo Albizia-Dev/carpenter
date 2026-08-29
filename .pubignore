@@ -9,3 +9,4 @@ build/
 .vscode/
 *.iml
 *.log
+okibi/

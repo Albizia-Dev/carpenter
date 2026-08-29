@@ -1,7 +1,8 @@
 import 'dart:math' as math;
 
 import 'package:carpenter/carpenter.dart';
-import 'package:flutter/material.dart' show Icons;
+import 'package:carpenter/gravity_icons.dart';
+
 import 'package:flutter/widgets.dart';
 
 import '../demo_data.dart';
@@ -131,7 +132,7 @@ final class _ProjectsPageState extends State<ProjectsPage> {
             CarpenterActionDescriptor(
               id: 'projects.refresh',
               label: 'Refresh',
-              icon: Icons.refresh,
+              icon: GravityIcons.arrowRotateRight,
               onInvoke: _refresh,
             ),
           ],
@@ -139,7 +140,7 @@ final class _ProjectsPageState extends State<ProjectsPage> {
             CarpenterActionDescriptor(
               id: 'projects.open-featured',
               label: 'Open featured',
-              icon: Icons.open_in_new,
+              icon: GravityIcons.arrowUpRightFromSquare,
               onInvoke: () => widget.navigator.project('CP-1042'),
             ),
           ],
@@ -172,7 +173,7 @@ final class _ProjectsPageState extends State<ProjectsPage> {
             CarpenterActionDescriptor(
               id: 'projects.refresh.filters',
               label: 'Refresh',
-              icon: Icons.refresh,
+              icon: GravityIcons.arrowRotateRight,
               onInvoke: _refresh,
             ),
           ],
@@ -227,7 +228,7 @@ final class _ProjectsPageState extends State<ProjectsPage> {
                 CarpenterActionDescriptor(
                   id: 'project.${project.id}.open',
                   label: 'Open',
-                  icon: Icons.arrow_forward,
+                  icon: GravityIcons.arrowRight,
                   onInvoke: () => widget.navigator.project(project.id),
                 ),
               ],

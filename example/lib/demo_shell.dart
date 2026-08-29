@@ -1,5 +1,5 @@
 import 'package:carpenter/carpenter.dart';
-import 'package:flutter/material.dart' show Icons;
+import 'package:carpenter/gravity_icons.dart';
 import 'package:flutter/widgets.dart';
 
 import 'demo_commands.dart';
@@ -46,19 +46,19 @@ final class _DemoShellState extends State<DemoShell> {
             CarpenterSidebarItem(
               id: 'dashboard',
               label: 'Overview',
-              icon: Icons.dashboard_outlined,
+              icon: GravityIcons.displayPulse,
               command: widget.commands.dashboard,
             ),
             CarpenterSidebarItem(
               id: 'projects',
               label: 'Projects',
-              icon: Icons.view_list_outlined,
+              icon: GravityIcons.layoutList,
               command: widget.commands.projects,
             ),
             CarpenterSidebarItem(
               id: 'operations',
               label: 'Operations',
-              icon: Icons.bolt_outlined,
+              icon: GravityIcons.thunderbolt,
               command: widget.commands.operations,
             ),
           ],
@@ -69,13 +69,13 @@ final class _DemoShellState extends State<DemoShell> {
             CarpenterSidebarItem(
               id: 'settings',
               label: 'Settings',
-              icon: Icons.settings_outlined,
+              icon: GravityIcons.gear,
               command: widget.commands.settings,
             ),
             CarpenterSidebarItem(
               id: 'notify',
               label: 'Notify',
-              icon: Icons.notifications_outlined,
+              icon: GravityIcons.bell,
               command: widget.commands.notify,
               selectable: false,
             ),
@@ -107,8 +107,10 @@ final class _DemoShellState extends State<DemoShell> {
                   subtitle: widget.subtitle,
                   leading: CarpenterIconButton(
                     icon: layout.isDesktop
-                        ? (_sidebarExpanded ? Icons.menu_open : Icons.menu)
-                        : Icons.menu,
+                        ? (_sidebarExpanded
+                              ? GravityIcons.xmark
+                              : GravityIcons.bars)
+                        : GravityIcons.bars,
                     semanticLabel: layout.isDesktop
                         ? 'Toggle compact sidebar'
                         : 'Open navigation',
@@ -123,7 +125,7 @@ final class _DemoShellState extends State<DemoShell> {
                         role: FeedbackColorRole.info,
                       ),
                     CarpenterIconButton(
-                      icon: Icons.notifications_outlined,
+                      icon: GravityIcons.bell,
                       semanticLabel: 'Show notification',
                       onPressed: () => widget.commands.notify.execute(null),
                     ),

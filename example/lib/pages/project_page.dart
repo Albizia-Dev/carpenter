@@ -1,5 +1,6 @@
 import 'package:carpenter/carpenter.dart';
-import 'package:flutter/material.dart' show Icons;
+import 'package:carpenter/gravity_icons.dart';
+
 import 'package:flutter/widgets.dart';
 
 import '../demo_data.dart';
@@ -72,7 +73,7 @@ final class _ProjectPageState extends State<ProjectPage> {
             CarpenterActionDescriptor(
               id: 'project.save',
               label: 'Save',
-              icon: Icons.save_outlined,
+              icon: GravityIcons.floppyDisk,
               onInvoke: _save,
             ),
           ],
@@ -80,7 +81,7 @@ final class _ProjectPageState extends State<ProjectPage> {
             CarpenterActionDescriptor(
               id: 'project.back',
               label: 'Back to projects',
-              icon: Icons.arrow_back,
+              icon: GravityIcons.arrowLeft,
               onInvoke: widget.navigator.projects,
             ),
           ],
