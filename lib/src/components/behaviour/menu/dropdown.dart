@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../../../foundation/icon_data.dart';
 import '../../../foundation/roles.dart';
 import '../../../internal/overlay/anchored_overlay_host.dart';
 import '../../basic/button/button.dart';
@@ -30,7 +31,7 @@ final class CarpenterDropdown extends StatelessWidget {
   final ValueChanged<bool> onOpenChanged;
   final String label;
   final List<CarpenterMenuItem> items;
-  final IconData? icon;
+  final CarpenterIconSource? icon;
   final ActionColorRole colorRole;
   final ActionProminence prominence;
   final ControlSize size;

@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../application/command.dart';
 import '../../application/hotkey.dart';
+import '../../foundation/icon_data.dart';
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
 import '../../internal/rendering/interactive_region.dart';
@@ -28,7 +29,7 @@ final class CarpenterSidebarItem {
 
   final String id;
   final String label;
-  final IconData icon;
+  final CarpenterIconSource icon;
   final CarpenterCommand<void>? command;
   final VoidCallback? onInvoke;
   final String? semanticLabel;

@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+import 'icon_data.dart';
+
 enum TypographyRole { display, title, body, label, caption }
 
 enum TypographyEmphasis { regular, medium, strong }
@@ -106,7 +108,7 @@ final class CarpenterActionDescriptor {
 
   final String id;
   final String label;
-  final IconData? icon;
+  final CarpenterIconSource? icon;
   final String? semanticLabel;
   final ActionColorRole colorRole;
   final ShortcutActivator? shortcut;

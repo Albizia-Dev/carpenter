@@ -7,6 +7,41 @@ const _icon = IconData(
   fontFamily: 'MaterialIcons',
   matchTextDirection: true,
 );
+const _customIcon = _TestIconData();
+
+final class _TestIconData extends CarpenterIconData {
+  const _TestIconData();
+
+  @override
+  Widget buildIcon(
+    BuildContext context, {
+    required double size,
+    required Color color,
+    String? semanticLabel,
+  }) =>
+      _TestRenderedIcon(size: size, color: color, semanticLabel: semanticLabel);
+}
+
+final class _TestRenderedIcon extends StatelessWidget {
+  const _TestRenderedIcon({
+    required this.size,
+    required this.color,
+    required this.semanticLabel,
+  });
+
+  final double size;
+  final Color color;
+  final String? semanticLabel;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+    label: semanticLabel,
+    child: SizedBox.square(
+      dimension: size,
+      child: ColoredBox(color: color),
+    ),
+  );
+}
 
 void main() {
   Widget harness(
@@ -37,6 +72,41 @@ void main() {
     final context = tester.element(find.byType(CarpenterIcon));
     expect(icon.size, context.units(theme.sizes.icon(IconSize.large)));
     expect(icon.color, theme.content.secondary);
+  });
+
+  testWidgets('renders custom CarpenterIconData with resolved properties', (
+    tester,
+  ) async {
+    final theme = CarpenterThemeData.light();
+    await tester.pumpWidget(
+      harness(
+        const CarpenterIcon(
+          _customIcon,
+          size: IconSize.large,
+          colorRole: ContentColorRole.secondary,
+          semanticLabel: 'Custom icon',
+        ),
+        theme: theme,
+      ),
+    );
+
+    final rendered = tester.widget<_TestRenderedIcon>(
+      find.byType(_TestRenderedIcon),
+    );
+    final context = tester.element(find.byType(CarpenterIcon));
+    expect(rendered.size, context.units(theme.sizes.icon(IconSize.large)));
+    expect(rendered.color, theme.content.secondary);
+    expect(rendered.semanticLabel, 'Custom icon');
+  });
+
+  testWidgets('custom icon source works in action icon slots', (tester) async {
+    await tester.pumpWidget(
+      harness(
+        CarpenterButton(label: 'Action', icon: _customIcon, onPressed: () {}),
+      ),
+    );
+
+    expect(find.byType(_TestRenderedIcon), findsOneWidget);
   });
 
   testWidgets('meaningful icon exposes label and decorative icon does not', (

@@ -63,7 +63,7 @@ Widget _catalog(BuildContext context) {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                GravityIcon(icon, size: size, colorRole: colorRole),
+                CarpenterIcon(icon, size: size, colorRole: colorRole),
                 const SizedBox(height: 8),
                 CarpenterText.caption(
                   icon.name,

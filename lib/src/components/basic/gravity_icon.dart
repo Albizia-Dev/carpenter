@@ -1,13 +1,13 @@
-import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../foundation/icon_data.dart';
 import '../../foundation/roles.dart';
-import '../../foundation/theme.dart';
+import 'icon.dart';
 
 /// A reference to one SVG from Carpenter's bundled Gravity icon set.
 @immutable
-final class GravityIconData {
+final class GravityIconData extends CarpenterIconData {
   const GravityIconData(this.name);
 
   /// Kebab-case icon name without the `.svg` suffix.
@@ -17,11 +17,27 @@ final class GravityIconData {
   String get assetPath => 'assets/icons/gravity/$name.svg';
 
   @override
+  Widget buildIcon(
+    BuildContext context, {
+    required double size,
+    required Color color,
+    String? semanticLabel,
+  }) {
+    return SvgPicture.asset(
+      assetPath,
+      package: 'carpenter',
+      width: size,
+      height: size,
+      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+      semanticsLabel: semanticLabel,
+    );
+  }
+
+  @override
   String toString() => 'GravityIconData($name)';
 }
 
-/// Renders a bundled Gravity UI SVG using Carpenter's semantic icon sizing and
-/// content colors.
+/// Compatibility wrapper around the generic [CarpenterIcon] renderer.
 final class GravityIcon extends StatelessWidget {
   const GravityIcon(
     this.icon, {
@@ -37,18 +53,10 @@ final class GravityIcon extends StatelessWidget {
   final String? semanticLabel;
 
   @override
-  Widget build(BuildContext context) {
-    final theme = CarpenterTheme.of(context);
-    final resolvedSize = context.units(theme.sizes.icon(size));
-    final color = theme.content.resolve(colorRole);
-
-    return SvgPicture.asset(
-      icon.assetPath,
-      package: 'carpenter',
-      width: resolvedSize,
-      height: resolvedSize,
-      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
-      semanticsLabel: semanticLabel,
-    );
-  }
+  Widget build(BuildContext context) => CarpenterIcon(
+    icon,
+    size: size,
+    colorRole: colorRole,
+    semanticLabel: semanticLabel,
+  );
 }

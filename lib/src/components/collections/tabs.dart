@@ -2,6 +2,7 @@ import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../foundation/icon_data.dart';
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
 import '../basic/button/button.dart';
@@ -19,7 +20,7 @@ final class CarpenterTab<T> {
   final T value;
   final String label;
   final String? semanticLabel;
-  final IconData? icon;
+  final CarpenterIconSource? icon;
   final bool enabled;
 
   String get effectiveSemanticLabel => semanticLabel ?? label;

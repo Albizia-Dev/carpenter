@@ -1,9 +1,11 @@
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../../foundation/icon_data.dart';
 import '../../../foundation/roles.dart';
 import '../../../foundation/theme.dart';
 import '../../../internal/rendering/action_control.dart';
+import '../../../internal/rendering/icon_renderer.dart';
 
 final class CarpenterButton extends StatelessWidget {
   const CarpenterButton({
@@ -108,7 +110,7 @@ final class CarpenterButton extends StatelessWidget {
 
   /// Compatibility alias for older Carpenter call sites.
   final VoidCallback? onInvoke;
-  final IconData? icon;
+  final CarpenterIconSource? icon;
   final CarpenterActionIconPosition iconPosition;
   final ActionColorRole colorRole;
   final ActionProminence prominence;
@@ -157,7 +159,7 @@ final class _ButtonContent extends StatelessWidget {
   });
 
   final String label;
-  final IconData? icon;
+  final CarpenterIconSource? icon;
   final CarpenterActionIconPosition iconPosition;
   final CarpenterActionStyle style;
   final double iconDimension;
@@ -172,24 +174,30 @@ final class _ButtonContent extends StatelessWidget {
         .copyWith(color: style.foreground);
 
     final hasGlyph = icon != null;
-    final glyph = WidgetSpan(
-      alignment: PlaceholderAlignment.middle,
-      child: SizedBox.square(
-        dimension: iconDimension,
-        child: Icon(icon, size: iconDimension, color: style.icon),
-      ),
-    );
+    final glyph = icon == null
+        ? null
+        : WidgetSpan(
+            alignment: PlaceholderAlignment.middle,
+            child: SizedBox.square(
+              dimension: iconDimension,
+              child: IconRenderer(
+                icon: icon!,
+                size: iconDimension,
+                color: style.icon,
+              ),
+            ),
+          );
     final spacer = WidgetSpan(child: SizedBox(width: gap));
     final spans = <InlineSpan>[
       if (hasGlyph && iconPosition == CarpenterActionIconPosition.leading)
-        glyph,
+        glyph!,
       if (hasGlyph && iconPosition == CarpenterActionIconPosition.leading)
         spacer,
       TextSpan(text: label),
       if (hasGlyph && iconPosition == CarpenterActionIconPosition.trailing)
         spacer,
       if (hasGlyph && iconPosition == CarpenterActionIconPosition.trailing)
-        glyph,
+        glyph!,
     ];
 
     return Text.rich(

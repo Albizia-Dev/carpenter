@@ -1,9 +1,11 @@
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../foundation/icon_data.dart';
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
 import '../../internal/rendering/focus_ring.dart';
+import '../../internal/rendering/icon_renderer.dart';
 import '../../internal/rendering/interactive_region.dart';
 
 /// An inline semantic navigation action.
@@ -22,7 +24,7 @@ final class CarpenterLink extends StatelessWidget {
   final String label;
   final VoidCallback? onInvoke;
   final String? semanticLabel;
-  final IconData? icon;
+  final CarpenterIconSource? icon;
   final ActionColorRole colorRole;
   final FocusNode? focusNode;
   final bool autofocus;
@@ -55,8 +57,8 @@ final class CarpenterLink extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (icon != null) ...[
-              Icon(
-                icon,
+              IconRenderer(
+                icon: icon!,
                 size: context.units(theme.sizes.actionIcon(ControlSize.small)),
                 color: style.icon,
               ),
