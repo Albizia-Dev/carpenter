@@ -2,8 +2,10 @@ import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../../foundation/icon_data.dart';
 import '../../../foundation/roles.dart';
 import '../../../foundation/theme.dart';
+import '../../../internal/rendering/icon_renderer.dart';
 import '../../../internal/rendering/text_editing_field.dart';
 import '../button/icon_button.dart';
 
@@ -43,7 +45,7 @@ final class CarpenterTextArea extends StatelessWidget {
   final FieldAvailability availability;
   final FieldSize size;
   final CarpenterShape shape;
-  final IconData? leadingIcon;
+  final CarpenterIconSource? leadingIcon;
   final CarpenterActionDescriptor? trailingAction;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
@@ -85,8 +87,8 @@ final class CarpenterTextArea extends StatelessWidget {
       leading: leadingIcon == null
           ? null
           : ExcludeSemantics(
-              child: Icon(
-                leadingIcon,
+              child: IconRenderer(
+                icon: leadingIcon!,
                 size: iconDimension,
                 color: fieldStyle.icon,
               ),
