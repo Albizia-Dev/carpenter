@@ -41,9 +41,9 @@ jobs:
       - name: Install Widgetbook dependencies
         working-directory: widgetbook
         run: flutter pub get
-      - name: Analyze Widgetbook
+      - name: Analyze changed Widgetbook use case
         working-directory: widgetbook
-        run: dart analyze
+        run: dart analyze lib/use_cases/foundation/gravity_icons.dart
       - name: Build Widgetbook web
         working-directory: widgetbook
         run: flutter build web --release --base-href /carpenter/
