@@ -29,6 +29,11 @@ def fmt_rem(px: float) -> str:
 
 def replace_edge(match: re.Match[str]) -> str:
     expr = match.group(1)
+    # The codemod may be run repeatedly while a migration branch evolves.
+    # Never reinterpret an EdgeInsets expression that already contains an
+    # explicit unit, otherwise 24px -> 1.5rem becomes 1.5/16 rem on the next run.
+    if 'context.units(' in expr or '.rem' in expr or '.px' in expr:
+        return expr
     return NUMBER.sub(lambda m: fmt_rem(float(m.group(0))), expr)
 
 
