@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import '../../../foundation/icon_data.dart';
 import '../../../foundation/roles.dart';
 import 'button.dart';
 
@@ -19,7 +20,7 @@ final class CarpenterToggleButton extends StatelessWidget {
   final String label;
   final bool checked;
   final ValueChanged<bool>? onChanged;
-  final IconData? icon;
+  final CarpenterIconSource? icon;
   final ControlSize size;
   final ActionColorRole colorRole;
   final String? semanticLabel;
