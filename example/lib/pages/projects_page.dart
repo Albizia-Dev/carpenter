@@ -117,7 +117,7 @@ final class _ProjectsPageState extends State<ProjectsPage> {
     );
 
     return ListView(
-      padding: EdgeInsets.all(context.units(context.units(.09375.rem).rem)),
+      padding: EdgeInsets.all(context.units(1.5.rem)),
       children: [
         CarpenterPageHeader(
           title: 'Project portfolio',

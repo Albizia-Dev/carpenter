@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/preview.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 enum _CollectionFailureMode { none, initial, query, refresh, loadMore }
 
@@ -72,10 +73,10 @@ Widget _lifecyclePlayground(BuildContext context) {
     initialValue: 'Type quickly to exercise cancellation',
   );
   final width = context.knobs.double.slider(
-    label: 'Layout · Width',
-    initialValue: 680,
-    min: 320,
-    max: 1000,
+    label: 'Layout · Width (rem)',
+    initialValue: 42.5,
+    min: 20,
+    max: 62.5,
     divisions: 34,
   );
 
@@ -87,7 +88,7 @@ Widget _lifecyclePlayground(BuildContext context) {
     hasMore: hasMore,
     searchLabel: searchLabel,
     placeholder: placeholder,
-    width: width,
+    width: width.rem,
   );
 }
 
@@ -109,7 +110,7 @@ final class _LifecyclePreview extends StatefulWidget {
   final bool hasMore;
   final String searchLabel;
   final String placeholder;
-  final double width;
+  final LengthUnit width;
 
   @override
   State<_LifecyclePreview> createState() => _LifecyclePreviewState();
@@ -193,7 +194,7 @@ final class _LifecyclePreviewState extends State<_LifecyclePreview> {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-    width: widget.width,
+    width: context.units(widget.width),
     height: context.units(32.5.rem),
     child: ListenableBuilder(
       listenable: _controller,
@@ -284,19 +285,19 @@ Widget _listTilePlayground(BuildContext context) {
     initialValue: true,
   );
   final width = context.knobs.double.slider(
-    label: 'Layout · Width',
-    initialValue: 600,
-    min: 240,
-    max: 900,
+    label: 'Layout · Width (rem)',
+    initialValue: 37.5,
+    min: 15,
+    max: 56.25,
     divisions: 33,
   );
 
   return preview(
     SizedBox(
-      width: width,
+      width: context.units(width.rem),
       child: CarpenterListTile(
         leading: showLeading
-            ? const CarpenterAvatar(initials: 'AB', size: 32)
+            ? const CarpenterAvatar(initials: 'AB', size: Rem(2))
             : null,
         title: CarpenterText.label(title),
         subtitle: subtitle == null
@@ -353,7 +354,7 @@ Widget _listTiles(BuildContext context) => previewColumn([
   SizedBox(
     width: context.units(22.5.rem),
     child: CarpenterListTile(
-      leading: const CarpenterAvatar(initials: 'AB', size: 32),
+      leading: const CarpenterAvatar(initials: 'AB', size: Rem(2)),
       title: const CarpenterText.label(
         'Narrow row with a long title that needs room',
       ),

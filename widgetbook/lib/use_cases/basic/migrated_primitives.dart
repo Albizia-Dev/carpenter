@@ -4,6 +4,7 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 enum _AvatarContent { initials, icon, image }
 
@@ -57,10 +58,10 @@ Widget _avatarPlayground(BuildContext context) {
     initialValue: 'https://avatars.githubusercontent.com/u/9919?v=4',
   );
   final size = context.knobs.double.slider(
-    label: 'Appearance · Size',
-    initialValue: 40,
-    min: 20,
-    max: 128,
+    label: 'Appearance · Size (rem)',
+    initialValue: 2.5,
+    min: 1.25,
+    max: 8,
     divisions: 27,
   );
   final semanticLabel = context.knobs.stringOrNull(
@@ -76,7 +77,7 @@ Widget _avatarPlayground(BuildContext context) {
           content == _AvatarContent.image && imageUrl.trim().isNotEmpty
           ? NetworkImage(imageUrl.trim())
           : null,
-      size: size,
+      size: size.rem,
       semanticLabel: semanticLabel,
       child: content == _AvatarContent.icon
           ? const Icon(CarpenterIcons.account)
@@ -91,11 +92,11 @@ Widget _avatarMatrix(BuildContext context) => preview(
     runSpacing: context.units(.75.rem),
     crossAxisAlignment: WrapCrossAlignment.center,
     children: [
-      CarpenterAvatar(initials: 'A', size: 24),
-      CarpenterAvatar(initials: 'AB', size: 32),
-      CarpenterAvatar(initials: 'CD', size: 40),
-      CarpenterAvatar(initials: 'ERP', size: 64),
-      CarpenterAvatar(initials: 'XL', size: 96),
+      CarpenterAvatar(initials: 'A', size: Rem(1.5)),
+      CarpenterAvatar(initials: 'AB', size: Rem(2)),
+      CarpenterAvatar(initials: 'CD', size: Rem(2.5)),
+      CarpenterAvatar(initials: 'ERP', size: Rem(4)),
+      CarpenterAvatar(initials: 'XL', size: Rem(6)),
       CarpenterAvatar(
         size: const Rem(3),
         semanticLabel: 'Account',

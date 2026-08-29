@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
 
 import 'demo_commands.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 final class DemoShell extends StatefulWidget {
   const DemoShell({
@@ -150,7 +151,7 @@ final class _Brand extends StatelessWidget {
         ? MainAxisAlignment.start
         : MainAxisAlignment.center,
     children: [
-      const CarpenterAvatar(initials: 'C', size: 32),
+      const CarpenterAvatar(initials: 'C', size: Rem(2)),
       if (expanded) ...[
         SizedBox(width: context.units(.625.rem)),
         const Expanded(
@@ -184,7 +185,7 @@ final class _Account extends StatelessWidget {
         ? MainAxisAlignment.start
         : MainAxisAlignment.center,
     children: [
-      const CarpenterAvatar(initials: 'NC', size: 32),
+      const CarpenterAvatar(initials: 'NC', size: Rem(2)),
       if (expanded) ...[
         SizedBox(width: context.units(.625.rem)),
         const Expanded(

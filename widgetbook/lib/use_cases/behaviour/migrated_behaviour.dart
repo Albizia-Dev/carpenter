@@ -546,13 +546,18 @@ Widget _surfacePlayground(BuildContext context) {
         'The surface API adapts between wide and narrow viewport profiles.',
   );
   final width = context.knobs.double.slider(
-    label: 'Layout · Host width',
-    initialValue: 900,
-    min: 300,
-    max: 1200,
+    label: 'Layout · Host width (rem)',
+    initialValue: 56.25,
+    min: 18.75,
+    max: 75,
     divisions: 30,
   );
-  return _SurfacePreview(kind: kind, title: title, body: body, width: width);
+  return _SurfacePreview(
+    kind: kind,
+    title: title,
+    body: body,
+    width: width.rem,
+  );
 }
 
 final class _SurfacePreview extends StatefulWidget {
@@ -566,7 +571,7 @@ final class _SurfacePreview extends StatefulWidget {
   final _SurfaceKind kind;
   final String title;
   final String body;
-  final double width;
+  final LengthUnit width;
 
   @override
   State<_SurfacePreview> createState() => _SurfacePreviewState();
@@ -575,7 +580,7 @@ final class _SurfacePreview extends StatefulWidget {
 final class _SurfacePreviewState extends State<_SurfacePreview> {
   @override
   Widget build(BuildContext context) => SizedBox(
-    width: widget.width,
+    width: context.units(widget.width),
     height: context.units(30.rem),
     child: CarpenterSurfaceHost(
       child: Builder(
@@ -598,7 +603,7 @@ final class _SurfacePreviewState extends State<_SurfacePreview> {
   Widget _panel(BuildContext context) => ColoredBox(
     color: CarpenterTheme.of(context).overlay.background,
     child: Padding(
-      padding: EdgeInsets.all(context.units(context.units(.09375.rem).rem)),
+      padding: EdgeInsets.all(context.units(1.5.rem)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
