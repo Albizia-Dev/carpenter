@@ -1,0 +1,79 @@
+name: Verify REM integration repair
+
+on:
+  push:
+    branches:
+      - fix/rem-unit-integration
+
+permissions:
+  contents: write
+
+jobs:
+  repair-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Repair merged REM migration
+        run: python3 .github/scripts/_repair_rem_integration.py
+
+      - name: Format repaired sources
+        run: dart format lib widgetbook/lib example/lib
+
+      - name: Audit known codemod corruption
+        run: |
+          python3 - <<'PY'
+          import re
+          from pathlib import Path
+
+          roots = [Path('lib'), Path('widgetbook/lib'), Path('example/lib')]
+          failures = []
+          for root in roots:
+              for path in root.rglob('*.dart'):
+                  text = path.read_text(encoding='utf-8')
+                  if 'context.units(context.units(' in text:
+                      failures.append(f'{path}: nested context.units')
+                  for line_no, line in enumerate(text.splitlines(), 1):
+                      if re.search(r'CarpenterAvatar\([^\n]*\bsize:\s*\d', line):
+                          failures.append(f'{path}:{line_no}: numeric CarpenterAvatar size')
+          if failures:
+              print('\n'.join(failures))
+              raise SystemExit(1)
+          PY
+
+      - name: Install package dependencies
+        run: flutter pub get
+
+      - name: Analyze library
+        run: dart analyze lib
+
+      - name: Install Widgetbook dependencies
+        working-directory: widgetbook
+        run: flutter pub get
+
+      - name: Build Widgetbook web
+        working-directory: widgetbook
+        run: flutter build web --release --base-href /carpenter/
+
+      - name: Install example dependencies
+        working-directory: example
+        run: flutter pub get
+
+      - name: Build example web
+        working-directory: example
+        run: flutter build web --release
+
+      - name: Commit repair
+        run: |
+          git add lib widgetbook/lib example/lib
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "fix: complete REM unit migration"
+          git push
