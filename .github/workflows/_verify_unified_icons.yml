@@ -1,0 +1,38 @@
+name: Verify unified icon sources
+
+on:
+  push:
+    branches: [feat/unified-icon-data]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Install package dependencies
+        run: flutter pub get
+      - name: Reject legacy IconData icon slots
+        run: |
+          if grep -R -n --include='*.dart' -E 'IconData\??[[:space:]]+(leadingIcon|icon)[[:space:]]*[;,)]' lib; then
+            echo 'Legacy IconData icon slot remains in lib.'
+            exit 1
+          fi
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test/basic/icon_test.dart widgetbook/lib/use_cases/foundation/gravity_icons.dart
+      - name: Analyze library
+        run: dart analyze lib
+      - name: Run tests
+        run: flutter test
+      - name: Install Widgetbook dependencies
+        working-directory: widgetbook
+        run: flutter pub get
+      - name: Analyze Widgetbook
+        working-directory: widgetbook
+        run: dart analyze
+      - name: Build Widgetbook web
+        working-directory: widgetbook
+        run: flutter build web --release --base-href /carpenter/
