@@ -29,16 +29,23 @@ def ensure_units_import(text: str) -> str:
 changed = []
 
 # Repair the EdgeInsets bug from the original codemod: its NUMBER pass converted
-# the freshly-generated rem literal a second time (24px -> 1.5rem -> .09375rem).
+# the freshly-generated rem literal a second time (for example 24px -> 1.5rem -> .09375rem).
 for root in ROOTS:
     for path in root.rglob('*.dart'):
         text = path.read_text(encoding='utf-8')
-        new = text.replace(
-            'context.units(context.units(.09375.rem).rem)',
-            'context.units(1.5.rem)',
-        ).replace(
-            'context.units(context.units(.078125.rem).rem)',
-            'context.units(1.25.rem)',
+        new = (
+            text.replace(
+                'context.units(context.units(.09375.rem).rem)',
+                'context.units(1.5.rem)',
+            )
+            .replace(
+                'context.units(context.units(.078125.rem).rem)',
+                'context.units(1.25.rem)',
+            )
+            .replace(
+                'context.units(context.units(1.09375.rem).rem)',
+                'context.units(17.5.rem)',
+            )
         )
 
         # CarpenterAvatar.size is LengthUnit now. Fix every remaining same-line
