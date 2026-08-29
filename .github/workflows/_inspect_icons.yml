@@ -1,0 +1,19 @@
+name: Inspect icon API
+
+on:
+  push:
+    branches: [feat/unified-icon-data]
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Find IconData API
+        run: |
+          echo '=== IconData occurrences ==='
+          grep -R -n --include='*.dart' '\bIconData\b' lib widgetbook test 2>/dev/null || true
+          echo '=== Icon(...) occurrences ==='
+          grep -R -n --include='*.dart' '\bIcon(' lib widgetbook test 2>/dev/null || true
+          echo '=== icon fields ==='
+          grep -R -n --include='*.dart' -E '(final|const|required)[[:space:]]+[^;=]*[[:space:]]icon[s]?[[:space:]]*[;=,)]' lib 2>/dev/null || true
