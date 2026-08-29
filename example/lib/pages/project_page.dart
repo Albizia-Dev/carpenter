@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 
 import '../demo_data.dart';
 import '../demo_routes.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 enum _ProjectTab { details, timeline }
 
@@ -48,7 +49,7 @@ final class _ProjectPageState extends State<ProjectPage> {
   Widget build(BuildContext context) {
     final project = _project;
     return ListView(
-      padding: EdgeInsets.all(context.units(context.units(.09375.rem).rem)),
+      padding: EdgeInsets.all(context.units(1.5.rem)),
       children: [
         CarpenterEntityHeader(
           title: project.name,
@@ -160,7 +161,10 @@ final class _ProjectPageState extends State<ProjectPage> {
                     title: 'Project created',
                     description: 'Initial scope and budget were registered.',
                     timestamp: DateTime(2026, 8, 20, 9, 30),
-                    leading: const CarpenterAvatar(initials: 'PO', size: 32),
+                    leading: const CarpenterAvatar(
+                      initials: 'PO',
+                      size: Rem(2),
+                    ),
                   ),
                   CarpenterTimelineItem(
                     id: 'review',
@@ -168,7 +172,10 @@ final class _ProjectPageState extends State<ProjectPage> {
                     description:
                         'Architecture and delivery plan were approved.',
                     timestamp: DateTime(2026, 8, 24, 14, 10),
-                    leading: const CarpenterAvatar(initials: 'AR', size: 32),
+                    leading: const CarpenterAvatar(
+                      initials: 'AR',
+                      size: Rem(2),
+                    ),
                   ),
                   CarpenterTimelineItem(
                     id: 'sync',
@@ -176,7 +183,10 @@ final class _ProjectPageState extends State<ProjectPage> {
                     description:
                         'External data was reconciled with the project.',
                     timestamp: DateTime(2026, 8, 28, 11, 45),
-                    leading: const CarpenterAvatar(initials: 'SY', size: 32),
+                    leading: const CarpenterAvatar(
+                      initials: 'SY',
+                      size: Rem(2),
+                    ),
                   ),
                 ],
               ),

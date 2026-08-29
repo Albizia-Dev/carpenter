@@ -110,7 +110,7 @@ final class _PresentationFrame extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final header = Padding(
-      padding: EdgeInsets.all(context.units(context.units(.078125.rem).rem)),
+      padding: EdgeInsets.all(context.units(1.25.rem)),
       child: CarpenterPageHeader(
         title: 'LoadingBoundary',
         subtitle: state.isLoading
@@ -119,7 +119,7 @@ final class _PresentationFrame extends StatelessWidget {
       ),
     );
     final body = Padding(
-      padding: EdgeInsets.all(context.units(context.units(.078125.rem).rem)),
+      padding: EdgeInsets.all(context.units(1.25.rem)),
       child: child,
     );
 
@@ -131,7 +131,7 @@ final class _PresentationFrame extends StatelessWidget {
           if (state.isLoading)
             CarpenterProgress(
               value: .6,
-              height: context.units(.1875.rem),
+              height: const Rem(.1875),
               semanticLabel: 'Page loading',
             ),
           Expanded(child: body),
@@ -160,9 +160,7 @@ final class _PresentationFrame extends StatelessWidget {
           Expanded(
             child: state.isLoading
                 ? Padding(
-                    padding: EdgeInsets.all(
-                      context.units(context.units(.078125.rem).rem),
-                    ),
+                    padding: EdgeInsets.all(context.units(1.25.rem)),
                     child: _SkeletonPreview(),
                   )
                 : body,
@@ -307,9 +305,7 @@ final class _NestedBoundaryDemo extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: EdgeInsets.all(
-            context.units(context.units(.078125.rem).rem),
-          ),
+          padding: EdgeInsets.all(context.units(1.25.rem)),
           child: CarpenterPageHeader(
             title: 'Outer boundary',
             subtitle: 'Outer active: ${outerState.activeCount}',
@@ -325,12 +321,10 @@ final class _NestedBoundaryDemo extends StatelessWidget {
           ),
         ),
         if (outerState.isLoading)
-          CarpenterProgress(value: .6, height: context.units(.1875.rem)),
+          CarpenterProgress(value: .6, height: const Rem(.1875)),
         Expanded(
           child: Padding(
-            padding: EdgeInsets.all(
-              context.units(context.units(.078125.rem).rem),
-            ),
+            padding: EdgeInsets.all(context.units(1.25.rem)),
             child: child,
           ),
         ),
