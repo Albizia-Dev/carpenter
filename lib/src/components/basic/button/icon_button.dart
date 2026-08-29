@@ -1,7 +1,9 @@
 import 'package:flutter/widgets.dart';
 
+import '../../../foundation/icon_data.dart';
 import '../../../foundation/roles.dart';
 import '../../../internal/rendering/action_control.dart';
+import '../../../internal/rendering/icon_renderer.dart';
 
 final class CarpenterIconButton extends StatelessWidget {
   const CarpenterIconButton({
@@ -38,7 +40,7 @@ final class CarpenterIconButton extends StatelessWidget {
        onInvoke = null,
        colorRole = action.colorRole;
 
-  final IconData icon;
+  final CarpenterIconSource icon;
   final String semanticLabel;
   final VoidCallback? onPressed;
 
@@ -67,8 +69,11 @@ final class CarpenterIconButton extends StatelessWidget {
       iconOnly: true,
       focusNode: focusNode,
       autofocus: autofocus,
-      childBuilder: (context, style, iconDimension) =>
-          Icon(icon, size: iconDimension, color: style.icon),
+      childBuilder: (context, style, iconDimension) => IconRenderer(
+        icon: icon,
+        size: iconDimension,
+        color: style.icon,
+      ),
     );
   }
 }
