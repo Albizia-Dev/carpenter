@@ -4,10 +4,12 @@ import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../foundation/icon_data.dart';
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
 import '../overlay/overlay_surface.dart';
 import '../rendering/focus_ring.dart';
+import '../rendering/icon_renderer.dart';
 import '../rendering/interactive_region.dart';
 import 'menu_navigation.dart';
 
@@ -25,7 +27,7 @@ final class MenuPanelEntry {
   final Object id;
   final String label;
   final String semanticLabel;
-  final IconData? icon;
+  final CarpenterIconSource? icon;
   final bool enabled;
   final bool selected;
   final VoidCallback? onActivate;
@@ -278,8 +280,8 @@ final class _MenuPanelItem extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (entry.icon != null) ...[
-                      Icon(
-                        entry.icon,
+                      IconRenderer(
+                        icon: entry.icon!,
                         size: context.units(theme.sizes.menuItemIcon),
                         color: color,
                       ),
