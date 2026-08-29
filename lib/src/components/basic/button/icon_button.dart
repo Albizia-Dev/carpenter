@@ -69,11 +69,8 @@ final class CarpenterIconButton extends StatelessWidget {
       iconOnly: true,
       focusNode: focusNode,
       autofocus: autofocus,
-      childBuilder: (context, style, iconDimension) => IconRenderer(
-        icon: icon,
-        size: iconDimension,
-        color: style.icon,
-      ),
+      childBuilder: (context, style, iconDimension) =>
+          IconRenderer(icon: icon, size: iconDimension, color: style.icon),
     );
   }
 }

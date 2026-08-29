@@ -18,11 +18,8 @@ final class _TestIconData extends CarpenterIconData {
     required double size,
     required Color color,
     String? semanticLabel,
-  }) => _TestRenderedIcon(
-    size: size,
-    color: color,
-    semanticLabel: semanticLabel,
-  );
+  }) =>
+      _TestRenderedIcon(size: size, color: color, semanticLabel: semanticLabel);
 }
 
 final class _TestRenderedIcon extends StatelessWidget {
@@ -105,11 +102,7 @@ void main() {
   testWidgets('custom icon source works in action icon slots', (tester) async {
     await tester.pumpWidget(
       harness(
-        CarpenterButton(
-          label: 'Action',
-          icon: _customIcon,
-          onPressed: () {},
-        ),
+        CarpenterButton(label: 'Action', icon: _customIcon, onPressed: () {}),
       ),
     );
 
