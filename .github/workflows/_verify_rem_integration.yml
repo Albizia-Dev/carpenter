@@ -21,8 +21,23 @@ jobs:
       - name: Repair merged REM migration
         run: python3 .github/scripts/_repair_rem_integration.py
 
+      - name: Install package dependencies
+        run: flutter pub get
+
       - name: Format repaired sources
-        run: dart format lib widgetbook/lib example/lib
+        run: |
+          dart format \
+            example/lib/demo_shell.dart \
+            example/lib/pages/dashboard_page.dart \
+            example/lib/pages/operations_page.dart \
+            example/lib/pages/project_page.dart \
+            example/lib/pages/projects_page.dart \
+            example/lib/pages/settings_page.dart \
+            widgetbook/lib/use_cases/basic/migrated_primitives.dart \
+            widgetbook/lib/use_cases/behaviour/loading_boundary.dart \
+            widgetbook/lib/use_cases/behaviour/migrated_behaviour.dart \
+            widgetbook/lib/use_cases/behaviour/popover.dart \
+            widgetbook/lib/use_cases/collections/migrated_collections.dart
 
       - name: Audit known codemod corruption
         run: |
@@ -45,9 +60,6 @@ jobs:
               raise SystemExit(1)
           PY
 
-      - name: Install package dependencies
-        run: flutter pub get
-
       - name: Analyze library
         run: dart analyze lib
 
@@ -69,7 +81,7 @@ jobs:
 
       - name: Commit repair
         run: |
-          git add lib widgetbook/lib example/lib
+          git add example/lib widgetbook/lib
           if git diff --cached --quiet; then
             exit 0
           fi
