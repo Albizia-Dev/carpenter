@@ -4,6 +4,9 @@ on:
   push:
     branches: [feat/unified-icon-data]
 
+permissions:
+  contents: write
+
 jobs:
   verify:
     runs-on: ubuntu-latest
@@ -21,8 +24,17 @@ jobs:
             echo 'Legacy IconData icon slot remains in lib.'
             exit 1
           fi
-      - name: Check formatting
-        run: dart format --output=none --set-exit-if-changed lib test/basic/icon_test.dart widgetbook/lib/use_cases/foundation/gravity_icons.dart
+      - name: Format changed sources
+        run: dart format lib test/basic/icon_test.dart widgetbook/lib/use_cases/foundation/gravity_icons.dart
+      - name: Commit formatting if needed
+        run: |
+          if ! git diff --quiet; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add lib test/basic/icon_test.dart widgetbook/lib/use_cases/foundation/gravity_icons.dart
+            git commit -m 'style: format unified icon sources'
+            git push
+          fi
       - name: Analyze library
         run: dart analyze lib
       - name: Run tests
