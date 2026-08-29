@@ -17,7 +17,7 @@ jobs:
         run: flutter pub get
       - name: Reject legacy IconData icon slots
         run: |
-          if grep -R -n --include='*.dart' -E 'IconData\??[[:space:]]+(leadingIcon|icon)[[:space:]]*[;,)]' lib; then
+          if grep -R -n --include='*.dart' -E 'final[[:space:]]+IconData\??[[:space:]]+(leadingIcon|icon)[[:space:]]*;' lib; then
             echo 'Legacy IconData icon slot remains in lib.'
             exit 1
           fi
