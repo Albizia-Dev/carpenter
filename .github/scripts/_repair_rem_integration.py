@@ -65,9 +65,14 @@ def replace(path_str: str, replacements: list[tuple[str, str]]) -> None:
     text = path.read_text(encoding='utf-8')
     new = text
     for old, replacement in replacements:
-        if old not in new:
-            raise RuntimeError(f'Missing expected text in {path}: {old!r}')
-        new = new.replace(old, replacement)
+        if old in new:
+            new = new.replace(old, replacement)
+        elif replacement in new:
+            continue
+        else:
+            raise RuntimeError(
+                f'Neither source nor repaired text found in {path}: {old!r}',
+            )
     if new != text:
         path.write_text(new, encoding='utf-8')
         if str(path) not in changed:
