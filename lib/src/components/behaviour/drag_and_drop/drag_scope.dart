@@ -32,9 +32,7 @@ final class CarpenterDragSession {
     operation: operation,
     sourceId: sourceId,
     targetId: clearTarget ? null : targetId ?? this.targetId,
-    dropPosition: clearTarget
-        ? null
-        : dropPosition ?? this.dropPosition,
+    dropPosition: clearTarget ? null : dropPosition ?? this.dropPosition,
     targetAccepts: clearTarget ? false : targetAccepts ?? this.targetAccepts,
   );
 }
@@ -106,7 +104,8 @@ final class CarpenterDragController extends ChangeNotifier {
       first.targetAccepts == second.targetAccepts;
 }
 
-typedef CarpenterDragSessionCallback = void Function(CarpenterDragSession? session);
+typedef CarpenterDragSessionCallback =
+    void Function(CarpenterDragSession? session);
 
 /// Shared drag-and-drop runtime for coordinated sources and targets.
 final class CarpenterDragScope extends StatefulWidget {

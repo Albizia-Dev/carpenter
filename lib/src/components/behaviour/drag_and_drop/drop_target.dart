@@ -41,8 +41,10 @@ final class CarpenterDropTargetState<T> {
 
 typedef CarpenterDropTargetBuilder<T> =
     Widget Function(BuildContext context, CarpenterDropTargetState<T> state);
-typedef CarpenterDropAcceptance<T> = bool Function(CarpenterDropDetails<T> details);
-typedef CarpenterDropCallback<T> = void Function(CarpenterDropDetails<T> details);
+typedef CarpenterDropAcceptance<T> =
+    bool Function(CarpenterDropDetails<T> details);
+typedef CarpenterDropCallback<T> =
+    void Function(CarpenterDropDetails<T> details);
 
 /// Typed drop target with operation negotiation and before/inside/after geometry.
 final class CarpenterDropTarget<T> extends StatefulWidget {
@@ -73,7 +75,8 @@ final class CarpenterDropTarget<T> extends StatefulWidget {
   final Set<CarpenterDragOperation> acceptedOperations;
 
   @override
-  State<CarpenterDropTarget<T>> createState() => _CarpenterDropTargetWidgetState<T>();
+  State<CarpenterDropTarget<T>> createState() =>
+      _CarpenterDropTargetWidgetState<T>();
 }
 
 final class _CarpenterDropTargetWidgetState<T>
@@ -119,8 +122,10 @@ final class _CarpenterDropTargetWidgetState<T>
     }
     final size = renderObject.size;
     var ratio = switch (widget.axis) {
-      CarpenterDropAxis.vertical => size.height == 0 ? .5 : localOffset.dy / size.height,
-      CarpenterDropAxis.horizontal => size.width == 0 ? .5 : localOffset.dx / size.width,
+      CarpenterDropAxis.vertical =>
+        size.height == 0 ? .5 : localOffset.dy / size.height,
+      CarpenterDropAxis.horizontal =>
+        size.width == 0 ? .5 : localOffset.dx / size.width,
     };
     if (widget.axis == CarpenterDropAxis.horizontal &&
         Directionality.of(context) == TextDirection.rtl) {
@@ -148,7 +153,8 @@ final class _CarpenterDropTargetWidgetState<T>
   }
 
   bool _updateHover(CarpenterDropDetails<T>? details) {
-    final accepts = details != null && (widget.canAccept?.call(details) ?? true);
+    final accepts =
+        details != null && (widget.canAccept?.call(details) ?? true);
     if (mounted) {
       setState(() {
         _hovering = true;
@@ -186,9 +192,8 @@ final class _CarpenterDropTargetWidgetState<T>
   Widget build(BuildContext context) => DragTarget<CarpenterDragPayload<T>>(
     onWillAcceptWithDetails: (details) =>
         _updateHover(_buildDetails(details.data, details.offset)),
-    onMove: (details) => _updateHover(
-      _buildDetails(details.data, details.offset),
-    ),
+    onMove: (details) =>
+        _updateHover(_buildDetails(details.data, details.offset)),
     onLeave: (_) => _clearHover(),
     onAcceptWithDetails: (details) {
       final drop = _buildDetails(details.data, details.offset);

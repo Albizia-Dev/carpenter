@@ -17,7 +17,9 @@ DateTime? carpenterParseDate(String value) {
   if (day == null || month == null || year == null) return null;
   if (year < 1 || month < 1 || month > 12 || day < 1) return null;
   final candidate = DateTime(year, month, day);
-  if (candidate.year != year || candidate.month != month || candidate.day != day) {
+  if (candidate.year != year ||
+      candidate.month != month ||
+      candidate.day != day) {
     return null;
   }
   return candidate;
@@ -245,7 +247,8 @@ DateTime _clampDate(DateTime value, DateTime? firstDate, DateTime? lastDate) {
   return date;
 }
 
-DateTime _dateOnly(DateTime value) => DateTime(value.year, value.month, value.day);
+DateTime _dateOnly(DateTime value) =>
+    DateTime(value.year, value.month, value.day);
 
 bool _sameNullableDate(DateTime? first, DateTime? second) {
   if (first == null || second == null) return first == second;

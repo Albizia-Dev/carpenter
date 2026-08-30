@@ -7,11 +7,9 @@ import 'input.dart';
 
 @immutable
 final class CarpenterInputMask {
-  const CarpenterInputMask(
-    this.pattern, {
-    this.placeholderCharacter = '_',
-  }) : assert(pattern.length > 0),
-       assert(placeholderCharacter.length == 1);
+  const CarpenterInputMask(this.pattern, {this.placeholderCharacter = '_'})
+    : assert(pattern.length > 0),
+      assert(placeholderCharacter.length == 1);
 
   static const date = CarpenterInputMask('##.##.####');
   static const time = CarpenterInputMask('##:##');
@@ -101,9 +99,7 @@ final class CarpenterInputMask {
   bool _accepts(_MaskSlot slot, String value) => switch (slot) {
     _MaskSlot.digit => RegExp(r'^\d$').hasMatch(value),
     _MaskSlot.letter => RegExp(r'^[A-Za-zА-Яа-яЁё]$').hasMatch(value),
-    _MaskSlot.alphaNumeric => RegExp(
-      r'^[0-9A-Za-zА-Яа-яЁё]$',
-    ).hasMatch(value),
+    _MaskSlot.alphaNumeric => RegExp(r'^[0-9A-Za-zА-Яа-яЁё]$').hasMatch(value),
   };
 }
 

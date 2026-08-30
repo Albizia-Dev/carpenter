@@ -126,7 +126,9 @@ final class _CarpenterDateRangeInputState
   }
 
   void _syncText() {
-    final text = widget.value == null ? '' : carpenterFormatDateRange(widget.value!);
+    final text = widget.value == null
+        ? ''
+        : carpenterFormatDateRange(widget.value!);
     if (_controller.text == text) return;
     _controller.value = TextEditingValue(
       text: text,
@@ -365,7 +367,8 @@ DateTime _clampDate(DateTime value, DateTime? firstDate, DateTime? lastDate) {
   return date;
 }
 
-DateTime _dateOnly(DateTime value) => DateTime(value.year, value.month, value.day);
+DateTime _dateOnly(DateTime value) =>
+    DateTime(value.year, value.month, value.day);
 
 bool _sameDate(DateTime a, DateTime b) =>
     a.year == b.year && a.month == b.month && a.day == b.day;

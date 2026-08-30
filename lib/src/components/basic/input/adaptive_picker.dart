@@ -144,8 +144,7 @@ final class _CarpenterDateWheelState extends State<CarpenterDateWheel> {
                 controller: _dayController,
                 itemExtent: extent,
                 count: _daysInMonth(_value.year, _value.month),
-                labelBuilder: (index) =>
-                    (index + 1).toString().padLeft(2, '0'),
+                labelBuilder: (index) => (index + 1).toString().padLeft(2, '0'),
                 onSelected: (index) => _change(day: index + 1),
               ),
             ),
@@ -154,8 +153,7 @@ final class _CarpenterDateWheelState extends State<CarpenterDateWheel> {
                 controller: _monthController,
                 itemExtent: extent,
                 count: 12,
-                labelBuilder: (index) =>
-                    (index + 1).toString().padLeft(2, '0'),
+                labelBuilder: (index) => (index + 1).toString().padLeft(2, '0'),
                 onSelected: (index) => _change(month: index + 1),
               ),
             ),
@@ -344,11 +342,7 @@ final class _CarpenterTimeSelectState extends State<CarpenterTimeSelect> {
               onOpenChanged: (value) => setState(() => _minuteOpen = value),
               label: 'Minute',
               options: [
-                for (
-                  var value = 0;
-                  value < 60;
-                  value += widget.minuteStep
-                )
+                for (var value = 0; value < 60; value += widget.minuteStep)
                   CarpenterOption<int>(
                     id: 'minute.$value',
                     value: value,
@@ -389,14 +383,14 @@ final class _PickerWheel extends StatelessWidget {
     onSelectedItemChanged: onSelected,
     childDelegate: ListWheelChildBuilderDelegate(
       childCount: count,
-      builder: (context, index) => Center(
-        child: CarpenterText.body(labelBuilder(index)),
-      ),
+      builder: (context, index) =>
+          Center(child: CarpenterText.body(labelBuilder(index))),
     ),
   );
 }
 
-DateTime _dateOnly(DateTime value) => DateTime(value.year, value.month, value.day);
+DateTime _dateOnly(DateTime value) =>
+    DateTime(value.year, value.month, value.day);
 
 DateTime _clampDate(DateTime value, DateTime first, DateTime last) {
   final date = _dateOnly(value);

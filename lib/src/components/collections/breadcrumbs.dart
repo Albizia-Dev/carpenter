@@ -58,10 +58,7 @@ final class _CarpenterBreadcrumbsState extends State<CarpenterBreadcrumbs> {
       if (children.isEmpty) return;
       children.add(
         const ExcludeSemantics(
-          child: CarpenterText.body(
-            '›',
-            colorRole: ContentColorRole.muted,
-          ),
+          child: CarpenterText.body('›', colorRole: ContentColorRole.muted),
         ),
       );
     }
