@@ -37,6 +37,7 @@ void main() {
     );
 
     await tester.enterText(find.byType(EditableText), '99');
+    await tester.pump();
     expect(find.text('Maximum is 10'), findsOneWidget);
     expect(value, 5);
   });
