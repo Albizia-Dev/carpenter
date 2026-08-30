@@ -6,6 +6,7 @@ import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
 import '../basic/status_indicator.dart';
 import '../basic/text.dart';
+import 'action_overflow.dart';
 import 'toolbar.dart';
 
 @immutable
@@ -52,61 +53,67 @@ final class CarpenterPageHeader extends StatelessWidget {
         constraints.maxWidth,
       );
       final actionWidget = actions ?? _descriptorActions();
-      final titleBlock = Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (breadcrumbs != null) ...[breadcrumbs!, SizedBox(height: gap)],
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: gap,
-            runSpacing: gap,
-            children: [
-              CarpenterText.title(
-                title,
-                emphasis: TypographyEmphasis.strong,
-                maxLines: 2,
+      final titleBlock = IntrinsicWidth(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (breadcrumbs != null) ...[breadcrumbs!, SizedBox(height: gap)],
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: gap,
+              runSpacing: gap,
+              children: [
+                CarpenterText.title(
+                  title,
+                  emphasis: TypographyEmphasis.strong,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (status case final CarpenterPageStatus value)
+                  CarpenterStatusIndicator(
+                    label: value.label,
+                    role: value.role,
+                  ),
+              ],
+            ),
+            if (subtitle != null) ...[
+              SizedBox(height: gap),
+              CarpenterText.body(
+                subtitle!,
+                colorRole: ContentColorRole.secondary,
+                maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
-              if (status case final CarpenterPageStatus value)
-                CarpenterStatusIndicator(label: value.label, role: value.role),
             ],
-          ),
-          if (subtitle != null) ...[
-            SizedBox(height: gap),
-            CarpenterText.body(
-              subtitle!,
-              colorRole: ContentColorRole.secondary,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
           ],
-        ],
+        ),
       );
+      final content = actionWidget == null
+          ? titleBlock
+          : viewport == CarpenterViewportClass.narrow
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                titleBlock,
+                SizedBox(height: gap),
+                actionWidget,
+              ],
+            )
+          : ActionOverflowLayout(
+              content: titleBlock,
+              actions: actionWidget,
+              gap: gap,
+              minimumInlineActionWidth: context.units(
+                theme.sizes.actionHeight(ControlSize.medium),
+              ),
+            );
       return Semantics(
         container: true,
         explicitChildNodes: true,
         header: true,
         label: semanticLabel ?? title,
-        child: viewport == CarpenterViewportClass.narrow
-            ? Column(
-                crossAxisAlignment: .stretch,
-                children: [
-                  titleBlock,
-                  if (actionWidget != null) ...[
-                    SizedBox(height: gap),
-                    actionWidget,
-                  ],
-                ],
-              )
-            : Row(
-                crossAxisAlignment: .start,
-                mainAxisAlignment: .spaceBetween,
-                children: [
-                  Expanded(child: titleBlock),
-                  if (actionWidget != null) Flexible(child: actionWidget),
-                ],
-              ),
+        child: content,
       );
     },
   );
@@ -119,11 +126,14 @@ final class CarpenterPageHeader extends StatelessWidget {
         for (final action in primaryActions)
           CarpenterToolbarItem(
             action: action,
-            priority: CarpenterToolbarPriority.critical,
+            group: CarpenterToolbarGroup.primary,
             prominence: ActionProminence.high,
           ),
         for (final action in secondaryActions)
-          CarpenterToolbarItem(action: action),
+          CarpenterToolbarItem(
+            action: action,
+            group: CarpenterToolbarGroup.secondary,
+          ),
       ],
     );
   }

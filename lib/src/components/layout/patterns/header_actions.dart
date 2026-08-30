@@ -35,15 +35,19 @@ final class CarpenterHeaderActions extends StatelessWidget {
       for (final action in primary)
         CarpenterToolbarItem(
           action: action,
-          priority: CarpenterToolbarPriority.critical,
+          group: CarpenterToolbarGroup.primary,
           prominence: ActionProminence.high,
           executionPhase: primaryExecutionPhase,
         ),
-      for (final action in secondary) CarpenterToolbarItem(action: action),
+      for (final action in secondary)
+        CarpenterToolbarItem(
+          action: action,
+          group: CarpenterToolbarGroup.secondary,
+        ),
       for (final action in destructive)
         CarpenterToolbarItem(
           action: action,
-          priority: CarpenterToolbarPriority.overflow,
+          group: CarpenterToolbarGroup.overflow,
           prominence: ActionProminence.outlined,
         ),
     ],
