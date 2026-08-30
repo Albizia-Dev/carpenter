@@ -98,9 +98,9 @@ final class _DragDropPreviewState extends State<_DragDropPreview> {
                     },
                     metadata: {'kind': 'invoice'},
                   ),
-                  feedback: const SizedBox(
-                    width: 220,
-                    child: CarpenterCard(
+                  feedback: SizedBox(
+                    width: context.units(13.75.rem),
+                    child: const CarpenterCard(
                       child: CarpenterText.label('Invoice #184'),
                     ),
                   ),
