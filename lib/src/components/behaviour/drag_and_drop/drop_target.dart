@@ -193,33 +193,32 @@ final class _CarpenterDropTargetWidgetState<T>
   }
 
   @override
-  Widget build(BuildContext context) =>
-      DragTarget<CarpenterDragTransport<T>>(
-        onWillAcceptWithDetails: (details) =>
-            _updateHover(_buildDetails(details.data, details.offset)),
-        onMove: (details) =>
-            _updateHover(_buildDetails(details.data, details.offset)),
-        onLeave: (_) => _clearHover(),
-        onAcceptWithDetails: (details) {
-          final drop = _buildDetails(details.data, details.offset);
-          if (drop != null && (widget.canAccept?.call(drop) ?? true)) {
-            widget.onDrop(drop);
-          }
-          _clearHover();
-        },
-        builder: (context, candidateData, rejectedData) => ConstrainedBox(
-          key: _geometryKey,
-          constraints: const BoxConstraints(),
-          child: widget.builder(
-            context,
-            CarpenterDropTargetState<T>(
-              hovering: _hovering,
-              accepts: _accepts,
-              payload: _payload,
-              operation: _operation,
-              position: _position,
-            ),
-          ),
+  Widget build(BuildContext context) => DragTarget<CarpenterDragTransport<T>>(
+    onWillAcceptWithDetails: (details) =>
+        _updateHover(_buildDetails(details.data, details.offset)),
+    onMove: (details) =>
+        _updateHover(_buildDetails(details.data, details.offset)),
+    onLeave: (_) => _clearHover(),
+    onAcceptWithDetails: (details) {
+      final drop = _buildDetails(details.data, details.offset);
+      if (drop != null && (widget.canAccept?.call(drop) ?? true)) {
+        widget.onDrop(drop);
+      }
+      _clearHover();
+    },
+    builder: (context, candidateData, rejectedData) => ConstrainedBox(
+      key: _geometryKey,
+      constraints: const BoxConstraints(),
+      child: widget.builder(
+        context,
+        CarpenterDropTargetState<T>(
+          hovering: _hovering,
+          accepts: _accepts,
+          payload: _payload,
+          operation: _operation,
+          position: _position,
         ),
-      );
+      ),
+    ),
+  );
 }

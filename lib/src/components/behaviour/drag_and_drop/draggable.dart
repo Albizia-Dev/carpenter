@@ -87,20 +87,19 @@ final class CarpenterDraggable<T> extends StatelessWidget {
     }
 
     final draggable = switch (activation) {
-      CarpenterDragActivation.immediate =>
-        Draggable<CarpenterDragTransport<T>>(
-          data: transport,
-          feedback: dragFeedback,
-          childWhenDragging: childWhenDragging,
-          dragAnchorStrategy: anchorStrategy,
-          axis: axis,
-          maxSimultaneousDrags: maxSimultaneousDrags,
-          onDragStarted: started,
-          onDragCompleted: completed,
-          onDraggableCanceled: canceled,
-          onDragEnd: ended,
-          child: child,
-        ),
+      CarpenterDragActivation.immediate => Draggable<CarpenterDragTransport<T>>(
+        data: transport,
+        feedback: dragFeedback,
+        childWhenDragging: childWhenDragging,
+        dragAnchorStrategy: anchorStrategy,
+        axis: axis,
+        maxSimultaneousDrags: maxSimultaneousDrags,
+        onDragStarted: started,
+        onDragCompleted: completed,
+        onDraggableCanceled: canceled,
+        onDragEnd: ended,
+        child: child,
+      ),
       CarpenterDragActivation.longPress =>
         LongPressDraggable<CarpenterDragTransport<T>>(
           data: transport,
