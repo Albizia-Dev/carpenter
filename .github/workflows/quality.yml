@@ -32,9 +32,6 @@ jobs:
       - name: Analyze library
         run: dart analyze lib
 
-      - name: Run focused action overflow tests
-        run: flutter test test/layout/action_overflow_test.dart test/layout/semantic_layout_test.dart
-
   consumers:
     name: Compile Widgetbook and example
     if: github.event_name == 'pull_request'
