@@ -27,10 +27,7 @@ jobs:
         run: flutter pub get
 
       - name: Check code style
-        run: |
-          dart format lib
-          git diff -- lib
-          exit 1
+        run: dart format --output=none --set-exit-if-changed lib
 
       - name: Analyze library
         run: dart analyze lib

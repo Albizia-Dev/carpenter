@@ -38,11 +38,13 @@ final class CarpenterToolbarItem {
   final ActionExecutionPhase executionPhase;
 
   @Deprecated('Use group instead. Priority is retained for compatibility.')
-  CarpenterToolbarPriority get priority => _priority ?? switch (group) {
-    CarpenterToolbarGroup.primary => CarpenterToolbarPriority.critical,
-    CarpenterToolbarGroup.secondary => CarpenterToolbarPriority.normal,
-    CarpenterToolbarGroup.overflow => CarpenterToolbarPriority.overflow,
-  };
+  CarpenterToolbarPriority get priority =>
+      _priority ??
+      switch (group) {
+        CarpenterToolbarGroup.primary => CarpenterToolbarPriority.critical,
+        CarpenterToolbarGroup.secondary => CarpenterToolbarPriority.normal,
+        CarpenterToolbarGroup.overflow => CarpenterToolbarPriority.overflow,
+      };
 
   CarpenterToolbarGroup get effectiveGroup => switch (_priority) {
     CarpenterToolbarPriority.critical => CarpenterToolbarGroup.primary,

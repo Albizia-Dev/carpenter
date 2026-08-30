@@ -89,7 +89,11 @@ final class CarpenterPageHeader extends StatelessWidget {
           : viewport == CarpenterViewportClass.narrow
           ? Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [titleBlock, SizedBox(height: gap), actionWidget],
+              children: [
+                titleBlock,
+                SizedBox(height: gap),
+                actionWidget,
+              ],
             )
           : ActionOverflowLayout(
               content: titleBlock,
