@@ -1,0 +1,18 @@
+name: Format Debug
+
+on:
+  push:
+    branches:
+      - release/0.1.1-ui-primitives
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: dart format lib/src/components/basic/input/number_input.dart
+      - run: cat lib/src/components/basic/input/number_input.dart
