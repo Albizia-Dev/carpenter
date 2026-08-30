@@ -112,9 +112,8 @@ final class _CarpenterNumberInputState extends State<CarpenterNumberInput> {
     });
   }
 
-  TextInputFormatter get _formatter => FilteringTextInputFormatter.allow(
-    RegExp(r'[-0-9.,]'),
-  );
+  TextInputFormatter get _formatter =>
+      FilteringTextInputFormatter.allow(RegExp(r'[-0-9.,]'));
 
   @override
   Widget build(BuildContext context) => CarpenterInput(
