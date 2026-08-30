@@ -5,10 +5,14 @@ import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
 import '../basic/button/button.dart';
 import '../basic/button/icon_button.dart';
+import '../basic/icons.dart';
 import '../behaviour/menu/dropdown.dart';
 import '../behaviour/menu/menu_entry.dart';
+import 'action_overflow.dart';
 
 enum CarpenterToolbarPriority { critical, normal, overflow }
+
+enum CarpenterToolbarGroup { primary, secondary, overflow }
 
 enum CarpenterToolbarPresentation { label, icon }
 
@@ -16,19 +20,36 @@ enum CarpenterToolbarPresentation { label, icon }
 final class CarpenterToolbarItem {
   const CarpenterToolbarItem({
     required this.action,
-    this.priority = CarpenterToolbarPriority.normal,
+    this.group = CarpenterToolbarGroup.secondary,
+    @Deprecated('Use group instead. Priority is retained for compatibility.')
+    CarpenterToolbarPriority? priority,
     this.presentation = CarpenterToolbarPresentation.label,
     this.prominence = ActionProminence.ghost,
     this.size = ControlSize.medium,
     this.executionPhase = ActionExecutionPhase.idle,
-  });
+  }) : _priority = priority;
 
   final CarpenterActionDescriptor action;
-  final CarpenterToolbarPriority priority;
+  final CarpenterToolbarGroup group;
+  final CarpenterToolbarPriority? _priority;
   final CarpenterToolbarPresentation presentation;
   final ActionProminence prominence;
   final ControlSize size;
   final ActionExecutionPhase executionPhase;
+
+  @Deprecated('Use group instead. Priority is retained for compatibility.')
+  CarpenterToolbarPriority get priority => _priority ?? switch (group) {
+    CarpenterToolbarGroup.primary => CarpenterToolbarPriority.critical,
+    CarpenterToolbarGroup.secondary => CarpenterToolbarPriority.normal,
+    CarpenterToolbarGroup.overflow => CarpenterToolbarPriority.overflow,
+  };
+
+  CarpenterToolbarGroup get effectiveGroup => switch (_priority) {
+    CarpenterToolbarPriority.critical => CarpenterToolbarGroup.primary,
+    CarpenterToolbarPriority.normal => CarpenterToolbarGroup.secondary,
+    CarpenterToolbarPriority.overflow => CarpenterToolbarGroup.overflow,
+    null => group,
+  };
 }
 
 final class CarpenterToolbar extends StatefulWidget {
@@ -69,17 +90,21 @@ final class _CarpenterToolbarState extends State<CarpenterToolbar> {
                 if (index > 0) _gap(context),
                 Flexible(
                   fit: FlexFit.loose,
-                  child: _ToolbarAction(item: layout.visible[index]),
+                  child: _ToolbarAction(
+                    item: layout.visible[index],
+                    forceIcon: layout.iconOnly,
+                  ),
                 ),
               ],
               if (layout.overflow.isNotEmpty) ...[
                 if (layout.visible.isNotEmpty) _gap(context),
                 Flexible(
                   fit: FlexFit.loose,
-                  child: CarpenterDropdown(
+                  child: CarpenterDropdown.icon(
                     open: _overflowOpen,
                     onOpenChanged: (value) =>
                         setState(() => _overflowOpen = value),
+                    icon: CarpenterIcons.more,
                     label: widget.overflowLabel,
                     items: [
                       for (final item in layout.overflow)
@@ -103,59 +128,38 @@ final class _CarpenterToolbarState extends State<CarpenterToolbar> {
   );
 
   _ToolbarLayout _layoutItems(BuildContext context, double availableWidth) {
-    if (!availableWidth.isFinite) {
-      return _ToolbarLayout(
-        visible: widget.items
-            .where((item) => item.priority != CarpenterToolbarPriority.overflow)
-            .toList(),
-        overflow: widget.items
-            .where((item) => item.priority == CarpenterToolbarPriority.overflow)
-            .toList(),
-      );
-    }
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.layoutToolbar);
-    final forcedOverflow = widget.items
-        .where((item) => item.priority == CarpenterToolbarPriority.overflow)
-        .toList();
-    final candidates = widget.items
-        .where((item) => item.priority != CarpenterToolbarPriority.overflow)
-        .toList();
-    final widths = {
-      for (final item in candidates) item: _itemWidth(context, item),
-    };
-    final allWidth =
-        widths.values.fold(0.0, (sum, width) => sum + width) +
-        _mathMax(0, candidates.length - 1) * gap;
-    if (forcedOverflow.isEmpty && allWidth <= availableWidth) {
-      return _ToolbarLayout(visible: candidates, overflow: const []);
-    }
-    final overflowWidth = _labelWidth(
-      context,
-      widget.overflowLabel,
-      ControlSize.medium,
-      hasIcon: false,
+    final overflowWidth = context.units(
+      theme.sizes.actionHeight(ControlSize.medium),
     );
-    final remaining = availableWidth - overflowWidth - gap;
-    final ranked = [...candidates]
-      ..sort((a, b) => a.priority.index.compareTo(b.priority.index));
-    final visible = <CarpenterToolbarItem>[];
-    var used = 0.0;
-    for (final item in ranked) {
-      final next = widths[item]! + (visible.isEmpty ? 0 : gap);
-      if (used + next <= remaining) {
-        visible.add(item);
-        used += next;
-      }
-    }
-    visible.sort(
-      (a, b) => widget.items.indexOf(a).compareTo(widget.items.indexOf(b)),
-    );
-    final overflow = [
+    final entries = [
       for (final item in widget.items)
-        if (!visible.contains(item)) item,
+        ActionOverflowEntry(
+          value: item,
+          group: switch (item.effectiveGroup) {
+            CarpenterToolbarGroup.primary => ActionOverflowGroup.primary,
+            CarpenterToolbarGroup.secondary => ActionOverflowGroup.secondary,
+            CarpenterToolbarGroup.overflow => ActionOverflowGroup.overflow,
+          },
+          expandedWidth: _itemWidth(context, item),
+          iconWidth: item.action.icon == null
+              ? null
+              : context.units(theme.sizes.actionHeight(item.size)),
+        ),
     ];
-    return _ToolbarLayout(visible: visible, overflow: overflow);
+    final resolution = const ActionOverflowResolver<CarpenterToolbarItem>()
+        .resolve(
+          entries: entries,
+          availableWidth: availableWidth,
+          gap: gap,
+          overflowWidth: overflowWidth,
+        );
+    return _ToolbarLayout(
+      visible: resolution.visible,
+      overflow: resolution.overflow,
+      iconOnly: resolution.iconOnly,
+    );
   }
 
   double _itemWidth(BuildContext context, CarpenterToolbarItem item) =>
@@ -200,32 +204,40 @@ final class _CarpenterToolbarState extends State<CarpenterToolbar> {
 }
 
 final class _ToolbarAction extends StatelessWidget {
-  const _ToolbarAction({required this.item});
+  const _ToolbarAction({required this.item, required this.forceIcon});
 
   final CarpenterToolbarItem item;
+  final bool forceIcon;
 
   @override
-  Widget build(BuildContext context) =>
-      item.presentation == CarpenterToolbarPresentation.icon
-      ? CarpenterIconButton.fromAction(
-          item.action,
-          prominence: item.prominence,
-          size: item.size,
-          executionPhase: item.executionPhase,
-        )
-      : CarpenterButton.fromAction(
-          item.action,
-          prominence: item.prominence,
-          size: item.size,
-          executionPhase: item.executionPhase,
-        );
+  Widget build(BuildContext context) {
+    final iconOnly =
+        forceIcon || item.presentation == CarpenterToolbarPresentation.icon;
+    if (iconOnly && item.action.icon != null) {
+      return CarpenterIconButton.fromAction(
+        item.action,
+        prominence: item.prominence,
+        size: item.size,
+        executionPhase: item.executionPhase,
+      );
+    }
+    return CarpenterButton.fromAction(
+      item.action,
+      prominence: item.prominence,
+      size: item.size,
+      executionPhase: item.executionPhase,
+    );
+  }
 }
 
 final class _ToolbarLayout {
-  const _ToolbarLayout({required this.visible, required this.overflow});
+  const _ToolbarLayout({
+    required this.visible,
+    required this.overflow,
+    required this.iconOnly,
+  });
 
   final List<CarpenterToolbarItem> visible;
   final List<CarpenterToolbarItem> overflow;
+  final bool iconOnly;
 }
-
-int _mathMax(int a, int b) => a > b ? a : b;

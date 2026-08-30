@@ -15,6 +15,7 @@ Widget _playground(BuildContext context) {
     label: 'Trigger · Label',
     initialValue: 'Действия',
   );
+  final iconOnly = context.knobs.boolean(label: 'Trigger · Icon only');
   final role = context.knobs.object.segmented(
     label: 'Trigger · Role',
     options: ActionColorRole.values,
@@ -36,6 +37,7 @@ Widget _playground(BuildContext context) {
   return preview(
     _DropdownPreview(
       label: label,
+      iconOnly: iconOnly,
       role: role,
       prominence: prominence,
       size: size,
@@ -48,6 +50,7 @@ Widget _playground(BuildContext context) {
 final class _DropdownPreview extends StatefulWidget {
   const _DropdownPreview({
     required this.label,
+    required this.iconOnly,
     required this.role,
     required this.prominence,
     required this.size,
@@ -56,6 +59,7 @@ final class _DropdownPreview extends StatefulWidget {
   });
 
   final String label;
+  final bool iconOnly;
   final ActionColorRole role;
   final ActionProminence prominence;
   final ControlSize size;
@@ -79,37 +83,53 @@ final class _DropdownPreviewState extends State<_DropdownPreview> {
   }
 
   @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      CarpenterDropdown(
-        open: _open,
-        onOpenChanged: (value) => setState(() => _open = value),
-        label: widget.label,
-        colorRole: widget.role,
-        prominence: widget.prominence,
-        size: widget.size,
-        items: [
-          CarpenterMenuItem(
-            action: CarpenterActionDescriptor(
-              id: 'duplicate',
-              label: 'Дублировать',
-              onInvoke: () => setState(() => _last = 'Дублировать'),
-            ),
-          ),
-          CarpenterMenuItem(
-            action: CarpenterActionDescriptor(
-              id: 'archive',
-              label: 'Архивировать',
-              onInvoke: widget.disableArchive
-                  ? null
-                  : () => setState(() => _last = 'Архивировать'),
-            ),
-          ),
-        ],
+  Widget build(BuildContext context) {
+    final items = [
+      CarpenterMenuItem(
+        action: CarpenterActionDescriptor(
+          id: 'duplicate',
+          label: 'Дублировать',
+          onInvoke: () => setState(() => _last = 'Дублировать'),
+        ),
       ),
-      SizedBox(height: context.units(1.rem)),
-      CarpenterText.caption('Последнее действие: $_last'),
-    ],
-  );
+      CarpenterMenuItem(
+        action: CarpenterActionDescriptor(
+          id: 'archive',
+          label: 'Архивировать',
+          onInvoke: widget.disableArchive
+              ? null
+              : () => setState(() => _last = 'Архивировать'),
+        ),
+      ),
+    ];
+    final dropdown = widget.iconOnly
+        ? CarpenterDropdown.icon(
+            open: _open,
+            onOpenChanged: (value) => setState(() => _open = value),
+            label: widget.label,
+            semanticLabel: widget.label,
+            icon: CarpenterIcons.more,
+            colorRole: widget.role,
+            prominence: widget.prominence,
+            size: widget.size,
+            items: items,
+          )
+        : CarpenterDropdown(
+            open: _open,
+            onOpenChanged: (value) => setState(() => _open = value),
+            label: widget.label,
+            colorRole: widget.role,
+            prominence: widget.prominence,
+            size: widget.size,
+            items: items,
+          );
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        dropdown,
+        SizedBox(height: context.units(1.rem)),
+        CarpenterText.caption('Последнее действие: $_last'),
+      ],
+    );
+  }
 }
