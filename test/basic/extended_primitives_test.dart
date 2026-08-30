@@ -46,10 +46,10 @@ void main() {
   ) async {
     await tester.pumpWidget(
       carpenterHarness(
-        const Column(
+        Column(
           children: [
             CarpenterBadge.count(140),
-            CarpenterAvatarGroup(
+            const CarpenterAvatarGroup(
               maxVisible: 2,
               items: [
                 CarpenterAvatarItem(initials: 'AA'),
