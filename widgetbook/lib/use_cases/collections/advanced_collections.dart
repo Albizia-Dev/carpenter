@@ -5,7 +5,10 @@ import 'package:widgetbook/widgetbook.dart';
 final reorderableCollectionComponent = WidgetbookComponent(
   name: 'Reorderable collection',
   useCases: [
-    WidgetbookUseCase(name: 'Playground', builder: (_) => const _ReorderPreview()),
+    WidgetbookUseCase(
+      name: 'Playground',
+      builder: (_) => const _ReorderPreview(),
+    ),
     WidgetbookUseCase(
       name: 'Constrained',
       builder: (context) => SizedBox(
@@ -26,24 +29,27 @@ final treeViewComponent = WidgetbookComponent(
 final treeTableComponent = WidgetbookComponent(
   name: 'Tree table',
   useCases: [
-    WidgetbookUseCase(name: 'Playground', builder: (_) => const _TreeTablePreview()),
+    WidgetbookUseCase(
+      name: 'Playground',
+      builder: (_) => const _TreeTablePreview(),
+    ),
   ],
 );
 
 final kanbanComponent = WidgetbookComponent(
   name: 'Kanban',
   useCases: [
-    WidgetbookUseCase(name: 'Playground', builder: (_) => const _KanbanPreview()),
+    WidgetbookUseCase(
+      name: 'Playground',
+      builder: (_) => const _KanbanPreview(),
+    ),
   ],
 );
 
 final planningBoardComponent = WidgetbookComponent(
   name: 'Planning board',
   useCases: [
-    WidgetbookUseCase(
-      name: 'Lanes',
-      builder: (_) => const _PlanningPreview(),
-    ),
+    WidgetbookUseCase(name: 'Lanes', builder: (_) => const _PlanningPreview()),
   ],
 );
 
@@ -113,11 +119,7 @@ const _treeNodes = <CarpenterTreeNode<String>>[
       ),
     ],
   ),
-  CarpenterTreeNode<String>(
-    id: 'archive',
-    value: 'archive',
-    label: 'Archive',
-  ),
+  CarpenterTreeNode<String>(id: 'archive', value: 'archive', label: 'Archive'),
 ];
 
 final class _TreePreview extends StatefulWidget {
@@ -144,18 +146,18 @@ final class _TreePreviewState extends State<_TreePreview> {
           selectedIds: _selected,
           selectionMode: CarpenterTreeSelectionMode.multiple,
           onExpansionChanged: (id, expanded) => setState(() {
-            _expanded = expanded ? {..._expanded, id} : _expanded.difference({id});
+            _expanded = expanded
+                ? {..._expanded, id}
+                : _expanded.difference({id});
           }),
           onSelectionChanged: (ids) => setState(() => _selected = ids),
           onDrop: (details) => setState(() {
-            _lastDrop = '${details.dragged.label} → ${details.target.label} · ${details.position.name}';
+            _lastDrop =
+                '${details.dragged.label} → ${details.target.label} · ${details.position.name}';
           }),
         ),
         SizedBox(height: context.units(.5.rem)),
-        CarpenterText.caption(
-          _lastDrop,
-          colorRole: ContentColorRole.secondary,
-        ),
+        CarpenterText.caption(_lastDrop, colorRole: ContentColorRole.secondary),
       ],
     ),
   );
@@ -239,7 +241,9 @@ final class _KanbanPreviewState extends State<_KanbanPreview> {
       final cards = <Object, List<String>>{
         for (final column in _columns) column.id: [...column.cards],
       };
-      final moved = cards[details.sourceColumn.id]!.removeAt(details.sourceIndex);
+      final moved = cards[details.sourceColumn.id]!.removeAt(
+        details.sourceIndex,
+      );
       cards[details.targetColumn.id]!.insert(details.targetIndex, moved);
       _columns = [
         for (final column in _columns)
@@ -321,16 +325,18 @@ final class _PlanningPreviewState extends State<_PlanningPreview> {
   ];
 
   @override
-  Widget build(BuildContext context) => CarpenterPlanningBoard<String, String, String>(
-    lanes: _lanes,
-    collapsedLaneIds: _collapsed,
-    cardKey: (card) => card,
-    onLaneExpansionChanged: (id, expanded) => setState(() {
-      _collapsed = expanded ? _collapsed.difference({id}) : {..._collapsed, id};
-    }),
-    cardBuilder: (context, card, state) => CarpenterCard(
-      child: CarpenterText.label(card),
-    ),
-    onMove: (_) {},
-  );
+  Widget build(BuildContext context) =>
+      CarpenterPlanningBoard<String, String, String>(
+        lanes: _lanes,
+        collapsedLaneIds: _collapsed,
+        cardKey: (card) => card,
+        onLaneExpansionChanged: (id, expanded) => setState(() {
+          _collapsed = expanded
+              ? _collapsed.difference({id})
+              : {..._collapsed, id};
+        }),
+        cardBuilder: (context, card, state) =>
+            CarpenterCard(child: CarpenterText.label(card)),
+        onMove: (_) {},
+      );
 }

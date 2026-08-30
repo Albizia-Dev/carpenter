@@ -42,7 +42,11 @@ final class CarpenterReorderItemState {
 }
 
 typedef CarpenterReorderItemBuilder<T> =
-    Widget Function(BuildContext context, T item, CarpenterReorderItemState state);
+    Widget Function(
+      BuildContext context,
+      T item,
+      CarpenterReorderItemState state,
+    );
 typedef CarpenterReorderCallback<T> =
     void Function(CarpenterReorderDetails<T> details);
 
@@ -121,8 +125,8 @@ final class _CarpenterReorderableCollectionState<T>
     if (callback == null) return;
     final source = details.payload.data;
     final position = _effectivePosition(details);
-    var insertion = targetIndex +
-        (position == CarpenterDropPosition.after ? 1 : 0);
+    var insertion =
+        targetIndex + (position == CarpenterDropPosition.after ? 1 : 0);
     if (source.index < insertion) insertion -= 1;
     final maxIndex = widget.items.isEmpty ? 0 : widget.items.length - 1;
     final newIndex = insertion.clamp(0, maxIndex);
@@ -141,7 +145,9 @@ final class _CarpenterReorderableCollectionState<T>
   Widget _item(BuildContext context, T item, int index) {
     final key = widget.itemKey(item);
     final enabled = widget.onReorder != null;
-    Widget buildItem(CarpenterDropTargetState<_ReorderDragData<T>> targetState) {
+    Widget buildItem(
+      CarpenterDropTargetState<_ReorderDragData<T>> targetState,
+    ) {
       final normal = widget.itemBuilder(
         context,
         item,
@@ -183,7 +189,7 @@ final class _CarpenterReorderableCollectionState<T>
       return KeyedSubtree(
         key: ValueKey<Object>(key),
         child: buildItem(
-          const CarpenterDropTargetState<_ReorderDragData<T>>(
+          CarpenterDropTargetState<_ReorderDragData<T>>(
             hovering: false,
             accepts: false,
           ),

@@ -235,7 +235,9 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
     int index,
   ) {
     final cardId = widget.cardKey(card);
-    Widget content(CarpenterDropTargetState<_KanbanDragData<C, T>> targetState) {
+    Widget content(
+      CarpenterDropTargetState<_KanbanDragData<C, T>> targetState,
+    ) {
       final state = CarpenterKanbanCardState<C>(
         column: column.value,
         index: index,
@@ -272,7 +274,7 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
 
     if (widget.onMove == null) {
       return content(
-        const CarpenterDropTargetState<_KanbanDragData<C, T>>(
+        CarpenterDropTargetState<_KanbanDragData<C, T>>(
           hovering: false,
           accepts: false,
         ),
@@ -283,8 +285,7 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
       axis: CarpenterDropAxis.vertical,
       edgeFraction: .35,
       acceptedOperations: const {CarpenterDragOperation.move},
-      canAccept: (details) =>
-          _canAccept(_moveDetails(column, index, details)),
+      canAccept: (details) => _canAccept(_moveDetails(column, index, details)),
       onDrop: (details) => _emit(_moveDetails(column, index, details)),
       builder: (context, state) => content(state),
     );
@@ -298,10 +299,12 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
       targetId: 'kanban.${column.id}.tail',
       fixedPosition: CarpenterDropPosition.after,
       acceptedOperations: const {CarpenterDragOperation.move},
-      canAccept: (details) =>
-          _canAccept(_moveDetails(column, column.cards.length, details, append: true)),
-      onDrop: (details) =>
-          _emit(_moveDetails(column, column.cards.length, details, append: true)),
+      canAccept: (details) => _canAccept(
+        _moveDetails(column, column.cards.length, details, append: true),
+      ),
+      onDrop: (details) => _emit(
+        _moveDetails(column, column.cards.length, details, append: true),
+      ),
       builder: (context, state) => AnimatedContainer(
         duration: theme.motion.transitionDuration(context),
         height: state.hovering ? context.units(2.rem) : gap,
@@ -363,7 +366,9 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
               ),
             if (column.loadState == CarpenterKanbanLoadState.failed)
               GestureDetector(
-                onTap: widget.onRetry == null ? null : () => widget.onRetry!(column),
+                onTap: widget.onRetry == null
+                    ? null
+                    : () => widget.onRetry!(column),
                 child: CarpenterText.caption(
                   column.errorText ?? 'Failed to load. Retry',
                   colorRole: ContentColorRole.secondary,
@@ -395,7 +400,8 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
       controller: _dragController,
       child: LayoutBuilder(
         builder: (context, constraints) => Listener(
-          onPointerMove: (event) => _autoScroll(event.localPosition, constraints.maxWidth),
+          onPointerMove: (event) =>
+              _autoScroll(event.localPosition, constraints.maxWidth),
           child: Semantics(
             container: true,
             label: widget.semanticLabel,
@@ -405,7 +411,11 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  for (var index = 0; index < widget.columns.length; index++) ...[
+                  for (
+                    var index = 0;
+                    index < widget.columns.length;
+                    index++
+                  ) ...[
                     if (index > 0) SizedBox(width: gap),
                     _column(context, widget.columns[index]),
                   ],

@@ -171,7 +171,8 @@ final class _DragDropPreviewState extends State<_DragDropPreview> {
 
   void _recordDrop(CarpenterDropDetails<String> details) {
     setState(() {
-      _lastDrop = '${details.payload.data} → ${details.targetId} · ${details.operation.name} · ${details.position.name}';
+      _lastDrop =
+          '${details.payload.data} → ${details.targetId} · ${details.operation.name} · ${details.position.name}';
     });
   }
 }
@@ -214,10 +215,7 @@ final class _Target extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CarpenterText.label(
-                title,
-                emphasis: TypographyEmphasis.strong,
-              ),
+              CarpenterText.label(title, emphasis: TypographyEmphasis.strong),
               SizedBox(height: context.units(.5.rem)),
               CarpenterText.caption(
                 state.hovering

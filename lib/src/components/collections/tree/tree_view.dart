@@ -92,16 +92,18 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
   void _select(CarpenterTreeNode<T> node) {
     _focusedId = node.id;
     final callback = widget.onSelectionChanged;
-    if (callback == null || widget.selectionMode == CarpenterTreeSelectionMode.none) {
+    if (callback == null ||
+        widget.selectionMode == CarpenterTreeSelectionMode.none) {
       setState(() {});
       return;
     }
     final next = switch (widget.selectionMode) {
       CarpenterTreeSelectionMode.none => widget.selectedIds,
       CarpenterTreeSelectionMode.single => <Object>{node.id},
-      CarpenterTreeSelectionMode.multiple => widget.selectedIds.contains(node.id)
-          ? widget.selectedIds.where((id) => id != node.id).toSet()
-          : {...widget.selectedIds, node.id},
+      CarpenterTreeSelectionMode.multiple =>
+        widget.selectedIds.contains(node.id)
+            ? widget.selectedIds.where((id) => id != node.id).toSet()
+            : {...widget.selectedIds, node.id},
     };
     callback(Set.unmodifiable(next));
     setState(() {});
@@ -214,7 +216,9 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
   Widget _row(BuildContext context, CarpenterTreeFlatNode<T> entry) {
     final node = entry.node;
     final expanded = widget.expandedIds.contains(node.id);
-    Widget buildContent(CarpenterDropTargetState<CarpenterTreeNode<T>> dropState) {
+    Widget buildContent(
+      CarpenterDropTargetState<CarpenterTreeNode<T>> dropState,
+    ) {
       _syncAutoExpand(node, dropState);
       final state = CarpenterTreeRowState<T>(
         node: node,
@@ -229,8 +233,10 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
       );
       final theme = CarpenterTheme.of(context);
       final indent = context.units(theme.spacing.large) * entry.depth;
-      final actions = widget.actions?.call(node) ?? const <CarpenterActionDescriptor>[];
-      final title = widget.itemBuilder?.call(context, node, state) ??
+      final actions =
+          widget.actions?.call(node) ?? const <CarpenterActionDescriptor>[];
+      final title =
+          widget.itemBuilder?.call(context, node, state) ??
           CarpenterText.label(
             node.label,
             emphasis: state.selected || state.focused
@@ -255,7 +261,9 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
                   size: ControlSize.xsmall,
                   onPressed: () => _toggleExpansion(node),
                 )
-              : SizedBox(width: context.units(theme.sizes.control(ControlSize.xsmall))),
+              : SizedBox(
+                  width: context.units(theme.sizes.control(ControlSize.xsmall)),
+                ),
           title: title,
           trailing: actions.isEmpty
               ? null
@@ -293,7 +301,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
 
     if (widget.onDrop == null) {
       return buildContent(
-        const CarpenterDropTargetState<CarpenterTreeNode<T>>(
+        CarpenterDropTargetState<CarpenterTreeNode<T>>(
           hovering: false,
           accepts: false,
         ),
@@ -315,27 +323,27 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
     final node = entry.node;
     final child = switch (node.loadState) {
       CarpenterTreeLoadState.loading => const CarpenterText.caption(
-          'Loading…',
-          colorRole: ContentColorRole.secondary,
-        ),
+        'Loading…',
+        colorRole: ContentColorRole.secondary,
+      ),
       CarpenterTreeLoadState.failed => Row(
-          children: [
-            Expanded(
-              child: CarpenterText.caption(
-                node.errorText ?? 'Failed to load children',
-                colorRole: ContentColorRole.secondary,
-              ),
+        children: [
+          Expanded(
+            child: CarpenterText.caption(
+              node.errorText ?? 'Failed to load children',
+              colorRole: ContentColorRole.secondary,
             ),
-            if (widget.onRetryLoad != null)
-              CarpenterIconButton(
-                icon: CarpenterIcons.refresh,
-                semanticLabel: 'Retry loading ${node.label}',
-                prominence: ActionProminence.ghost,
-                size: ControlSize.xsmall,
-                onPressed: () => widget.onRetryLoad!(node),
-              ),
-          ],
-        ),
+          ),
+          if (widget.onRetryLoad != null)
+            CarpenterIconButton(
+              icon: CarpenterIcons.refresh,
+              semanticLabel: 'Retry loading ${node.label}',
+              prominence: ActionProminence.ghost,
+              size: ControlSize.xsmall,
+              onPressed: () => widget.onRetryLoad!(node),
+            ),
+        ],
+      ),
       CarpenterTreeLoadState.ready => const SizedBox.shrink(),
     };
     return Padding(

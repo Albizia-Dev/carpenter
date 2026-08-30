@@ -29,10 +29,7 @@ final class CarpenterPlanningLane<L, C, T> {
 
 @immutable
 final class CarpenterPlanningMoveDetails<L, C, T> {
-  const CarpenterPlanningMoveDetails({
-    required this.lane,
-    required this.move,
-  });
+  const CarpenterPlanningMoveDetails({required this.lane, required this.move});
 
   final CarpenterPlanningLane<L, C, T> lane;
   final CarpenterKanbanMoveDetails<C, T> move;
@@ -119,10 +116,8 @@ final class _PlanningLaneView<L, C, T> extends StatelessWidget {
   final CarpenterKanbanColumnCallback<C, T>? onLoadMore;
   final CarpenterKanbanColumnCallback<C, T>? onRetry;
 
-  int get _cardCount => lane.columns.fold<int>(
-    0,
-    (count, column) => count + column.cards.length,
-  );
+  int get _cardCount =>
+      lane.columns.fold<int>(0, (count, column) => count + column.cards.length);
 
   @override
   Widget build(BuildContext context) {

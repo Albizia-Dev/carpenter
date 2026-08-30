@@ -44,7 +44,8 @@ final class CarpenterFileDropData<T> {
   final List<CarpenterFileCandidate<T>> files;
 }
 
-typedef CarpenterFileAcceptance<T> = bool Function(CarpenterFileCandidate<T> file);
+typedef CarpenterFileAcceptance<T> =
+    bool Function(CarpenterFileCandidate<T> file);
 typedef CarpenterFilesChanged<T> =
     void Function(List<CarpenterFileCandidate<T>> files);
 
@@ -177,48 +178,49 @@ final class _CarpenterFileInputState<T> extends State<CarpenterFileInput<T>> {
   }
 
   @override
-  Widget build(BuildContext context) => CarpenterDropTarget<CarpenterFileDropData<T>>(
-    targetId: widget.key ?? this,
-    fixedPosition: CarpenterDropPosition.inside,
-    canAccept: (details) =>
-        widget.availability == FieldAvailability.enabled &&
-        details.payload.data.files.any(_acceptsFile),
-    onDrop: (details) => _accept(details.payload.data.files),
-    builder: (context, dropState) => Semantics(
-      liveRegion: dropState.hovering,
-      value: dropState.hovering
-          ? dropState.accepts
-                ? 'Drop files here'
-                : 'Files not accepted'
-          : null,
-      child: CarpenterInput(
-        controller: _textController,
-        label: widget.label,
-        placeholder: dropState.hovering && dropState.accepts
-            ? 'Drop files here'
-            : widget.placeholder,
-        description: widget.description,
-        errorText: widget.errorText,
-        semanticLabel: widget.semanticLabel,
-        required: widget.required,
-        availability: widget.availability == FieldAvailability.disabled
-            ? FieldAvailability.disabled
-            : FieldAvailability.readOnly,
-        size: widget.size,
-        shape: widget.shape,
-        leadingIcon: CarpenterIcons.file,
-        trailingAction: CarpenterActionDescriptor(
-          id: 'file.browse',
-          label: 'Choose files',
-          semanticLabel: 'Choose files',
-          icon: CarpenterIcons.openFile,
-          onInvoke: widget.availability == FieldAvailability.enabled
-              ? widget.onBrowseRequested
+  Widget build(BuildContext context) =>
+      CarpenterDropTarget<CarpenterFileDropData<T>>(
+        targetId: widget.key ?? this,
+        fixedPosition: CarpenterDropPosition.inside,
+        canAccept: (details) =>
+            widget.availability == FieldAvailability.enabled &&
+            details.payload.data.files.any(_acceptsFile),
+        onDrop: (details) => _accept(details.payload.data.files),
+        builder: (context, dropState) => Semantics(
+          liveRegion: dropState.hovering,
+          value: dropState.hovering
+              ? dropState.accepts
+                    ? 'Drop files here'
+                    : 'Files not accepted'
               : null,
+          child: CarpenterInput(
+            controller: _textController,
+            label: widget.label,
+            placeholder: dropState.hovering && dropState.accepts
+                ? 'Drop files here'
+                : widget.placeholder,
+            description: widget.description,
+            errorText: widget.errorText,
+            semanticLabel: widget.semanticLabel,
+            required: widget.required,
+            availability: widget.availability == FieldAvailability.disabled
+                ? FieldAvailability.disabled
+                : FieldAvailability.readOnly,
+            size: widget.size,
+            shape: widget.shape,
+            leadingIcon: CarpenterIcons.file,
+            trailingAction: CarpenterActionDescriptor(
+              id: 'file.browse',
+              label: 'Choose files',
+              semanticLabel: 'Choose files',
+              icon: CarpenterIcons.openFile,
+              onInvoke: widget.availability == FieldAvailability.enabled
+                  ? widget.onBrowseRequested
+                  : null,
+            ),
+          ),
         ),
-      ),
-    ),
-  );
+      );
 }
 
 /// Standalone file drop surface. Link it to a [CarpenterFileInput] by giving
@@ -241,7 +243,8 @@ final class CarpenterFileDropZone<T> extends StatelessWidget {
   final String description;
   final String semanticLabel;
 
-  bool _acceptsFile(CarpenterFileCandidate<T> file) => accepts?.call(file) ?? true;
+  bool _acceptsFile(CarpenterFileCandidate<T> file) =>
+      accepts?.call(file) ?? true;
 
   void _submit(List<CarpenterFileCandidate<T>> files) {
     final accepted = files.where(_acceptsFile).toList(growable: false);
@@ -251,55 +254,56 @@ final class CarpenterFileDropZone<T> extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => CarpenterDropTarget<CarpenterFileDropData<T>>(
-    targetId: key ?? this,
-    fixedPosition: CarpenterDropPosition.inside,
-    canAccept: (details) => details.payload.data.files.any(_acceptsFile),
-    onDrop: (details) => _submit(details.payload.data.files),
-    builder: (context, state) {
-      final theme = CarpenterTheme.of(context);
-      final role = !state.hovering
-          ? FeedbackColorRole.neutral
-          : state.accepts
-          ? FeedbackColorRole.success
-          : FeedbackColorRole.danger;
-      final colors = theme.feedback.resolve(role);
-      return CarpenterCard(
-        semanticLabel: semanticLabel,
-        borderColor: state.hovering ? colors.foreground : null,
-        backgroundColor: state.hovering ? colors.background : null,
-        child: SizedBox(
-          height: context.units(7.rem),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              CarpenterIcon(
-                CarpenterIcons.upload,
-                colorRole: state.hovering && state.accepts
-                    ? ContentColorRole.primary
-                    : ContentColorRole.secondary,
+  Widget build(BuildContext context) =>
+      CarpenterDropTarget<CarpenterFileDropData<T>>(
+        targetId: key ?? this,
+        fixedPosition: CarpenterDropPosition.inside,
+        canAccept: (details) => details.payload.data.files.any(_acceptsFile),
+        onDrop: (details) => _submit(details.payload.data.files),
+        builder: (context, state) {
+          final theme = CarpenterTheme.of(context);
+          final role = !state.hovering
+              ? FeedbackColorRole.neutral
+              : state.accepts
+              ? FeedbackColorRole.success
+              : FeedbackColorRole.danger;
+          final colors = theme.feedback.resolve(role);
+          return CarpenterCard(
+            semanticLabel: semanticLabel,
+            borderColor: state.hovering ? colors.foreground : null,
+            backgroundColor: state.hovering ? colors.background : null,
+            child: SizedBox(
+              height: context.units(7.rem),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CarpenterIcon(
+                    CarpenterIcons.upload,
+                    colorRole: state.hovering && state.accepts
+                        ? ContentColorRole.primary
+                        : ContentColorRole.secondary,
+                  ),
+                  SizedBox(height: context.units(.5.rem)),
+                  CarpenterText.label(
+                    title,
+                    emphasis: TypographyEmphasis.strong,
+                    textAlign: TextAlign.center,
+                  ),
+                  CarpenterText.caption(
+                    state.hovering
+                        ? state.accepts
+                              ? 'Release to add files'
+                              : 'These files are not accepted'
+                        : description,
+                    colorRole: ContentColorRole.secondary,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
-              SizedBox(height: context.units(.5.rem)),
-              CarpenterText.label(
-                title,
-                emphasis: TypographyEmphasis.strong,
-                textAlign: TextAlign.center,
-              ),
-              CarpenterText.caption(
-                state.hovering
-                    ? state.accepts
-                          ? 'Release to add files'
-                          : 'These files are not accepted'
-                    : description,
-                colorRole: ContentColorRole.secondary,
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       );
-    },
-  );
 }
 
 enum CarpenterAttachmentPhase { idle, uploading, complete, failed }
@@ -340,10 +344,8 @@ final class CarpenterUploadProgress extends StatelessWidget {
   final String semanticLabel;
 
   @override
-  Widget build(BuildContext context) => CarpenterProgress(
-    value: value,
-    semanticLabel: semanticLabel,
-  );
+  Widget build(BuildContext context) =>
+      CarpenterProgress(value: value, semanticLabel: semanticLabel);
 }
 
 final class CarpenterAttachmentList<T> extends StatelessWidget {

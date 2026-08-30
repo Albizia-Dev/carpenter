@@ -86,11 +86,7 @@ List<CarpenterTreeFlatNode<T>> flattenCarpenterTree<T>(
   ) {
     for (final node in nodes) {
       result.add(
-        CarpenterTreeFlatNode<T>(
-          node: node,
-          depth: depth,
-          parentId: parentId,
-        ),
+        CarpenterTreeFlatNode<T>(node: node, depth: depth, parentId: parentId),
       );
       if (expandedIds.contains(node.id) && node.children.isNotEmpty) {
         visit(node.children, depth + 1, node.id);

@@ -67,7 +67,9 @@ void main() {
     expect(selection, {'root'});
   });
 
-  testWidgets('reorderable collection emits controlled movement', (tester) async {
+  testWidgets('reorderable collection emits controlled movement', (
+    tester,
+  ) async {
     CarpenterReorderDetails<String>? movement;
     await tester.pumpWidget(
       carpenterHarness(
