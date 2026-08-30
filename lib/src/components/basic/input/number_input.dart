@@ -83,7 +83,8 @@ final class _CarpenterNumberInputState extends State<CarpenterNumberInput> {
   num? _parse(String raw, {required bool reportError}) {
     final text = raw.trim();
     if (text.isEmpty) {
-      if (reportError && _localError != null) setState(() => _localError = null);
+      if (reportError && _localError != null)
+        setState(() => _localError = null);
       return null;
     }
     final parsed = num.tryParse(text.replaceAll(',', '.'));
@@ -95,7 +96,8 @@ final class _CarpenterNumberInputState extends State<CarpenterNumberInput> {
     } else if (widget.max != null && parsed > widget.max!) {
       error = 'Maximum is ${widget.max}';
     }
-    if (reportError && error != _localError) setState(() => _localError = error);
+    if (reportError && error != _localError)
+      setState(() => _localError = error);
     return error == null ? parsed : null;
   }
 

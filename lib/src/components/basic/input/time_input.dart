@@ -56,7 +56,8 @@ final class _CarpenterTimeInputState extends State<CarpenterTimeInput> {
   bool _open = false;
   bool _hourOpen = false;
   bool _minuteOpen = false;
-  late CarpenterTime _draft = widget.value ?? const CarpenterTime(hour: 9, minute: 0);
+  late CarpenterTime _draft =
+      widget.value ?? const CarpenterTime(hour: 9, minute: 0);
 
   void _setOpen(bool value) {
     if (value) {
@@ -120,10 +121,12 @@ final class _CarpenterTimeInputState extends State<CarpenterTimeInput> {
                   value: _draft.hour,
                   onChanged: (value) {
                     if (value == null) return;
-                    setState(() => _draft = CarpenterTime(
-                      hour: value,
-                      minute: _draft.minute,
-                    ));
+                    setState(
+                      () => _draft = CarpenterTime(
+                        hour: value,
+                        minute: _draft.minute,
+                      ),
+                    );
                   },
                   open: _hourOpen,
                   onOpenChanged: (value) => setState(() => _hourOpen = value),
@@ -144,16 +147,23 @@ final class _CarpenterTimeInputState extends State<CarpenterTimeInput> {
                   value: _draft.minute,
                   onChanged: (value) {
                     if (value == null) return;
-                    setState(() => _draft = CarpenterTime(
-                      hour: _draft.hour,
-                      minute: value,
-                    ));
+                    setState(
+                      () => _draft = CarpenterTime(
+                        hour: _draft.hour,
+                        minute: value,
+                      ),
+                    );
                   },
                   open: _minuteOpen,
-                  onOpenChanged: (value) => setState(() => _minuteOpen = value),
+                  onOpenChanged: (value) =>
+                      setState(() => _minuteOpen = value),
                   label: 'Minute',
                   options: [
-                    for (var minute = 0; minute < 60; minute += widget.minuteStep)
+                    for (
+                      var minute = 0;
+                      minute < 60;
+                      minute += widget.minuteStep
+                    )
                       CarpenterOption(
                         id: 'minute.$minute',
                         value: minute,
