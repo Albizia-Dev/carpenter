@@ -65,7 +65,8 @@ final class _CarpenterBreadcrumbsState extends State<CarpenterBreadcrumbs> {
 
     void appendItem(CarpenterBreadcrumb item, {required bool current}) {
       appendSeparator();
-      if (current || item.onInvoke == null) {
+      final onInvoke = item.onInvoke;
+      if (current || onInvoke == null) {
         children.add(
           CarpenterText.body(
             item.label,
@@ -83,7 +84,7 @@ final class _CarpenterBreadcrumbsState extends State<CarpenterBreadcrumbs> {
         _BreadcrumbLink(
           label: item.label,
           semanticLabel: item.semanticLabel,
-          onInvoke: item.onInvoke,
+          onInvoke: onInvoke,
         ),
       );
     }
