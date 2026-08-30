@@ -1,5 +1,4 @@
 import 'package:carpenter_units/carpenter_units.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../foundation/roles.dart';
@@ -93,19 +92,23 @@ typedef CarpenterKanbanColumnCallback<C, T> =
 @immutable
 final class _KanbanDragData<C, T> {
   const _KanbanDragData({
-    required this.boardId,
-    required this.sourceColumnId,
+    required this.groupId,
+    required this.sourceColumn,
     required this.sourceIndex,
     required this.card,
   });
 
-  final Object boardId;
-  final Object sourceColumnId;
+  final Object groupId;
+  final CarpenterKanbanColumn<C, T> sourceColumn;
   final int sourceIndex;
   final T card;
 }
 
 /// Controlled multi-column board with cross-column and within-column DnD.
+///
+/// Separate Kanban instances can participate in the same drag surface by
+/// sharing [dragGroupId]. This is how [CarpenterPlanningBoard] enables moves
+/// across lanes without making card state internal.
 final class CarpenterKanban<C, T> extends StatefulWidget {
   const CarpenterKanban({
     super.key,
@@ -116,6 +119,7 @@ final class CarpenterKanban<C, T> extends StatefulWidget {
     this.canMove,
     this.onLoadMore,
     this.onRetry,
+    this.dragGroupId,
     this.dragActivation = CarpenterDragActivation.immediate,
     this.emptyLabel = 'No cards',
     this.semanticLabel = 'Kanban board',
@@ -128,6 +132,10 @@ final class CarpenterKanban<C, T> extends StatefulWidget {
   final CarpenterKanbanMoveAcceptance<C, T>? canMove;
   final CarpenterKanbanColumnCallback<C, T>? onLoadMore;
   final CarpenterKanbanColumnCallback<C, T>? onRetry;
+
+  /// Structural identity for compatible drag surfaces. When omitted, the
+  /// Kanban instance only accepts cards originating from itself.
+  final Object? dragGroupId;
   final CarpenterDragActivation dragActivation;
   final String emptyLabel;
   final String semanticLabel;
@@ -137,23 +145,18 @@ final class CarpenterKanban<C, T> extends StatefulWidget {
 }
 
 final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
-  final Object _boardId = Object();
+  final Object _fallbackDragGroupId = Object();
   final CarpenterDragController _dragController = CarpenterDragController();
   final ScrollController _scrollController = ScrollController();
   Object? _draggingCardId;
+
+  Object get _dragGroupId => widget.dragGroupId ?? _fallbackDragGroupId;
 
   @override
   void dispose() {
     _dragController.dispose();
     _scrollController.dispose();
     super.dispose();
-  }
-
-  CarpenterKanbanColumn<C, T>? _columnById(Object id) {
-    for (final column in widget.columns) {
-      if (column.id == id) return column;
-    }
-    return null;
   }
 
   CarpenterDropPosition _effectivePosition(
@@ -175,9 +178,8 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
     bool append = false,
   }) {
     final drag = details.payload.data;
-    if (drag.boardId != _boardId) return null;
-    final sourceColumn = _columnById(drag.sourceColumnId);
-    if (sourceColumn == null) return null;
+    if (drag.groupId != _dragGroupId) return null;
+    final sourceColumn = drag.sourceColumn;
     final position = append
         ? CarpenterDropPosition.after
         : _effectivePosition(details);
@@ -254,8 +256,8 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
         payload: CarpenterDragPayload<_KanbanDragData<C, T>>(
           id: cardId,
           data: _KanbanDragData<C, T>(
-            boardId: _boardId,
-            sourceColumnId: column.id,
+            groupId: _dragGroupId,
+            sourceColumn: column,
             sourceIndex: index,
             card: card,
           ),
@@ -265,7 +267,7 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
         onDragCompleted: () {
           if (mounted) setState(() => _draggingCardId = null);
         },
-        onDragCanceled: (_, __) {
+        onDragCanceled: (_, _) {
           if (mounted) setState(() => _draggingCardId = null);
         },
         child: child,
