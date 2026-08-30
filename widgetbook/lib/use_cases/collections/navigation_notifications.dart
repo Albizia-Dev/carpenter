@@ -21,15 +21,13 @@ final notificationListComponent = WidgetbookComponent(
 );
 
 Widget _breadcrumbs(BuildContext context) {
-  final maxVisible = context.knobs.double
-      .slider(
-        label: 'Behaviour · Visible items',
-        initialValue: 4,
-        min: 2,
-        max: 6,
-        divisions: 4,
-      )
-      .round();
+  final maxVisible = context.knobs.double.slider(
+    label: 'Behaviour · Visible items',
+    initialValue: 4,
+    min: 2,
+    max: 6,
+    divisions: 4,
+  ).round();
   final includeDeepPath = context.knobs.boolean(
     label: 'Content · Deep path',
     initialValue: true,
@@ -69,9 +67,7 @@ Widget _breadcrumbsLong(BuildContext context) => previewColumn([
       ],
     ),
   ),
-  const CarpenterText.caption(
-    'Narrow width forces wrapping; path overflow remains explicit.',
-  ),
+  const CarpenterText.caption('Narrow width forces wrapping; path overflow remains explicit.'),
 ]);
 
 Widget _notifications(BuildContext context) {
@@ -124,8 +120,7 @@ final class _NotificationPreviewState extends State<_NotificationPreview> {
     CarpenterNotification(
       id: 'balance-warning',
       title: 'Balance mismatch',
-      message:
-          'Opening balance differs from the imported statement by 12 450.00.',
+      message: 'Opening balance differs from the imported statement by 12 450.00.',
       tone: FeedbackColorRole.warning,
       unread: widget.includeUnread,
       timestamp: DateTime(2026, 8, 31, 3, 15),

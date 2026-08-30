@@ -93,9 +93,7 @@ final class _NumberPreviewState extends State<_NumberPreview> {
       width: context.units(22.rem),
       child: CarpenterNumberInput(
         value: _value,
-        onChanged: widget.enabled
-            ? (value) => setState(() => _value = value)
-            : null,
+        onChanged: widget.enabled ? (value) => setState(() => _value = value) : null,
         label: 'Amount',
         description: 'Typed num? value, commas accepted as decimal separators.',
         placeholder: '0.00',
@@ -115,7 +113,11 @@ final class _NumberPreviewState extends State<_NumberPreview> {
 Widget _numberStates(BuildContext context) => previewColumn([
   SizedBox(
     width: context.units(18.rem),
-    child: CarpenterNumberInput(value: 42, onChanged: (_) {}, label: 'Enabled'),
+    child: CarpenterNumberInput(
+      value: 42,
+      onChanged: (_) {},
+      label: 'Enabled',
+    ),
   ),
   SizedBox(
     width: context.units(18.rem),
@@ -231,10 +233,7 @@ final class _DateRangePreviewState extends State<_DateRangePreview> {
   }
 
   void _sync() {
-    _value =
-        widget.start != null &&
-            widget.end != null &&
-            !widget.end!.isBefore(widget.start!)
+    _value = widget.start != null && widget.end != null && !widget.end!.isBefore(widget.start!)
         ? CarpenterDateRange(start: widget.start!, end: widget.end!)
         : null;
   }
@@ -254,28 +253,20 @@ final class _DateRangePreviewState extends State<_DateRangePreview> {
 }
 
 Widget _badge(BuildContext context) {
-  final count = context.knobs.double
-      .slider(
-        label: 'Content · Count',
-        initialValue: 7,
-        min: 0,
-        max: 150,
-        divisions: 150,
-      )
-      .round();
+  final count = context.knobs.double.slider(
+    label: 'Content · Count',
+    initialValue: 7,
+    min: 0,
+    max: 150,
+    divisions: 150,
+  ).round();
   final role = context.knobs.object.segmented(
     label: 'Appearance · Role',
     options: FeedbackColorRole.values,
     initialOption: FeedbackColorRole.danger,
     labelBuilder: semanticValueLabel,
   );
-  return preview(
-    CarpenterBadge.count(
-      count,
-      role: role,
-      semanticLabel: '$count notifications',
-    ),
-  );
+  return preview(CarpenterBadge.count(count, role: role, semanticLabel: '$count notifications'));
 }
 
 Widget _badgeRoles(BuildContext context) => preview(
@@ -290,24 +281,20 @@ Widget _badgeRoles(BuildContext context) => preview(
 );
 
 Widget _avatarGroup(BuildContext context) {
-  final people = context.knobs.double
-      .slider(
-        label: 'Content · People',
-        initialValue: 7,
-        min: 1,
-        max: 12,
-        divisions: 11,
-      )
-      .round();
-  final maxVisible = context.knobs.double
-      .slider(
-        label: 'Behaviour · Visible',
-        initialValue: 4,
-        min: 1,
-        max: 8,
-        divisions: 7,
-      )
-      .round();
+  final people = context.knobs.double.slider(
+    label: 'Content · People',
+    initialValue: 7,
+    min: 1,
+    max: 12,
+    divisions: 11,
+  ).round();
+  final maxVisible = context.knobs.double.slider(
+    label: 'Behaviour · Visible',
+    initialValue: 4,
+    min: 1,
+    max: 8,
+    divisions: 7,
+  ).round();
   final size = context.knobs.double.slider(
     label: 'Appearance · Size (rem)',
     initialValue: 2.5,
@@ -315,20 +302,7 @@ Widget _avatarGroup(BuildContext context) {
     max: 5,
     divisions: 14,
   );
-  const initials = [
-    'NC',
-    'AK',
-    'IM',
-    'DS',
-    'EV',
-    'AM',
-    'MK',
-    'VP',
-    'TA',
-    'RN',
-    'AS',
-    'OL',
-  ];
+  const initials = ['NC', 'AK', 'IM', 'DS', 'EV', 'AM', 'MK', 'VP', 'TA', 'RN', 'AS', 'OL'];
   return preview(
     CarpenterAvatarGroup(
       items: [
