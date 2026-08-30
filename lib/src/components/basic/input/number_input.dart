@@ -83,33 +83,38 @@ final class _CarpenterNumberInputState extends State<CarpenterNumberInput> {
   num? _parse(String raw, {required bool reportError}) {
     final text = raw.trim();
     if (text.isEmpty) {
-      if (reportError && _localError != null)
-        setState(() => _localError = null);
+      _setLocalError(null, report: reportError);
       return null;
     }
+
     final parsed = num.tryParse(text.replaceAll(',', '.'));
     String? error;
     if (parsed == null) {
       error = 'Enter a valid number';
+    } else if (!widget.allowNegative && parsed < 0) {
+      error = 'Negative values are not allowed';
+    } else if (!widget.allowDecimal && parsed != parsed.roundToDouble()) {
+      error = 'Enter a whole number';
     } else if (widget.min != null && parsed < widget.min!) {
       error = 'Minimum is ${widget.min}';
     } else if (widget.max != null && parsed > widget.max!) {
       error = 'Maximum is ${widget.max}';
     }
-    if (reportError && error != _localError)
-      setState(() => _localError = error);
+
+    _setLocalError(error, report: reportError);
     return error == null ? parsed : null;
   }
 
-  TextInputFormatter get _formatter => TextInputFormatter.withFunction((
-    oldValue,
-    newValue,
-  ) {
-    final decimal = widget.allowDecimal ? r'(?:[\.,]\d*)?' : '';
-    final sign = widget.allowNegative ? r'-?' : '';
-    final pattern = RegExp('^$sign\\d*$decimal\$');
-    return pattern.hasMatch(newValue.text) ? newValue : oldValue;
-  });
+  void _setLocalError(String? error, {required bool report}) {
+    if (!report || error == _localError) return;
+    setState(() {
+      _localError = error;
+    });
+  }
+
+  TextInputFormatter get _formatter => FilteringTextInputFormatter.allow(
+    RegExp(r'[-0-9.,]'),
+  );
 
   @override
   Widget build(BuildContext context) => CarpenterInput(
@@ -131,13 +136,17 @@ final class _CarpenterNumberInputState extends State<CarpenterNumberInput> {
     textInputAction: TextInputAction.done,
     focusNode: widget.focusNode,
     autofocus: widget.autofocus,
-    onChanged: (raw) {
-      final parsed = _parse(raw, reportError: true);
-      if (_localError == null) widget.onChanged?.call(parsed);
-    },
-    onSubmitted: (raw) {
-      final parsed = _parse(raw, reportError: true);
-      if (_localError == null) widget.onSubmitted?.call(parsed);
-    },
+    onChanged: _handleChanged,
+    onSubmitted: _handleSubmitted,
   );
+
+  void _handleChanged(String raw) {
+    final parsed = _parse(raw, reportError: true);
+    if (_localError == null) widget.onChanged?.call(parsed);
+  }
+
+  void _handleSubmitted(String raw) {
+    final parsed = _parse(raw, reportError: true);
+    if (_localError == null) widget.onSubmitted?.call(parsed);
+  }
 }

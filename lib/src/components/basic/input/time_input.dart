@@ -56,19 +56,54 @@ final class _CarpenterTimeInputState extends State<CarpenterTimeInput> {
   bool _open = false;
   bool _hourOpen = false;
   bool _minuteOpen = false;
-  late CarpenterTime _draft =
+  late CarpenterTime _draft = _initialValue();
+
+  CarpenterTime _initialValue() =>
       widget.value ?? const CarpenterTime(hour: 9, minute: 0);
 
   void _setOpen(bool value) {
-    if (value) {
-      _draft = widget.value ?? const CarpenterTime(hour: 9, minute: 0);
-    }
+    if (value) _draft = _initialValue();
     setState(() {
       _open = value;
       if (!value) {
         _hourOpen = false;
         _minuteOpen = false;
       }
+    });
+  }
+
+  void _changeHour(int? value) {
+    if (value == null) return;
+    setState(() {
+      _draft = CarpenterTime(hour: value, minute: _draft.minute);
+    });
+  }
+
+  void _changeMinute(int? value) {
+    if (value == null) return;
+    setState(() {
+      _draft = CarpenterTime(hour: _draft.hour, minute: value);
+    });
+  }
+
+  List<CarpenterOption<int>> get _hourOptions => [
+    for (var hour = 0; hour < 24; hour++)
+      CarpenterOption(
+        id: 'hour.$hour',
+        value: hour,
+        label: hour.toString().padLeft(2, '0'),
+      ),
+  ];
+
+  List<CarpenterOption<int>> get _minuteOptions {
+    final count = 60 ~/ widget.minuteStep;
+    return List.generate(count, (index) {
+      final minute = index * widget.minuteStep;
+      return CarpenterOption(
+        id: 'minute.$minute',
+        value: minute,
+        label: minute.toString().padLeft(2, '0'),
+      );
     });
   }
 
@@ -119,57 +154,30 @@ final class _CarpenterTimeInputState extends State<CarpenterTimeInput> {
               Expanded(
                 child: CarpenterSelect<int>(
                   value: _draft.hour,
-                  onChanged: (value) {
-                    if (value == null) return;
-                    setState(
-                      () => _draft = CarpenterTime(
-                        hour: value,
-                        minute: _draft.minute,
-                      ),
-                    );
-                  },
+                  onChanged: _changeHour,
                   open: _hourOpen,
-                  onOpenChanged: (value) => setState(() => _hourOpen = value),
+                  onOpenChanged: (value) {
+                    setState(() {
+                      _hourOpen = value;
+                    });
+                  },
                   label: 'Hour',
-                  options: [
-                    for (var hour = 0; hour < 24; hour++)
-                      CarpenterOption(
-                        id: 'hour.$hour',
-                        value: hour,
-                        label: hour.toString().padLeft(2, '0'),
-                      ),
-                  ],
+                  options: _hourOptions,
                 ),
               ),
               SizedBox(width: context.units(.75.rem)),
               Expanded(
                 child: CarpenterSelect<int>(
                   value: _draft.minute,
-                  onChanged: (value) {
-                    if (value == null) return;
-                    setState(
-                      () => _draft = CarpenterTime(
-                        hour: _draft.hour,
-                        minute: value,
-                      ),
-                    );
-                  },
+                  onChanged: _changeMinute,
                   open: _minuteOpen,
-                  onOpenChanged: (value) =>
-                      setState(() => _minuteOpen = value),
+                  onOpenChanged: (value) {
+                    setState(() {
+                      _minuteOpen = value;
+                    });
+                  },
                   label: 'Minute',
-                  options: [
-                    for (
-                      var minute = 0;
-                      minute < 60;
-                      minute += widget.minuteStep
-                    )
-                      CarpenterOption(
-                        id: 'minute.$minute',
-                        value: minute,
-                        label: minute.toString().padLeft(2, '0'),
-                      ),
-                  ],
+                  options: _minuteOptions,
                 ),
               ),
             ],
