@@ -53,36 +53,41 @@ final class CarpenterPageHeader extends StatelessWidget {
         constraints.maxWidth,
       );
       final actionWidget = actions ?? _descriptorActions();
-      final titleBlock = Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (breadcrumbs != null) ...[breadcrumbs!, SizedBox(height: gap)],
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: gap,
-            runSpacing: gap,
-            children: [
-              CarpenterText.title(
-                title,
-                emphasis: TypographyEmphasis.strong,
-                maxLines: 2,
+      final titleBlock = IntrinsicWidth(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (breadcrumbs != null) ...[breadcrumbs!, SizedBox(height: gap)],
+            Wrap(
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: gap,
+              runSpacing: gap,
+              children: [
+                CarpenterText.title(
+                  title,
+                  emphasis: TypographyEmphasis.strong,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                if (status case final CarpenterPageStatus value)
+                  CarpenterStatusIndicator(
+                    label: value.label,
+                    role: value.role,
+                  ),
+              ],
+            ),
+            if (subtitle != null) ...[
+              SizedBox(height: gap),
+              CarpenterText.body(
+                subtitle!,
+                colorRole: ContentColorRole.secondary,
+                maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
-              if (status case final CarpenterPageStatus value)
-                CarpenterStatusIndicator(label: value.label, role: value.role),
             ],
-          ),
-          if (subtitle != null) ...[
-            SizedBox(height: gap),
-            CarpenterText.body(
-              subtitle!,
-              colorRole: ContentColorRole.secondary,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-            ),
           ],
-        ],
+        ),
       );
       final content = actionWidget == null
           ? titleBlock

@@ -75,7 +75,7 @@ void main() {
           width: 300,
           child: ActionOverflowLayout(
             gap: 8,
-            minimumInlineActionWidth: 40,
+            minimumInlineActionWidth: 100,
             content: const SizedBox(
               key: ValueKey('content'),
               width: 260,
