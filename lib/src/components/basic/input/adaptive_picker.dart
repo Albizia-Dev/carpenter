@@ -10,7 +10,8 @@ import '../select/select.dart';
 import '../text.dart';
 
 TargetPlatform carpenterPickerPlatform(BuildContext context) {
-  final scope = context.dependOnInheritedWidgetOfExactType<CarpenterRuntimeScope>();
+  final scope = context
+      .dependOnInheritedWidgetOfExactType<CarpenterRuntimeScope>();
   return scope?.runtime.maybeRead<CarpenterCoreRuntime>()?.platform ??
       defaultTargetPlatform;
 }
@@ -62,7 +63,9 @@ final class _CarpenterDateWheelState extends State<CarpenterDateWheel> {
   @override
   void didUpdateWidget(CarpenterDateWheel oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final previousFirstYear = _dateOnly(oldWidget.firstDate ?? DateTime(1900)).year;
+    final previousFirstYear = _dateOnly(
+      oldWidget.firstDate ?? DateTime(1900),
+    ).year;
     final next = _clampDate(widget.value, _first, _last);
     if (previousFirstYear != _first.year) {
       _yearController.dispose();
@@ -78,7 +81,9 @@ final class _CarpenterDateWheelState extends State<CarpenterDateWheel> {
 
   void _createControllers() {
     _dayController = FixedExtentScrollController(initialItem: _value.day - 1);
-    _monthController = FixedExtentScrollController(initialItem: _value.month - 1);
+    _monthController = FixedExtentScrollController(
+      initialItem: _value.month - 1,
+    );
     _yearController = FixedExtentScrollController(
       initialItem: _value.year - _first.year,
     );
@@ -87,7 +92,9 @@ final class _CarpenterDateWheelState extends State<CarpenterDateWheel> {
   void _syncControllers() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      if (_dayController.hasClients) _dayController.jumpToItem(_value.day - 1);
+      if (_dayController.hasClients) {
+        _dayController.jumpToItem(_value.day - 1);
+      }
       if (_monthController.hasClients) {
         _monthController.jumpToItem(_value.month - 1);
       }
@@ -137,7 +144,8 @@ final class _CarpenterDateWheelState extends State<CarpenterDateWheel> {
                 controller: _dayController,
                 itemExtent: extent,
                 count: _daysInMonth(_value.year, _value.month),
-                labelBuilder: (index) => (index + 1).toString().padLeft(2, '0'),
+                labelBuilder: (index) =>
+                    (index + 1).toString().padLeft(2, '0'),
                 onSelected: (index) => _change(day: index + 1),
               ),
             ),
@@ -146,7 +154,8 @@ final class _CarpenterDateWheelState extends State<CarpenterDateWheel> {
                 controller: _monthController,
                 itemExtent: extent,
                 count: 12,
-                labelBuilder: (index) => (index + 1).toString().padLeft(2, '0'),
+                labelBuilder: (index) =>
+                    (index + 1).toString().padLeft(2, '0'),
                 onSelected: (index) => _change(month: index + 1),
               ),
             ),
@@ -188,7 +197,7 @@ final class CarpenterTimeWheel extends StatefulWidget {
 }
 
 final class _CarpenterTimeWheelState extends State<CarpenterTimeWheel> {
-  late int _hour = widget.hour.clamp(0, 23);
+  late int _hour = widget.hour.clamp(0, 23).toInt();
   late int _minute = _normalizeMinute(widget.minute, widget.minuteStep);
   late final FixedExtentScrollController _hourController =
       FixedExtentScrollController(initialItem: _hour);
@@ -198,13 +207,28 @@ final class _CarpenterTimeWheelState extends State<CarpenterTimeWheel> {
   @override
   void didUpdateWidget(CarpenterTimeWheel oldWidget) {
     super.didUpdateWidget(oldWidget);
+    final nextHour = widget.hour.clamp(0, 23).toInt();
+    final nextMinute = _normalizeMinute(widget.minute, widget.minuteStep);
     if (oldWidget.minuteStep != widget.minuteStep) {
-      _minute = _normalizeMinute(widget.minute, widget.minuteStep);
       _minuteController.dispose();
       _minuteController = FixedExtentScrollController(
-        initialItem: _minute ~/ widget.minuteStep,
+        initialItem: nextMinute ~/ widget.minuteStep,
       );
     }
+    final changed = nextHour != _hour || nextMinute != _minute;
+    _hour = nextHour;
+    _minute = nextMinute;
+    if (changed) _syncControllers();
+  }
+
+  void _syncControllers() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (_hourController.hasClients) _hourController.jumpToItem(_hour);
+      if (_minuteController.hasClients) {
+        _minuteController.jumpToItem(_minute ~/ widget.minuteStep);
+      }
+    });
   }
 
   @override
@@ -320,7 +344,11 @@ final class _CarpenterTimeSelectState extends State<CarpenterTimeSelect> {
               onOpenChanged: (value) => setState(() => _minuteOpen = value),
               label: 'Minute',
               options: [
-                for (var value = 0; value < 60; value += widget.minuteStep)
+                for (
+                  var value = 0;
+                  value < 60;
+                  value += widget.minuteStep
+                )
                   CarpenterOption<int>(
                     id: 'minute.$value',
                     value: value,
@@ -385,6 +413,6 @@ bool _sameDate(DateTime first, DateTime second) =>
 int _daysInMonth(int year, int month) => DateTime(year, month + 1, 0).day;
 
 int _normalizeMinute(int minute, int step) {
-  final safe = minute.clamp(0, 59);
+  final safe = minute.clamp(0, 59).toInt();
   return (safe ~/ step) * step;
 }
