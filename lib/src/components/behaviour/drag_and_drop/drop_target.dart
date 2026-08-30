@@ -12,6 +12,7 @@ final class CarpenterDropDetails<T> {
     required this.operation,
     required this.position,
     required this.localOffset,
+    this.targetSize = Size.zero,
     this.targetId,
   });
 
@@ -19,6 +20,7 @@ final class CarpenterDropDetails<T> {
   final CarpenterDragOperation operation;
   final CarpenterDropPosition position;
   final Offset localOffset;
+  final Size targetSize;
   final Object? targetId;
 }
 
@@ -152,6 +154,7 @@ final class _CarpenterDropTargetWidgetState<T>
       operation: operation,
       position: _resolvePosition(localOffset),
       localOffset: localOffset,
+      targetSize: _targetBox?.size ?? Size.zero,
       targetId: _targetId,
     );
   }
