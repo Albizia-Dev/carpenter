@@ -9,7 +9,7 @@ import '../text.dart';
 
 @immutable
 final class CarpenterDateRange {
-  const CarpenterDateRange({required this.start, required this.end})
+  CarpenterDateRange({required this.start, required this.end})
     : assert(!end.isBefore(start));
 
   final DateTime start;
