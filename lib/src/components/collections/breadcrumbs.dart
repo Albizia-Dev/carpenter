@@ -1,14 +1,14 @@
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../../foundation/roles.dart';
-import '../../../foundation/theme.dart';
-import '../../basic/icon.dart';
-import '../../basic/icons.dart';
-import '../../basic/link.dart';
-import '../../basic/text.dart';
-import '../../behaviour/menu/dropdown.dart';
-import '../../behaviour/menu/menu_entry.dart';
+import '../../foundation/roles.dart';
+import '../../foundation/theme.dart';
+import '../basic/icon.dart';
+import '../basic/icons.dart';
+import '../basic/link.dart';
+import '../basic/text.dart';
+import '../behaviour/menu/dropdown.dart';
+import '../behaviour/menu/menu_entry.dart';
 
 @immutable
 final class CarpenterBreadcrumb {
