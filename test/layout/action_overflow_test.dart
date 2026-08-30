@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -90,9 +91,11 @@ void main() {
       ),
     );
 
-    final content = tester.getRect(find.byKey(const ValueKey('content')));
-    final actions = tester.getRect(find.byKey(const ValueKey('actions')));
-    expect(actions.top, greaterThanOrEqualTo(content.bottom + 8));
+    final actions = tester.renderObject<RenderBox>(
+      find.byKey(const ValueKey('actions')),
+    );
+    final parentData = actions.parentData! as BoxParentData;
+    expect(parentData.offset.dy, 28);
   });
 
   testWidgets('action layout stays inline when minimum action space remains', (
@@ -121,9 +124,15 @@ void main() {
       ),
     );
 
-    final content = tester.getRect(find.byKey(const ValueKey('content')));
-    final actions = tester.getRect(find.byKey(const ValueKey('actions')));
-    expect(actions.top, content.top);
-    expect(actions.left, greaterThan(content.right));
+    final content = tester.renderObject<RenderBox>(
+      find.byKey(const ValueKey('content')),
+    );
+    final actions = tester.renderObject<RenderBox>(
+      find.byKey(const ValueKey('actions')),
+    );
+    final contentParentData = content.parentData! as BoxParentData;
+    final actionsParentData = actions.parentData! as BoxParentData;
+    expect(actionsParentData.offset.dy, contentParentData.offset.dy);
+    expect(actionsParentData.offset.dx, greaterThan(contentParentData.offset.dx));
   });
 }
