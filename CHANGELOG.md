@@ -52,3 +52,10 @@
   notification lists with unread state, actions, and caller-owned dismissal.
 - Added interactive Widgetbook playgrounds and behavioural tests for the new
   components.
+- Added `CarpenterMaskedInput` and rebuilt date, time, and date-range controls
+  as masked text fields with trailing adaptive picker actions.
+- Refined breadcrumbs to the compact text-and-chevron presentation used by the
+  example while retaining deep-path overflow behaviour.
+- Added the typed drag-and-drop kernel with payloads, move/copy/link operation
+  negotiation, shared sessions, draggable adapters, drop targets, and
+  before/inside/after positioning.
