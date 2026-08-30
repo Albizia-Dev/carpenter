@@ -1,0 +1,35 @@
+name: Format Fix
+
+on:
+  push:
+    branches:
+      - feat/masked-input-dnd-kernel
+    paths:
+      - .github/workflows/format-fix.yml
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/masked-input-dnd-kernel
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart format lib
+      - name: Commit formatting
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib
+          git commit -m "style: apply final dart format"
+          git push origin HEAD:feat/masked-input-dnd-kernel
