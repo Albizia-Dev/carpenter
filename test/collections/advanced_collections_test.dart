@@ -72,7 +72,7 @@ void main() {
   ) async {
     CarpenterReorderDetails<String>? movement;
     await tester.pumpWidget(
-      carpenterHarness(
+      carpenterOverlayHarness(
         CarpenterReorderableCollection<String>(
           items: const ['A', 'B', 'C'],
           itemKey: (item) => item,
