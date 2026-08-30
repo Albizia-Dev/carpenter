@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'drag_operation.dart';
@@ -62,8 +61,7 @@ final class CarpenterDropTarget<T> extends StatefulWidget {
       CarpenterDragOperation.copy,
       CarpenterDragOperation.link,
     },
-  }) : assert(edgeFraction >= 0 && edgeFraction < .5),
-       assert(acceptedOperations.length > 0);
+  }) : assert(edgeFraction >= 0 && edgeFraction < .5);
 
   final CarpenterDropTargetBuilder<T> builder;
   final CarpenterDropCallback<T> onDrop;
@@ -82,6 +80,7 @@ final class CarpenterDropTarget<T> extends StatefulWidget {
 final class _CarpenterDropTargetWidgetState<T>
     extends State<CarpenterDropTarget<T>> {
   final Object _fallbackTargetId = Object();
+  final GlobalKey _geometryKey = GlobalKey();
   CarpenterDragPayload<T>? _payload;
   CarpenterDragOperation? _operation;
   CarpenterDropPosition? _position;
@@ -89,6 +88,13 @@ final class _CarpenterDropTargetWidgetState<T>
   bool _accepts = false;
 
   Object get _targetId => widget.targetId ?? _fallbackTargetId;
+
+  RenderBox? get _targetBox {
+    final renderObject = _geometryKey.currentContext?.findRenderObject();
+    return renderObject is RenderBox && renderObject.hasSize
+        ? renderObject
+        : null;
+  }
 
   CarpenterDragOperation? _resolveOperation(CarpenterDragPayload<T> payload) {
     final session = CarpenterDragScope.maybeOf(context)?.session;
@@ -107,20 +113,15 @@ final class _CarpenterDropTargetWidgetState<T>
     return null;
   }
 
-  Offset _localOffset(Offset globalOffset) {
-    final renderObject = context.findRenderObject();
-    if (renderObject is! RenderBox) return Offset.zero;
-    return renderObject.globalToLocal(globalOffset);
-  }
+  Offset _localOffset(Offset globalOffset) =>
+      _targetBox?.globalToLocal(globalOffset) ?? Offset.zero;
 
   CarpenterDropPosition _resolvePosition(Offset localOffset) {
     final fixed = widget.fixedPosition;
     if (fixed != null) return fixed;
-    final renderObject = context.findRenderObject();
-    if (renderObject is! RenderBox || !renderObject.hasSize) {
-      return CarpenterDropPosition.inside;
-    }
-    final size = renderObject.size;
+    final box = _targetBox;
+    if (box == null) return CarpenterDropPosition.inside;
+    final size = box.size;
     var ratio = switch (widget.axis) {
       CarpenterDropAxis.vertical =>
         size.height == 0 ? .5 : localOffset.dy / size.height,
@@ -202,14 +203,18 @@ final class _CarpenterDropTargetWidgetState<T>
       }
       _clearHover();
     },
-    builder: (context, candidateData, rejectedData) => widget.builder(
-      context,
-      CarpenterDropTargetState<T>(
-        hovering: _hovering,
-        accepts: _accepts,
-        payload: _payload,
-        operation: _operation,
-        position: _position,
+    builder: (context, candidateData, rejectedData) => ConstrainedBox(
+      key: _geometryKey,
+      constraints: const BoxConstraints(),
+      child: widget.builder(
+        context,
+        CarpenterDropTargetState<T>(
+          hovering: _hovering,
+          accepts: _accepts,
+          payload: _payload,
+          operation: _operation,
+          position: _position,
+        ),
       ),
     ),
   );
