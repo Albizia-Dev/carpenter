@@ -98,6 +98,71 @@ void main() {
     expect(movement!.newIndex, greaterThan(0));
   });
 
+  testWidgets('kanban drag group allows moves between board surfaces', (
+    tester,
+  ) async {
+    final group = Object();
+    CarpenterKanbanMoveDetails<String, String>? movement;
+    const source = CarpenterKanbanColumn<String, String>(
+      id: 'source',
+      value: 'source',
+      title: 'Source',
+      cards: ['Source card'],
+    );
+    const target = CarpenterKanbanColumn<String, String>(
+      id: 'target',
+      value: 'target',
+      title: 'Target',
+      cards: ['Target card'],
+    );
+
+    Widget cardBuilder(
+      BuildContext context,
+      String card,
+      CarpenterKanbanCardState<String> state,
+    ) => SizedBox(
+      height: 48,
+      child: CarpenterCard(child: CarpenterText.label(card)),
+    );
+
+    await tester.pumpWidget(
+      carpenterOverlayHarness(
+        Column(
+          children: [
+            CarpenterKanban<String, String>(
+              columns: const [source],
+              cardKey: (card) => card,
+              cardBuilder: cardBuilder,
+              dragGroupId: group,
+              onMove: (_) {},
+            ),
+            CarpenterKanban<String, String>(
+              columns: const [target],
+              cardKey: (card) => card,
+              cardBuilder: cardBuilder,
+              dragGroupId: group,
+              onMove: (details) => movement = details,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('Source card')),
+    );
+    await tester.pump();
+    await gesture.moveTo(tester.getCenter(find.text('Target card')));
+    await tester.pump();
+    await gesture.up();
+    await tester.pump();
+
+    expect(movement, isNotNull);
+    expect(movement!.card, 'Source card');
+    expect(movement!.sourceColumn.id, 'source');
+    expect(movement!.targetColumn.id, 'target');
+  });
+
   testWidgets('kanban renders empty columns and planning lanes collapse', (
     tester,
   ) async {
