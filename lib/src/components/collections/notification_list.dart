@@ -1,12 +1,12 @@
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../basic/badge.dart';
-import '../../basic/button/button.dart';
-import '../../basic/card.dart';
-import '../../basic/text.dart';
-import '../../../foundation/roles.dart';
-import '../../../foundation/theme.dart';
+import '../../foundation/roles.dart';
+import '../../foundation/theme.dart';
+import '../basic/badge.dart';
+import '../basic/button/button.dart';
+import '../basic/card.dart';
+import '../basic/text.dart';
 
 @immutable
 final class CarpenterNotification {
