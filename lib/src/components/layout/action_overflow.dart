@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
@@ -97,7 +95,9 @@ final class ActionOverflowResolver<T> {
     required double overflowWidth,
   }) {
     final visibleEntries = entries.where(visibleWhen).toList();
-    final overflowEntries = entries.where((entry) => !visibleWhen(entry)).toList();
+    final overflowEntries = entries
+        .where((entry) => !visibleWhen(entry))
+        .toList();
     final useIcons = stage == ActionOverflowStage.iconOnly;
     var requiredWidth = 0.0;
     for (var index = 0; index < visibleEntries.length; index++) {
@@ -154,10 +154,12 @@ final class ActionOverflowLayout extends MultiChildRenderObjectWidget {
   }
 }
 
+final class _ActionOverflowParentData extends ContainerBoxParentData<RenderBox> {}
+
 final class _RenderActionOverflow extends RenderBox
     with
-        ContainerRenderObjectMixin<RenderBox, ContainerBoxParentData<RenderBox>>,
-        RenderBoxContainerDefaultsMixin<RenderBox, ContainerBoxParentData<RenderBox>> {
+        ContainerRenderObjectMixin<RenderBox, _ActionOverflowParentData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, _ActionOverflowParentData> {
   _RenderActionOverflow({
     required double gap,
     required double minimumInlineActionWidth,
@@ -196,8 +198,8 @@ final class _RenderActionOverflow extends RenderBox
 
   @override
   void setupParentData(RenderBox child) {
-    if (child.parentData is! ContainerBoxParentData<RenderBox>) {
-      child.parentData = ContainerBoxParentData<RenderBox>();
+    if (child.parentData is! _ActionOverflowParentData) {
+      child.parentData = _ActionOverflowParentData();
     }
   }
 
@@ -210,11 +212,14 @@ final class _RenderActionOverflow extends RenderBox
 
     content.layout(loose, parentUsesSize: true);
 
-    final inline = !maxWidth.isFinite ||
+    final inline =
+        !maxWidth.isFinite ||
         maxWidth - content.size.width - gap >= minimumInlineActionWidth;
     final actionMaxWidth = inline
         ? maxWidth.isFinite
-              ? math.max(0, maxWidth - content.size.width - gap)
+              ? (maxWidth - content.size.width - gap)
+                    .clamp(0.0, double.infinity)
+                    .toDouble()
               : double.infinity
         : maxWidth;
     actions.layout(
@@ -227,16 +232,18 @@ final class _RenderActionOverflow extends RenderBox
 
     final naturalWidth = inline
         ? content.size.width + gap + actions.size.width
-        : math.max(content.size.width, actions.size.width);
+        : content.size.width > actions.size.width
+        ? content.size.width
+        : actions.size.width;
     final naturalHeight = inline
-        ? math.max(content.size.height, actions.size.height)
+        ? content.size.height > actions.size.height
+              ? content.size.height
+              : actions.size.height
         : content.size.height + gap + actions.size.height;
     size = constraints.constrain(Size(naturalWidth, naturalHeight));
 
-    final contentParentData = content.parentData!
-        as ContainerBoxParentData<RenderBox>;
-    final actionsParentData = actions.parentData!
-        as ContainerBoxParentData<RenderBox>;
+    final contentParentData = content.parentData! as _ActionOverflowParentData;
+    final actionsParentData = actions.parentData! as _ActionOverflowParentData;
     if (inline) {
       contentParentData.offset = Offset(_startX(content.size.width), 0);
       actionsParentData.offset = Offset(_endX(actions.size.width), 0);
@@ -256,7 +263,8 @@ final class _RenderActionOverflow extends RenderBox
       textDirection == TextDirection.ltr ? size.width - childWidth : 0;
 
   @override
-  void paint(PaintingContext context, Offset offset) => defaultPaint(context, offset);
+  void paint(PaintingContext context, Offset offset) =>
+      defaultPaint(context, offset);
 
   @override
   bool hitTestChildren(BoxHitTestResult result, {required Offset position}) =>
