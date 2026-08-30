@@ -62,3 +62,5 @@ jobs:
           git push origin HEAD:feat/file-tree-board-collections
       - run: dart analyze lib
       - run: flutter test test/basic/file_input_test.dart test/collections/advanced_collections_test.dart
+
+# Final behavioral rerun including shared Kanban drag groups.
