@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'drag_operation.dart';
 import 'drag_payload.dart';
 import 'drag_scope.dart';
+import 'drag_transport.dart';
 
 enum CarpenterDragActivation { immediate, longPress }
 
@@ -50,6 +51,17 @@ final class CarpenterDraggable<T> extends StatelessWidget {
     );
     final controller = CarpenterDragScope.maybeOf(context);
     final dragFeedback = feedback ?? Opacity(opacity: .82, child: child);
+    final transport = CarpenterDragTransport<T>(payload);
+
+    Offset anchorStrategy(
+      Draggable<Object> draggable,
+      BuildContext dragContext,
+      Offset position,
+    ) {
+      final anchor = childDragAnchorStrategy(draggable, dragContext, position);
+      transport.dragStartPoint = anchor;
+      return anchor;
+    }
 
     void started() {
       controller?.begin(
@@ -75,23 +87,26 @@ final class CarpenterDraggable<T> extends StatelessWidget {
     }
 
     final draggable = switch (activation) {
-      CarpenterDragActivation.immediate => Draggable<CarpenterDragPayload<T>>(
-        data: payload,
-        feedback: dragFeedback,
-        childWhenDragging: childWhenDragging,
-        axis: axis,
-        maxSimultaneousDrags: maxSimultaneousDrags,
-        onDragStarted: started,
-        onDragCompleted: completed,
-        onDraggableCanceled: canceled,
-        onDragEnd: ended,
-        child: child,
-      ),
-      CarpenterDragActivation.longPress =>
-        LongPressDraggable<CarpenterDragPayload<T>>(
-          data: payload,
+      CarpenterDragActivation.immediate =>
+        Draggable<CarpenterDragTransport<T>>(
+          data: transport,
           feedback: dragFeedback,
           childWhenDragging: childWhenDragging,
+          dragAnchorStrategy: anchorStrategy,
+          axis: axis,
+          maxSimultaneousDrags: maxSimultaneousDrags,
+          onDragStarted: started,
+          onDragCompleted: completed,
+          onDraggableCanceled: canceled,
+          onDragEnd: ended,
+          child: child,
+        ),
+      CarpenterDragActivation.longPress =>
+        LongPressDraggable<CarpenterDragTransport<T>>(
+          data: transport,
+          feedback: dragFeedback,
+          childWhenDragging: childWhenDragging,
+          dragAnchorStrategy: anchorStrategy,
           axis: axis,
           maxSimultaneousDrags: maxSimultaneousDrags,
           onDragStarted: started,
