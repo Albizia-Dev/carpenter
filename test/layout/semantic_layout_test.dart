@@ -29,7 +29,7 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('toolbar moves actions into one shared overflow menu', (
+  testWidgets('toolbar moves action groups into one shared overflow menu', (
     tester,
   ) async {
     var invoked = 0;
@@ -41,17 +41,18 @@ void main() {
           label: 'Long action $index',
           onInvoke: () => invoked += 1,
         ),
-        priority: index == 0
-            ? CarpenterToolbarPriority.critical
-            : CarpenterToolbarPriority.normal,
+        group: index == 0
+            ? CarpenterToolbarGroup.primary
+            : CarpenterToolbarGroup.secondary,
       ),
     );
     await tester.pumpWidget(
       _overlayHarness(width: 260, child: CarpenterToolbar(items: items)),
     );
 
-    expect(find.text('More actions'), findsOneWidget);
-    await tester.tap(find.text('More actions'));
+    final overflowTrigger = find.bySemanticsLabel('More actions');
+    expect(overflowTrigger, findsOneWidget);
+    await tester.tap(overflowTrigger);
     await tester.pumpAndSettle();
     expect(find.byType(CarpenterMenu), findsOneWidget);
     await tester.tap(find.text('Long action 4').last);

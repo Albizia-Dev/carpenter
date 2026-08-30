@@ -68,15 +68,23 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      const Directionality(
+      Directionality(
         textDirection: TextDirection.ltr,
         child: SizedBox(
           width: 300,
           child: ActionOverflowLayout(
             gap: 8,
             minimumInlineActionWidth: 40,
-            content: SizedBox(key: ValueKey('content'), width: 260, height: 20),
-            actions: SizedBox(key: ValueKey('actions'), width: 200, height: 20),
+            content: const SizedBox(
+              key: ValueKey('content'),
+              width: 260,
+              height: 20,
+            ),
+            actions: const SizedBox(
+              key: ValueKey('actions'),
+              width: 200,
+              height: 20,
+            ),
           ),
         ),
       ),
@@ -91,15 +99,23 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      const Directionality(
+      Directionality(
         textDirection: TextDirection.ltr,
         child: SizedBox(
           width: 300,
           child: ActionOverflowLayout(
             gap: 8,
             minimumInlineActionWidth: 40,
-            content: SizedBox(key: ValueKey('content'), width: 180, height: 20),
-            actions: SizedBox(key: ValueKey('actions'), width: 100, height: 20),
+            content: const SizedBox(
+              key: ValueKey('content'),
+              width: 180,
+              height: 20,
+            ),
+            actions: const SizedBox(
+              key: ValueKey('actions'),
+              width: 100,
+              height: 20,
+            ),
           ),
         ),
       ),
