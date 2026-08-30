@@ -3,11 +3,10 @@ import 'package:flutter/widgets.dart';
 
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
-import '../basic/icon.dart';
-import '../basic/icons.dart';
-import '../basic/link.dart';
+import '../../internal/overlay/anchored_overlay_host.dart';
 import '../basic/text.dart';
-import '../behaviour/menu/dropdown.dart';
+import '../behaviour/control.dart';
+import '../behaviour/menu/menu.dart';
 import '../behaviour/menu/menu_entry.dart';
 
 @immutable
@@ -23,7 +22,7 @@ final class CarpenterBreadcrumb {
   final String? semanticLabel;
 }
 
-/// Hierarchical navigation path with adaptive overflow for long locations.
+/// Hierarchical navigation path with compact text presentation and adaptive overflow.
 final class CarpenterBreadcrumbs extends StatefulWidget {
   const CarpenterBreadcrumbs({
     super.key,
@@ -57,12 +56,10 @@ final class _CarpenterBreadcrumbsState extends State<CarpenterBreadcrumbs> {
 
     void appendSeparator() {
       if (children.isEmpty) return;
-      final rtl = Directionality.of(context) == TextDirection.rtl;
       children.add(
-        ExcludeSemantics(
-          child: CarpenterIcon(
-            rtl ? CarpenterIcons.chevronLeft : CarpenterIcons.chevronRight,
-            size: IconSize.xsmall,
+        const ExcludeSemantics(
+          child: CarpenterText.body(
+            '›',
             colorRole: ContentColorRole.muted,
           ),
         ),
@@ -86,7 +83,7 @@ final class _CarpenterBreadcrumbsState extends State<CarpenterBreadcrumbs> {
         return;
       }
       children.add(
-        CarpenterLink(
+        _BreadcrumbLink(
           label: item.label,
           semanticLabel: item.semanticLabel,
           onInvoke: item.onInvoke,
@@ -99,30 +96,36 @@ final class _CarpenterBreadcrumbsState extends State<CarpenterBreadcrumbs> {
       appendSeparator();
       final hidden = widget.items.sublist(1, tailStart);
       children.add(
-        CarpenterDropdown.icon(
+        AnchoredOverlayHost(
           open: _overflowOpen,
           onOpenChanged: (value) => setState(() => _overflowOpen = value),
-          label: 'More path items',
-          semanticLabel: 'More breadcrumb items',
-          icon: CarpenterIcons.more,
-          size: ControlSize.xsmall,
-          prominence: ActionProminence.ghost,
-          items: [
-            for (var index = 0; index < hidden.length; index++)
-              CarpenterMenuItem(
-                action: CarpenterActionDescriptor(
-                  id: 'breadcrumb.overflow.$index',
-                  label: hidden[index].label,
-                  semanticLabel: hidden[index].semanticLabel,
-                  onInvoke: hidden[index].onInvoke == null
-                      ? null
-                      : () {
-                          setState(() => _overflowOpen = false);
-                          hidden[index].onInvoke!();
-                        },
+          placement: OverlayPlacement.bottomStart,
+          fallbackPlacements: const [OverlayPlacement.bottomEnd],
+          anchor: _BreadcrumbLink(
+            label: '…',
+            semanticLabel: 'More breadcrumb items',
+            onInvoke: () => setState(() => _overflowOpen = !_overflowOpen),
+          ),
+          overlayBuilder: (context) => CarpenterMenu(
+            semanticLabel: 'More breadcrumb items',
+            onDismissRequested: () => setState(() => _overflowOpen = false),
+            items: [
+              for (var index = 0; index < hidden.length; index++)
+                CarpenterMenuItem(
+                  action: CarpenterActionDescriptor(
+                    id: 'breadcrumb.overflow.$index',
+                    label: hidden[index].label,
+                    semanticLabel: hidden[index].semanticLabel,
+                    onInvoke: hidden[index].onInvoke == null
+                        ? null
+                        : () {
+                            setState(() => _overflowOpen = false);
+                            hidden[index].onInvoke!();
+                          },
+                  ),
                 ),
-              ),
-          ],
+            ],
+          ),
         ),
       );
     }
@@ -143,4 +146,33 @@ final class _CarpenterBreadcrumbsState extends State<CarpenterBreadcrumbs> {
       ),
     );
   }
+}
+
+final class _BreadcrumbLink extends StatelessWidget {
+  const _BreadcrumbLink({
+    required this.label,
+    required this.onInvoke,
+    this.semanticLabel,
+  });
+
+  final String label;
+  final VoidCallback onInvoke;
+  final String? semanticLabel;
+
+  @override
+  Widget build(BuildContext context) => CarpenterControl(
+    onTap: onInvoke,
+    semanticLabel: semanticLabel ?? label,
+    semanticButton: false,
+    semanticLink: true,
+    builder: (context, state) => CarpenterText.body(
+      label,
+      emphasis: state.hovered || state.focused
+          ? TypographyEmphasis.medium
+          : TypographyEmphasis.regular,
+      colorRole: state.hovered || state.focused
+          ? ContentColorRole.primary
+          : ContentColorRole.secondary,
+    ),
+  );
 }
