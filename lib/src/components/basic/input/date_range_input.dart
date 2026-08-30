@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 
 import '../../../foundation/roles.dart';
 import '../../behaviour/dialog.dart';
-import '../button/button.dart';
 import '../calendar.dart';
 import '../icons.dart';
 import '../text.dart';
