@@ -2,7 +2,6 @@ import 'package:flutter/widgets.dart';
 
 import '../../../foundation/roles.dart';
 import '../../behaviour/dialog.dart';
-import '../button/button.dart';
 import '../icons.dart';
 import 'adaptive_picker.dart';
 import 'masked_input.dart';
