@@ -1,0 +1,18 @@
+name: Test Masked Input and DnD
+
+on:
+  push:
+    branches:
+      - feat/masked-input-dnd-kernel
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: flutter test test/basic/extended_primitives_test.dart test/collections/navigation_notifications_test.dart test/behaviour/drag_and_drop_test.dart
