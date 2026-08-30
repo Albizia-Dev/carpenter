@@ -12,6 +12,7 @@ import 'use_cases/basic/extended_primitives.dart';
 import 'use_cases/basic/icon.dart';
 import 'use_cases/basic/icon_button.dart';
 import 'use_cases/basic/input.dart';
+import 'use_cases/basic/masked_input.dart';
 import 'use_cases/basic/migrated_primitives.dart';
 import 'use_cases/basic/radio_group.dart';
 import 'use_cases/basic/select.dart';
@@ -20,6 +21,7 @@ import 'use_cases/basic/switch.dart';
 import 'use_cases/basic/text.dart';
 import 'use_cases/basic/text_area.dart';
 import 'use_cases/behaviour/dialog.dart';
+import 'use_cases/behaviour/drag_and_drop.dart';
 import 'use_cases/behaviour/dropdown.dart';
 import 'use_cases/behaviour/loading_boundary.dart';
 import 'use_cases/behaviour/menu.dart';
@@ -73,6 +75,7 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
         cardComponent,
         linkComponent,
         inputComponent,
+        maskedInputComponent,
         numberInputComponent,
         textAreaComponent,
         dateInputComponent,
@@ -91,6 +94,7 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
       name: 'Behaviour',
       children: [
         controlComponent,
+        dragAndDropComponent,
         loadingBoundaryComponent,
         popoverComponent,
         menuComponent,
