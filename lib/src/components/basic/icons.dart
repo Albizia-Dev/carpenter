@@ -36,6 +36,7 @@ abstract final class CarpenterIcons {
   static const save = IconData(0x25a9);
   static const copy = IconData(0x29c9);
   static const calendar = IconData(0x25a6);
+  static const clock = IconData(0x25f7);
   static const code = IconData(0x2328);
   static const completedSolid = accept;
   static const removeLink = IconData(0x29c0);

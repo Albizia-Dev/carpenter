@@ -42,6 +42,69 @@ void main() {
     expect(value, 5);
   });
 
+  testWidgets('masked input formats typed characters and exposes raw value', (
+    tester,
+  ) async {
+    final controller = TextEditingController();
+    const mask = CarpenterInputMask('AA-####-****');
+    await tester.pumpWidget(
+      carpenterHarness(
+        CarpenterMaskedInput(controller: controller, mask: mask),
+      ),
+    );
+
+    await tester.enterText(find.byType(EditableText), 'AB1234XY90');
+    expect(controller.text, 'AB-1234-XY90');
+    expect(mask.unmask(controller.text), 'AB1234XY90');
+    expect(mask.isComplete(controller.text), isTrue);
+  });
+
+  testWidgets('date input is a masked field that emits typed dates', (
+    tester,
+  ) async {
+    DateTime? value;
+    await tester.pumpWidget(
+      carpenterOverlayHarness(
+        CarpenterDateInput(value: null, onChanged: (next) => value = next),
+      ),
+    );
+
+    expect(find.byType(CarpenterMaskedInput), findsOneWidget);
+    await tester.enterText(find.byType(EditableText), '01092026');
+    expect(find.text('01.09.2026'), findsOneWidget);
+    expect(value, DateTime(2026, 9, 1));
+  });
+
+  testWidgets('time and range inputs parse masked manual entry', (tester) async {
+    CarpenterTime? time;
+    CarpenterDateRange? range;
+    await tester.pumpWidget(
+      carpenterOverlayHarness(
+        Column(
+          children: [
+            CarpenterTimeInput(
+              value: null,
+              onChanged: (next) => time = next,
+            ),
+            CarpenterDateRangeInput(
+              value: null,
+              onChanged: (next) => range = next,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    expect(find.byType(CarpenterMaskedInput), findsNWidgets(2));
+    final fields = find.byType(EditableText);
+    await tester.enterText(fields.at(0), '1430');
+    await tester.enterText(fields.at(1), '0109202612092026');
+
+    expect(time, const CarpenterTime(hour: 14, minute: 30));
+    expect(range?.start, DateTime(2026, 9, 1));
+    expect(range?.end, DateTime(2026, 9, 12));
+  });
+
   testWidgets('badge count caps and avatar group exposes overflow', (
     tester,
   ) async {
