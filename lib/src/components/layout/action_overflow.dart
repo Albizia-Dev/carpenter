@@ -67,7 +67,8 @@ final class ActionOverflowResolver<T> {
     final primary = entries
         .where((entry) => entry.group == ActionOverflowGroup.primary)
         .toList();
-    if (primary.isNotEmpty && primary.every((entry) => entry.iconWidth != null)) {
+    if (primary.isNotEmpty &&
+        primary.every((entry) => entry.iconWidth != null)) {
       final iconOnly = _resolution(
         entries: entries,
         stage: ActionOverflowStage.iconOnly,
@@ -136,11 +137,12 @@ final class ActionOverflowLayout extends MultiChildRenderObjectWidget {
   final double minimumInlineActionWidth;
 
   @override
-  RenderObject createRenderObject(BuildContext context) => _RenderActionOverflow(
-    gap: gap,
-    minimumInlineActionWidth: minimumInlineActionWidth,
-    textDirection: Directionality.maybeOf(context) ?? TextDirection.ltr,
-  );
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderActionOverflow(
+        gap: gap,
+        minimumInlineActionWidth: minimumInlineActionWidth,
+        textDirection: Directionality.maybeOf(context) ?? TextDirection.ltr,
+      );
 
   @override
   void updateRenderObject(
@@ -154,7 +156,8 @@ final class ActionOverflowLayout extends MultiChildRenderObjectWidget {
   }
 }
 
-final class _ActionOverflowParentData extends ContainerBoxParentData<RenderBox> {}
+final class _ActionOverflowParentData
+    extends ContainerBoxParentData<RenderBox> {}
 
 final class _RenderActionOverflow extends RenderBox
     with
@@ -215,13 +218,16 @@ final class _RenderActionOverflow extends RenderBox
     final inline =
         !maxWidth.isFinite ||
         maxWidth - content.size.width - gap >= minimumInlineActionWidth;
-    final actionMaxWidth = inline
-        ? maxWidth.isFinite
-              ? (maxWidth - content.size.width - gap)
-                    .clamp(0.0, double.infinity)
-                    .toDouble()
-              : double.infinity
-        : maxWidth;
+    double actionMaxWidth;
+    if (!inline) {
+      actionMaxWidth = maxWidth;
+    } else if (!maxWidth.isFinite) {
+      actionMaxWidth = double.infinity;
+    } else {
+      actionMaxWidth = (maxWidth - content.size.width - gap)
+          .clamp(0.0, double.infinity)
+          .toDouble();
+    }
     actions.layout(
       BoxConstraints(
         maxWidth: actionMaxWidth,
@@ -232,13 +238,9 @@ final class _RenderActionOverflow extends RenderBox
 
     final naturalWidth = inline
         ? content.size.width + gap + actions.size.width
-        : content.size.width > actions.size.width
-        ? content.size.width
-        : actions.size.width;
+        : _max(content.size.width, actions.size.width);
     final naturalHeight = inline
-        ? content.size.height > actions.size.height
-              ? content.size.height
-              : actions.size.height
+        ? _max(content.size.height, actions.size.height)
         : content.size.height + gap + actions.size.height;
     size = constraints.constrain(Size(naturalWidth, naturalHeight));
 
@@ -261,6 +263,8 @@ final class _RenderActionOverflow extends RenderBox
 
   double _endX(double childWidth) =>
       textDirection == TextDirection.ltr ? size.width - childWidth : 0;
+
+  double _max(double first, double second) => first > second ? first : second;
 
   @override
   void paint(PaintingContext context, Offset offset) =>
