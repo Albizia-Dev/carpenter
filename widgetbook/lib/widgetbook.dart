@@ -8,6 +8,7 @@ import 'use_cases/basic/button.dart';
 import 'use_cases/basic/card_link.dart';
 import 'use_cases/basic/checkbox.dart';
 import 'use_cases/basic/combo_box.dart';
+import 'use_cases/basic/extended_primitives.dart';
 import 'use_cases/basic/icon.dart';
 import 'use_cases/basic/icon_button.dart';
 import 'use_cases/basic/input.dart';
@@ -31,6 +32,7 @@ import 'use_cases/collections/content_primitives.dart';
 import 'use_cases/collections/data_list.dart';
 import 'use_cases/collections/filter_bar.dart';
 import 'use_cases/collections/migrated_collections.dart';
+import 'use_cases/collections/navigation_notifications.dart';
 import 'use_cases/collections/table.dart';
 import 'use_cases/foundation/colors.dart';
 import 'use_cases/foundation/gravity_icons.dart';
@@ -61,6 +63,8 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
         textComponent,
         iconComponent,
         avatarComponent,
+        avatarGroupComponent,
+        badgeComponent,
         statusIndicatorComponent,
         activityComponent,
         buttonComponent,
@@ -69,8 +73,11 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
         cardComponent,
         linkComponent,
         inputComponent,
+        numberInputComponent,
         textAreaComponent,
         dateInputComponent,
+        dateRangeInputComponent,
+        timeInputComponent,
         colorPickerComponent,
         checkboxComponent,
         radioGroupComponent,
@@ -104,9 +111,11 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
         collectionKernelComponent,
         collectionLifecycleComponent,
         filterBarComponent,
+        breadcrumbsComponent,
         dataListComponent,
         listTileComponent,
         definitionListComponent,
+        notificationListComponent,
         tabsComponent,
         paginationBarComponent,
         tableComponent,

@@ -27,6 +27,7 @@ final class TextEditingField extends StatefulWidget {
     this.onSubmitted,
     this.keyboardType,
     this.textInputAction,
+    this.inputFormatters,
     this.focusNode,
     this.autofocus = false,
   });
@@ -49,6 +50,7 @@ final class TextEditingField extends StatefulWidget {
   final ValueChanged<String>? onSubmitted;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
+  final List<TextInputFormatter>? inputFormatters;
   final FocusNode? focusNode;
   final bool autofocus;
 
@@ -157,6 +159,7 @@ final class _TextEditingFieldState extends State<TextEditingField>
       autofocus: widget.autofocus && !_disabled,
       keyboardType: widget.keyboardType,
       textInputAction: widget.textInputAction,
+      inputFormatters: widget.inputFormatters,
       onChanged: widget.onChanged,
       onSubmitted: widget.onSubmitted,
       cursorWidth: context.units(theme.shapes.fieldCursorWidth),

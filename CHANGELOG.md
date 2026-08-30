@@ -42,3 +42,13 @@
   Layout/Page Pattern-only semantic viewport presets with an off mode.
 - Hardened Table body sizing for short viewport constraints used by adaptive
   page patterns.
+
+# 0.1.1
+
+- Added adaptive breadcrumbs with overflow navigation for deep paths.
+- Added controlled numeric, time, and date-range inputs, including numeric
+  input formatting and validation support in the shared field pipeline.
+- Added badges, avatar groups with automatic overflow, and persistent
+  notification lists with unread state, actions, and caller-owned dismissal.
+- Added interactive Widgetbook playgrounds and behavioural tests for the new
+  components.

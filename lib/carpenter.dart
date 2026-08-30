@@ -23,6 +23,8 @@ export 'src/application/shell/shell.dart';
 
 // Basic components.
 export 'src/components/basic/avatar.dart';
+export 'src/components/basic/avatar_group.dart';
+export 'src/components/basic/badge.dart';
 export 'src/components/basic/button/button.dart';
 export 'src/components/basic/button/icon_button.dart';
 export 'src/components/basic/button/toggle_button.dart';
@@ -33,8 +35,11 @@ export 'src/components/basic/color_picker.dart';
 export 'src/components/basic/icon.dart';
 export 'src/components/basic/icons.dart';
 export 'src/components/basic/input/date_input.dart';
+export 'src/components/basic/input/date_range_input.dart';
 export 'src/components/basic/input/input.dart';
+export 'src/components/basic/input/number_input.dart';
 export 'src/components/basic/input/text_area.dart';
+export 'src/components/basic/input/time_input.dart';
 export 'src/components/basic/link.dart';
 export 'src/components/basic/loader.dart';
 export 'src/components/basic/progress.dart';
@@ -64,6 +69,7 @@ export 'src/components/behaviour/toast/toaster_controller.dart';
 export 'src/components/behaviour/tooltip.dart';
 
 // Collections and content.
+export 'src/components/collections/breadcrumbs.dart';
 export 'src/components/collections/collection_search_field.dart';
 export 'src/components/collections/contracts/collection_adapter.dart';
 export 'src/components/collections/contracts/collection_event.dart';
@@ -78,6 +84,7 @@ export 'src/components/collections/data_list.dart';
 export 'src/components/collections/definition_list.dart';
 export 'src/components/collections/filter/filter_bar.dart';
 export 'src/components/collections/list_tile.dart';
+export 'src/components/collections/notification_list.dart';
 export 'src/components/collections/pagination.dart';
 export 'src/components/collections/pagination_bar.dart';
 export 'src/components/collections/table/table.dart';
