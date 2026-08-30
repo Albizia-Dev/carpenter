@@ -158,19 +158,26 @@ final class _BreadcrumbLink extends StatelessWidget {
   final String? semanticLabel;
 
   @override
-  Widget build(BuildContext context) => CarpenterControl(
+  Widget build(BuildContext context) => Semantics(
+    container: true,
+    explicitChildNodes: false,
+    excludeSemantics: true,
+    link: true,
+    enabled: true,
+    label: semanticLabel ?? label,
     onTap: onInvoke,
-    semanticLabel: semanticLabel ?? label,
-    semanticButton: false,
-    semanticLink: true,
-    builder: (context, state) => CarpenterText.body(
-      label,
-      emphasis: state.hovered || state.focused
-          ? TypographyEmphasis.medium
-          : TypographyEmphasis.regular,
-      colorRole: state.hovered || state.focused
-          ? ContentColorRole.primary
-          : ContentColorRole.secondary,
+    child: CarpenterControl(
+      onTap: onInvoke,
+      semanticButton: false,
+      builder: (context, state) => CarpenterText.body(
+        label,
+        emphasis: state.hovered || state.focused
+            ? TypographyEmphasis.medium
+            : TypographyEmphasis.regular,
+        colorRole: state.hovered || state.focused
+            ? ContentColorRole.primary
+            : ContentColorRole.secondary,
+      ),
     ),
   );
 }
