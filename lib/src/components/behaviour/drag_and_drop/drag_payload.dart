@@ -9,7 +9,7 @@ final class CarpenterDragPayload<T> {
     this.id,
     this.allowedOperations = const {CarpenterDragOperation.move},
     this.metadata = const {},
-  }) : assert(allowedOperations.length > 0);
+  });
 
   final T data;
   final Object? id;
