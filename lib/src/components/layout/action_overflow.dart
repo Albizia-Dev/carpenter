@@ -145,11 +145,9 @@ final class ActionOverflowLayout extends MultiChildRenderObjectWidget {
       );
 
   @override
-  void updateRenderObject(
-    BuildContext context,
-    covariant _RenderActionOverflow renderObject,
-  ) {
-    renderObject
+  void updateRenderObject(BuildContext context, RenderObject renderObject) {
+    final target = renderObject as _RenderActionOverflow;
+    target
       ..gap = gap
       ..minimumInlineActionWidth = minimumInlineActionWidth
       ..textDirection = Directionality.maybeOf(context) ?? TextDirection.ltr;
@@ -265,6 +263,12 @@ final class _RenderActionOverflow extends RenderBox
       textDirection == TextDirection.ltr ? size.width - childWidth : 0;
 
   double _max(double first, double second) => first > second ? first : second;
+
+  @override
+  void applyPaintTransform(RenderBox child, Matrix4 transform) {
+    final parentData = child.parentData! as _ActionOverflowParentData;
+    transform.translate(parentData.offset.dx, parentData.offset.dy);
+  }
 
   @override
   void paint(PaintingContext context, Offset offset) =>
