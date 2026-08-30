@@ -9,6 +9,7 @@ import 'use_cases/basic/card_link.dart';
 import 'use_cases/basic/checkbox.dart';
 import 'use_cases/basic/combo_box.dart';
 import 'use_cases/basic/extended_primitives.dart';
+import 'use_cases/basic/file_input.dart';
 import 'use_cases/basic/icon.dart';
 import 'use_cases/basic/icon_button.dart';
 import 'use_cases/basic/input.dart';
@@ -29,6 +30,7 @@ import 'use_cases/behaviour/migrated_behaviour.dart';
 import 'use_cases/behaviour/popover.dart';
 import 'use_cases/behaviour/toast.dart';
 import 'use_cases/behaviour/tooltip.dart';
+import 'use_cases/collections/advanced_collections.dart';
 import 'use_cases/collections/collection_kernel.dart';
 import 'use_cases/collections/content_primitives.dart';
 import 'use_cases/collections/data_list.dart';
@@ -76,6 +78,7 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
         linkComponent,
         inputComponent,
         maskedInputComponent,
+        fileInputComponent,
         numberInputComponent,
         textAreaComponent,
         dateInputComponent,
@@ -117,6 +120,11 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
         filterBarComponent,
         breadcrumbsComponent,
         dataListComponent,
+        reorderableCollectionComponent,
+        treeViewComponent,
+        treeTableComponent,
+        kanbanComponent,
+        planningBoardComponent,
         listTileComponent,
         definitionListComponent,
         notificationListComponent,
