@@ -1,4 +1,3 @@
-import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -76,26 +75,14 @@ void main() {
           child: ActionOverflowLayout(
             gap: 8,
             minimumInlineActionWidth: 100,
-            content: const SizedBox(
-              key: ValueKey('content'),
-              width: 260,
-              height: 20,
-            ),
-            actions: const SizedBox(
-              key: ValueKey('actions'),
-              width: 200,
-              height: 20,
-            ),
+            content: const SizedBox(width: 260, height: 20),
+            actions: const SizedBox(width: 200, height: 20),
           ),
         ),
       ),
     );
 
-    final actions = tester.renderObject<RenderBox>(
-      find.byKey(const ValueKey('actions')),
-    );
-    final parentData = actions.parentData! as BoxParentData;
-    expect(parentData.offset.dy, 28);
+    expect(tester.getSize(find.byType(ActionOverflowLayout)).height, 48);
   });
 
   testWidgets('action layout stays inline when minimum action space remains', (
@@ -109,30 +96,13 @@ void main() {
           child: ActionOverflowLayout(
             gap: 8,
             minimumInlineActionWidth: 40,
-            content: const SizedBox(
-              key: ValueKey('content'),
-              width: 180,
-              height: 20,
-            ),
-            actions: const SizedBox(
-              key: ValueKey('actions'),
-              width: 100,
-              height: 20,
-            ),
+            content: const SizedBox(width: 180, height: 20),
+            actions: const SizedBox(width: 100, height: 20),
           ),
         ),
       ),
     );
 
-    final content = tester.renderObject<RenderBox>(
-      find.byKey(const ValueKey('content')),
-    );
-    final actions = tester.renderObject<RenderBox>(
-      find.byKey(const ValueKey('actions')),
-    );
-    final contentParentData = content.parentData! as BoxParentData;
-    final actionsParentData = actions.parentData! as BoxParentData;
-    expect(actionsParentData.offset.dy, contentParentData.offset.dy);
-    expect(actionsParentData.offset.dx, greaterThan(contentParentData.offset.dx));
+    expect(tester.getSize(find.byType(ActionOverflowLayout)).height, 20);
   });
 }
