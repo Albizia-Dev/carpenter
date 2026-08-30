@@ -23,7 +23,7 @@ final class CarpenterInputMask {
   String get placeholder {
     final buffer = StringBuffer();
     for (final part in _parts) {
-      buffer.write(part.slot == null ? part.literal : placeholderCharacter);
+      buffer.write(part.slot == null ? part.literal! : placeholderCharacter);
     }
     return buffer.toString();
   }
@@ -70,7 +70,9 @@ final class CarpenterInputMask {
         '*' => _MaskSlot.alphaNumeric,
         _ => null,
       };
-      result.add(slot == null ? _MaskPart.literal(character) : _MaskPart.slot(slot));
+      result.add(
+        slot == null ? _MaskPart.literal(character) : _MaskPart.slot(slot),
+      );
     }
     if (escaped) result.add(const _MaskPart.literal(r'\'));
     return result;
@@ -91,7 +93,7 @@ final class CarpenterInputMask {
         consumedSlot = true;
         continue;
       }
-      if (consumedSlot) buffer.write(part.literal);
+      if (consumedSlot) buffer.write(part.literal!);
     }
     return buffer.toString();
   }
@@ -99,7 +101,9 @@ final class CarpenterInputMask {
   bool _accepts(_MaskSlot slot, String value) => switch (slot) {
     _MaskSlot.digit => RegExp(r'^\d$').hasMatch(value),
     _MaskSlot.letter => RegExp(r'^[A-Za-zА-Яа-яЁё]$').hasMatch(value),
-    _MaskSlot.alphaNumeric => RegExp(r'^[0-9A-Za-zА-Яа-яЁё]$').hasMatch(value),
+    _MaskSlot.alphaNumeric => RegExp(
+      r'^[0-9A-Za-zА-Яа-яЁё]$',
+    ).hasMatch(value),
   };
 }
 
@@ -126,11 +130,14 @@ final class _CarpenterMaskFormatter extends TextInputFormatter {
     var raw = mask.unmask(newValue.text);
     final oldRaw = mask.unmask(oldValue.text);
 
-    if (newValue.text.length < oldValue.text.length && raw == oldRaw && raw.isNotEmpty) {
-      final rawCursor = mask.unmask(
-        oldValue.text.substring(0, oldValue.selection.baseOffset.clamp(0, oldValue.text.length)),
-      ).length;
-      final removeAt = (rawCursor - 1).clamp(0, raw.length - 1);
+    if (newValue.text.length < oldValue.text.length &&
+        raw == oldRaw &&
+        raw.isNotEmpty) {
+      final cursor = oldValue.selection.baseOffset
+          .clamp(0, oldValue.text.length)
+          .toInt();
+      final rawCursor = mask.unmask(oldValue.text.substring(0, cursor)).length;
+      final removeAt = (rawCursor - 1).clamp(0, raw.length - 1).toInt();
       raw = raw.substring(0, removeAt) + raw.substring(removeAt + 1);
     }
 
