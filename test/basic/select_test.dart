@@ -11,7 +11,9 @@ void main() {
     CarpenterOption(id: 'b', value: 2, label: 'Bravo'),
   ];
 
-  testWidgets('value and open state remain controlled', (tester) async {
+  testWidgets('value and open state remain controlled when requested', (
+    tester,
+  ) async {
     int? value = 1;
     var open = false;
     late StateSetter update;
@@ -41,6 +43,38 @@ void main() {
     expect(value, 2);
     expect(open, isFalse);
     expect(find.text('Bravo'), findsOneWidget);
+  });
+
+  testWidgets('overlay state is self-managed by default', (tester) async {
+    int? value;
+    late StateSetter update;
+    await tester.pumpWidget(
+      carpenterOverlayHarness(
+        StatefulBuilder(
+          builder: (context, setState) {
+            update = setState;
+            return CarpenterSelect<int>(
+              value: value,
+              onChanged: (next) => update(() => value = next),
+              options: options,
+              label: 'Choice',
+              placeholder: 'Choose',
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Choose'));
+    await tester.pumpAndSettle();
+    expect(find.text('Alpha'), findsOneWidget);
+    expect(find.text('Bravo'), findsOneWidget);
+
+    await tester.tap(find.text('Bravo'));
+    await tester.pumpAndSettle();
+    expect(value, 2);
+    expect(find.text('Bravo'), findsOneWidget);
+    expect(find.text('Alpha'), findsNothing);
   });
 
   testWidgets('keyboard navigation selects and restores field focus', (
