@@ -162,13 +162,22 @@ final class _CarpenterDropTargetWidgetState<T>
   bool _updateHover(CarpenterDropDetails<T>? details) {
     final accepts =
         details != null && (widget.canAccept?.call(details) ?? true);
-    if (mounted) {
+    final payload = details?.payload;
+    final operation = details?.operation;
+    final position = details?.position;
+    final changed =
+        !_hovering ||
+        _accepts != accepts ||
+        _payload?.id != payload?.id ||
+        _operation != operation ||
+        _position != position;
+    if (changed && mounted) {
       setState(() {
         _hovering = true;
         _accepts = accepts;
-        _payload = details?.payload;
-        _operation = details?.operation;
-        _position = details?.position;
+        _payload = payload;
+        _operation = operation;
+        _position = position;
       });
     }
     final controller = CarpenterDragScope.maybeOf(context);
