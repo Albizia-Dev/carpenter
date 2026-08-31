@@ -323,10 +323,13 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
   Widget _column(BuildContext context, CarpenterKanbanColumn<C, T> column) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.medium);
-    return SizedBox(
-      width: context.units(18.rem),
-      child: CarpenterCard(
-        semanticLabel: column.semanticLabel ?? column.title,
+
+    Widget buildColumn(
+      CarpenterDropTargetState<_KanbanDragData<C, T>> targetState,
+    ) => CarpenterCard(
+      semanticLabel: column.semanticLabel ?? column.title,
+      child: ConstrainedBox(
+        constraints: BoxConstraints(minHeight: context.units(12.rem)),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -392,6 +395,29 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
         ),
       ),
     );
+
+    final child = widget.onMove == null
+        ? buildColumn(
+            CarpenterDropTargetState<_KanbanDragData<C, T>>(
+              hovering: false,
+              accepts: false,
+            ),
+          )
+        : CarpenterDropTarget<_KanbanDragData<C, T>>(
+            key: ValueKey<String>('kanban.column.${column.id}.drop'),
+            targetId: 'kanban.${column.id}.column',
+            fixedPosition: CarpenterDropPosition.after,
+            acceptedOperations: const {CarpenterDragOperation.move},
+            canAccept: (details) => _canAccept(
+              _moveDetails(column, column.cards.length, details, append: true),
+            ),
+            onDrop: (details) => _emit(
+              _moveDetails(column, column.cards.length, details, append: true),
+            ),
+            builder: (context, state) => buildColumn(state),
+          );
+
+    return SizedBox(width: context.units(18.rem), child: child);
   }
 
   @override
@@ -411,7 +437,9 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
               controller: _scrollController,
               scrollDirection: Axis.horizontal,
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: constraints.hasBoundedHeight
+                    ? CrossAxisAlignment.stretch
+                    : CrossAxisAlignment.start,
                 children: [
                   for (
                     var index = 0;
