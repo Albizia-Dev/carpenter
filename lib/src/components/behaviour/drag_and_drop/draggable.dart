@@ -10,6 +10,23 @@ enum CarpenterDragActivation { immediate, longPress }
 typedef CarpenterDragCanceledCallback =
     void Function(Velocity velocity, Offset offset);
 
+final class _CarpenterSizedDragFeedback extends StatelessWidget {
+  const _CarpenterSizedDragFeedback({
+    required this.sourceKey,
+    required this.child,
+  });
+
+  final GlobalKey sourceKey;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final renderObject = sourceKey.currentContext?.findRenderObject();
+    if (renderObject is! RenderBox || !renderObject.hasSize) return child;
+    return SizedBox.fromSize(size: renderObject.size, child: child);
+  }
+}
+
 /// Typed pointer drag source backed by Flutter's drag recognizers and Carpenter sessions.
 final class CarpenterDraggable<T> extends StatelessWidget {
   const CarpenterDraggable({
@@ -50,7 +67,13 @@ final class CarpenterDraggable<T> extends StatelessWidget {
       'CarpenterDraggable operation must be allowed by its payload.',
     );
     final controller = CarpenterDragScope.maybeOf(context);
-    final dragFeedback = feedback ?? Opacity(opacity: .82, child: child);
+    final sourceKey = GlobalKey();
+    final sourceChild = KeyedSubtree(key: sourceKey, child: child);
+    final dragFeedback = feedback ??
+        _CarpenterSizedDragFeedback(
+          sourceKey: sourceKey,
+          child: Opacity(opacity: .82, child: child),
+        );
     final transport = CarpenterDragTransport<T>(payload);
 
     Offset anchorStrategy(
@@ -98,7 +121,7 @@ final class CarpenterDraggable<T> extends StatelessWidget {
         onDragCompleted: completed,
         onDraggableCanceled: canceled,
         onDragEnd: ended,
-        child: child,
+        child: sourceChild,
       ),
       CarpenterDragActivation.longPress =>
         LongPressDraggable<CarpenterDragTransport<T>>(
@@ -112,7 +135,7 @@ final class CarpenterDraggable<T> extends StatelessWidget {
           onDragCompleted: completed,
           onDraggableCanceled: canceled,
           onDragEnd: ended,
-          child: child,
+          child: sourceChild,
         ),
     };
 
