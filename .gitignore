@@ -97,3 +97,4 @@ doc/api/
 *.js.map
 
 okibi/
+.idea/
