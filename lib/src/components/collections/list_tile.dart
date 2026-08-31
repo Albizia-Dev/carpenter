@@ -29,6 +29,7 @@ final class CarpenterListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.medium);
+    final radius = BorderRadius.circular(context.units(.5.rem));
     return Semantics(
       container: true,
       selected: selected,
@@ -40,36 +41,43 @@ final class CarpenterListTile extends StatelessWidget {
               states.contains(WidgetState.hovered) ||
               states.contains(WidgetState.pressed) ||
               states.contains(WidgetState.focused);
-          return AnimatedContainer(
+          final background = selected
+              ? theme.overlay.selected
+              : active
+              ? theme.overlay.hovered
+              : const Color(0x00000000);
+          return TweenAnimationBuilder<Color?>(
             duration: theme.motion.transitionDuration(context),
             curve: theme.motion.stateCurve,
-            padding: EdgeInsets.symmetric(horizontal: gap, vertical: gap * .75),
-            decoration: BoxDecoration(
-              color: selected
-                  ? theme.overlay.selected
-                  : active
-                  ? theme.overlay.hovered
-                  : const Color(0x00000000),
-              borderRadius: BorderRadius.circular(context.units(.5.rem)),
+            tween: ColorTween(end: background),
+            builder: (context, color, child) => DecoratedBox(
+              decoration: BoxDecoration(color: color, borderRadius: radius),
+              child: child,
             ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (leading != null) ...[leading!, SizedBox(width: gap)],
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      title,
-                      if (subtitle != null) ...[
-                        SizedBox(height: gap / 2),
-                        subtitle!,
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: gap,
+                vertical: gap * .75,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (leading != null) ...[leading!, SizedBox(width: gap)],
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        title,
+                        if (subtitle != null) ...[
+                          SizedBox(height: gap / 2),
+                          subtitle!,
+                        ],
                       ],
-                    ],
+                    ),
                   ),
-                ),
-                if (trailing != null) ...[SizedBox(width: gap), trailing!],
-              ],
+                  if (trailing != null) ...[SizedBox(width: gap), trailing!],
+                ],
+              ),
             ),
           );
         },
