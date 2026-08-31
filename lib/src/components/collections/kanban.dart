@@ -409,20 +409,10 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
             fixedPosition: CarpenterDropPosition.after,
             acceptedOperations: const {CarpenterDragOperation.move},
             canAccept: (details) => _canAccept(
-              _moveDetails(
-                column,
-                column.cards.length,
-                details,
-                append: true,
-              ),
+              _moveDetails(column, column.cards.length, details, append: true),
             ),
             onDrop: (details) => _emit(
-              _moveDetails(
-                column,
-                column.cards.length,
-                details,
-                append: true,
-              ),
+              _moveDetails(column, column.cards.length, details, append: true),
             ),
             builder: (context, state) => buildColumn(state),
           );
