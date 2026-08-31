@@ -1,3 +1,17 @@
+# 0.1.3
+
+- Stabilized collection hover styling so state transitions animate color without
+  re-running row layout geometry on every animation tick.
+- Avoided redundant drag-and-drop target rebuilds while the pointer remains in
+  the same accepted payload, operation, and before/inside/after position.
+- Extended `CarpenterProgress` with an indeterminate mode by making `value`
+  optional while preserving determinate progress for finite values.
+- Animated determinate progress changes with Carpenter motion tokens and drove
+  indeterminate progress from the existing Mordant loading-cycle token, with
+  reduced-motion handling retained.
+- Added regression coverage for stable list/tree hover geometry, drag hover
+  rebuilds, and determinate/indeterminate progress semantics.
+
 # 0.1.2
 
 - Stabilized default drag feedback geometry so flex and stretched children keep
