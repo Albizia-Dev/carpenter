@@ -1,0 +1,28 @@
+name: Verify DnD Fixes
+
+on:
+  push:
+    branches:
+      - fix/dnd-feedback-and-kanban-dropzones
+    paths:
+      - .github/workflows/dnd-fix-verify.yml
+      - lib/src/components/behaviour/drag_and_drop/draggable.dart
+      - lib/src/components/collections/kanban.dart
+      - test/collections/advanced_collections_test.dart
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed lib/src/components/behaviour/drag_and_drop/draggable.dart lib/src/components/collections/kanban.dart test/collections/advanced_collections_test.dart
+      - run: dart analyze lib
+      - run: flutter test test/collections/advanced_collections_test.dart
