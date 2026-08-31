@@ -1,0 +1,44 @@
+name: Create GitHub Release 0.1.2
+
+on:
+  push:
+    branches:
+      - release/0.1.2-example-and-ergonomics
+    paths:
+      - .github/workflows/github-release-012.yml
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cat > /tmp/notes.md <<'EOF'
+          ## Carpenter 0.1.2
+
+          This release is a dogfooding pass over Carpenter as an application toolkit rather than a component catalog.
+
+          ### Ergonomics
+          - `CarpenterSelect`, `CarpenterComboBox`, and `CarpenterAutosuggest` now own transient overlay visibility by default while keeping an optional controlled mode.
+          - Added `CarpenterPageBody` for standard page padding and vertical rhythm.
+          - Gravity UI icons are exported from the main `package:carpenter/carpenter.dart` barrel.
+          - `CarpenterTreeView.actions` now supports iconless semantic actions without runtime assertions.
+
+          ### Example workspace
+          - Added a live controlled Kanban and generic reorder surface.
+          - Added a keyboard-friendly controlled resource tree explorer.
+          - Expanded settings into a production-shaped form with masked, number, date, time, range, select, combo, autosuggest, and file fields.
+          - Added record breadcrumbs, persistent notifications, command-driven navigation, and clearer loading-boundary examples.
+
+          ### Validation
+          - Library format and static analysis passed.
+          - Widgetbook and example web builds passed.
+          - Focused API and route-level widget tests passed.
+          - REM audit passed.
+          EOF
+          gh release create v0.1.2 --repo "$GITHUB_REPOSITORY" --title "Carpenter 0.1.2" --notes-file /tmp/notes.md
