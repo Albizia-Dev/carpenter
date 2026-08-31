@@ -10,11 +10,7 @@ void main() {
       carpenterHarness(
         CarpenterTreeView<String>(
           nodes: const [
-            CarpenterTreeNode<String>(
-              id: 'root',
-              value: 'root',
-              label: 'Root',
-            ),
+            CarpenterTreeNode<String>(id: 'root', value: 'root', label: 'Root'),
           ],
           actions: (_) => [
             CarpenterActionDescriptor(
