@@ -21,32 +21,32 @@ void main() {
     await tester.pumpWidget(
       const CarpenterExampleApp(syncRouteInformation: false),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('Active projects'), findsOneWidget);
     expect(find.text('Overview'), findsWidgets);
 
     await tester.tap(find.text('Projects').first);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.text('Project portfolio'), findsOneWidget);
 
     await tester.tap(find.text('Planning').first);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.text('Delivery planning'), findsOneWidget);
     expect(find.text('Triage order'), findsOneWidget);
 
     await tester.tap(find.text('Explorer').first);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.text('Resource explorer'), findsOneWidget);
     expect(find.text('Bank accounts'), findsWidgets);
 
     await tester.tap(find.text('Operations').first);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.text('Operations lab'), findsOneWidget);
     expect(find.text('Global command hotkeys'), findsOneWidget);
 
     await tester.tap(find.text('Settings').first);
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.text('Settings'), findsWidgets);
     expect(find.text('Display name'), findsOneWidget);
     expect(find.text('Workspace code'), findsOneWidget);
@@ -62,7 +62,7 @@ void main() {
         initialUri: Uri(path: '/projects/CP-1042'),
       ),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
 
     expect(find.text('Treasury migration'), findsWidgets);
     expect(find.text('CP-1042 · Finance platform'), findsOneWidget);
