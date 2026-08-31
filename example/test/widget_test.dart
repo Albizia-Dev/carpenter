@@ -9,12 +9,12 @@ void main() {
     expect(detail.route, DemoRoutes.project);
     expect(detail.arguments['id'], 'CP-1047');
     expect(DemoRoutes.serialize(detail).path, '/projects/CP-1047');
+    expect(DemoRoutes.parse(Uri(path: '/planning')).route, DemoRoutes.planning);
+    expect(DemoRoutes.parse(Uri(path: '/explorer')).route, DemoRoutes.explorer);
     expect(DemoRoutes.parse(Uri(path: '/settings')).route, DemoRoutes.settings);
   });
 
-  testWidgets('sidebar navigates between top-level application pages', (
-    tester,
-  ) async {
+  testWidgets('sidebar navigates across real feature surfaces', (tester) async {
     await tester.binding.setSurfaceSize(const Size(1440, 900));
     addTearDown(() => tester.binding.setSurfaceSize(null));
 
@@ -30,6 +30,16 @@ void main() {
     await tester.pump();
     expect(find.text('Project portfolio'), findsOneWidget);
 
+    await tester.tap(find.text('Planning').first);
+    await tester.pump();
+    expect(find.text('Delivery planning'), findsOneWidget);
+    expect(find.text('Delivery board'), findsOneWidget);
+
+    await tester.tap(find.text('Explorer').first);
+    await tester.pump();
+    expect(find.text('Resource explorer'), findsOneWidget);
+    expect(find.text('Bank accounts'), findsWidgets);
+
     await tester.tap(find.text('Operations').first);
     await tester.pump();
     expect(find.text('Operations lab'), findsOneWidget);
@@ -38,6 +48,8 @@ void main() {
     await tester.tap(find.text('Settings').first);
     await tester.pump();
     expect(find.text('Interface density'), findsOneWidget);
+    expect(find.text('Next review'), findsOneWidget);
+    expect(find.text('Approval documents'), findsOneWidget);
   });
 
   testWidgets('deep project URL renders through yx navigation', (tester) async {
@@ -55,5 +67,6 @@ void main() {
     expect(find.text('Treasury migration'), findsWidgets);
     expect(find.text('CP-1042 · Finance platform'), findsOneWidget);
     expect(find.text('Timeline'), findsOneWidget);
+    expect(find.text('Projects'), findsWidgets);
   });
 }
