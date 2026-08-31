@@ -132,9 +132,6 @@ final class CarpenterKanban<C, T> extends StatefulWidget {
   final CarpenterKanbanMoveAcceptance<C, T>? canMove;
   final CarpenterKanbanColumnCallback<C, T>? onLoadMore;
   final CarpenterKanbanColumnCallback<C, T>? onRetry;
-
-  /// Structural identity for compatible drag surfaces. When omitted, the
-  /// Kanban instance only accepts cards originating from itself.
   final Object? dragGroupId;
   final CarpenterDragActivation dragActivation;
   final String emptyLabel;
@@ -159,43 +156,26 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
     super.dispose();
   }
 
-  CarpenterDropPosition _effectivePosition(
-    CarpenterDropDetails<_KanbanDragData<C, T>> details,
-  ) {
-    if (details.position != CarpenterDropPosition.inside) {
-      return details.position;
-    }
-    if (details.targetSize.height == 0) return CarpenterDropPosition.after;
-    return details.localOffset.dy < details.targetSize.height / 2
-        ? CarpenterDropPosition.before
-        : CarpenterDropPosition.after;
-  }
-
   CarpenterKanbanMoveDetails<C, T>? _moveDetails(
     CarpenterKanbanColumn<C, T> targetColumn,
-    int targetCardIndex,
-    CarpenterDropDetails<_KanbanDragData<C, T>> details, {
-    bool append = false,
-  }) {
+    int insertionIndex,
+    CarpenterDropPosition position,
+    CarpenterDropDetails<_KanbanDragData<C, T>> details,
+  ) {
     final drag = details.payload.data;
     if (drag.groupId != _dragGroupId) return null;
-    final sourceColumn = drag.sourceColumn;
-    final position = append
-        ? CarpenterDropPosition.after
-        : _effectivePosition(details);
-    var insertion = append
-        ? targetColumn.cards.length
-        : targetCardIndex + (position == CarpenterDropPosition.after ? 1 : 0);
-    if (sourceColumn.id == targetColumn.id && drag.sourceIndex < insertion) {
-      insertion -= 1;
+    var targetIndex = insertionIndex;
+    if (drag.sourceColumn.id == targetColumn.id &&
+        drag.sourceIndex < targetIndex) {
+      targetIndex -= 1;
     }
-    insertion = insertion.clamp(0, targetColumn.cards.length);
+    targetIndex = targetIndex.clamp(0, targetColumn.cards.length);
     return CarpenterKanbanMoveDetails<C, T>(
       card: drag.card,
-      sourceColumn: sourceColumn,
+      sourceColumn: drag.sourceColumn,
       sourceIndex: drag.sourceIndex,
       targetColumn: targetColumn,
-      targetIndex: insertion,
+      targetIndex: targetIndex,
       position: position,
       operation: details.operation,
     );
@@ -237,85 +217,82 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
     int index,
   ) {
     final cardId = widget.cardKey(card);
-    Widget content(
-      CarpenterDropTargetState<_KanbanDragData<C, T>> targetState,
-    ) {
-      final state = CarpenterKanbanCardState<C>(
-        column: column.value,
-        index: index,
-        dragging: _draggingCardId == cardId,
-        hovering: targetState.hovering,
-        acceptsDrop: targetState.accepts,
-        dropPosition: targetState.position,
-      );
-      final child = widget.cardBuilder(context, card, state);
-      if (widget.onMove == null) return child;
-      return CarpenterDraggable<_KanbanDragData<C, T>>(
-        sourceId: cardId,
-        activation: widget.dragActivation,
-        payload: CarpenterDragPayload<_KanbanDragData<C, T>>(
-          id: cardId,
-          data: _KanbanDragData<C, T>(
-            groupId: _dragGroupId,
-            sourceColumn: column,
-            sourceIndex: index,
-            card: card,
-          ),
+    final state = CarpenterKanbanCardState<C>(
+      column: column.value,
+      index: index,
+      dragging: _draggingCardId == cardId,
+      hovering: false,
+      acceptsDrop: false,
+    );
+    final child = widget.cardBuilder(context, card, state);
+    if (widget.onMove == null) return child;
+    return CarpenterDraggable<_KanbanDragData<C, T>>(
+      sourceId: cardId,
+      activation: widget.dragActivation,
+      payload: CarpenterDragPayload<_KanbanDragData<C, T>>(
+        id: cardId,
+        data: _KanbanDragData<C, T>(
+          groupId: _dragGroupId,
+          sourceColumn: column,
+          sourceIndex: index,
+          card: card,
         ),
-        semanticLabel: 'Move card ${index + 1} in ${column.title}',
-        onDragStarted: () => setState(() => _draggingCardId = cardId),
-        onDragCompleted: () {
-          if (mounted) setState(() => _draggingCardId = null);
-        },
-        onDragCanceled: (_, _) {
-          if (mounted) setState(() => _draggingCardId = null);
-        },
-        child: child,
-      );
-    }
-
-    if (widget.onMove == null) {
-      return content(
-        CarpenterDropTargetState<_KanbanDragData<C, T>>(
-          hovering: false,
-          accepts: false,
-        ),
-      );
-    }
-    return CarpenterDropTarget<_KanbanDragData<C, T>>(
-      targetId: 'kanban.${column.id}.$cardId',
-      axis: CarpenterDropAxis.vertical,
-      edgeFraction: .35,
-      acceptedOperations: const {CarpenterDragOperation.move},
-      canAccept: (details) => _canAccept(_moveDetails(column, index, details)),
-      onDrop: (details) => _emit(_moveDetails(column, index, details)),
-      builder: (context, state) => content(state),
+      ),
+      semanticLabel: 'Move card ${index + 1} in ${column.title}',
+      onDragStarted: () => setState(() => _draggingCardId = cardId),
+      onDragCompleted: () {
+        if (mounted) setState(() => _draggingCardId = null);
+      },
+      onDragCanceled: (_, _) {
+        if (mounted) setState(() => _draggingCardId = null);
+      },
+      child: child,
     );
   }
 
-  Widget _tailDrop(BuildContext context, CarpenterKanbanColumn<C, T> column) {
+  Widget _dropSlot(
+    BuildContext context,
+    CarpenterKanbanColumn<C, T> column,
+    int insertionIndex, {
+    required CarpenterDropPosition position,
+    bool empty = false,
+  }) {
     final theme = CarpenterTheme.of(context);
-    final gap = context.units(theme.spacing.small);
-    if (widget.onMove == null) return SizedBox(height: gap);
+    final idleHeight = context.units(empty ? 6.rem : .75.rem);
+    final activeHeight = context.units(empty ? 6.rem : 2.rem);
+    final child = empty
+        ? Center(
+            child: CarpenterText.caption(
+              widget.emptyLabel,
+              colorRole: ContentColorRole.secondary,
+              textAlign: TextAlign.center,
+            ),
+          )
+        : null;
+    if (widget.onMove == null) {
+      return SizedBox(height: idleHeight, child: child);
+    }
     return CarpenterDropTarget<_KanbanDragData<C, T>>(
-      targetId: 'kanban.${column.id}.tail',
-      fixedPosition: CarpenterDropPosition.after,
+      targetId: 'kanban.${column.id}.slot.$insertionIndex',
+      fixedPosition: position,
       acceptedOperations: const {CarpenterDragOperation.move},
       canAccept: (details) => _canAccept(
-        _moveDetails(column, column.cards.length, details, append: true),
+        _moveDetails(column, insertionIndex, position, details),
       ),
       onDrop: (details) => _emit(
-        _moveDetails(column, column.cards.length, details, append: true),
+        _moveDetails(column, insertionIndex, position, details),
       ),
       builder: (context, state) => AnimatedContainer(
         duration: theme.motion.transitionDuration(context),
-        height: state.hovering ? context.units(2.rem) : gap,
+        height: state.hovering ? activeHeight : idleHeight,
+        alignment: Alignment.center,
         decoration: BoxDecoration(
           color: state.hovering && state.accepts
               ? theme.feedback.resolve(FeedbackColorRole.info).background
               : const Color(0x00000000),
           borderRadius: BorderRadius.circular(context.units(.25.rem)),
         ),
+        child: child,
       ),
     );
   }
@@ -347,19 +324,32 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
             SizedBox(height: gap),
             if (column.cards.isEmpty &&
                 column.loadState == CarpenterKanbanLoadState.ready)
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: context.units(2.rem)),
-                child: CarpenterText.caption(
-                  widget.emptyLabel,
-                  colorRole: ContentColorRole.secondary,
-                  textAlign: TextAlign.center,
-                ),
+              _dropSlot(
+                context,
+                column,
+                0,
+                position: CarpenterDropPosition.inside,
+                empty: true,
+              )
+            else ...[
+              _dropSlot(
+                context,
+                column,
+                0,
+                position: CarpenterDropPosition.before,
               ),
-            for (var index = 0; index < column.cards.length; index++) ...[
-              if (index > 0) SizedBox(height: gap),
-              _card(context, column, column.cards[index], index),
+              for (var index = 0; index < column.cards.length; index++) ...[
+                _card(context, column, column.cards[index], index),
+                _dropSlot(
+                  context,
+                  column,
+                  index + 1,
+                  position: index + 1 == column.cards.length
+                      ? CarpenterDropPosition.after
+                      : CarpenterDropPosition.before,
+                ),
+              ],
             ],
-            _tailDrop(context, column),
             if (column.loadState == CarpenterKanbanLoadState.loading)
               const CarpenterText.caption(
                 'Loading…',
