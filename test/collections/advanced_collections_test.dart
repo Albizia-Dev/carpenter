@@ -67,6 +67,42 @@ void main() {
     expect(selection, {'root'});
   });
 
+  testWidgets('drag feedback preserves source geometry', (tester) async {
+    await tester.pumpWidget(
+      carpenterOverlayHarness(
+        SizedBox(
+          width: 320,
+          child: CarpenterReorderableCollection<String>(
+            items: const ['A', 'B'],
+            itemKey: (item) => item,
+            onReorder: (_) {},
+            itemBuilder: (context, item, state) => SizedBox(
+              key: ValueKey<String>('geometry-$item'),
+              height: 48,
+              child: CarpenterCard(child: CarpenterText.label(item)),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final item = find.byKey(const ValueKey<String>('geometry-A'));
+    final sourceSize = tester.getSize(item);
+    final gesture = await tester.startGesture(tester.getCenter(item));
+    await tester.pump();
+
+    expect(item, findsNWidgets(2));
+    final renderedSizes = item.evaluate().map((element) {
+      final renderObject = element.renderObject;
+      expect(renderObject, isA<RenderBox>());
+      return (renderObject! as RenderBox).size;
+    });
+    expect(renderedSizes, everyElement(sourceSize));
+
+    await gesture.up();
+    await tester.pump();
+  });
+
   testWidgets('reorderable collection emits controlled movement', (
     tester,
   ) async {
@@ -98,7 +134,7 @@ void main() {
     expect(movement!.newIndex, greaterThan(0));
   });
 
-  testWidgets('kanban drag group allows moves between board surfaces', (
+  testWidgets('kanban accepts drops across the full empty column', (
     tester,
   ) async {
     final group = Object();
@@ -113,7 +149,6 @@ void main() {
       id: 'target',
       value: 'target',
       title: 'Target',
-      cards: ['Target card'],
     );
 
     Widget cardBuilder(
@@ -148,11 +183,16 @@ void main() {
       ),
     );
 
+    final targetColumn = find.byKey(
+      const ValueKey<String>('kanban.column.target.drop'),
+    );
+    expect(tester.getSize(targetColumn).height, greaterThan(0));
+
     final gesture = await tester.startGesture(
       tester.getCenter(find.text('Source card')),
     );
     await tester.pump();
-    await gesture.moveTo(tester.getCenter(find.text('Target card')));
+    await gesture.moveTo(tester.getCenter(targetColumn));
     await tester.pump();
     await gesture.up();
     await tester.pump();
@@ -161,6 +201,7 @@ void main() {
     expect(movement!.card, 'Source card');
     expect(movement!.sourceColumn.id, 'source');
     expect(movement!.targetColumn.id, 'target');
+    expect(movement!.targetIndex, 0);
   });
 
   testWidgets('kanban renders empty columns and planning lanes collapse', (
