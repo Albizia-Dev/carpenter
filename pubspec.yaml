@@ -1,6 +1,6 @@
 name: carpenter
 description: A semantic and adaptive UI platform for Flutter applications across desktop, web, and mobile.
-version: 0.1.2
+version: 0.1.3
 repository: https://github.com/Albizia-Dev/carpenter
 issue_tracker: https://github.com/Albizia-Dev/carpenter/issues
 topics:
