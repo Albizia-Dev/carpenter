@@ -67,6 +67,36 @@ void main() {
     expect(selection, {'root'});
   });
 
+  testWidgets('default drag feedback keeps source layout constraints', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      carpenterOverlayHarness(
+        SizedBox(
+          width: 180,
+          child: CarpenterDraggable<String>(
+            payload: const CarpenterDragPayload<String>(id: 'drag', data: 'drag'),
+            child: const Row(
+              children: [
+                Expanded(child: CarpenterText.label('Flexible drag child')),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('Flexible drag child')),
+    );
+    await tester.pump();
+
+    expect(tester.takeException(), isNull);
+
+    await gesture.up();
+    await tester.pump();
+  });
+
   testWidgets('reorderable collection emits controlled movement', (
     tester,
   ) async {
@@ -98,7 +128,7 @@ void main() {
     expect(movement!.newIndex, greaterThan(0));
   });
 
-  testWidgets('kanban drag group allows moves between board surfaces', (
+  testWidgets('kanban accepts a card into a stable empty-column drop zone', (
     tester,
   ) async {
     final group = Object();
@@ -113,7 +143,6 @@ void main() {
       id: 'target',
       value: 'target',
       title: 'Target',
-      cards: ['Target card'],
     );
 
     Widget cardBuilder(
@@ -148,11 +177,12 @@ void main() {
       ),
     );
 
+    final emptyZoneCenter = tester.getCenter(find.text('No cards'));
     final gesture = await tester.startGesture(
       tester.getCenter(find.text('Source card')),
     );
     await tester.pump();
-    await gesture.moveTo(tester.getCenter(find.text('Target card')));
+    await gesture.moveTo(emptyZoneCenter);
     await tester.pump();
     await gesture.up();
     await tester.pump();
@@ -161,6 +191,7 @@ void main() {
     expect(movement!.card, 'Source card');
     expect(movement!.sourceColumn.id, 'source');
     expect(movement!.targetColumn.id, 'target');
+    expect(movement!.targetIndex, 0);
   });
 
   testWidgets('kanban renders empty columns and planning lanes collapse', (
