@@ -33,11 +33,7 @@ final class _ExplorerPageState extends State<ExplorerPage> {
             ),
             CarpenterTreeNode<_ExplorerEntry>(
               id: 'payments',
-              value: _ExplorerEntry(
-                'Payments',
-                'Collection',
-                '184 this month',
-              ),
+              value: _ExplorerEntry('Payments', 'Collection', '184 this month'),
               label: 'Payments',
             ),
           ],
@@ -178,7 +174,8 @@ final class _ExplorerPageState extends State<ExplorerPage> {
           subtitle:
               'Keyboard-friendly hierarchical navigation with caller-owned expansion and selection.',
           status: CarpenterPageStatus(
-            label: '${flattenCarpenterTree(_nodes, _expanded).length} visible nodes',
+            label:
+                '${flattenCarpenterTree(_nodes, _expanded).length} visible nodes',
             role: FeedbackColorRole.info,
           ),
         ),

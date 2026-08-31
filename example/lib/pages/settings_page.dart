@@ -43,21 +43,13 @@ final class _SettingsPageState extends State<SettingsPage> {
       value: 'Finance platform',
       label: 'Finance platform',
     ),
-    CarpenterOption(
-      id: 'delivery',
-      value: 'Delivery',
-      label: 'Delivery',
-    ),
+    CarpenterOption(id: 'delivery', value: 'Delivery', label: 'Delivery'),
     CarpenterOption(
       id: 'platform',
       value: 'Client platform',
       label: 'Client platform',
     ),
-    CarpenterOption(
-      id: 'operations',
-      value: 'Operations',
-      label: 'Operations',
-    ),
+    CarpenterOption(id: 'operations', value: 'Operations', label: 'Operations'),
   ];
 
   static const _tags = <CarpenterOption<String>>[
@@ -98,7 +90,8 @@ final class _SettingsPageState extends State<SettingsPage> {
       const CarpenterToastDescriptor(
         id: 'settings-saved',
         title: 'Settings saved',
-        message: 'Typed values stayed caller-owned while transient UI stayed local.',
+        message:
+            'Typed values stayed caller-owned while transient UI stayed local.',
         role: FeedbackColorRole.success,
       ),
     );
@@ -299,7 +292,8 @@ final class _SettingsPageState extends State<SettingsPage> {
               onChanged: (value) => _change(() => _files = value),
               onBrowseRequested: _fakeBrowse,
               label: 'Approval documents',
-              description: 'This example simulates the platform browse adapter.',
+              description:
+                  'This example simulates the platform browse adapter.',
               accepts: (file) => file.mimeType == 'application/pdf',
             ),
             if (_files.isNotEmpty) ...[

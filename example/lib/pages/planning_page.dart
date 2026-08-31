@@ -123,7 +123,8 @@ final class _PlanningPageState extends State<PlanningPage> {
         subtitle:
             'Controlled Kanban and generic reorder surfaces using the same Carpenter drag-and-drop kernel.',
         status: CarpenterPageStatus(
-          label: '${_items.values.fold<int>(0, (sum, list) => sum + list.length)} work items',
+          label:
+              '${_items.values.fold<int>(0, (sum, list) => sum + list.length)} work items',
           role: FeedbackColorRole.info,
         ),
       ),
