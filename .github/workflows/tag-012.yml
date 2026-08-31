@@ -1,0 +1,25 @@
+name: Create v0.1.2 tag
+
+on:
+  push:
+    branches:
+      - release/0.1.2-example-and-ergonomics
+    paths:
+      - .github/workflows/tag-012.yml
+
+permissions:
+  contents: write
+
+jobs:
+  tag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Create release tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag v0.1.2 65cfe2eb1e8d3068ec32f9d0b586baff6e32a438
+          git push origin v0.1.2
