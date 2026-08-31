@@ -1,0 +1,36 @@
+name: Verify hover and progress regressions
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Check targeted test style
+        run: >-
+          dart format --output=none --set-exit-if-changed
+          test/collections/hover_stability_test.dart
+          test/components/progress_test.dart
+
+      - name: Run regression tests
+        run: >-
+          flutter test
+          test/collections/hover_stability_test.dart
+          test/components/progress_test.dart
+          test/collections/advanced_collections_test.dart
