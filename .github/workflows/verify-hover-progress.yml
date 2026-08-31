@@ -1,6 +1,9 @@
 name: Verify hover and progress regressions
 
 on:
+  push:
+    branches:
+      - fix/hover-progress-elevation
   pull_request:
     branches:
       - develop
