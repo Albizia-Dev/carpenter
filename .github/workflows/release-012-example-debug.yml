@@ -1,0 +1,46 @@
+name: Debug 0.1.2 Example
+
+on:
+  push:
+    branches:
+      - release/0.1.2-example-and-ergonomics
+
+jobs:
+  routes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - working-directory: example
+        run: flutter pub get
+      - working-directory: example
+        run: flutter test test/widget_test.dart --plain-name "demo routes parse and serialize stable URLs"
+
+  project:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - working-directory: example
+        run: flutter pub get
+      - working-directory: example
+        run: flutter test test/widget_test.dart --plain-name "deep project URL renders through yx navigation"
+
+  sidebar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - working-directory: example
+        run: flutter pub get
+      - working-directory: example
+        run: flutter test test/widget_test.dart --plain-name "sidebar navigates across real feature surfaces"
