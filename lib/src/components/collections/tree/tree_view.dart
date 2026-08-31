@@ -269,7 +269,6 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
           trailing: actions.isEmpty
               ? null
               : Wrap(
-                  spacing: context.units(theme.spacing.xsmall),
                   children: [
                     for (final action in actions)
                       if (action.icon != null)
