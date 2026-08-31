@@ -1,11 +1,8 @@
 import 'package:carpenter/carpenter.dart';
-import 'package:carpenter/gravity_icons.dart';
-
 import 'package:flutter/widgets.dart';
 
 import '../demo_data.dart';
 import '../demo_routes.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 enum _ProjectTab { details, timeline }
 
@@ -49,9 +46,18 @@ final class _ProjectPageState extends State<ProjectPage> {
   @override
   Widget build(BuildContext context) {
     final project = _project;
-    return ListView(
-      padding: EdgeInsets.all(context.units(1.5.rem)),
+    return CarpenterPageBody(
+      semanticLabel: '${project.id} project record',
       children: [
+        CarpenterBreadcrumbs(
+          items: [
+            CarpenterBreadcrumb(
+              label: 'Projects',
+              onInvoke: widget.navigator.projects,
+            ),
+            CarpenterBreadcrumb(label: project.id),
+          ],
+        ),
         CarpenterEntityHeader(
           title: project.name,
           subtitle: '${project.id} · ${project.owner}',
@@ -86,7 +92,6 @@ final class _ProjectPageState extends State<ProjectPage> {
             ),
           ],
         ),
-        SizedBox(height: context.units(1.5.rem)),
         CarpenterRecordSummary(
           children: [
             CarpenterRecordMetric(
@@ -108,9 +113,7 @@ final class _ProjectPageState extends State<ProjectPage> {
             ),
           ],
         ),
-        SizedBox(height: context.units(1.5.rem)),
         CarpenterProgress(value: project.progress),
-        SizedBox(height: context.units(1.5.rem)),
         CarpenterRecordTabs<_ProjectTab>(
           value: _tab,
           onChanged: (value) => setState(() => _tab = value),

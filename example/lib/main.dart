@@ -7,7 +7,9 @@ import 'demo_commands.dart';
 import 'demo_routes.dart';
 import 'demo_shell.dart';
 import 'pages/dashboard_page.dart';
+import 'pages/explorer_page.dart';
 import 'pages/operations_page.dart';
+import 'pages/planning_page.dart';
 import 'pages/project_page.dart';
 import 'pages/projects_page.dart';
 import 'pages/settings_page.dart';
@@ -104,6 +106,26 @@ final class _CarpenterExampleAppState extends State<CarpenterExampleApp> {
       ),
     ),
     CarpenterRoute(
+      route: DemoRoutes.planning,
+      shell: (context, child) => _shell(
+        selectedId: 'planning',
+        title: 'Planning',
+        subtitle: 'Controlled Kanban and drag-and-drop',
+        child: child,
+      ),
+      page: (context) => PlanningPage(toaster: _toaster),
+    ),
+    CarpenterRoute(
+      route: DemoRoutes.explorer,
+      shell: (context, child) => _shell(
+        selectedId: 'explorer',
+        title: 'Explorer',
+        subtitle: 'Hierarchical data and keyboard navigation',
+        child: child,
+      ),
+      page: (context) => ExplorerPage(toaster: _toaster),
+    ),
+    CarpenterRoute(
       route: DemoRoutes.operations,
       shell: (context, child) => _shell(
         selectedId: 'operations',
@@ -118,7 +140,7 @@ final class _CarpenterExampleAppState extends State<CarpenterExampleApp> {
       shell: (context, child) => _shell(
         selectedId: 'settings',
         title: 'Settings',
-        subtitle: 'Controlled form state',
+        subtitle: 'Controlled forms and typed fields',
         child: child,
       ),
       page: (context) => SettingsPage(toaster: _toaster),

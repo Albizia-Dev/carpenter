@@ -47,6 +47,32 @@ final class DemoCommands {
            return const CarpenterCommandResult();
          },
        ),
+       planning = CarpenterCommandController<void>(
+         id: 'navigation.planning',
+         title: 'Planning',
+         group: 'Navigation',
+         description: 'Open the live drag-and-drop planning board.',
+         shortcuts: const [
+           SingleActivator(LogicalKeyboardKey.digit4, control: true),
+         ],
+         execute: (_) {
+           navigator.planning();
+           return const CarpenterCommandResult();
+         },
+       ),
+       explorer = CarpenterCommandController<void>(
+         id: 'navigation.explorer',
+         title: 'Explorer',
+         group: 'Navigation',
+         description: 'Open the keyboard-friendly resource tree.',
+         shortcuts: const [
+           SingleActivator(LogicalKeyboardKey.digit5, control: true),
+         ],
+         execute: (_) {
+           navigator.explorer();
+           return const CarpenterCommandResult();
+         },
+       ),
        settings = CarpenterCommandController<void>(
          id: 'navigation.settings',
          title: 'Settings',
@@ -85,6 +111,8 @@ final class DemoCommands {
   final CarpenterCommandController<void> dashboard;
   final CarpenterCommandController<void> projects;
   final CarpenterCommandController<void> operations;
+  final CarpenterCommandController<void> planning;
+  final CarpenterCommandController<void> explorer;
   final CarpenterCommandController<void> settings;
   final CarpenterCommandController<void> notify;
 
@@ -92,6 +120,8 @@ final class DemoCommands {
     dashboard,
     projects,
     operations,
+    planning,
+    explorer,
     settings,
     notify,
   ];
@@ -100,6 +130,8 @@ final class DemoCommands {
     dashboard.dispose();
     projects.dispose();
     operations.dispose();
+    planning.dispose();
+    explorer.dispose();
     settings.dispose();
     notify.dispose();
   }

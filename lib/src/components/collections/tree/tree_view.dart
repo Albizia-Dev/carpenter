@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../../foundation/roles.dart';
 import '../../../foundation/theme.dart';
+import '../../basic/button/button.dart';
 import '../../basic/button/icon_button.dart';
 import '../../basic/icons.dart';
 import '../../basic/text.dart';
@@ -270,11 +271,18 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
               : Wrap(
                   children: [
                     for (final action in actions)
-                      CarpenterIconButton.fromAction(
-                        action,
-                        prominence: ActionProminence.ghost,
-                        size: ControlSize.xsmall,
-                      ),
+                      if (action.icon != null)
+                        CarpenterIconButton.fromAction(
+                          action,
+                          prominence: ActionProminence.ghost,
+                          size: ControlSize.xsmall,
+                        )
+                      else
+                        CarpenterButton.fromAction(
+                          action,
+                          prominence: ActionProminence.ghost,
+                          size: ControlSize.xsmall,
+                        ),
                   ],
                 ),
         ),

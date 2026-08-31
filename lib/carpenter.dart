@@ -3,6 +3,7 @@ library;
 
 export 'package:carpenter_units/carpenter_units.dart';
 export 'package:yx_navigation/yx_navigation.dart';
+export 'gravity_icons.dart';
 
 // Application runtime and integration.
 export 'src/application/app.dart';
@@ -119,6 +120,7 @@ export 'src/components/layout/patterns/list_report.dart';
 export 'src/components/layout/patterns/master_detail_page.dart';
 export 'src/components/layout/patterns/object_page.dart';
 export 'src/components/layout/patterns/page_blocks.dart';
+export 'src/components/layout/patterns/page_body.dart';
 export 'src/components/layout/patterns/states/empty_state.dart';
 export 'src/components/layout/regions/adaptive_region.dart';
 export 'src/components/layout/regions/adaptive_region_policy.dart';

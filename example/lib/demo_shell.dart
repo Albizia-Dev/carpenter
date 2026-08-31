@@ -1,9 +1,7 @@
 import 'package:carpenter/carpenter.dart';
-import 'package:carpenter/gravity_icons.dart';
 import 'package:flutter/widgets.dart';
 
 import 'demo_commands.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 final class DemoShell extends StatefulWidget {
   const DemoShell({
@@ -54,6 +52,18 @@ final class _DemoShellState extends State<DemoShell> {
               label: 'Projects',
               icon: GravityIcons.layoutList,
               command: widget.commands.projects,
+            ),
+            CarpenterSidebarItem(
+              id: 'planning',
+              label: 'Planning',
+              icon: GravityIcons.clock,
+              command: widget.commands.planning,
+            ),
+            CarpenterSidebarItem(
+              id: 'explorer',
+              label: 'Explorer',
+              icon: GravityIcons.bars,
+              command: widget.commands.explorer,
             ),
             CarpenterSidebarItem(
               id: 'operations',
