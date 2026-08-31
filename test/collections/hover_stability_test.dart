@@ -23,9 +23,7 @@ void main() {
 
     final row = find.byKey(const ValueKey<String>('row'));
     final initialRect = tester.getRect(row);
-    final mouse = await tester.createGesture(
-      kind: PointerDeviceKind.mouse,
-    );
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
     await mouse.addPointer(location: Offset.zero);
 
     for (var index = 0; index < 4; index++) {
