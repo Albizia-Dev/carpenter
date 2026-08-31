@@ -28,7 +28,7 @@ final class _CarpenterSizedDragFeedback extends StatelessWidget {
 }
 
 /// Typed pointer drag source backed by Flutter's drag recognizers and Carpenter sessions.
-final class CarpenterDraggable<T> extends StatelessWidget {
+final class CarpenterDraggable<T> extends StatefulWidget {
   const CarpenterDraggable({
     super.key,
     required this.payload,
@@ -61,21 +61,28 @@ final class CarpenterDraggable<T> extends StatelessWidget {
   final CarpenterDragCanceledCallback? onDragCanceled;
 
   @override
+  State<CarpenterDraggable<T>> createState() => _CarpenterDraggableState<T>();
+}
+
+final class _CarpenterDraggableState<T> extends State<CarpenterDraggable<T>> {
+  final GlobalKey _sourceKey = GlobalKey();
+
+  @override
   Widget build(BuildContext context) {
+    final widget = this.widget;
     assert(
-      payload.supports(operation),
+      widget.payload.supports(widget.operation),
       'CarpenterDraggable operation must be allowed by its payload.',
     );
     final controller = CarpenterDragScope.maybeOf(context);
-    final sourceKey = GlobalKey();
-    final sourceChild = KeyedSubtree(key: sourceKey, child: child);
+    final sourceChild = KeyedSubtree(key: _sourceKey, child: widget.child);
     final dragFeedback =
-        feedback ??
+        widget.feedback ??
         _CarpenterSizedDragFeedback(
-          sourceKey: sourceKey,
-          child: Opacity(opacity: .82, child: child),
+          sourceKey: _sourceKey,
+          child: Opacity(opacity: .82, child: widget.child),
         );
-    final transport = CarpenterDragTransport<T>(payload);
+    final transport = CarpenterDragTransport<T>(widget.payload);
 
     Offset anchorStrategy(
       Draggable<Object> draggable,
@@ -89,35 +96,35 @@ final class CarpenterDraggable<T> extends StatelessWidget {
 
     void started() {
       controller?.begin(
-        payload: payload,
-        operation: operation,
-        sourceId: sourceId,
+        payload: widget.payload,
+        operation: widget.operation,
+        sourceId: widget.sourceId,
       );
-      onDragStarted?.call();
+      widget.onDragStarted?.call();
     }
 
     void completed() {
       controller?.complete();
-      onDragCompleted?.call();
+      widget.onDragCompleted?.call();
     }
 
     void canceled(Velocity velocity, Offset offset) {
       controller?.cancel();
-      onDragCanceled?.call(velocity, offset);
+      widget.onDragCanceled?.call(velocity, offset);
     }
 
     void ended(DraggableDetails details) {
       if (!details.wasAccepted) controller?.cancel();
     }
 
-    final draggable = switch (activation) {
+    final draggable = switch (widget.activation) {
       CarpenterDragActivation.immediate => Draggable<CarpenterDragTransport<T>>(
         data: transport,
         feedback: dragFeedback,
-        childWhenDragging: childWhenDragging,
+        childWhenDragging: widget.childWhenDragging,
         dragAnchorStrategy: anchorStrategy,
-        axis: axis,
-        maxSimultaneousDrags: maxSimultaneousDrags,
+        axis: widget.axis,
+        maxSimultaneousDrags: widget.maxSimultaneousDrags,
         onDragStarted: started,
         onDragCompleted: completed,
         onDraggableCanceled: canceled,
@@ -128,10 +135,10 @@ final class CarpenterDraggable<T> extends StatelessWidget {
         LongPressDraggable<CarpenterDragTransport<T>>(
           data: transport,
           feedback: dragFeedback,
-          childWhenDragging: childWhenDragging,
+          childWhenDragging: widget.childWhenDragging,
           dragAnchorStrategy: anchorStrategy,
-          axis: axis,
-          maxSimultaneousDrags: maxSimultaneousDrags,
+          axis: widget.axis,
+          maxSimultaneousDrags: widget.maxSimultaneousDrags,
           onDragStarted: started,
           onDragCompleted: completed,
           onDraggableCanceled: canceled,
@@ -140,6 +147,10 @@ final class CarpenterDraggable<T> extends StatelessWidget {
         ),
     };
 
-    return Semantics(container: true, label: semanticLabel, child: draggable);
+    return Semantics(
+      container: true,
+      label: widget.semanticLabel,
+      child: draggable,
+    );
   }
 }
