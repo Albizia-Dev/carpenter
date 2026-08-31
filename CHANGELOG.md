@@ -1,11 +1,42 @@
-# 0.1.0-dev.1
+# 0.1.2
 
-- Established the initial publishable Flutter package.
-- Added the development example application.
-- Added the Widgetbook development catalog.
-- Added package documentation and publication quality gates.
+- Stabilized default drag feedback geometry so flex and stretched children keep
+  the rendered source size while moving through an overlay.
+- Kept Kanban columns as stable drop targets, including empty columns, while
+  retaining precise card insertion positioning for non-empty columns.
+- Made `CarpenterSelect`, `CarpenterComboBox`, and `CarpenterAutosuggest`
+  self-manage transient overlay visibility by default while preserving an
+  optional controlled `open` / `onOpenChanged` mode.
+- Added `CarpenterPageBody` for standard scrollable page padding and vertical
+  rhythm without repeating `ListView` and spacer boilerplate on every screen.
+- Exported bundled Gravity UI icons through the main `carpenter.dart` barrel so
+  ordinary applications can use one package import.
+- Reworked the example into a connected feature workspace with live controlled
+  Kanban and generic reordering, a keyboard-friendly tree explorer, persistent
+  notifications, record breadcrumbs, and a production-shaped typed form using
+  masked, number, date, time, range, select, autosuggest, combo, and file
+  inputs.
+- Rewrote package and example documentation around the current public API,
+  state-ownership model, routes, commands, and real application composition.
 
-# Unreleased
+# 0.1.1
+
+- Added adaptive breadcrumbs with overflow navigation for deep paths.
+- Added controlled numeric, time, and date-range inputs, including numeric
+  input formatting and validation support in the shared field pipeline.
+- Added badges, avatar groups with automatic overflow, and persistent
+  notification lists with unread state, actions, and caller-owned dismissal.
+- Added interactive Widgetbook playgrounds and behavioural tests for the new
+  components.
+- Added `CarpenterMaskedInput` and rebuilt date, time, and date-range controls
+  as masked text fields with trailing adaptive picker actions.
+- Refined breadcrumbs to the compact text-and-chevron presentation used by the
+  example while retaining deep-path overflow behaviour.
+- Added the typed drag-and-drop kernel with payloads, move/copy/link operation
+  negotiation, shared sessions, draggable adapters, drop targets, and
+  before/inside/after positioning.
+
+# 0.1.0
 
 - Added the framework-only `Application` root with Carpenter theme and unit
   scopes plus Navigator and Router integration.
@@ -43,19 +74,9 @@
 - Hardened Table body sizing for short viewport constraints used by adaptive
   page patterns.
 
-# 0.1.1
+# 0.1.0-dev.1
 
-- Added adaptive breadcrumbs with overflow navigation for deep paths.
-- Added controlled numeric, time, and date-range inputs, including numeric
-  input formatting and validation support in the shared field pipeline.
-- Added badges, avatar groups with automatic overflow, and persistent
-  notification lists with unread state, actions, and caller-owned dismissal.
-- Added interactive Widgetbook playgrounds and behavioural tests for the new
-  components.
-- Added `CarpenterMaskedInput` and rebuilt date, time, and date-range controls
-  as masked text fields with trailing adaptive picker actions.
-- Refined breadcrumbs to the compact text-and-chevron presentation used by the
-  example while retaining deep-path overflow behaviour.
-- Added the typed drag-and-drop kernel with payloads, move/copy/link operation
-  negotiation, shared sessions, draggable adapters, drop targets, and
-  before/inside/after positioning.
+- Established the initial publishable Flutter package.
+- Added the development example application.
+- Added the Widgetbook development catalog.
+- Added package documentation and publication quality gates.
