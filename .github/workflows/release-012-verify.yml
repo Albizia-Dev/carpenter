@@ -26,9 +26,11 @@ jobs:
           lib/src/components/basic/select/select.dart
           lib/src/components/basic/select/combo_box.dart
           lib/src/components/basic/select/autosuggest.dart
+          lib/src/components/collections/tree/tree_view.dart
           lib/src/components/layout/patterns/page_body.dart
           lib/carpenter.dart
           test/basic/select_test.dart
+          test/collections/tree_actions_test.dart
           example/lib/demo_commands.dart
           example/lib/demo_routes.dart
           example/lib/demo_shell.dart
@@ -52,7 +54,7 @@ jobs:
       - name: Analyze library
         run: dart analyze lib
       - name: Test ergonomic controls
-        run: flutter test test/basic/select_test.dart test/basic/combo_box_test.dart test/basic/autosuggest_test.dart
+        run: flutter test test/basic/select_test.dart test/basic/combo_box_test.dart test/basic/autosuggest_test.dart test/collections/tree_actions_test.dart
       - name: Install example dependencies
         working-directory: example
         run: flutter pub get
