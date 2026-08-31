@@ -72,17 +72,20 @@ void main() {
   ) async {
     await tester.pumpWidget(
       carpenterOverlayHarness(
-        SizedBox(
-          width: 180,
-          child: CarpenterDraggable<String>(
-            payload: const CarpenterDragPayload<String>(
-              id: 'drag',
-              data: 'drag',
-            ),
-            child: const Row(
-              children: [
-                Expanded(child: CarpenterText.label('Flexible drag child')),
-              ],
+        StatefulBuilder(
+          builder: (context, setState) => SizedBox(
+            width: 180,
+            child: CarpenterDraggable<String>(
+              payload: const CarpenterDragPayload<String>(
+                id: 'drag',
+                data: 'drag',
+              ),
+              onDragStarted: () => setState(() {}),
+              child: const Row(
+                children: [
+                  Expanded(child: CarpenterText.label('Flexible drag child')),
+                ],
+              ),
             ),
           ),
         ),
