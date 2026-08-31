@@ -33,6 +33,7 @@ jobs:
           example/lib/demo_routes.dart
           example/lib/demo_shell.dart
           example/lib/main.dart
+          example/lib/pages/dashboard_page.dart
           example/lib/pages/explorer_page.dart
           example/lib/pages/planning_page.dart
           example/lib/pages/project_page.dart
@@ -58,6 +59,21 @@ jobs:
       - name: Analyze example
         working-directory: example
         run: dart analyze lib test
-      - name: Test example
+      - name: Test route parsing
         working-directory: example
-        run: flutter test
+        run: flutter test test/widget_test.dart --plain-name "demo routes parse and serialize stable URLs"
+      - name: Test sidebar navigation
+        working-directory: example
+        run: flutter test test/widget_test.dart --plain-name "sidebar navigation executes the same route commands"
+      - name: Test planning route
+        working-directory: example
+        run: flutter test test/widget_test.dart --plain-name "planning route renders reorder and kanban surfaces"
+      - name: Test explorer route
+        working-directory: example
+        run: flutter test test/widget_test.dart --plain-name "explorer route renders the controlled resource tree"
+      - name: Test settings route
+        working-directory: example
+        run: flutter test test/widget_test.dart --plain-name "settings route renders typed and masked fields"
+      - name: Test project route
+        working-directory: example
+        run: flutter test test/widget_test.dart --plain-name "deep project URL renders through yx navigation"
