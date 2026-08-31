@@ -55,7 +55,10 @@ final class CarpenterListTile extends StatelessWidget {
               child: child,
             ),
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: gap, vertical: gap * .75),
+              padding: EdgeInsets.symmetric(
+                horizontal: gap,
+                vertical: gap * .75,
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
