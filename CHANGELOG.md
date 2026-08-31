@@ -11,6 +11,8 @@
   rhythm without repeating `ListView` and spacer boilerplate on every screen.
 - Exported bundled Gravity UI icons through the main `carpenter.dart` barrel so
   ordinary applications can use one package import.
+- Fixed `CarpenterTreeView.actions` so semantic row actions without icons render
+  as compact text actions instead of asserting at runtime.
 - Reworked the example into a connected feature workspace with live controlled
   Kanban and generic reordering, a keyboard-friendly tree explorer, persistent
   notifications, record breadcrumbs, and a production-shaped typed form using
