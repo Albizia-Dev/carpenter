@@ -1,6 +1,4 @@
 import 'package:carpenter/carpenter.dart';
-import 'package:carpenter/gravity_icons.dart';
-
 import 'package:flutter/widgets.dart';
 
 import '../demo_commands.dart';
@@ -35,13 +33,13 @@ final class DashboardPage extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => ListView(
-    padding: EdgeInsets.all(context.units(1.5.rem)),
+  Widget build(BuildContext context) => CarpenterPageBody(
+    semanticLabel: 'Workspace overview',
     children: [
       CarpenterPageHeader(
         title: 'Overview',
         subtitle:
-            'A connected application example: navigation, loading, commands, collections and adaptive layout.',
+            'A connected application example: navigation, loading, commands, collections, drag-and-drop and adaptive layout.',
         status: const CarpenterPageStatus(
           label: 'All systems nominal',
           role: FeedbackColorRole.success,
@@ -63,7 +61,6 @@ final class DashboardPage extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: context.units(1.5.rem)),
       const CarpenterRecordSummary(
         children: [
           CarpenterRecordMetric(
@@ -88,11 +85,10 @@ final class DashboardPage extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: context.units(1.5.rem)),
       CarpenterNotice(
         title: 'The example is intentionally interconnected',
         message:
-            'Use Ctrl+1/2/3 (Cmd on macOS) to navigate. Global hotkeys and sidebar items execute the same CarpenterCommand instances.',
+            'Use Ctrl+1 through Ctrl+5 (Cmd on macOS) to navigate. Global hotkeys and sidebar items execute the same CarpenterCommand instances.',
         tone: CarpenterNoticeTone.info,
         action: CarpenterActionDescriptor(
           id: 'dashboard.hotkeys',
@@ -100,7 +96,6 @@ final class DashboardPage extends StatelessWidget {
           onInvoke: navigator.operations,
         ),
       ),
-      SizedBox(height: context.units(1.5.rem)),
       Wrap(
         spacing: context.units(1.rem),
         runSpacing: context.units(1.rem),
@@ -149,7 +144,34 @@ final class DashboardPage extends StatelessWidget {
           ),
         ],
       ),
-      SizedBox(height: context.units(1.5.rem)),
+      CarpenterPageSection(
+        id: const CarpenterPageSectionId('alerts'),
+        title: 'Persistent notifications',
+        description:
+            'Toasts are transient; notification state is an ordinary caller-owned collection.',
+        child: CarpenterNotificationList(
+          items: [
+            CarpenterNotification(
+              id: 'approval',
+              title: 'Two approvals are due today',
+              message: 'Expense approvals need review before 17:00.',
+              tone: FeedbackColorRole.warning,
+              unread: true,
+              action: CarpenterActionDescriptor(
+                id: 'dashboard.approval.open',
+                label: 'Open operations',
+                onInvoke: navigator.operations,
+              ),
+            ),
+            const CarpenterNotification(
+              id: 'sync',
+              title: 'Bank synchronization healthy',
+              message: 'All configured integrations completed their last run.',
+              tone: FeedbackColorRole.success,
+            ),
+          ],
+        ),
+      ),
       CarpenterExpander(
         initiallyExpanded: true,
         header: const CarpenterText.title('Command-driven navigation'),
@@ -157,22 +179,12 @@ final class DashboardPage extends StatelessWidget {
           spacing: context.units(.75.rem),
           runSpacing: context.units(.75.rem),
           children: [
-            CarpenterCommandButton<void>(
-              command: commands.dashboard,
-              input: null,
-            ),
-            CarpenterCommandButton<void>(
-              command: commands.projects,
-              input: null,
-            ),
-            CarpenterCommandButton<void>(
-              command: commands.operations,
-              input: null,
-            ),
-            CarpenterCommandButton<void>(
-              command: commands.settings,
-              input: null,
-            ),
+            CarpenterCommandButton<void>(command: commands.dashboard, input: null),
+            CarpenterCommandButton<void>(command: commands.projects, input: null),
+            CarpenterCommandButton<void>(command: commands.planning, input: null),
+            CarpenterCommandButton<void>(command: commands.explorer, input: null),
+            CarpenterCommandButton<void>(command: commands.operations, input: null),
+            CarpenterCommandButton<void>(command: commands.settings, input: null),
           ],
         ),
       ),
