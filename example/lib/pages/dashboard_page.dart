@@ -179,12 +179,30 @@ final class DashboardPage extends StatelessWidget {
           spacing: context.units(.75.rem),
           runSpacing: context.units(.75.rem),
           children: [
-            CarpenterCommandButton<void>(command: commands.dashboard, input: null),
-            CarpenterCommandButton<void>(command: commands.projects, input: null),
-            CarpenterCommandButton<void>(command: commands.planning, input: null),
-            CarpenterCommandButton<void>(command: commands.explorer, input: null),
-            CarpenterCommandButton<void>(command: commands.operations, input: null),
-            CarpenterCommandButton<void>(command: commands.settings, input: null),
+            CarpenterCommandButton<void>(
+              command: commands.dashboard,
+              input: null,
+            ),
+            CarpenterCommandButton<void>(
+              command: commands.projects,
+              input: null,
+            ),
+            CarpenterCommandButton<void>(
+              command: commands.planning,
+              input: null,
+            ),
+            CarpenterCommandButton<void>(
+              command: commands.explorer,
+              input: null,
+            ),
+            CarpenterCommandButton<void>(
+              command: commands.operations,
+              input: null,
+            ),
+            CarpenterCommandButton<void>(
+              command: commands.settings,
+              input: null,
+            ),
           ],
         ),
       ),
