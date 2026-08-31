@@ -56,6 +56,12 @@ final class _PlanningPageState extends State<PlanningPage> {
     ],
   };
 
+  final List<String> _triage = <String>[
+    'Review failed bank import',
+    'Approve supplier contract',
+    'Reconcile warehouse variance',
+  ];
+
   List<CarpenterKanbanColumn<String, _WorkItem>> get _columns => [
     CarpenterKanbanColumn<String, _WorkItem>(
       id: 'backlog',
@@ -101,6 +107,13 @@ final class _PlanningPageState extends State<PlanningPage> {
     );
   }
 
+  void _reorderTriage(CarpenterReorderDetails<String> details) {
+    setState(() {
+      final item = _triage.removeAt(details.oldIndex);
+      _triage.insert(details.newIndex.clamp(0, _triage.length), item);
+    });
+  }
+
   @override
   Widget build(BuildContext context) => CarpenterPageBody(
     semanticLabel: 'Planning workspace',
@@ -108,7 +121,7 @@ final class _PlanningPageState extends State<PlanningPage> {
       CarpenterPageHeader(
         title: 'Delivery planning',
         subtitle:
-            'A controlled Kanban using Carpenter drag-and-drop. Move cards within a column or across columns, including an empty one.',
+            'Controlled Kanban and generic reorder surfaces using the same Carpenter drag-and-drop kernel.',
         status: CarpenterPageStatus(
           label: '${_items.values.fold<int>(0, (sum, list) => sum + list.length)} work items',
           role: FeedbackColorRole.info,
@@ -117,49 +130,81 @@ final class _PlanningPageState extends State<PlanningPage> {
       const CarpenterNotice(
         title: 'This is application state, not a canned component demo',
         message:
-            'The board only emits move details. This page owns the lists and applies every reorder, so the example mirrors production usage.',
+            'The widgets only emit move details. This page owns the lists and applies every reorder, so the example mirrors production usage.',
         tone: CarpenterNoticeTone.info,
       ),
-      CarpenterKanban<String, _WorkItem>(
-        columns: _columns,
-        cardKey: (item) => item.id,
-        onMove: _move,
-        cardBuilder: (context, item, state) => CarpenterCard(
-          semanticLabel: '${item.id} ${item.title}',
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
+      CarpenterPageSection(
+        id: const CarpenterPageSectionId('triage'),
+        title: 'Triage order',
+        description:
+            'A presentation-neutral reorderable collection for arbitrary application content.',
+        child: CarpenterReorderableCollection<String>(
+          items: _triage,
+          itemKey: (item) => item,
+          onReorder: _reorderTriage,
+          itemBuilder: (context, item, state) => Padding(
+            padding: EdgeInsets.only(bottom: context.units(.5.rem)),
+            child: CarpenterCard(
+              semanticLabel: item,
+              child: Row(
                 children: [
-                  Expanded(
-                    child: CarpenterText.label(
-                      item.title,
-                      emphasis: TypographyEmphasis.strong,
-                    ),
-                  ),
-                  CarpenterStatusIndicator(
-                    label: item.id,
-                    role: item.priority,
+                  Expanded(child: CarpenterText.body(item)),
+                  CarpenterText.caption(
+                    state.dragging ? 'Moving' : 'Drag to reorder',
+                    colorRole: ContentColorRole.secondary,
                   ),
                 ],
               ),
-              SizedBox(height: context.units(.5.rem)),
-              CarpenterText.caption(
-                item.owner,
-                colorRole: ContentColorRole.secondary,
-              ),
-              if (state.dragging || state.hovering) ...[
+            ),
+          ),
+        ),
+      ),
+      CarpenterPageSection(
+        id: const CarpenterPageSectionId('kanban'),
+        title: 'Delivery board',
+        description:
+            'Move cards within a column or across columns. Empty columns remain valid drop targets.',
+        child: CarpenterKanban<String, _WorkItem>(
+          columns: _columns,
+          cardKey: (item) => item.id,
+          onMove: _move,
+          cardBuilder: (context, item, state) => CarpenterCard(
+            semanticLabel: '${item.id} ${item.title}',
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: CarpenterText.label(
+                        item.title,
+                        emphasis: TypographyEmphasis.strong,
+                      ),
+                    ),
+                    CarpenterStatusIndicator(
+                      label: item.id,
+                      role: item.priority,
+                    ),
+                  ],
+                ),
                 SizedBox(height: context.units(.5.rem)),
                 CarpenterText.caption(
-                  state.dragging
-                      ? 'Dragging'
-                      : state.acceptsDrop
-                      ? 'Drop here'
-                      : 'Drop not accepted',
+                  item.owner,
                   colorRole: ContentColorRole.secondary,
                 ),
+                if (state.dragging || state.hovering) ...[
+                  SizedBox(height: context.units(.5.rem)),
+                  CarpenterText.caption(
+                    state.dragging
+                        ? 'Dragging'
+                        : state.acceptsDrop
+                        ? 'Drop here'
+                        : 'Drop not accepted',
+                    colorRole: ContentColorRole.secondary,
+                  ),
+                ],
               ],
-            ],
+            ),
           ),
         ),
       ),
