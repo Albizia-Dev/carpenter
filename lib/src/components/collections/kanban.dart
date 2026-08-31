@@ -276,12 +276,10 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
       targetId: 'kanban.${column.id}.slot.$insertionIndex',
       fixedPosition: position,
       acceptedOperations: const {CarpenterDragOperation.move},
-      canAccept: (details) => _canAccept(
-        _moveDetails(column, insertionIndex, position, details),
-      ),
-      onDrop: (details) => _emit(
-        _moveDetails(column, insertionIndex, position, details),
-      ),
+      canAccept: (details) =>
+          _canAccept(_moveDetails(column, insertionIndex, position, details)),
+      onDrop: (details) =>
+          _emit(_moveDetails(column, insertionIndex, position, details)),
       builder: (context, state) => AnimatedContainer(
         duration: theme.motion.transitionDuration(context),
         height: state.hovering ? activeHeight : idleHeight,

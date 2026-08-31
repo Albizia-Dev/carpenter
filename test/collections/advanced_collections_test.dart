@@ -75,7 +75,10 @@ void main() {
         SizedBox(
           width: 180,
           child: CarpenterDraggable<String>(
-            payload: const CarpenterDragPayload<String>(id: 'drag', data: 'drag'),
+            payload: const CarpenterDragPayload<String>(
+              id: 'drag',
+              data: 'drag',
+            ),
             child: const Row(
               children: [
                 Expanded(child: CarpenterText.label('Flexible drag child')),

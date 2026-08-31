@@ -69,7 +69,8 @@ final class CarpenterDraggable<T> extends StatelessWidget {
     final controller = CarpenterDragScope.maybeOf(context);
     final sourceKey = GlobalKey();
     final sourceChild = KeyedSubtree(key: sourceKey, child: child);
-    final dragFeedback = feedback ??
+    final dragFeedback =
+        feedback ??
         _CarpenterSizedDragFeedback(
           sourceKey: sourceKey,
           child: Opacity(opacity: .82, child: child),
