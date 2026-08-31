@@ -7,7 +7,10 @@ void main() {
   testWidgets('progress exposes determinate semantics', (tester) async {
     await tester.pumpWidget(
       carpenterHarness(
-        const CarpenterProgress(value: .42, semanticLabel: 'Upload progress'),
+        const CarpenterProgress(
+          value: .42,
+          semanticLabel: 'Upload progress',
+        ),
       ),
     );
 
