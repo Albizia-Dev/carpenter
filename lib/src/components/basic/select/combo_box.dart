@@ -5,16 +5,19 @@ import '../../../internal/selection/suggestion_field.dart';
 import 'select.dart';
 
 /// An editable controlled field whose query may resolve to one selected option.
-final class CarpenterComboBox<T> extends StatelessWidget {
+///
+/// Value and query remain caller-owned. Overlay visibility is self-managed by
+/// default; pass both [open] and [onOpenChanged] to control it explicitly.
+final class CarpenterComboBox<T> extends StatefulWidget {
   const CarpenterComboBox({
     super.key,
     required this.controller,
     required this.value,
     required this.onChanged,
     required this.onQueryChanged,
-    required this.open,
-    required this.onOpenChanged,
     required this.options,
+    this.open,
+    this.onOpenChanged,
     this.loadState = OptionsLoadState.ready,
     this.label,
     this.placeholder,
@@ -33,14 +36,22 @@ final class CarpenterComboBox<T> extends StatelessWidget {
     this.loadingText = 'Loading',
     this.emptyText = 'No options',
     this.failedText = 'Unable to load options',
-  });
+  }) : assert(
+         open == null || onOpenChanged != null,
+         'Controlled CarpenterComboBox.open requires onOpenChanged.',
+       );
 
   final TextEditingController controller;
   final T? value;
   final ValueChanged<T>? onChanged;
   final ValueChanged<String>? onQueryChanged;
-  final bool open;
-  final ValueChanged<bool> onOpenChanged;
+
+  /// Controlled overlay visibility. Omit to let Carpenter own this transient
+  /// interaction state.
+  final bool? open;
+
+  /// Observes self-managed visibility changes or updates controlled [open].
+  final ValueChanged<bool>? onOpenChanged;
   final List<CarpenterOption<T>> options;
   final OptionsLoadState loadState;
   final String? label;
@@ -61,11 +72,20 @@ final class CarpenterComboBox<T> extends StatelessWidget {
   final String emptyText;
   final String failedText;
 
+  @override
+  State<CarpenterComboBox<T>> createState() => _CarpenterComboBoxState<T>();
+}
+
+final class _CarpenterComboBoxState<T> extends State<CarpenterComboBox<T>> {
+  bool _open = false;
+
+  bool get _effectiveOpen => widget.open ?? _open;
+
   Object? get _selectedId {
-    final selected = value;
+    final selected = widget.value;
     if (selected == null) return null;
-    for (final option in options) {
-      if (isSameValue?.call(option.value, selected) ??
+    for (final option in widget.options) {
+      if (widget.isSameValue?.call(option.value, selected) ??
           option.value == selected) {
         return option.id;
       }
@@ -73,34 +93,41 @@ final class CarpenterComboBox<T> extends StatelessWidget {
     return null;
   }
 
+  void _setOpen(bool value) {
+    if (widget.open == null && _open != value) {
+      setState(() => _open = value);
+    }
+    widget.onOpenChanged?.call(value);
+  }
+
   @override
   Widget build(BuildContext context) => SuggestionField<T>(
-    controller: controller,
-    options: options,
-    open: open,
-    onOpenChanged: onOpenChanged,
-    onQueryChanged: onQueryChanged,
-    onSelected: onChanged == null
+    controller: widget.controller,
+    options: widget.options,
+    open: _effectiveOpen,
+    onOpenChanged: _setOpen,
+    onQueryChanged: widget.onQueryChanged,
+    onSelected: widget.onChanged == null
         ? null
-        : (option) => onChanged!.call(option.value),
+        : (option) => widget.onChanged!.call(option.value),
     selectedOptionId: _selectedId,
-    loadState: loadState,
-    loadingText: loadingText,
-    emptyText: emptyText,
-    failedText: failedText,
-    label: label,
-    placeholder: placeholder,
-    description: description,
-    errorText: errorText,
-    semanticLabel: semanticLabel,
-    required: required,
-    availability: availability,
-    size: size,
-    shape: shape,
-    placement: placement,
-    clearAction: clearAction,
-    focusNode: focusNode,
-    autofocus: autofocus,
+    loadState: widget.loadState,
+    loadingText: widget.loadingText,
+    emptyText: widget.emptyText,
+    failedText: widget.failedText,
+    label: widget.label,
+    placeholder: widget.placeholder,
+    description: widget.description,
+    errorText: widget.errorText,
+    semanticLabel: widget.semanticLabel,
+    required: widget.required,
+    availability: widget.availability,
+    size: widget.size,
+    shape: widget.shape,
+    placement: widget.placement,
+    clearAction: widget.clearAction,
+    focusNode: widget.focusNode,
+    autofocus: widget.autofocus,
     replaceQueryOnSelection: true,
   );
 }
