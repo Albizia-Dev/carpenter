@@ -61,8 +61,10 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Restore repository-managed analysis config
+        run: git checkout -- analysis_options.yaml
+
       - name: Publish dry run
-        continue-on-error: true
         run: dart pub publish --dry-run
 
       - name: Publish to pub.dev
