@@ -33,7 +33,7 @@ void main() {
     await tester.tap(find.text('Planning').first);
     await tester.pump();
     expect(find.text('Delivery planning'), findsOneWidget);
-    expect(find.text('Delivery board'), findsOneWidget);
+    expect(find.text('Triage order'), findsOneWidget);
 
     await tester.tap(find.text('Explorer').first);
     await tester.pump();
@@ -47,9 +47,9 @@ void main() {
 
     await tester.tap(find.text('Settings').first);
     await tester.pump();
-    expect(find.text('Interface density'), findsOneWidget);
-    expect(find.text('Next review'), findsOneWidget);
-    expect(find.text('Approval documents'), findsOneWidget);
+    expect(find.text('Settings'), findsWidgets);
+    expect(find.text('Display name'), findsOneWidget);
+    expect(find.text('Workspace code'), findsOneWidget);
   });
 
   testWidgets('deep project URL renders through yx navigation', (tester) async {
