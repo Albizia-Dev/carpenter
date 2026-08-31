@@ -12,10 +12,7 @@ Future<void> _pumpExample(WidgetTester tester, {Uri? initialUri}) async {
   await tester.binding.setSurfaceSize(const Size(1440, 900));
   addTearDown(() => tester.binding.setSurfaceSize(null));
   await tester.pumpWidget(
-    CarpenterExampleApp(
-      syncRouteInformation: false,
-      initialUri: initialUri,
-    ),
+    CarpenterExampleApp(syncRouteInformation: false, initialUri: initialUri),
   );
   await _pumpFrames(tester);
 }
