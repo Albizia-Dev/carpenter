@@ -117,7 +117,7 @@ final class _ProjectStructurePreviewState
               nodes: _projectNodes,
               controller: _treeController,
               treeHeader: 'Object',
-              treeWidth: const CarpenterTableColumnWidth.flexible(
+              treeWidth: CarpenterTableColumnWidth.flexible(
                 flex: 3,
                 minimum: 12.rem,
                 maximum: 28.rem,
@@ -142,7 +142,7 @@ final class _ProjectStructurePreviewState
                 CarpenterTreeTableColumn<String>(
                   id: 'kind',
                   header: 'Kind',
-                  width: const CarpenterTableColumnWidth.fixed(width: 7.rem),
+                  width: CarpenterTableColumnWidth.fixed(width: 7.rem),
                   cellBuilder: (context, node) => CarpenterText.caption(
                     node.canExpand ? 'Group' : 'File',
                     colorRole: ContentColorRole.secondary,
@@ -152,7 +152,7 @@ final class _ProjectStructurePreviewState
                   id: 'state',
                   header: 'State',
                   alignment: CarpenterTableColumnAlignment.end,
-                  width: const CarpenterTableColumnWidth.fixed(width: 6.rem),
+                  width: CarpenterTableColumnWidth.fixed(width: 6.rem),
                   cellBuilder: (context, node) => CarpenterText.caption(
                     node.loadState.name,
                     textAlign: TextAlign.end,
