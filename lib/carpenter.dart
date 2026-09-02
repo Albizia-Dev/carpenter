@@ -114,6 +114,7 @@ export 'src/components/layout/app_frame.dart';
 export 'src/components/layout/application_shell.dart';
 export 'src/components/layout/master_detail.dart';
 export 'src/components/layout/page_header.dart';
+export 'src/components/layout/patterns/block_group.dart';
 export 'src/components/layout/patterns/collection_page.dart';
 export 'src/components/layout/patterns/field_group.dart';
 export 'src/components/layout/patterns/form_page.dart';
@@ -122,7 +123,7 @@ export 'src/components/layout/patterns/list_report.dart';
 export 'src/components/layout/patterns/master_detail_page.dart';
 export 'src/components/layout/patterns/object_page.dart';
 export 'src/components/layout/patterns/page_blocks.dart'
-    hide CarpenterPageSection, CarpenterPageSectionId;
+    hide CarpenterBlockGroup, CarpenterPageSection, CarpenterPageSectionId;
 export 'src/components/layout/patterns/page_section.dart';
 export 'src/components/layout/patterns/page_body.dart';
 export 'src/components/layout/patterns/states/empty_state.dart';
