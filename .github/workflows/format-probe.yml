@@ -5,21 +5,28 @@ on:
     branches:
       - develop
 
+permissions:
+  contents: write
+
 jobs:
   format:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
       - uses: subosito/flutter-action@v2
         with:
           channel: stable
           cache: true
       - run: flutter pub get
-      - name: Format and capture patch
+      - name: Format, remove probe, and push
         run: |
           dart format lib
-          git diff --binary > format.patch
-      - uses: actions/upload-artifact@v4
-        with:
-          name: format-patch
-          path: format.patch
+          rm .github/workflows/format-probe.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib .github/workflows/format-probe.yml
+          git diff --cached --quiet && exit 0
+          git commit -m "style: apply dart format"
+          git push origin HEAD:${{ github.head_ref }}
