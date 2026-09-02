@@ -7,7 +7,7 @@ import '../../../foundation/theme.dart';
 ///
 /// Spacing inside each field is owned by the field itself. This component only
 /// controls spacing *between* fields, so its default gaps are deliberately
-/// larger than a label-to-control gap.
+/// larger than a label-to-control gap and smaller than a block-to-block gap.
 final class CarpenterFieldGroup extends StatelessWidget {
   const CarpenterFieldGroup({
     super.key,
@@ -28,8 +28,8 @@ final class CarpenterFieldGroup extends StatelessWidget {
   Widget build(BuildContext context) {
     if (children.isEmpty) return const SizedBox.shrink();
     final theme = CarpenterTheme.of(context);
-    final columnGap = context.units(columnSpacing ?? theme.spacing.layoutSection);
-    final rowGap = context.units(rowSpacing ?? theme.spacing.large);
+    final columnGap = context.units(columnSpacing ?? theme.spacing.large);
+    final rowGap = context.units(rowSpacing ?? theme.spacing.medium);
     final minWidth = context.units(minimumColumnWidth);
 
     return LayoutBuilder(
