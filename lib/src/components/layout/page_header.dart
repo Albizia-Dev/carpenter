@@ -48,7 +48,7 @@ final class CarpenterPageHeader extends StatelessWidget {
     builder: (context, constraints) {
       final theme = CarpenterTheme.of(context);
       final externalGap = context.units(theme.spacing.layoutHeader);
-      final internalGap = context.units(theme.spacing.xsmall);
+      final internalGap = context.units(theme.spacing.small) / 2;
       final statusGap = context.units(theme.spacing.small);
       final viewport = const CarpenterViewportPolicy().resolve(
         context,
