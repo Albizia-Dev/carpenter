@@ -84,16 +84,7 @@ final class CarpenterText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
-    final resolved = theme.typography.resolve(context, role, emphasis);
-    final scale = switch (role) {
-      TypographyRole.display => .875,
-      TypographyRole.title => 5 / 6,
-      _ => 1.0,
-    };
-    final fontSize = resolved.fontSize;
-    final style = scale == 1.0 || fontSize == null
-        ? resolved
-        : resolved.copyWith(fontSize: fontSize * scale);
+    final style = theme.typography.resolve(context, role, emphasis);
     return Text(
       data,
       style: style.copyWith(color: theme.content.resolve(colorRole)),
