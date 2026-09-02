@@ -57,6 +57,53 @@ void main() {
     },
   );
 
+  testWidgets('typed dialog ignores delayed close after dismissal', (
+    tester,
+  ) async {
+    CarpenterDialogClose<int>? delayedClose;
+    await tester.pumpWidget(
+      WidgetsApp(
+        color: const Color(0xFFFFFFFF),
+        pageRouteBuilder: <T>(settings, builder) => PageRouteBuilder<T>(
+          settings: settings,
+          pageBuilder: (context, _, _) => builder(context),
+        ),
+        home: UnitsRoot(
+          rem: const Px(16),
+          child: CarpenterTheme(
+            data: CarpenterThemeData.light(),
+            child: Builder(
+              builder: (context) => CarpenterButton(
+                label: 'Open delayed dialog',
+                onInvoke: () {
+                  showCarpenterDialog<int>(
+                    context: context,
+                    title: 'Delayed dialog',
+                    content: const CarpenterText.body('Wait for completion'),
+                    actionsBuilder: (close) {
+                      delayedClose = close;
+                      return const [];
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open delayed dialog'));
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+
+    delayedClose!(42);
+    await tester.pump();
+    expect(tester.takeException(), isNull);
+    expect(find.text('Open delayed dialog'), findsOneWidget);
+  });
+
   testWidgets('initial focus and Tab traversal remain trapped', (tester) async {
     final first = FocusNode();
     final second = FocusNode();

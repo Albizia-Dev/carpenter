@@ -1,3 +1,8 @@
+# 0.1.6
+
+- Made typed dialog close callbacks route-aware so a delayed asynchronous
+  action cannot pop the page below an already dismissed dialog.
+
 # 0.1.5
 
 - Added typed `showCarpenterDialog<T>` route composition with result-bearing

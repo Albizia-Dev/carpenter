@@ -38,6 +38,9 @@ Future<T?> showCarpenterDialog<T>({
     transitionDuration: Duration.zero,
     pageBuilder: (dialogContext, _, _) {
       void close([T? result]) {
+        if (!dialogContext.mounted) return;
+        final route = ModalRoute.of(dialogContext);
+        if (route?.isCurrent != true) return;
         final navigator = Navigator.of(dialogContext);
         if (navigator.canPop()) navigator.pop<T>(result);
       }
