@@ -21,11 +21,12 @@ final class CarpenterPageBody extends StatelessWidget {
 
   final List<Widget> children;
 
-  /// Structural escape hatch. Defaults to the theme's large spacing on every
+  /// Structural escape hatch. Defaults to the page-layout spacing on every
   /// side.
   final EdgeInsetsGeometry? padding;
 
-  /// Gap between top-level page blocks. Defaults to the theme's large spacing.
+  /// Gap between top-level page sections. It is intentionally larger than
+  /// field and block gaps so separate semantic groups read as separate groups.
   final LengthUnit? spacing;
   final ScrollController? controller;
   final ScrollPhysics? physics;
@@ -34,7 +35,7 @@ final class CarpenterPageBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
-    final gap = context.units(spacing ?? theme.spacing.large);
+    final gap = context.units(spacing ?? theme.spacing.layoutPage);
     final list = ListView.separated(
       controller: controller,
       physics: physics,
