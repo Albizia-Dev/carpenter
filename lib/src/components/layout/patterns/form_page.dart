@@ -22,6 +22,7 @@ final class CarpenterFormPage extends StatelessWidget {
     this.destructiveActions = const [],
     this.saveExecutionPhase = ActionExecutionPhase.idle,
     this.dirtyLabel = 'Unsaved changes',
+    this.headerBehavior = CarpenterPageHeaderBehavior.sticky,
     this.semanticLabel,
   });
 
@@ -36,12 +37,14 @@ final class CarpenterFormPage extends StatelessWidget {
   final bool dirty;
   final ActionExecutionPhase saveExecutionPhase;
   final String dirtyLabel;
+  final CarpenterPageHeaderBehavior headerBehavior;
   final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.layoutSection);
+    final pageOwnsScroll = headerBehavior == CarpenterPageHeaderBehavior.scrolls;
     final actions = CarpenterHeaderActions(
       primary: [saveAction],
       secondary: [cancelAction, ...secondaryActions],
@@ -50,7 +53,10 @@ final class CarpenterFormPage extends StatelessWidget {
     );
     return CarpenterPageRegion(
       semanticLabel: semanticLabel ?? title,
-      scrollOwnership: CarpenterRegionScrollOwnership.child,
+      scrollOwnership: pageOwnsScroll
+          ? CarpenterRegionScrollOwnership.region
+          : CarpenterRegionScrollOwnership.child,
+      headerBehavior: headerBehavior,
       shortcutActions: actions.allActions,
       header: CarpenterPageHeader(
         title: title,
@@ -64,7 +70,9 @@ final class CarpenterFormPage extends StatelessWidget {
         actions: actions,
       ),
       body: CarpenterPrimaryRegion(
-        scrollOwnership: CarpenterRegionScrollOwnership.region,
+        scrollOwnership: pageOwnsScroll
+            ? CarpenterRegionScrollOwnership.child
+            : CarpenterRegionScrollOwnership.region,
         semanticLabel: '$title form',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
