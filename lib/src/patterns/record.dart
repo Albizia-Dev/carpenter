@@ -7,7 +7,7 @@ import '../components/basic/text.dart';
 import '../components/collections/tabs.dart';
 import '../components/layout/page_header.dart';
 import '../components/layout/patterns/header_actions.dart';
-import '../components/layout/patterns/page_blocks.dart';
+import '../components/layout/patterns/page_section.dart';
 import '../foundation/roles.dart';
 import '../foundation/theme.dart';
 import '../page/capability.dart';
