@@ -13,6 +13,7 @@ final class InteractiveRegion extends StatefulWidget {
     super.key,
     required this.onActivate,
     required this.builder,
+    this.onDoubleActivate,
     this.activationBlocked = false,
     this.handlesActivationShortcuts = true,
     this.includeFocusSemantics = true,
@@ -22,6 +23,7 @@ final class InteractiveRegion extends StatefulWidget {
   });
 
   final VoidCallback? onActivate;
+  final VoidCallback? onDoubleActivate;
   final InteractiveRegionBuilder builder;
   final bool activationBlocked;
   final bool handlesActivationShortcuts;
@@ -40,7 +42,8 @@ final class _InteractiveRegionState extends State<InteractiveRegion> {
   bool _pressed = false;
   bool _showFocusHighlight = false;
 
-  bool get _enabled => widget.onActivate != null;
+  bool get _enabled =>
+      widget.onActivate != null || widget.onDoubleActivate != null;
   bool get _interactive => _enabled && !widget.activationBlocked;
 
   Set<WidgetState> get _states => <WidgetState>{
@@ -66,7 +69,11 @@ final class _InteractiveRegionState extends State<InteractiveRegion> {
   }
 
   void _activate() {
-    if (_interactive) widget.onActivate!();
+    if (_interactive) widget.onActivate?.call();
+  }
+
+  void _doubleActivate() {
+    if (_interactive) widget.onDoubleActivate?.call();
   }
 
   @override
@@ -128,7 +135,10 @@ final class _InteractiveRegionState extends State<InteractiveRegion> {
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             excludeFromSemantics: true,
-            onTap: _interactive ? _activate : null,
+            onTap: _interactive && widget.onActivate != null ? _activate : null,
+            onDoubleTap: _interactive && widget.onDoubleActivate != null
+                ? _doubleActivate
+                : null,
             child: widget.builder(context, _states, _showFocusHighlight),
           ),
         ),

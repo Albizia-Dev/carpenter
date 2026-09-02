@@ -7,6 +7,9 @@ enum CarpenterTreeLoadState { ready, loading, failed }
 
 enum CarpenterTreeSelectionMode { none, single, multiple }
 
+typedef CarpenterTreeNodePredicate<T> =
+    bool Function(CarpenterTreeNode<T> node);
+
 @immutable
 final class CarpenterTreeNode<T> {
   const CarpenterTreeNode({
@@ -98,6 +101,49 @@ List<CarpenterTreeFlatNode<T>> flattenCarpenterTree<T>(
   return List.unmodifiable(result);
 }
 
+/// Flattens a filtered tree while retaining ancestors of matching nodes.
+///
+/// Matching paths are expanded for presentation without mutating the caller's
+/// controlled [expandedIds]. Explicit expansion still controls unrelated
+/// branches while the filter is active.
+List<CarpenterTreeFlatNode<T>> flattenFilteredCarpenterTree<T>(
+  List<CarpenterTreeNode<T>> roots,
+  Set<Object> expandedIds,
+  CarpenterTreeNodePredicate<T> predicate,
+) {
+  final matches = <Object, bool>{};
+
+  bool subtreeMatches(CarpenterTreeNode<T> node) {
+    final cached = matches[node.id];
+    if (cached != null) return cached;
+    final result = predicate(node) || node.children.any(subtreeMatches);
+    matches[node.id] = result;
+    return result;
+  }
+
+  final result = <CarpenterTreeFlatNode<T>>[];
+  void visit(
+    Iterable<CarpenterTreeNode<T>> nodes,
+    int depth,
+    Object? parentId,
+  ) {
+    for (final node in nodes) {
+      if (!subtreeMatches(node)) continue;
+      result.add(
+        CarpenterTreeFlatNode<T>(node: node, depth: depth, parentId: parentId),
+      );
+      final hasMatchingChild = node.children.any(subtreeMatches);
+      if ((expandedIds.contains(node.id) || hasMatchingChild) &&
+          node.children.isNotEmpty) {
+        visit(node.children, depth + 1, node.id);
+      }
+    }
+  }
+
+  visit(roots, 0, null);
+  return List.unmodifiable(result);
+}
+
 bool carpenterTreeContains<T>(CarpenterTreeNode<T> root, Object id) {
   if (root.id == id) return true;
   return root.children.any((child) => carpenterTreeContains(child, id));
@@ -111,6 +157,19 @@ CarpenterTreeNode<T>? findCarpenterTreeNode<T>(
     if (node.id == id) return node;
     final nested = findCarpenterTreeNode(node.children, id);
     if (nested != null) return nested;
+  }
+  return null;
+}
+
+/// Returns the root-to-node path for [id], or null when the node is absent.
+List<CarpenterTreeNode<T>>? findCarpenterTreePath<T>(
+  Iterable<CarpenterTreeNode<T>> roots,
+  Object id,
+) {
+  for (final node in roots) {
+    if (node.id == id) return <CarpenterTreeNode<T>>[node];
+    final nested = findCarpenterTreePath(node.children, id);
+    if (nested != null) return <CarpenterTreeNode<T>>[node, ...nested];
   }
   return null;
 }

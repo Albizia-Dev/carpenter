@@ -47,7 +47,9 @@ final class CarpenterPageHeader extends StatelessWidget {
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) {
       final theme = CarpenterTheme.of(context);
-      final gap = context.units(theme.spacing.layoutHeader);
+      final externalGap = context.units(theme.spacing.layoutHeader);
+      final internalGap = context.units(theme.spacing.small) / 2;
+      final statusGap = context.units(theme.spacing.small);
       final viewport = const CarpenterViewportPolicy().resolve(
         context,
         constraints.maxWidth,
@@ -58,33 +60,28 @@ final class CarpenterPageHeader extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (breadcrumbs != null) ...[breadcrumbs!, SizedBox(height: gap)],
-            Wrap(
-              crossAxisAlignment: WrapCrossAlignment.center,
-              spacing: gap,
-              runSpacing: gap,
-              children: [
-                CarpenterText.title(
-                  title,
-                  emphasis: TypographyEmphasis.strong,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                if (status case final CarpenterPageStatus value)
-                  CarpenterStatusIndicator(
-                    label: value.label,
-                    role: value.role,
-                  ),
-              ],
+            if (breadcrumbs != null) ...[
+              breadcrumbs!,
+              SizedBox(height: externalGap),
+            ],
+            CarpenterText.title(
+              title,
+              emphasis: TypographyEmphasis.strong,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
             if (subtitle != null) ...[
-              SizedBox(height: gap),
+              SizedBox(height: internalGap),
               CarpenterText.body(
                 subtitle!,
                 colorRole: ContentColorRole.secondary,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
               ),
+            ],
+            if (status case final CarpenterPageStatus value) ...[
+              SizedBox(height: statusGap),
+              CarpenterStatusIndicator(label: value.label, role: value.role),
             ],
           ],
         ),
@@ -96,14 +93,14 @@ final class CarpenterPageHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 titleBlock,
-                SizedBox(height: gap),
+                SizedBox(height: externalGap),
                 actionWidget,
               ],
             )
           : ActionOverflowLayout(
               content: titleBlock,
               actions: actionWidget,
-              gap: gap,
+              gap: externalGap,
               minimumInlineActionWidth: context.units(
                 theme.sizes.actionHeight(ControlSize.medium),
               ),

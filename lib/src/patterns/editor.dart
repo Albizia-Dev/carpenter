@@ -8,6 +8,7 @@ import '../application/command.dart';
 import '../components/basic/text.dart';
 import '../components/behaviour/notice.dart';
 import '../components/layout/page_header.dart';
+import '../components/layout/patterns/page_body.dart';
 import '../components/layout/patterns/page_blocks.dart';
 import '../foundation/roles.dart';
 import '../foundation/theme.dart';
@@ -307,7 +308,6 @@ final class CarpenterEditorPage<TRecord> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     assert(descriptor.kind == CarpenterPageKind.editor);
-    final gap = context.units(CarpenterTheme.of(context).spacing.layoutSection);
     return CarpenterPage(
       descriptor: descriptor,
       state: _pageState,
@@ -317,30 +317,21 @@ final class CarpenterEditorPage<TRecord> extends StatelessWidget {
       capabilities: capabilities,
       body:
           body ??
-          ListView(
+          CarpenterPageBody(
             children: [
-              if (summary != null) ...[summary!, SizedBox(height: gap)],
+              if (summary != null) summary!,
               if (editorState case CarpenterEditorValidationFailure(
                 :final errors,
-              )) ...[
+              ))
                 CarpenterValidationSummary(errors: errors),
-                SizedBox(height: gap),
-              ],
-              if (editorState case CarpenterEditorSaveFailure(
-                :final error,
-              )) ...[
+              if (editorState case CarpenterEditorSaveFailure(:final error))
                 CarpenterAttentionBlock(
                   title: 'Save failed',
                   message: error.toString(),
                   tone: CarpenterNoticeTone.danger,
                 ),
-                SizedBox(height: gap),
-              ],
-              if (attention != null) ...[attention!, SizedBox(height: gap)],
-              for (final section in sections) ...[
-                section,
-                SizedBox(height: gap),
-              ],
+              if (attention != null) attention!,
+              ...sections,
             ],
           ),
     );

@@ -84,11 +84,10 @@ final class CarpenterText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
+    final style = theme.typography.resolve(context, role, emphasis);
     return Text(
       data,
-      style: theme.typography
-          .resolve(context, role, emphasis)
-          .copyWith(color: theme.content.resolve(colorRole)),
+      style: style.copyWith(color: theme.content.resolve(colorRole)),
       textAlign: textAlign,
       maxLines: maxLines,
       overflow: overflow,

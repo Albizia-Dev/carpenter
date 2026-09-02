@@ -2,6 +2,8 @@ import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
 import '../application/command.dart';
+import '../components/layout/regions/primary_region.dart';
+import '../components/layout/regions/region_role.dart';
 import '../foundation/theme.dart';
 import 'capability.dart';
 import 'controller.dart';
@@ -11,6 +13,10 @@ import 'state.dart';
 import 'state_boundary.dart';
 
 /// Infrastructure host shared by page patterns.
+///
+/// The page owns its outer inset and, by default, the single vertical document
+/// viewport. Collection/explorer pages whose body already owns a viewport can
+/// opt into [CarpenterRegionScrollOwnership.child].
 final class CarpenterPage extends StatelessWidget {
   const CarpenterPage({
     super.key,
@@ -25,7 +31,14 @@ final class CarpenterPage extends StatelessWidget {
     this.footer,
     this.aside,
     this.overlay,
-  });
+    this.scrollOwnership = CarpenterRegionScrollOwnership.region,
+    this.headerBehavior = CarpenterPageHeaderBehavior.sticky,
+    this.scrollController,
+  }) : assert(
+         headerBehavior != CarpenterPageHeaderBehavior.scrolls ||
+             scrollOwnership == CarpenterRegionScrollOwnership.region,
+         'A scrolling page header requires CarpenterPage to own scrolling.',
+       );
 
   final CarpenterPageDescriptor descriptor;
   final Widget body;
@@ -38,6 +51,9 @@ final class CarpenterPage extends StatelessWidget {
   final Widget? footer;
   final Widget? aside;
   final Widget? overlay;
+  final CarpenterRegionScrollOwnership scrollOwnership;
+  final CarpenterPageHeaderBehavior headerBehavior;
+  final ScrollController? scrollController;
 
   @override
   Widget build(BuildContext context) {
@@ -63,6 +79,61 @@ final class CarpenterPage extends StatelessWidget {
       ...commands,
       for (final binding in commandBindings) binding.command,
     ];
+
+    Widget primary({required bool bounded}) => Row(
+      crossAxisAlignment: bounded
+          ? CrossAxisAlignment.stretch
+          : CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: CarpenterPageStateBoundary(state: effectiveState, child: body),
+        ),
+        if (aside != null) ...[SizedBox(width: gap), aside!],
+      ],
+    );
+
+    Widget pageContent;
+    if (scrollOwnership == CarpenterRegionScrollOwnership.region) {
+      final document = Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (headerBehavior == CarpenterPageHeaderBehavior.scrolls &&
+              header != null) ...[
+            header!,
+            SizedBox(height: gap),
+          ],
+          primary(bounded: false),
+        ],
+      );
+      pageContent = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (headerBehavior == CarpenterPageHeaderBehavior.sticky &&
+              header != null) ...[
+            header!,
+            SizedBox(height: gap),
+          ],
+          Expanded(
+            child: SingleChildScrollView(
+              controller: scrollController,
+              child: document,
+            ),
+          ),
+          if (footer != null) ...[SizedBox(height: gap), footer!],
+        ],
+      );
+    } else {
+      pageContent = Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (header != null) ...[header!, SizedBox(height: gap)],
+          Expanded(child: primary(bounded: true)),
+          if (footer != null) ...[SizedBox(height: gap), footer!],
+        ],
+      );
+    }
+
     Widget content = ColoredBox(
       color: theme.surface.base,
       child: SafeArea(
@@ -73,27 +144,7 @@ final class CarpenterPage extends StatelessWidget {
                 padding: EdgeInsets.all(
                   context.units(theme.spacing.layoutPage),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    if (header != null) ...[header!, SizedBox(height: gap)],
-                    Expanded(
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            child: CarpenterPageStateBoundary(
-                              state: effectiveState,
-                              child: body,
-                            ),
-                          ),
-                          if (aside != null) ...[SizedBox(width: gap), aside!],
-                        ],
-                      ),
-                    ),
-                    if (footer != null) ...[SizedBox(height: gap), footer!],
-                  ],
-                ),
+                child: pageContent,
               ),
             ),
             if (overlay != null) Positioned.fill(child: overlay!),
@@ -102,11 +153,12 @@ final class CarpenterPage extends StatelessWidget {
       ),
     );
     content = CarpenterCommandScope(commands: pageCommands, child: content);
-    if (commandBindings.isNotEmpty)
+    if (commandBindings.isNotEmpty) {
       content = CarpenterCommandShortcutScope(
         bindings: commandBindings,
         child: content,
       );
+    }
     return CarpenterPageScope(
       descriptor: descriptor,
       controller: controller,

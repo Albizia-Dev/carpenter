@@ -38,6 +38,7 @@ import 'use_cases/collections/filter_bar.dart';
 import 'use_cases/collections/migrated_collections.dart';
 import 'use_cases/collections/navigation_notifications.dart';
 import 'use_cases/collections/table.dart';
+import 'use_cases/collections/tree_table_contracts.dart';
 import 'use_cases/foundation/colors.dart';
 import 'use_cases/foundation/gravity_icons.dart';
 import 'use_cases/foundation/typography.dart';
@@ -123,6 +124,7 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
         reorderableCollectionComponent,
         treeViewComponent,
         treeTableComponent,
+        treeTableContractsComponent,
         kanbanComponent,
         planningBoardComponent,
         listTileComponent,

@@ -27,17 +27,41 @@ typedef CarpenterTreeNodeBuilder<T> =
     );
 typedef CarpenterTreeActionsBuilder<T> =
     List<CarpenterActionDescriptor> Function(CarpenterTreeNode<T> node);
+typedef CarpenterTreeActivation<T> = void Function(CarpenterTreeNode<T> node);
+
+/// Imperative navigation surface for a controlled tree.
+///
+/// Expansion itself remains controlled by [CarpenterTreeView.expandedIds]. A
+/// reveal request asks the tree to expand the target path through
+/// [CarpenterTreeView.onExpansionChanged], focus the row and scroll it into the
+/// nearest enclosing viewport once it becomes visible.
+final class CarpenterTreeController extends ChangeNotifier {
+  Object? _revealId;
+  int _revealRevision = 0;
+
+  Object? get revealId => _revealId;
+  int get revealRevision => _revealRevision;
+
+  void reveal(Object id) {
+    _revealId = id;
+    _revealRevision += 1;
+    notifyListeners();
+  }
+}
 
 /// Controlled hierarchical collection with keyboard navigation and DnD.
 final class CarpenterTreeView<T> extends StatefulWidget {
   const CarpenterTreeView({
     super.key,
     required this.nodes,
+    this.controller,
     this.expandedIds = const {},
     this.selectedIds = const {},
     this.selectionMode = CarpenterTreeSelectionMode.single,
     this.onExpansionChanged,
     this.onSelectionChanged,
+    this.onActivated,
+    this.filter,
     this.onDrop,
     this.canDrop,
     this.onRetryLoad,
@@ -49,11 +73,14 @@ final class CarpenterTreeView<T> extends StatefulWidget {
   });
 
   final List<CarpenterTreeNode<T>> nodes;
+  final CarpenterTreeController? controller;
   final Set<Object> expandedIds;
   final Set<Object> selectedIds;
   final CarpenterTreeSelectionMode selectionMode;
   final CarpenterTreeExpansionChanged? onExpansionChanged;
   final CarpenterTreeSelectionChanged? onSelectionChanged;
+  final CarpenterTreeActivation<T>? onActivated;
+  final CarpenterTreeNodePredicate<T>? filter;
   final CarpenterTreeDropCallback<T>? onDrop;
   final CarpenterTreeDropAcceptance<T>? canDrop;
   final CarpenterTreeNodeCallback<T>? onRetryLoad;
@@ -71,15 +98,92 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
   Object? _focusedId;
   Object? _draggingId;
   Object? _autoExpandId;
+  Object? _pendingRevealId;
   Timer? _autoExpandTimer;
+  final Map<Object, GlobalKey> _rowKeys = <Object, GlobalKey>{};
 
-  List<CarpenterTreeFlatNode<T>> get _flat =>
-      flattenCarpenterTree(widget.nodes, widget.expandedIds);
+  List<CarpenterTreeFlatNode<T>> get _flat {
+    final filter = widget.filter;
+    if (filter == null) {
+      return flattenCarpenterTree(widget.nodes, widget.expandedIds);
+    }
+    return flattenFilteredCarpenterTree(
+      widget.nodes,
+      widget.expandedIds,
+      filter,
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller?.addListener(_handleRevealRequest);
+    if (widget.controller?.revealId != null) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _handleRevealRequest(),
+      );
+    }
+  }
+
+  @override
+  void didUpdateWidget(CarpenterTreeView<T> oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller?.removeListener(_handleRevealRequest);
+      widget.controller?.addListener(_handleRevealRequest);
+      if (widget.controller?.revealId != null) _handleRevealRequest();
+    }
+    if (_pendingRevealId != null) _scheduleReveal(_pendingRevealId!);
+  }
 
   @override
   void dispose() {
+    widget.controller?.removeListener(_handleRevealRequest);
     _autoExpandTimer?.cancel();
     super.dispose();
+  }
+
+  bool _subtreeMatchesFilter(CarpenterTreeNode<T> node) {
+    final filter = widget.filter;
+    if (filter == null) return false;
+    return filter(node) || node.children.any(_subtreeMatchesFilter);
+  }
+
+  bool _visuallyExpanded(CarpenterTreeNode<T> node) =>
+      widget.expandedIds.contains(node.id) ||
+      (widget.filter != null && node.children.any(_subtreeMatchesFilter));
+
+  void _handleRevealRequest() {
+    if (!mounted) return;
+    final id = widget.controller?.revealId;
+    if (id == null) return;
+    final path = findCarpenterTreePath(widget.nodes, id);
+    if (path == null) return;
+    for (final ancestor in path.take(path.length - 1)) {
+      if (!widget.expandedIds.contains(ancestor.id)) {
+        widget.onExpansionChanged?.call(ancestor.id, true);
+      }
+    }
+    _pendingRevealId = id;
+    setState(() => _focusedId = id);
+    _scheduleReveal(id);
+  }
+
+  void _scheduleReveal(Object id) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _pendingRevealId != id) return;
+      final rowContext = _rowKeys[id]?.currentContext;
+      if (rowContext == null) return;
+      _pendingRevealId = null;
+      unawaited(
+        Scrollable.ensureVisible(
+          rowContext,
+          alignment: 0.5,
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+        ),
+      );
+    });
   }
 
   void _toggleExpansion(CarpenterTreeNode<T> node) {
@@ -108,6 +212,11 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
     };
     callback(Set.unmodifiable(next));
     setState(() {});
+  }
+
+  void _activate(CarpenterTreeNode<T> node) {
+    setState(() => _focusedId = node.id);
+    widget.onActivated?.call(node);
   }
 
   KeyEventResult _handleKey(FocusNode focusNode, KeyEvent event) {
@@ -145,8 +254,11 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
       }
       return KeyEventResult.handled;
     }
-    if (event.logicalKey == LogicalKeyboardKey.enter ||
-        event.logicalKey == LogicalKeyboardKey.space) {
+    if (event.logicalKey == LogicalKeyboardKey.enter) {
+      _activate(current.node);
+      return KeyEventResult.handled;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.space) {
       _select(current.node);
       return KeyEventResult.handled;
     }
@@ -216,7 +328,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
 
   Widget _row(BuildContext context, CarpenterTreeFlatNode<T> entry) {
     final node = entry.node;
-    final expanded = widget.expandedIds.contains(node.id);
+    final expanded = _visuallyExpanded(node);
     Widget buildContent(
       CarpenterDropTargetState<CarpenterTreeNode<T>> dropState,
     ) {
@@ -245,11 +357,15 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
                 : TypographyEmphasis.regular,
           );
       final row = Padding(
+        key: _rowKeys.putIfAbsent(node.id, GlobalKey.new),
         padding: EdgeInsetsDirectional.only(start: indent),
         child: CarpenterListTile(
           selected: state.selected,
           semanticLabel: node.effectiveSemanticLabel,
           onInvoke: () => _select(node),
+          onDoubleInvoke: widget.onActivated == null
+              ? null
+              : () => _activate(node),
           leading: node.canExpand
               ? CarpenterIconButton(
                   icon: expanded
@@ -363,6 +479,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
   @override
   Widget build(BuildContext context) {
     final flat = _flat;
+    if (_pendingRevealId != null) _scheduleReveal(_pendingRevealId!);
     return CarpenterDragScope(
       child: Focus(
         autofocus: true,
@@ -377,7 +494,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
             children: [
               for (final entry in flat) ...[
                 _row(context, entry),
-                if (widget.expandedIds.contains(entry.node.id) &&
+                if (_visuallyExpanded(entry.node) &&
                     entry.node.children.isEmpty &&
                     entry.node.loadState != CarpenterTreeLoadState.ready)
                   _lazyState(context, entry),
