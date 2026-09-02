@@ -13,6 +13,7 @@ final class CarpenterListTile extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.onInvoke,
+    this.onDoubleInvoke,
     this.selected = false,
     this.semanticLabel,
   });
@@ -22,6 +23,7 @@ final class CarpenterListTile extends StatelessWidget {
   final Widget? subtitle;
   final Widget? trailing;
   final VoidCallback? onInvoke;
+  final VoidCallback? onDoubleInvoke;
   final bool selected;
   final String? semanticLabel;
 
@@ -36,6 +38,7 @@ final class CarpenterListTile extends StatelessWidget {
       label: semanticLabel,
       child: InteractiveRegion(
         onActivate: onInvoke,
+        onDoubleActivate: onDoubleInvoke,
         builder: (context, states, showFocusHighlight) {
           final active =
               states.contains(WidgetState.hovered) ||
