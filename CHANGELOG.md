@@ -8,8 +8,8 @@
 - Added independent tree selection and activation, keyboard activation,
   filtering with retained ancestor paths, and `CarpenterTreeController.reveal`
   for controlled navigation to nested nodes.
-- Extended `CarpenterTreeTable` with the same tree interaction contracts plus
-  fixed/flexible column widths and semantic column alignment.
+- Extended `CarpenterTreeTable` with the same tree interaction contracts and
+  added fixed/flexible column widths plus semantic column alignment.
 - Moved display/title sizing from runtime `CarpenterText` scaling into Mordant
   typography tokens and regenerated the checked-in token output.
 - Added project-shaped Widgetbook coverage for page composition, tree-table
