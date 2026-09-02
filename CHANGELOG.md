@@ -1,3 +1,21 @@
+# 0.1.4
+
+- Unified page viewport ownership so `CarpenterPage` owns ordinary document
+  scrolling while explorer and collection content can explicitly keep a
+  child-owned viewport, eliminating duplicated page inset and nested scrolling.
+- Made the flow-native `CarpenterPageSection` canonical and removed the hidden
+  legacy section implementation from the page-block compatibility layer.
+- Added independent tree selection and activation, keyboard activation,
+  filtering with retained ancestor paths, and `CarpenterTreeController.reveal`
+  for controlled navigation to nested nodes.
+- Extended `CarpenterTreeTable` with the same tree interaction contracts plus
+  fixed/flexible column widths and semantic column alignment.
+- Moved display/title sizing from runtime `CarpenterText` scaling into Mordant
+  typography tokens and regenerated the checked-in token output.
+- Added project-shaped Widgetbook coverage for page composition, tree-table
+  filtering/reveal/activation, and regression tests for filtered paths and
+  reveal path discovery.
+
 # 0.1.3
 
 - Stabilized collection hover styling so state transitions animate color without
