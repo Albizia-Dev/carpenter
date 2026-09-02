@@ -3,11 +3,12 @@ import 'package:flutter/widgets.dart';
 
 import '../../../foundation/theme.dart';
 
-/// Standard scrollable page body with Carpenter spacing and padding.
+/// Standard non-scrollable page document body with Carpenter section spacing.
 ///
-/// Use this for ordinary application pages instead of repeating a [ListView],
-/// page padding, and spacer widgets between every top-level block. More complex
-/// layouts can still opt into custom slivers or scroll views directly.
+/// Scroll ownership belongs to [CarpenterPage] or [CarpenterPageRegion]. This
+/// widget only arranges semantic page blocks inside that viewport. Collection
+/// renderers that own their own viewport should be passed directly to a page
+/// with child-owned scrolling instead of being nested here.
 final class CarpenterPageBody extends StatelessWidget {
   const CarpenterPageBody({
     super.key,
@@ -21,31 +22,44 @@ final class CarpenterPageBody extends StatelessWidget {
 
   final List<Widget> children;
 
-  /// Structural escape hatch. Defaults to the page-layout spacing on every
-  /// side.
+  /// Optional local inset for the document body. Page-level inset is owned by
+  /// the surrounding page region, so this defaults to zero.
   final EdgeInsetsGeometry? padding;
 
-  /// Gap between top-level page sections. It is intentionally larger than
-  /// field and block gaps so separate semantic groups read as separate groups.
+  /// Gap between top-level semantic sections.
   final LengthUnit? spacing;
+
+  /// Retained for source compatibility. Scrolling is owned by the page region.
+  @Deprecated('Scrolling is owned by CarpenterPage or CarpenterPageRegion.')
   final ScrollController? controller;
+
+  /// Retained for source compatibility. Scrolling is owned by the page region.
+  @Deprecated('Scrolling is owned by CarpenterPage or CarpenterPageRegion.')
   final ScrollPhysics? physics;
+
   final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
-    final gap = context.units(spacing ?? theme.spacing.layoutPage);
-    final list = ListView.separated(
-      controller: controller,
-      physics: physics,
-      padding: padding ?? EdgeInsets.all(gap),
-      itemCount: children.length,
-      separatorBuilder: (_, _) => SizedBox(height: gap),
-      itemBuilder: (context, index) => children[index],
+    final gap = context.units(spacing ?? theme.spacing.layoutSection);
+    Widget body = Padding(
+      padding: padding ?? EdgeInsets.zero,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var index = 0; index < children.length; index++) ...[
+            children[index],
+            if (index < children.length - 1) SizedBox(height: gap),
+          ],
+        ],
+      ),
     );
     final label = semanticLabel;
-    if (label == null) return list;
-    return Semantics(container: true, label: label, child: list);
+    if (label != null) {
+      body = Semantics(container: true, label: label, child: body);
+    }
+    return body;
   }
 }
