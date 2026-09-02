@@ -2,6 +2,7 @@ import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
 import '../components/layout/page_header.dart';
+import '../components/layout/regions/region_role.dart';
 import '../foundation/theme.dart';
 import '../page/descriptor.dart';
 import '../page/page.dart';
@@ -38,6 +39,7 @@ final class CarpenterExplorerPage extends StatelessWidget {
     return CarpenterPage(
       descriptor: descriptor,
       state: state,
+      scrollOwnership: CarpenterRegionScrollOwnership.child,
       header:
           header ??
           CarpenterPageHeader(title: descriptor.title, actions: search),

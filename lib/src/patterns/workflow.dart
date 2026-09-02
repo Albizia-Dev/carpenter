@@ -8,6 +8,7 @@ import '../components/basic/card.dart';
 import '../components/basic/text.dart';
 import '../components/behaviour/notice.dart';
 import '../components/layout/page_header.dart';
+import '../components/layout/patterns/page_body.dart';
 import '../components/layout/patterns/page_blocks.dart';
 import '../foundation/roles.dart';
 import '../foundation/theme.dart';
@@ -345,21 +346,26 @@ final class CarpenterWorkflowPage<TState, TContext> extends StatelessWidget {
               ? const CarpenterPageBlocking()
               : const CarpenterPageReady(),
           header: header ?? CarpenterPageHeader(title: descriptor.title),
-          body: ListView(
+          body: CarpenterPageBody(
             children: [
-              if (progress != null) ...[progress!, SizedBox(height: gap)],
-              if (stage != null) ...[
-                CarpenterText.title(stage.title),
-                if (stage.description != null) ...[
-                  SizedBox(height: context.units(.25.rem)),
-                  CarpenterText.body(
-                    stage.description!,
-                    colorRole: ContentColorRole.secondary,
-                  ),
-                ],
-                SizedBox(height: gap),
-              ],
-              if (controller.error != null) ...[
+              if (progress != null) progress!,
+              if (stage != null)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    CarpenterText.title(stage.title),
+                    if (stage.description != null) ...[
+                      SizedBox(height: context.units(.25.rem)),
+                      CarpenterText.body(
+                        stage.description!,
+                        colorRole: ContentColorRole.secondary,
+                      ),
+                    ],
+                    SizedBox(height: gap),
+                    stage.build(context, controller.state, controller.context),
+                  ],
+                ),
+              if (controller.error != null)
                 CarpenterNotice(
                   title: 'Transition failed',
                   message: controller.error.toString(),
@@ -370,11 +376,7 @@ final class CarpenterWorkflowPage<TState, TContext> extends StatelessWidget {
                     onInvoke: controller.retry,
                   ),
                 ),
-                SizedBox(height: gap),
-              ],
-              if (stage != null)
-                stage.build(context, controller.state, controller.context),
-              if (history != null) ...[SizedBox(height: gap), history!],
+              if (history != null) history!,
             ],
           ),
           footer: CarpenterActionBar(

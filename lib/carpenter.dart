@@ -122,7 +122,7 @@ export 'src/components/layout/patterns/list_report.dart';
 export 'src/components/layout/patterns/master_detail_page.dart';
 export 'src/components/layout/patterns/object_page.dart';
 export 'src/components/layout/patterns/page_blocks.dart'
-    hide CarpenterBlockGroup, CarpenterPageSection, CarpenterPageSectionId;
+    hide CarpenterBlockGroup;
 export 'src/components/layout/patterns/page_section.dart';
 export 'src/components/layout/patterns/page_body.dart';
 export 'src/components/layout/patterns/states/empty_state.dart';

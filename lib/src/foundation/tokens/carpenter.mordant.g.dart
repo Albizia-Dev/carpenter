@@ -1,6 +1,7 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+
 import 'package:carpenter_mordant/carpenter_mordant.dart' as _i1;
 
 const PaletteTokens palette = PaletteTokens();
@@ -220,9 +221,9 @@ final class PaletteTokens {
 final class FontSizeTokens {
   const FontSizeTokens();
 
-  _i1.Rem get display => const _i1.Rem(2.0);
+  _i1.Rem get display => const _i1.Rem(1.75);
 
-  _i1.Rem get title => const _i1.Rem(1.5);
+  _i1.Rem get title => const _i1.Rem(1.25);
 
   _i1.Rem get body => const _i1.Rem(1.0);
 
@@ -234,9 +235,9 @@ final class FontSizeTokens {
 final class FontLineHeightTokens {
   const FontLineHeightTokens();
 
-  _i1.Rem get display => const _i1.Rem(2.5);
+  _i1.Rem get display => const _i1.Rem(2.1875);
 
-  _i1.Rem get title => const _i1.Rem(2.0);
+  _i1.Rem get title => const _i1.Rem(1.6667);
 
   _i1.Rem get body => const _i1.Rem(1.5);
 

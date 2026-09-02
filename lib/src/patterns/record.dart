@@ -7,6 +7,7 @@ import '../components/basic/text.dart';
 import '../components/collections/tabs.dart';
 import '../components/layout/page_header.dart';
 import '../components/layout/patterns/header_actions.dart';
+import '../components/layout/patterns/page_body.dart';
 import '../components/layout/patterns/page_section.dart';
 import '../foundation/roles.dart';
 import '../foundation/theme.dart';
@@ -412,7 +413,6 @@ final class CarpenterRecordPage<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     assert(descriptor.kind == CarpenterPageKind.record);
-    final gap = context.units(CarpenterTheme.of(context).spacing.layoutSection);
     return CarpenterPage(
       descriptor: descriptor,
       controller: controller,
@@ -423,19 +423,13 @@ final class CarpenterRecordPage<T> extends StatelessWidget {
       header: header ?? CarpenterEntityHeader(title: descriptor.title),
       body:
           body ??
-          ListView(
+          CarpenterPageBody(
             children: [
-              if (summary != null) ...[summary!, SizedBox(height: gap)],
-              if (attention != null) ...[attention!, SizedBox(height: gap)],
-              for (final section in sections) ...[
-                section,
-                SizedBox(height: gap),
-              ],
-              if (tabs != null) ...[tabs!, SizedBox(height: gap)],
-              for (final collection in related) ...[
-                collection,
-                SizedBox(height: gap),
-              ],
+              if (summary != null) summary!,
+              if (attention != null) attention!,
+              ...sections,
+              if (tabs != null) tabs!,
+              ...related,
               if (timeline != null) timeline!,
             ],
           ),
