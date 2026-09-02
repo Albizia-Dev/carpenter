@@ -116,7 +116,6 @@ export 'src/components/layout/master_detail.dart';
 export 'src/components/layout/page_header.dart';
 export 'src/components/layout/patterns/block_group.dart';
 export 'src/components/layout/patterns/collection_page.dart';
-export 'src/components/layout/patterns/field_group.dart';
 export 'src/components/layout/patterns/form_page.dart';
 export 'src/components/layout/patterns/header_actions.dart';
 export 'src/components/layout/patterns/list_report.dart';
