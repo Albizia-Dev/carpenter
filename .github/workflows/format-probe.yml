@@ -1,0 +1,25 @@
+name: Format Probe
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Format and capture patch
+        run: |
+          dart format lib
+          git diff --binary > format.patch
+      - uses: actions/upload-artifact@v4
+        with:
+          name: format-patch
+          path: format.patch
