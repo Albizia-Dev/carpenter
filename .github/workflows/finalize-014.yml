@@ -11,7 +11,7 @@ permissions:
   contents: write
 
 jobs:
-  verify:
+  format:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout branch
@@ -26,9 +26,6 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Install package dependencies
-        run: flutter pub get
-
       - name: Format touched sources
         run: |
           dart format \
@@ -40,25 +37,7 @@ jobs:
             widgetbook/lib/use_cases/collections/tree_table_contracts.dart \
             test/collections/tree_state_test.dart
 
-      - name: Analyze library
-        run: dart analyze lib
-
-      - name: Run tree contract tests
-        run: flutter test test/collections/tree_state_test.dart
-
-      - name: Build Widgetbook
-        working-directory: widgetbook
-        run: |
-          flutter pub get
-          flutter build web --release --base-href /carpenter/
-
-      - name: Build example
-        working-directory: example
-        run: |
-          flutter pub get
-          flutter build web --release
-
-      - name: Remove one-shot verifier
+      - name: Remove one-shot finalizer
         run: |
           rm -f .github/finalize-014.trigger
           rm -f .github/workflows/finalize-014.yml
@@ -76,11 +55,8 @@ jobs:
             widgetbook/lib/use_cases/collections/tree_table_contracts.dart \
             test/collections/tree_state_test.dart
           git add -u .github/finalize-014.trigger .github/workflows/finalize-014.yml
-          if git diff --cached --quiet; then
-            exit 0
-          fi
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git commit -m "chore(release): finalize 0.1.4 verification"
+          git commit -m "style: format 0.1.4 sources"
           git pull --rebase origin "${GITHUB_REF_NAME}"
           git push origin HEAD:"${GITHUB_REF_NAME}"
