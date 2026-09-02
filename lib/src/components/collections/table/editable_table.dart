@@ -37,17 +37,9 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
 
   final List<T> items;
   final List<CarpenterTableColumn<T>> columns;
-
-  /// Actions that belong to the table as a whole, for example "Add row".
   final List<Widget> headerActions;
-
-  /// Footer cells keyed by [CarpenterTableColumn.id]. Useful for totals.
   final Map<String, CarpenterTableFooterCellBuilder<T>> footerCells;
-
-  /// Single click selection. Kept separate from activation deliberately.
   final ValueChanged<T>? onRowSelected;
-
-  /// Double click / double tap activation, for example opening row details.
   final ValueChanged<T>? onRowActivated;
   final bool Function(T item)? selected;
   final LengthUnit minimumWidth;
@@ -61,6 +53,13 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
     final horizontal = context.units(theme.spacing.tableHorizontal);
     final vertical = context.units(theme.spacing.tableVertical);
     final borderWidth = context.units(theme.shapes.tableBorderWidth);
+    final selectedBackground = theme.selection
+        .resolve(
+          role: SelectionColorRole.primary,
+          selected: true,
+          states: const <WidgetState>{},
+        )
+        .background;
 
     return Semantics(
       container: true,
@@ -134,7 +133,7 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
                       child: Container(
                         decoration: BoxDecoration(
                           color: selected?.call(item) == true
-                              ? theme.selection.selected.background
+                              ? selectedBackground
                               : theme.surface.base,
                           border: Border(
                             bottom: BorderSide(
