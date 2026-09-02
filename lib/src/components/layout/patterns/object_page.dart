@@ -29,6 +29,7 @@ final class CarpenterObjectPage extends StatelessWidget {
     this.primaryActions = const [],
     this.secondaryActions = const [],
     this.destructiveActions = const [],
+    this.headerBehavior = CarpenterPageHeaderBehavior.sticky,
     this.semanticLabel,
   });
 
@@ -47,14 +48,18 @@ final class CarpenterObjectPage extends StatelessWidget {
   final List<CarpenterActionDescriptor> primaryActions;
   final List<CarpenterActionDescriptor> secondaryActions;
   final List<CarpenterActionDescriptor> destructiveActions;
+  final CarpenterPageHeaderBehavior headerBehavior;
   final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.layoutSection);
+    final pageOwnsScroll = headerBehavior == CarpenterPageHeaderBehavior.scrolls;
     final primary = CarpenterPrimaryRegion(
-      scrollOwnership: CarpenterRegionScrollOwnership.region,
+      scrollOwnership: pageOwnsScroll
+          ? CarpenterRegionScrollOwnership.child
+          : CarpenterRegionScrollOwnership.region,
       semanticLabel: '$title primary content',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -87,7 +92,10 @@ final class CarpenterObjectPage extends StatelessWidget {
     final allActions = actions.allActions;
     return CarpenterPageRegion(
       semanticLabel: semanticLabel ?? title,
-      scrollOwnership: CarpenterRegionScrollOwnership.child,
+      scrollOwnership: pageOwnsScroll
+          ? CarpenterRegionScrollOwnership.region
+          : CarpenterRegionScrollOwnership.child,
+      headerBehavior: headerBehavior,
       shortcutActions: allActions,
       header: CarpenterPageHeader(
         title: title,
