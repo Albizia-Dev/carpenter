@@ -34,7 +34,7 @@ void main() {
       ),
     );
     final text = tester.widget<Text>(find.text('Carpenter'));
-    expect(text.style!.fontSize, 24);
+    expect(text.style!.fontSize, 20);
     expect(text.style!.fontWeight, FontWeight.w700);
     expect(text.style!.color, CarpenterThemeData.light().content.secondary);
   });

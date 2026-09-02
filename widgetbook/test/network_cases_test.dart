@@ -12,9 +12,12 @@ void main() {
     await _useLargeSurface(tester);
     await tester.pumpWidget(
       _harness(
-        layoutViewportFrame(
-          preset: LayoutViewportPreset.mobileLandscape,
-          child: buildNetworkCollectionPageDemo(),
+        Builder(
+          builder: (context) => layoutViewportFrame(
+            context,
+            preset: LayoutViewportPreset.mobileLandscape,
+            child: buildNetworkCollectionPageDemo(),
+          ),
         ),
       ),
     );

@@ -152,6 +152,8 @@ void main() {
     );
     addTearDown(press.removePointer);
     await tester.pump();
+    focusNode.requestFocus();
+    await tester.pump();
 
     await expectLater(
       find.byKey(const ValueKey('states-golden')),

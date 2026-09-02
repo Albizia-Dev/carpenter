@@ -181,8 +181,8 @@ void main() {
     await tester.drag(handle, const Offset(1000, 0));
     await tester.pump();
 
-    expect(changed, isA<Px>());
-    expect((changed! as Px).value, 240);
+    expect(changed, isA<Rem>());
+    expect((changed! as Rem).value, 15);
   });
 
   testWidgets('keyboard moves row focus and toggles selection', (tester) async {

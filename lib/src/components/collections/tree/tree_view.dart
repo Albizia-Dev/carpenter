@@ -357,7 +357,6 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
                 : TypographyEmphasis.regular,
           );
       final row = Padding(
-        key: _rowKeys.putIfAbsent(node.id, GlobalKey.new),
         padding: EdgeInsetsDirectional.only(start: indent),
         child: CarpenterListTile(
           selected: state.selected,
@@ -424,20 +423,26 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
     }
 
     if (widget.onDrop == null) {
-      return buildContent(
-        CarpenterDropTargetState<CarpenterTreeNode<T>>(
-          hovering: false,
-          accepts: false,
+      return KeyedSubtree(
+        key: _rowKeys.putIfAbsent(node.id, GlobalKey.new),
+        child: buildContent(
+          CarpenterDropTargetState<CarpenterTreeNode<T>>(
+            hovering: false,
+            accepts: false,
+          ),
         ),
       );
     }
-    return CarpenterDropTarget<CarpenterTreeNode<T>>(
-      targetId: node.id,
-      axis: CarpenterDropAxis.vertical,
-      acceptedOperations: const {CarpenterDragOperation.move},
-      canAccept: (details) => _canDrop(node, details),
-      onDrop: (details) => _drop(node, details),
-      builder: (context, state) => buildContent(state),
+    return KeyedSubtree(
+      key: _rowKeys.putIfAbsent(node.id, GlobalKey.new),
+      child: CarpenterDropTarget<CarpenterTreeNode<T>>(
+        targetId: node.id,
+        axis: CarpenterDropAxis.vertical,
+        acceptedOperations: const {CarpenterDragOperation.move},
+        canAccept: (details) => _canDrop(node, details),
+        onDrop: (details) => _drop(node, details),
+        builder: (context, state) => buildContent(state),
+      ),
     );
   }
 

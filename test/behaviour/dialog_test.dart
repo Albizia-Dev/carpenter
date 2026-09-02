@@ -6,6 +6,57 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/harness.dart';
 
 void main() {
+  testWidgets(
+    'showCarpenterDialog captures local theme and rem and returns value',
+    (tester) async {
+      int? result;
+      await tester.pumpWidget(
+        WidgetsApp(
+          color: const Color(0xFFFFFFFF),
+          pageRouteBuilder: <T>(settings, builder) => PageRouteBuilder<T>(
+            settings: settings,
+            pageBuilder: (context, _, _) => builder(context),
+          ),
+          home: UnitsRoot(
+            rem: const Px(18),
+            child: CarpenterTheme(
+              data: CarpenterThemeData.light(),
+              child: Builder(
+                builder: (context) => CarpenterButton(
+                  label: 'Open typed dialog',
+                  onInvoke: () async {
+                    result = await showCarpenterDialog<int>(
+                      context: context,
+                      title: 'Typed dialog',
+                      content: const CarpenterText.body('Choose a result'),
+                      actionsBuilder: (close) => [
+                        CarpenterActionDescriptor(
+                          id: 'accept',
+                          label: 'Accept',
+                          onInvoke: () => close(42),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open typed dialog'));
+      await tester.pumpAndSettle();
+      expect(find.text('Typed dialog'), findsOneWidget);
+      expect(find.text('Choose a result'), findsOneWidget);
+
+      await tester.tap(find.text('Accept'));
+      await tester.pumpAndSettle();
+      expect(result, 42);
+      expect(find.text('Typed dialog'), findsNothing);
+    },
+  );
+
   testWidgets('initial focus and Tab traversal remain trapped', (tester) async {
     final first = FocusNode();
     final second = FocusNode();

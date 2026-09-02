@@ -7,6 +7,64 @@ import '../../internal/overlay/overlay_lifecycle_host.dart';
 import '../../internal/overlay/overlay_surface.dart';
 import '../basic/button/button.dart';
 
+typedef CarpenterDialogClose<T> = void Function([T? result]);
+typedef CarpenterDialogActionsBuilder<T> =
+    List<CarpenterActionDescriptor> Function(CarpenterDialogClose<T> close);
+
+/// Opens a typed Carpenter modal route and completes with the value supplied
+/// to an action's [CarpenterDialogClose].
+///
+/// The route captures the nearest Carpenter theme and root `rem` value before
+/// entering the Navigator overlay. This keeps locally hosted Carpenter
+/// subtrees working even when the application root belongs to another UI
+/// system during an incremental migration.
+Future<T?> showCarpenterDialog<T>({
+  required BuildContext context,
+  required String title,
+  required Widget content,
+  required CarpenterDialogActionsBuilder<T> actionsBuilder,
+  DialogDismissPolicy dismissPolicy = DialogDismissPolicy.escapeOnly,
+  String? semanticLabel,
+  FocusNode? initialFocusNode,
+}) {
+  final theme = CarpenterTheme.of(context);
+  final rem = Px(context.units(const Rem(1)));
+
+  return showGeneralDialog<T>(
+    context: context,
+    barrierDismissible: false,
+    barrierLabel: semanticLabel ?? title,
+    barrierColor: const Color(0x00000000),
+    transitionDuration: Duration.zero,
+    pageBuilder: (dialogContext, _, _) {
+      void close([T? result]) {
+        final navigator = Navigator.of(dialogContext);
+        if (navigator.canPop()) navigator.pop<T>(result);
+      }
+
+      return UnitsRoot(
+        rem: rem,
+        child: CarpenterTheme(
+          data: theme,
+          child: CarpenterDialog(
+            open: true,
+            onOpenChanged: (open) {
+              if (!open) close();
+            },
+            title: title,
+            content: content,
+            actions: actionsBuilder(close),
+            dismissPolicy: dismissPolicy,
+            initialFocusNode: initialFocusNode,
+            semanticLabel: semanticLabel,
+            child: const SizedBox.shrink(),
+          ),
+        ),
+      );
+    },
+  );
+}
+
 /// A controlled modal composition container with trapped keyboard focus.
 final class CarpenterDialog extends StatelessWidget {
   const CarpenterDialog({

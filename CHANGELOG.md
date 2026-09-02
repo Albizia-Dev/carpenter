@@ -1,3 +1,12 @@
+# 0.1.5
+
+- Added typed `showCarpenterDialog<T>` route composition with result-bearing
+  actions and automatic capture of the nearest Carpenter theme and root `rem`,
+  including support for locally hosted Carpenter subtrees during incremental
+  migrations from other UI systems.
+- Kept tree row geometry keys outside default drag feedback so draggable trees
+  no longer duplicate `GlobalKey` instances while a row is moving.
+
 # 0.1.4
 
 - Unified page viewport ownership so `CarpenterPage` owns ordinary document

@@ -56,9 +56,12 @@ void main() {
     await _useLargeSurface(tester);
     await tester.pumpWidget(
       _harness(
-        layoutViewportFrame(
-          preset: LayoutViewportPreset.mobilePortrait,
-          child: buildPaymentListSample(),
+        Builder(
+          builder: (context) => layoutViewportFrame(
+            context,
+            preset: LayoutViewportPreset.mobilePortrait,
+            child: buildPaymentListSample(),
+          ),
         ),
       ),
     );
