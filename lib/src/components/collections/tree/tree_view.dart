@@ -19,11 +19,12 @@ import '../list_tile.dart';
 import 'tree_event.dart';
 import 'tree_state.dart';
 
-typedef CarpenterTreeNodeBuilder<T> = Widget Function(
-  BuildContext context,
-  CarpenterTreeNode<T> node,
-  CarpenterTreeRowState<T> state,
-);
+typedef CarpenterTreeNodeBuilder<T> =
+    Widget Function(
+      BuildContext context,
+      CarpenterTreeNode<T> node,
+      CarpenterTreeRowState<T> state,
+    );
 typedef CarpenterTreeActionsBuilder<T> =
     List<CarpenterActionDescriptor> Function(CarpenterTreeNode<T> node);
 typedef CarpenterTreeActivation<T> = void Function(CarpenterTreeNode<T> node);
