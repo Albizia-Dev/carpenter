@@ -11,9 +11,9 @@ extension type const CarpenterPageSectionId(String value) {}
 /// A semantic page section that participates in the document flow.
 ///
 /// Sections are deliberately surface-neutral. A section is not a card unless
-/// the caller explicitly places a [CarpenterCard] (or another surface) inside
-/// it. This keeps ordinary record and form pages visually continuous instead
-/// of turning every logical group into a separate tile.
+/// the caller explicitly places a card or another surface inside it. This keeps
+/// ordinary record and form pages visually continuous instead of turning every
+/// logical group into a separate tile.
 final class CarpenterPageSection extends StatefulWidget {
   const CarpenterPageSection({
     super.key,
@@ -52,7 +52,7 @@ final class _CarpenterPageSectionState extends State<CarpenterPageSection> {
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
-    final tightGap = context.units(theme.spacing.xsmall);
+    final tightGap = context.units(theme.spacing.small) / 2;
     final actionGap = context.units(theme.spacing.small);
     final contentGap = context.units(theme.spacing.medium);
     final actions = <Widget>[
