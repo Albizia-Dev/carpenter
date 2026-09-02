@@ -54,8 +54,8 @@ enum CarpenterPageHeaderBehavior {
 final class CarpenterPageRegion extends StatelessWidget {
   const CarpenterPageRegion({
     super.key,
-    required this.header,
     required this.body,
+    this.header,
     this.toolbar,
     this.scrollOwnership = CarpenterRegionScrollOwnership.child,
     this.headerBehavior = CarpenterPageHeaderBehavior.sticky,
@@ -68,7 +68,7 @@ final class CarpenterPageRegion extends StatelessWidget {
          'A scrolling page header requires the page region to own scrolling.',
        );
 
-  final Widget header;
+  final Widget? header;
   final Widget body;
   final Widget? toolbar;
   final CarpenterRegionScrollOwnership scrollOwnership;
@@ -123,7 +123,7 @@ final class _PageRegionLayout extends StatelessWidget {
     required this.scrollController,
   });
 
-  final Widget header;
+  final Widget? header;
   final Widget? toolbar;
   final Widget body;
   final CarpenterRegionScrollOwnership scrollOwnership;
@@ -149,7 +149,10 @@ final class _PageRegionLayout extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (includeHeader) ...[header, SizedBox(height: gap)],
+          if (includeHeader && header != null) ...[
+            header!,
+            SizedBox(height: gap),
+          ],
           if (toolbar != null) ...[toolbar!, SizedBox(height: gap)],
           body,
         ],
@@ -159,9 +162,12 @@ final class _PageRegionLayout extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: bounded ? MainAxisSize.max : MainAxisSize.min,
         children: [
-          header,
-          if (toolbar != null) ...[SizedBox(height: gap), toolbar!],
-          SizedBox(height: gap),
+          if (header != null) header!,
+          if (toolbar != null) ...[
+            if (header != null) SizedBox(height: gap),
+            toolbar!,
+          ],
+          if (header != null || toolbar != null) SizedBox(height: gap),
           if (bounded) Expanded(child: body) else body,
         ],
       );
@@ -195,12 +201,13 @@ final class _PageRegionLayout extends StatelessWidget {
                     controller: scrollController,
                     child: scrollingContent(includeHeader: false),
                   );
+                  if (header == null) return scrollView;
                   if (!constraints.maxHeight.isFinite) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        header,
+                        header!,
                         SizedBox(height: gap),
                         scrollView,
                       ],
@@ -209,7 +216,7 @@ final class _PageRegionLayout extends StatelessWidget {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      header,
+                      header!,
                       SizedBox(height: gap),
                       Expanded(child: scrollView),
                     ],
