@@ -37,6 +37,15 @@ final class CarpenterPrimaryRegion extends StatelessWidget {
   );
 }
 
+/// Controls whether the page header participates in the page scroll flow.
+enum CarpenterPageHeaderBehavior {
+  /// Header stays at the top while the page body scrolls.
+  sticky,
+
+  /// Header is part of the document and scrolls away with the content.
+  scrolls,
+}
+
 /// Owns page anatomy and optionally its single vertical scroll viewport.
 ///
 /// Collection renderers such as [CarpenterTable] should normally use
@@ -49,15 +58,21 @@ final class CarpenterPageRegion extends StatelessWidget {
     required this.body,
     this.toolbar,
     this.scrollOwnership = CarpenterRegionScrollOwnership.child,
+    this.headerBehavior = CarpenterPageHeaderBehavior.sticky,
     this.scrollController,
     this.shortcutActions = const [],
     this.semanticLabel = 'Page',
-  });
+  }) : assert(
+         headerBehavior != CarpenterPageHeaderBehavior.scrolls ||
+             scrollOwnership == CarpenterRegionScrollOwnership.region,
+         'A scrolling page header requires the page region to own scrolling.',
+       );
 
   final Widget header;
   final Widget body;
   final Widget? toolbar;
   final CarpenterRegionScrollOwnership scrollOwnership;
+  final CarpenterPageHeaderBehavior headerBehavior;
   final ScrollController? scrollController;
   final List<CarpenterActionDescriptor> shortcutActions;
   final String semanticLabel;
@@ -75,6 +90,7 @@ final class CarpenterPageRegion extends StatelessWidget {
       toolbar: toolbar,
       body: body,
       scrollOwnership: scrollOwnership,
+      headerBehavior: headerBehavior,
       scrollController: scrollController,
     );
     if (shortcuts.isNotEmpty) {
@@ -103,6 +119,7 @@ final class _PageRegionLayout extends StatelessWidget {
     required this.toolbar,
     required this.body,
     required this.scrollOwnership,
+    required this.headerBehavior,
     required this.scrollController,
   });
 
@@ -110,6 +127,7 @@ final class _PageRegionLayout extends StatelessWidget {
   final Widget? toolbar;
   final Widget body;
   final CarpenterRegionScrollOwnership scrollOwnership;
+  final CarpenterPageHeaderBehavior headerBehavior;
   final ScrollController? scrollController;
 
   @override
@@ -126,7 +144,18 @@ final class _PageRegionLayout extends StatelessWidget {
             : theme.spacing.layoutPage,
       );
       final gap = context.units(theme.spacing.layoutSection);
-      Widget pageColumn({required bool bounded}) => Column(
+
+      Widget scrollingContent({required bool includeHeader}) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (includeHeader) ...[header, SizedBox(height: gap)],
+          if (toolbar != null) ...[toolbar!, SizedBox(height: gap)],
+          body,
+        ],
+      );
+
+      Widget childOwnedContent({required bool bounded}) => Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: bounded ? MainAxisSize.max : MainAxisSize.min,
         children: [
@@ -150,13 +179,38 @@ final class _PageRegionLayout extends StatelessWidget {
               child: LayoutBuilder(
                 builder: (context, constraints) {
                   if (scrollOwnership ==
-                      CarpenterRegionScrollOwnership.region) {
-                    return SingleChildScrollView(
-                      controller: scrollController,
-                      child: pageColumn(bounded: false),
+                      CarpenterRegionScrollOwnership.child) {
+                    return childOwnedContent(
+                      bounded: constraints.maxHeight.isFinite,
                     );
                   }
-                  return pageColumn(bounded: constraints.maxHeight.isFinite);
+
+                  if (headerBehavior == CarpenterPageHeaderBehavior.scrolls) {
+                    return SingleChildScrollView(
+                      controller: scrollController,
+                      child: scrollingContent(includeHeader: true),
+                    );
+                  }
+
+                  final scrollView = SingleChildScrollView(
+                    controller: scrollController,
+                    child: scrollingContent(includeHeader: false),
+                  );
+                  if (!constraints.maxHeight.isFinite) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [header, SizedBox(height: gap), scrollView],
+                    );
+                  }
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      header,
+                      SizedBox(height: gap),
+                      Expanded(child: scrollView),
+                    ],
+                  );
                 },
               ),
             ),
