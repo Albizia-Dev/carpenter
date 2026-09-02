@@ -14,7 +14,7 @@
   typography tokens and regenerated the checked-in token output.
 - Added project-shaped Widgetbook coverage for page composition, tree-table
   filtering/reveal/activation, and regression tests for filtered paths and
-  reveal path discovery.
+  controller reveal-path discovery.
 
 # 0.1.3
 
