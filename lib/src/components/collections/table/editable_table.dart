@@ -13,11 +13,11 @@ typedef CarpenterTableFooterCellBuilder<T> =
 
 /// Local-data table for editable business grids.
 ///
-/// Unlike [CarpenterTable], which is optimized for collection adapters,
-/// sorting, paging and server-backed snapshots, this widget is intentionally
-/// small and mutation-friendly. Cell builders may contain inputs, checkboxes,
-/// date fields and row actions. Header actions cover add/import operations and
-/// [footerCells] provides aligned totals or other per-column summaries.
+/// The regular Carpenter table is optimized for collection adapters, sorting,
+/// paging and server-backed snapshots. This widget is intentionally small and
+/// mutation-friendly. Cell builders may contain inputs, checkboxes, date fields
+/// and row actions. Header actions cover add/import operations and [footerCells]
+/// provides aligned totals or other per-column summaries.
 final class CarpenterEditableTable<T> extends StatelessWidget {
   const CarpenterEditableTable({
     super.key,
