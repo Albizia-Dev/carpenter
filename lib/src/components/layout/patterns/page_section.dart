@@ -109,11 +109,7 @@ final class _CarpenterPageSectionState extends State<CarpenterPageSection> {
           children: [
             Expanded(child: heading),
             SizedBox(width: contentGap),
-            Wrap(
-              spacing: actionGap,
-              runSpacing: actionGap,
-              children: actions,
-            ),
+            Wrap(spacing: actionGap, runSpacing: actionGap, children: actions),
           ],
         );
       },
@@ -126,10 +122,7 @@ final class _CarpenterPageSectionState extends State<CarpenterPageSection> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           header,
-          if (_expanded) ...[
-            SizedBox(height: contentGap),
-            widget.child,
-          ],
+          if (_expanded) ...[SizedBox(height: contentGap), widget.child],
         ],
       ),
     );

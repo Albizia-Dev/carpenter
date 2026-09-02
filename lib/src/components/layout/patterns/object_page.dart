@@ -55,7 +55,8 @@ final class CarpenterObjectPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.layoutSection);
-    final pageOwnsScroll = headerBehavior == CarpenterPageHeaderBehavior.scrolls;
+    final pageOwnsScroll =
+        headerBehavior == CarpenterPageHeaderBehavior.scrolls;
     final primary = CarpenterPrimaryRegion(
       scrollOwnership: pageOwnsScroll
           ? CarpenterRegionScrollOwnership.child

@@ -5,11 +5,7 @@ import '../../../foundation/theme.dart';
 
 /// Groups related content blocks with a gap larger than field-to-field spacing.
 final class CarpenterBlockGroup extends StatelessWidget {
-  const CarpenterBlockGroup({
-    super.key,
-    required this.children,
-    this.spacing,
-  });
+  const CarpenterBlockGroup({super.key, required this.children, this.spacing});
 
   final List<Widget> children;
   final LengthUnit? spacing;

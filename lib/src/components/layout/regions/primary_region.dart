@@ -178,8 +178,7 @@ final class _PageRegionLayout extends StatelessWidget {
               ),
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  if (scrollOwnership ==
-                      CarpenterRegionScrollOwnership.child) {
+                  if (scrollOwnership == CarpenterRegionScrollOwnership.child) {
                     return childOwnedContent(
                       bounded: constraints.maxHeight.isFinite,
                     );
@@ -200,7 +199,11 @@ final class _PageRegionLayout extends StatelessWidget {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       mainAxisSize: MainAxisSize.min,
-                      children: [header, SizedBox(height: gap), scrollView],
+                      children: [
+                        header,
+                        SizedBox(height: gap),
+                        scrollView,
+                      ],
                     );
                   }
                   return Column(

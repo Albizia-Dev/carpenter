@@ -44,7 +44,8 @@ final class CarpenterFormPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.layoutSection);
-    final pageOwnsScroll = headerBehavior == CarpenterPageHeaderBehavior.scrolls;
+    final pageOwnsScroll =
+        headerBehavior == CarpenterPageHeaderBehavior.scrolls;
     final actions = CarpenterHeaderActions(
       primary: [saveAction],
       secondary: [cancelAction, ...secondaryActions],

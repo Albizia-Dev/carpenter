@@ -52,8 +52,7 @@ final class CarpenterFieldGroup extends StatelessWidget {
         }
 
         final itemWidth =
-            (available - columnGap * (effectiveColumns - 1)) /
-            effectiveColumns;
+            (available - columnGap * (effectiveColumns - 1)) / effectiveColumns;
         return Wrap(
           spacing: columnGap,
           runSpacing: rowGap,

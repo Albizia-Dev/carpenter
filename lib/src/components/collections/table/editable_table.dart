@@ -8,10 +8,8 @@ import '../../../foundation/theme.dart';
 import '../../basic/text.dart';
 import 'table_column.dart';
 
-typedef CarpenterTableFooterCellBuilder<T> = Widget Function(
-  BuildContext context,
-  List<T> items,
-);
+typedef CarpenterTableFooterCellBuilder<T> =
+    Widget Function(BuildContext context, List<T> items);
 
 /// Local-data table for editable business grids.
 ///
@@ -149,7 +147,9 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
                         child: _row(
                           context,
                           columns
-                              .map((column) => column.cellBuilder(context, item))
+                              .map(
+                                (column) => column.cellBuilder(context, item),
+                              )
                               .toList(growable: false),
                         ),
                       ),
