@@ -1,0 +1,159 @@
+name: Finalize layout refactor
+
+on:
+  push:
+    branches:
+      - fix/project-layout-foundations
+    paths:
+      - '.github/finalize-layout-refactor.trigger'
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Apply deterministic refactor
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text()
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected one exact match, got {count}')
+              p.write_text(text.replace(old, new, 1))
+
+          def regex_once(path, pattern, replacement):
+              p = Path(path)
+              text = p.read_text()
+              updated, count = re.subn(pattern, replacement, text, count=1, flags=re.S)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected one regex match, got {count}')
+              p.write_text(updated)
+
+          # Remove the hidden legacy page-section implementation. The canonical
+          # implementation is page_section.dart.
+          regex_once(
+              'lib/src/components/layout/patterns/page_blocks.dart',
+              r'extension type const CarpenterPageSectionId\(String value\) \{\}\n\nfinal class CarpenterPageSection extends StatefulWidget \{.*?\n\}\n\nfinal class CarpenterActionBar',
+              'final class CarpenterActionBar',
+          )
+          regex_once(
+              'lib/carpenter.dart',
+              r"export 'src/components/layout/patterns/page_blocks\.dart'\s+hide CarpenterPageSection, CarpenterPageSectionId;",
+              "export 'src/components/layout/patterns/page_blocks.dart';",
+          )
+
+          # Record pages now provide document blocks; CarpenterPage owns the
+          # document viewport.
+          replace_once(
+              'lib/src/patterns/record.dart',
+              "import '../components/layout/patterns/header_actions.dart';\n",
+              "import '../components/layout/patterns/header_actions.dart';\nimport '../components/layout/patterns/page_body.dart';\n",
+          )
+          replace_once(
+              'lib/src/patterns/record.dart',
+              "    final gap = context.units(CarpenterTheme.of(context).spacing.layoutSection);\n    return CarpenterPage(\n",
+              "    return CarpenterPage(\n",
+          )
+          replace_once(
+              'lib/src/patterns/record.dart',
+              """      body:\n          body ??\n          ListView(\n            children: [\n              if (summary != null) ...[summary!, SizedBox(height: gap)],\n              if (attention != null) ...[attention!, SizedBox(height: gap)],\n              for (final section in sections) ...[\n                section,\n                SizedBox(height: gap),\n              ],\n              if (tabs != null) ...[tabs!, SizedBox(height: gap)],\n              for (final collection in related) ...[\n                collection,\n                SizedBox(height: gap),\n              ],\n              if (timeline != null) timeline!,\n            ],\n          ),\n""",
+              """      body:\n          body ??\n          CarpenterPageBody(\n            children: [\n              if (summary != null) summary!,\n              if (attention != null) attention!,\n              ...sections,\n              if (tabs != null) tabs!,\n              ...related,\n              if (timeline != null) timeline!,\n            ],\n          ),\n""",
+          )
+
+          # Editor page sections are also document blocks now.
+          replace_once(
+              'lib/src/patterns/editor.dart',
+              "import '../components/layout/page_header.dart';\n",
+              "import '../components/layout/page_header.dart';\nimport '../components/layout/patterns/page_body.dart';\n",
+          )
+          replace_once(
+              'lib/src/patterns/editor.dart',
+              "    final gap = context.units(CarpenterTheme.of(context).spacing.layoutSection);\n    return CarpenterPage(\n",
+              "    return CarpenterPage(\n",
+          )
+          replace_once(
+              'lib/src/patterns/editor.dart',
+              """      body:\n          body ??\n          ListView(\n            children: [\n              if (summary != null) ...[summary!, SizedBox(height: gap)],\n              if (editorState case CarpenterEditorValidationFailure(\n                :final errors,\n              )) ...[\n                CarpenterValidationSummary(errors: errors),\n                SizedBox(height: gap),\n              ],\n              if (editorState case CarpenterEditorSaveFailure(\n                :final error,\n              )) ...[\n                CarpenterAttentionBlock(\n                  title: 'Save failed',\n                  message: error.toString(),\n                  tone: CarpenterNoticeTone.danger,\n                ),\n                SizedBox(height: gap),\n              ],\n              if (attention != null) ...[attention!, SizedBox(height: gap)],\n              for (final section in sections) ...[\n                section,\n                SizedBox(height: gap),\n              ],\n            ],\n          ),\n""",
+              """      body:\n          body ??\n          CarpenterPageBody(\n            children: [\n              if (summary != null) summary!,\n              if (editorState case CarpenterEditorValidationFailure(\n                :final errors,\n              ))\n                CarpenterValidationSummary(errors: errors),\n              if (editorState case CarpenterEditorSaveFailure(\n                :final error,\n              ))\n                CarpenterAttentionBlock(\n                  title: 'Save failed',\n                  message: error.toString(),\n                  tone: CarpenterNoticeTone.danger,\n                ),\n              if (attention != null) attention!,\n              ...sections,\n            ],\n          ),\n""",
+          )
+
+          # Workflow pages keep intra-stage spacing local while top-level
+          # sections use CarpenterPageBody spacing.
+          replace_once(
+              'lib/src/patterns/workflow.dart',
+              "import '../components/layout/page_header.dart';\n",
+              "import '../components/layout/page_header.dart';\nimport '../components/layout/patterns/page_body.dart';\n",
+          )
+          regex_once(
+              'lib/src/patterns/workflow.dart',
+              r"          body: ListView\(\n            children: \[\n              if \(progress != null\) \.\.\.\[progress!, SizedBox\(height: gap\)\],\n              if \(stage != null\) \.\.\.\[\n                CarpenterText\.title\(stage\.title\),\n                if \(stage\.description != null\) \.\.\.\[\n                  SizedBox\(height: context\.units\(\.25\.rem\)\),\n                  CarpenterText\.body\(\n                    stage\.description!,\n                    colorRole: ContentColorRole\.secondary,\n                  \),\n                \],\n                SizedBox\(height: gap\),\n              \],\n              if \(controller\.error != null\) \.\.\.\[\n                CarpenterNotice\(\n                  title: 'Transition failed',\n                  message: controller\.error\.toString\(\),\n                  tone: CarpenterNoticeTone\.danger,\n                  action: CarpenterActionDescriptor\(\n                    id: 'workflow\.retry',\n                    label: 'Retry',\n                    onInvoke: controller\.retry,\n                  \),\n                \),\n                SizedBox\(height: gap\),\n              \],\n              if \(stage != null\)\n                stage\.build\(context, controller\.state, controller\.context\),\n              if \(history != null\) \.\.\.\[SizedBox\(height: gap\), history!\],\n            \],\n          \),",
+              """          body: CarpenterPageBody(\n            children: [\n              if (progress != null) progress!,\n              if (stage != null)\n                Column(\n                  crossAxisAlignment: CrossAxisAlignment.stretch,\n                  children: [\n                    CarpenterText.title(stage.title),\n                    if (stage.description != null) ...[\n                      SizedBox(height: context.units(.25.rem)),\n                      CarpenterText.body(\n                        stage.description!,\n                        colorRole: ContentColorRole.secondary,\n                      ),\n                    ],\n                    SizedBox(height: gap),\n                    stage.build(context, controller.state, controller.context),\n                  ],\n                ),\n              if (controller.error != null)\n                CarpenterNotice(\n                  title: 'Transition failed',\n                  message: controller.error.toString(),\n                  tone: CarpenterNoticeTone.danger,\n                  action: CarpenterActionDescriptor(\n                    id: 'workflow.retry',\n                    label: 'Retry',\n                    onInvoke: controller.retry,\n                  ),\n                ),\n              if (history != null) history!,\n            ],\n          ),""",
+          )
+
+          # Explorer content already owns bounded collection/navigation
+          # viewports, so opt out of document scrolling explicitly.
+          replace_once(
+              'lib/src/patterns/explorer.dart',
+              "import '../components/layout/page_header.dart';\n",
+              "import '../components/layout/page_header.dart';\nimport '../components/layout/regions/region_role.dart';\n",
+          )
+          replace_once(
+              'lib/src/patterns/explorer.dart',
+              "      state: state,\n      header:\n",
+              "      state: state,\n      scrollOwnership: CarpenterRegionScrollOwnership.child,\n      header:\n",
+          )
+          PY
+
+      - name: Regenerate Mordant tokens
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Restore repository analysis config
+        run: git checkout -- analysis_options.yaml
+
+      - name: Format changed Dart
+        run: dart format lib/carpenter.dart lib/src/components/layout/patterns/page_blocks.dart lib/src/patterns/record.dart lib/src/patterns/editor.dart lib/src/patterns/workflow.dart lib/src/patterns/explorer.dart lib/src/foundation/tokens/carpenter.mordant.g.dart
+
+      - name: Analyze library
+        run: dart analyze lib
+
+      - name: Remove one-shot automation
+        shell: bash
+        run: |
+          rm -f .github/finalize-layout-refactor.trigger
+          rm -f .github/workflows/regenerate-mordant.yml
+          rm -f .github/workflows/finalize-layout-refactor.yml
+
+      - name: Commit finalized refactor
+        shell: bash
+        run: |
+          set -euo pipefail
+          git add -A
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git commit -m "fix(layout): finalize page and token contracts"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push origin HEAD:"${GITHUB_REF_NAME}"
