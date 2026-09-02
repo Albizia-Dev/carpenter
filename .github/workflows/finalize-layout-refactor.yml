@@ -62,8 +62,8 @@ jobs:
           )
           regex_once(
               'lib/carpenter.dart',
-              r"export 'src/components/layout/patterns/page_blocks\.dart'\s+hide CarpenterPageSection, CarpenterPageSectionId;",
-              "export 'src/components/layout/patterns/page_blocks.dart';",
+              r"export 'src/components/layout/patterns/page_blocks\.dart'\s+hide CarpenterBlockGroup, CarpenterPageSection, CarpenterPageSectionId;",
+              "export 'src/components/layout/patterns/page_blocks.dart'\n    hide CarpenterBlockGroup;",
           )
 
           # Record pages now provide document blocks; CarpenterPage owns the
