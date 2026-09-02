@@ -1,1 +1,1 @@
-verify
+format
