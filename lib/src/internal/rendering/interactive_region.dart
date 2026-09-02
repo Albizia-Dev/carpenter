@@ -1,12 +1,11 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-typedef InteractiveRegionBuilder =
-    Widget Function(
-      BuildContext context,
-      Set<WidgetState> states,
-      bool showFocusHighlight,
-    );
+typedef InteractiveRegionBuilder = Widget Function(
+  BuildContext context,
+  Set<WidgetState> states,
+  bool showFocusHighlight,
+);
 
 final class InteractiveRegion extends StatefulWidget {
   const InteractiveRegion({
@@ -136,8 +135,7 @@ final class _InteractiveRegionState extends State<InteractiveRegion> {
             behavior: HitTestBehavior.opaque,
             excludeFromSemantics: true,
             onTap: _interactive && widget.onActivate != null ? _activate : null,
-            onDoubleTap:
-                _interactive && widget.onDoubleActivate != null
+            onDoubleTap: _interactive && widget.onDoubleActivate != null
                 ? _doubleActivate
                 : null,
             child: widget.builder(context, _states, _showFocusHighlight),

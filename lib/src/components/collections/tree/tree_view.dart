@@ -19,12 +19,11 @@ import '../list_tile.dart';
 import 'tree_event.dart';
 import 'tree_state.dart';
 
-typedef CarpenterTreeNodeBuilder<T> =
-    Widget Function(
-      BuildContext context,
-      CarpenterTreeNode<T> node,
-      CarpenterTreeRowState<T> state,
-    );
+typedef CarpenterTreeNodeBuilder<T> = Widget Function(
+  BuildContext context,
+  CarpenterTreeNode<T> node,
+  CarpenterTreeRowState<T> state,
+);
 typedef CarpenterTreeActionsBuilder<T> =
     List<CarpenterActionDescriptor> Function(CarpenterTreeNode<T> node);
 typedef CarpenterTreeActivation<T> = void Function(CarpenterTreeNode<T> node);
@@ -119,7 +118,9 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
     super.initState();
     widget.controller?.addListener(_handleRevealRequest);
     if (widget.controller?.revealId != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _handleRevealRequest());
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _handleRevealRequest(),
+      );
     }
   }
 
@@ -361,7 +362,9 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
           selected: state.selected,
           semanticLabel: node.effectiveSemanticLabel,
           onInvoke: () => _select(node),
-          onDoubleInvoke: widget.onActivated == null ? null : () => _activate(node),
+          onDoubleInvoke: widget.onActivated == null
+              ? null
+              : () => _activate(node),
           leading: node.canExpand
               ? CarpenterIconButton(
                   icon: expanded

@@ -86,10 +86,7 @@ final class CarpenterPage extends StatelessWidget {
           : CrossAxisAlignment.start,
       children: [
         Expanded(
-          child: CarpenterPageStateBoundary(
-            state: effectiveState,
-            child: body,
-          ),
+          child: CarpenterPageStateBoundary(state: effectiveState, child: body),
         ),
         if (aside != null) ...[SizedBox(width: gap), aside!],
       ],

@@ -125,9 +125,7 @@ final class _ProjectStructurePreviewState
               expandedIds: _expanded,
               selectedIds: _selected,
               filter: _filtered
-                  ? (node) => node.label
-                        .toLowerCase()
-                        .contains('specification')
+                  ? (node) => node.label.toLowerCase().contains('specification')
                   : null,
               onExpansionChanged: (id, expanded) => setState(() {
                 _expanded = expanded

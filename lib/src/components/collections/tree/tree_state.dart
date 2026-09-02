@@ -7,7 +7,9 @@ enum CarpenterTreeLoadState { ready, loading, failed }
 
 enum CarpenterTreeSelectionMode { none, single, multiple }
 
-typedef CarpenterTreeNodePredicate<T> = bool Function(CarpenterTreeNode<T> node);
+typedef CarpenterTreeNodePredicate<T> = bool Function(
+  CarpenterTreeNode<T> node,
+);
 
 @immutable
 final class CarpenterTreeNode<T> {
