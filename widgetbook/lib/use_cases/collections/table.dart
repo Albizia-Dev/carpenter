@@ -39,10 +39,6 @@ Widget _playground(BuildContext context) {
     initialOption: CollectionSelectionMode.multiple,
     labelBuilder: semanticValueLabel,
   );
-  final resizable = context.knobs.boolean(
-    label: 'Columns · Resizable',
-    initialValue: true,
-  );
   final narrow = context.knobs.boolean(label: 'Viewport · Narrow');
   final longText = context.knobs.boolean(label: 'Content · Long text');
   final manyColumns = context.knobs.boolean(label: 'Columns · Many columns');
@@ -55,7 +51,6 @@ Widget _playground(BuildContext context) {
         scenario: scenario,
         pagination: pagination,
         selectionMode: selectionMode,
-        resizable: resizable,
         longText: longText,
         manyColumns: manyColumns,
       ),
@@ -66,12 +61,11 @@ Widget _playground(BuildContext context) {
 Widget _edgeCases(BuildContext context) => preview(
   SizedBox(
     width: context.units(20.rem),
-    child: _TablePreview(
+    child: const _TablePreview(
       rowCount: 20,
       scenario: DemoCollectionScenario.refreshError,
       pagination: DemoPaginationFixture.unknownTotal,
       selectionMode: CollectionSelectionMode.multiple,
-      resizable: true,
       longText: true,
       manyColumns: true,
     ),
@@ -84,7 +78,6 @@ final class _TablePreview extends StatefulWidget {
     required this.scenario,
     required this.pagination,
     required this.selectionMode,
-    required this.resizable,
     required this.longText,
     required this.manyColumns,
   });
@@ -93,7 +86,6 @@ final class _TablePreview extends StatefulWidget {
   final DemoCollectionScenario scenario;
   final DemoPaginationFixture pagination;
   final CollectionSelectionMode selectionMode;
-  final bool resizable;
   final bool longText;
   final bool manyColumns;
 
@@ -146,7 +138,12 @@ final class _TablePreviewState extends State<_TablePreview> {
           header: 'Name',
           value: (row) => row.name,
           sortable: true,
-          resizable: widget.resizable,
+          width: CarpenterTableColumnWidth.flexible(
+            flex: 2,
+            preferred: 14.rem,
+            minimum: 8.rem,
+            maximum: 30.rem,
+          ),
         ),
         CarpenterTableColumn<_ExampleRow>.number(
           id: 'amount',
@@ -154,7 +151,11 @@ final class _TablePreviewState extends State<_TablePreview> {
           value: (row) => row.amount,
           formatter: (value) => '${value.toInt()} ₽',
           sortable: true,
-          resizable: widget.resizable,
+          width: CarpenterTableColumnWidth.fixed(
+            width: 10.rem,
+            minimum: 6.rem,
+            maximum: 18.rem,
+          ),
         ),
         CarpenterTableColumn<_ExampleRow>.status(
           id: 'state',
@@ -163,14 +164,22 @@ final class _TablePreviewState extends State<_TablePreview> {
           role: (row) => row.active
               ? FeedbackColorRole.success
               : FeedbackColorRole.warning,
-          resizable: widget.resizable,
+          width: CarpenterTableColumnWidth.fixed(
+            width: 8.rem,
+            minimum: 6.rem,
+            maximum: 14.rem,
+          ),
         ),
         if (widget.manyColumns)
           CarpenterTableColumn<_ExampleRow>.text(
             id: 'identity',
             header: 'Stable identity',
             value: (row) => 'record-${row.id}',
-            resizable: widget.resizable,
+            width: CarpenterTableColumnWidth.fixed(
+              width: 12.rem,
+              minimum: 8.rem,
+              maximum: 20.rem,
+            ),
           ),
         CarpenterTableColumn<_ExampleRow>.actions(
           id: 'actions',
@@ -182,7 +191,6 @@ final class _TablePreviewState extends State<_TablePreview> {
               onInvoke: () {},
             ),
           ],
-          resizable: widget.resizable,
         ),
       ],
       selection: _selection,
@@ -193,9 +201,8 @@ final class _TablePreviewState extends State<_TablePreview> {
       onSortingChanged: (value) => setState(() => _sorting = value),
       multiSort: true,
       columnWidths: _widths,
-      onColumnWidthChanged: widget.resizable
-          ? (id, width) => setState(() => _widths[id] = width)
-          : null,
+      onColumnWidthChanged: (id, width) =>
+          setState(() => _widths[id] = width),
       onLoadMore: snapshot.pageInfo.hasNext ? () {} : null,
       retryAction: CarpenterActionDescriptor(
         id: 'retry',
