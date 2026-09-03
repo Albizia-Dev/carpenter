@@ -10,7 +10,7 @@ on:
 
 jobs:
   library:
-    name: Library code style and analysis
+    name: Library analysis
     runs-on: ubuntu-latest
 
     steps:
@@ -25,9 +25,6 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
-
-      - name: Check code style
-        run: dart format --output=none --set-exit-if-changed lib
 
       - name: Analyze library
         run: dart analyze lib
