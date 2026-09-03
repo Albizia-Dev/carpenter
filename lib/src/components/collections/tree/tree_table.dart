@@ -420,7 +420,6 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     CarpenterTreeRowState<T> state,
     double gap,
   ) {
-    final theme = CarpenterTheme.of(context);
     final primary =
         widget.actions?.call(node) ?? const <CarpenterActionDescriptor>[];
     final secondary =
