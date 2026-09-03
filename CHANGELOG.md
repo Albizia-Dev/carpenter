@@ -1,3 +1,13 @@
+# 0.1.7
+
+- Added opt-in desktop multiple-selection semantics for trees and tree tables:
+  unmodified activation replaces selection, Ctrl/Cmd toggles, and Shift selects
+  a visible range while preserving the source-compatible toggle default.
+- Added caller-owned scroll controllers to trees and tree tables for restoring
+  explorer position per location.
+- Added immutable local explorer history with independent back and forward
+  stacks that does not depend on application router history.
+
 # 0.1.6
 
 - Made typed dialog close callbacks route-aware so a delayed asynchronous

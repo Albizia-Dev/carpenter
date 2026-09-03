@@ -16,6 +16,7 @@ import '../../behaviour/drag_and_drop/drag_scope.dart';
 import '../../behaviour/drag_and_drop/draggable.dart';
 import '../../behaviour/drag_and_drop/drop_target.dart';
 import '../list_tile.dart';
+import '../contracts/selection_mode.dart';
 import 'tree_event.dart';
 import 'tree_state.dart';
 
@@ -58,6 +59,8 @@ final class CarpenterTreeView<T> extends StatefulWidget {
     this.expandedIds = const {},
     this.selectedIds = const {},
     this.selectionMode = CarpenterTreeSelectionMode.single,
+    this.multipleSelectionBehavior = CollectionMultiSelectionBehavior.toggle,
+    this.scrollController,
     this.onExpansionChanged,
     this.onSelectionChanged,
     this.onActivated,
@@ -77,6 +80,8 @@ final class CarpenterTreeView<T> extends StatefulWidget {
   final Set<Object> expandedIds;
   final Set<Object> selectedIds;
   final CarpenterTreeSelectionMode selectionMode;
+  final CollectionMultiSelectionBehavior multipleSelectionBehavior;
+  final ScrollController? scrollController;
   final CarpenterTreeExpansionChanged? onExpansionChanged;
   final CarpenterTreeSelectionChanged? onSelectionChanged;
   final CarpenterTreeActivation<T>? onActivated;
@@ -96,6 +101,7 @@ final class CarpenterTreeView<T> extends StatefulWidget {
 
 final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
   Object? _focusedId;
+  Object? _selectionAnchorId;
   Object? _draggingId;
   Object? _autoExpandId;
   Object? _pendingRevealId;
@@ -205,13 +211,41 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
     final next = switch (widget.selectionMode) {
       CarpenterTreeSelectionMode.none => widget.selectedIds,
       CarpenterTreeSelectionMode.single => <Object>{node.id},
-      CarpenterTreeSelectionMode.multiple =>
-        widget.selectedIds.contains(node.id)
-            ? widget.selectedIds.where((id) => id != node.id).toSet()
-            : {...widget.selectedIds, node.id},
+      CarpenterTreeSelectionMode.multiple => _multipleSelection(node.id),
     };
     callback(Set.unmodifiable(next));
     setState(() {});
+  }
+
+  Set<Object> _multipleSelection(Object id) {
+    if (widget.multipleSelectionBehavior ==
+        CollectionMultiSelectionBehavior.toggle) {
+      _selectionAnchorId = id;
+      return widget.selectedIds.contains(id)
+          ? widget.selectedIds.where((candidate) => candidate != id).toSet()
+          : {...widget.selectedIds, id};
+    }
+
+    final keyboard = HardwareKeyboard.instance;
+    final additive = keyboard.isControlPressed || keyboard.isMetaPressed;
+    final anchorId = _selectionAnchorId;
+    if (keyboard.isShiftPressed && anchorId != null) {
+      final visibleIds = _flat.map((entry) => entry.node.id).toList();
+      final anchorIndex = visibleIds.indexOf(anchorId);
+      final targetIndex = visibleIds.indexOf(id);
+      if (anchorIndex >= 0 && targetIndex >= 0) {
+        final start = anchorIndex < targetIndex ? anchorIndex : targetIndex;
+        final end = anchorIndex < targetIndex ? targetIndex : anchorIndex;
+        final range = visibleIds.sublist(start, end + 1).toSet();
+        return additive ? {...widget.selectedIds, ...range} : range;
+      }
+    }
+
+    _selectionAnchorId = id;
+    if (!additive) return <Object>{id};
+    return widget.selectedIds.contains(id)
+        ? widget.selectedIds.where((candidate) => candidate != id).toSet()
+        : {...widget.selectedIds, id};
   }
 
   void _activate(CarpenterTreeNode<T> node) {
@@ -415,7 +449,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
         onDragCompleted: () {
           if (mounted) setState(() => _draggingId = null);
         },
-        onDragCanceled: (_, __) {
+        onDragCanceled: (_, _) {
           if (mounted) setState(() => _draggingId = null);
         },
         child: row,
@@ -485,6 +519,25 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
   Widget build(BuildContext context) {
     final flat = _flat;
     if (_pendingRevealId != null) _scheduleReveal(_pendingRevealId!);
+    Widget rows = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final entry in flat) ...[
+          _row(context, entry),
+          if (_visuallyExpanded(entry.node) &&
+              entry.node.children.isEmpty &&
+              entry.node.loadState != CarpenterTreeLoadState.ready)
+            _lazyState(context, entry),
+        ],
+      ],
+    );
+    if (widget.scrollController != null) {
+      rows = SingleChildScrollView(
+        controller: widget.scrollController,
+        child: rows,
+      );
+    }
     return CarpenterDragScope(
       child: Focus(
         autofocus: true,
@@ -493,19 +546,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
           container: true,
           explicitChildNodes: true,
           label: widget.semanticLabel,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (final entry in flat) ...[
-                _row(context, entry),
-                if (_visuallyExpanded(entry.node) &&
-                    entry.node.children.isEmpty &&
-                    entry.node.loadState != CarpenterTreeLoadState.ready)
-                  _lazyState(context, entry),
-              ],
-            ],
-          ),
+          child: rows,
         ),
       ),
     );

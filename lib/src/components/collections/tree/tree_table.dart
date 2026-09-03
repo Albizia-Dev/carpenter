@@ -1,5 +1,4 @@
 import 'package:carpenter_units/carpenter_units.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../foundation/roles.dart';
@@ -7,6 +6,7 @@ import '../../../foundation/theme.dart';
 import '../../basic/text.dart';
 import '../../behaviour/drag_and_drop/draggable.dart';
 import '../table/table_column.dart';
+import '../contracts/selection_mode.dart';
 import 'tree_event.dart';
 import 'tree_state.dart';
 import 'tree_view.dart';
@@ -61,6 +61,8 @@ final class CarpenterTreeTable<T> extends StatelessWidget {
     this.expandedIds = const {},
     this.selectedIds = const {},
     this.selectionMode = CarpenterTreeSelectionMode.single,
+    this.multipleSelectionBehavior = CollectionMultiSelectionBehavior.toggle,
+    this.scrollController,
     this.onExpansionChanged,
     this.onSelectionChanged,
     this.onActivated,
@@ -84,6 +86,8 @@ final class CarpenterTreeTable<T> extends StatelessWidget {
   final Set<Object> expandedIds;
   final Set<Object> selectedIds;
   final CarpenterTreeSelectionMode selectionMode;
+  final CollectionMultiSelectionBehavior multipleSelectionBehavior;
+  final ScrollController? scrollController;
   final CarpenterTreeExpansionChanged? onExpansionChanged;
   final CarpenterTreeSelectionChanged? onSelectionChanged;
   final CarpenterTreeActivation<T>? onActivated;
@@ -103,8 +107,53 @@ final class CarpenterTreeTable<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.medium);
+    final tree = CarpenterTreeView<T>(
+      nodes: nodes,
+      controller: controller,
+      expandedIds: expandedIds,
+      selectedIds: selectedIds,
+      selectionMode: selectionMode,
+      multipleSelectionBehavior: multipleSelectionBehavior,
+      scrollController: scrollController,
+      onExpansionChanged: onExpansionChanged,
+      onSelectionChanged: onSelectionChanged,
+      onActivated: onActivated,
+      filter: filter,
+      onDrop: onDrop,
+      canDrop: canDrop,
+      onRetryLoad: onRetryLoad,
+      actions: actions,
+      dragActivation: dragActivation,
+      semanticLabel: '$semanticLabel rows',
+      itemBuilder: (context, node, state) => Row(
+        children: [
+          _TreeTableSlot(
+            width: _effectiveTreeWidth,
+            alignment: treeAlignment,
+            child: CarpenterText.label(
+              node.label,
+              emphasis: state.selected || state.focused
+                  ? TypographyEmphasis.medium
+                  : TypographyEmphasis.regular,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          for (final column in columns) ...[
+            SizedBox(width: gap),
+            _TreeTableSlot(
+              width: column.effectiveWidth,
+              alignment: column.alignment,
+              child: column.cellBuilder(context, node),
+            ),
+          ],
+        ],
+      ),
+    );
     Widget content = Column(
-      mainAxisSize: MainAxisSize.min,
+      mainAxisSize: scrollController == null
+          ? MainAxisSize.min
+          : MainAxisSize.max,
       children: [
         Container(
           color: theme.surface.subtle,
@@ -134,47 +183,7 @@ final class CarpenterTreeTable<T> extends StatelessWidget {
             ],
           ),
         ),
-        CarpenterTreeView<T>(
-          nodes: nodes,
-          controller: controller,
-          expandedIds: expandedIds,
-          selectedIds: selectedIds,
-          selectionMode: selectionMode,
-          onExpansionChanged: onExpansionChanged,
-          onSelectionChanged: onSelectionChanged,
-          onActivated: onActivated,
-          filter: filter,
-          onDrop: onDrop,
-          canDrop: canDrop,
-          onRetryLoad: onRetryLoad,
-          actions: actions,
-          dragActivation: dragActivation,
-          semanticLabel: '$semanticLabel rows',
-          itemBuilder: (context, node, state) => Row(
-            children: [
-              _TreeTableSlot(
-                width: _effectiveTreeWidth,
-                alignment: treeAlignment,
-                child: CarpenterText.label(
-                  node.label,
-                  emphasis: state.selected || state.focused
-                      ? TypographyEmphasis.medium
-                      : TypographyEmphasis.regular,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              for (final column in columns) ...[
-                SizedBox(width: gap),
-                _TreeTableSlot(
-                  width: column.effectiveWidth,
-                  alignment: column.alignment,
-                  child: column.cellBuilder(context, node),
-                ),
-              ],
-            ],
-          ),
-        ),
+        if (scrollController == null) tree else Expanded(child: tree),
       ],
     );
 

@@ -1,4 +1,5 @@
 import 'package:carpenter/carpenter.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -65,6 +66,129 @@ void main() {
 
     await tester.tap(find.text('Root'));
     expect(selection, {'root'});
+  });
+
+  testWidgets('tree desktop selection replaces, toggles and extends ranges', (
+    tester,
+  ) async {
+    var selected = <Object>{'outside'};
+    const nodes = <CarpenterTreeNode<String>>[
+      CarpenterTreeNode<String>(id: 'a', value: 'a', label: 'Alpha'),
+      CarpenterTreeNode<String>(id: 'b', value: 'b', label: 'Bravo'),
+      CarpenterTreeNode<String>(id: 'c', value: 'c', label: 'Charlie'),
+    ];
+
+    await tester.pumpWidget(
+      carpenterHarness(
+        StatefulBuilder(
+          builder: (context, setState) => CarpenterTreeView<String>(
+            nodes: nodes,
+            selectionMode: CarpenterTreeSelectionMode.multiple,
+            multipleSelectionBehavior: CollectionMultiSelectionBehavior.desktop,
+            selectedIds: selected,
+            onSelectionChanged: (value) => setState(() => selected = value),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Alpha'));
+    await tester.pump();
+    expect(selected, {'a'});
+
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.tap(find.text('Charlie'));
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await tester.pump();
+    expect(selected, {'a', 'c'});
+
+    await tester.tap(find.text('Alpha'));
+    await tester.pump();
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.shiftLeft);
+    await tester.tap(find.text('Charlie'));
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.shiftLeft);
+    await tester.pump();
+    expect(selected, {'a', 'b', 'c'});
+  });
+
+  testWidgets('tree toggle selection behavior remains source compatible', (
+    tester,
+  ) async {
+    Set<Object>? selected;
+    await tester.pumpWidget(
+      carpenterHarness(
+        CarpenterTreeView<String>(
+          nodes: const [
+            CarpenterTreeNode<String>(id: 'a', value: 'a', label: 'Alpha'),
+          ],
+          selectionMode: CarpenterTreeSelectionMode.multiple,
+          selectedIds: const {'outside'},
+          onSelectionChanged: (value) => selected = value,
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Alpha'));
+    expect(selected, {'outside', 'a'});
+  });
+
+  testWidgets('tree exposes controlled scroll position', (tester) async {
+    final controller = ScrollController();
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      carpenterHarness(
+        SizedBox(
+          height: 120,
+          child: CarpenterTreeView<int>(
+            scrollController: controller,
+            nodes: [
+              for (var index = 0; index < 20; index++)
+                CarpenterTreeNode<int>(
+                  id: index,
+                  value: index,
+                  label: 'Node $index',
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    controller.jumpTo(100);
+    await tester.pump();
+    expect(controller.offset, 100);
+  });
+
+  testWidgets('tree table keeps its header above a controlled viewport', (
+    tester,
+  ) async {
+    final controller = ScrollController();
+    addTearDown(controller.dispose);
+    await tester.pumpWidget(
+      carpenterHarness(
+        SizedBox(
+          height: 160,
+          child: CarpenterTreeTable<int>(
+            scrollController: controller,
+            treeHeader: 'Material',
+            nodes: [
+              for (var index = 0; index < 20; index++)
+                CarpenterTreeNode<int>(
+                  id: index,
+                  value: index,
+                  label: 'Material $index',
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Material'), findsOneWidget);
+    controller.jumpTo(100);
+    await tester.pump();
+    expect(controller.offset, 100);
+    expect(find.text('Material'), findsOneWidget);
   });
 
   testWidgets('drag feedback preserves source geometry', (tester) async {

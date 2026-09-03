@@ -112,7 +112,8 @@ final class _ProjectStructurePreviewState
             id: const CarpenterPageSectionId('structure'),
             title: 'Structure',
             description:
-                'Click or Space selects. Double-click or Enter activates.',
+                'Click selects, Ctrl/Cmd toggles, Shift selects a range. '
+                'Double-click or Enter activates.',
             child: CarpenterTreeTable<String>(
               nodes: _projectNodes,
               controller: _treeController,
@@ -124,6 +125,9 @@ final class _ProjectStructurePreviewState
               ),
               expandedIds: _expanded,
               selectedIds: _selected,
+              selectionMode: CarpenterTreeSelectionMode.multiple,
+              multipleSelectionBehavior:
+                  CollectionMultiSelectionBehavior.desktop,
               filter: _filtered
                   ? (node) => node.label.toLowerCase().contains('specification')
                   : null,

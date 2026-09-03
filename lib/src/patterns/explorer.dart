@@ -8,6 +8,53 @@ import '../page/descriptor.dart';
 import '../page/page.dart';
 import '../page/state.dart';
 
+/// Controlled navigation history for an explorer location.
+///
+/// The application owns this value and may serialize or persist it alongside
+/// its per-location view state. Navigating to a new location clears the
+/// forward stack; moving backward or forward never touches router history.
+@immutable
+final class CarpenterExplorerHistory<L> {
+  const CarpenterExplorerHistory({
+    required this.current,
+    this.backStack = const [],
+    this.forwardStack = const [],
+  });
+
+  final L current;
+  final List<L> backStack;
+  final List<L> forwardStack;
+
+  bool get canGoBack => backStack.isNotEmpty;
+  bool get canGoForward => forwardStack.isNotEmpty;
+
+  CarpenterExplorerHistory<L> navigateTo(L location) {
+    if (location == current) return this;
+    return CarpenterExplorerHistory<L>(
+      current: location,
+      backStack: List<L>.unmodifiable([...backStack, current]),
+    );
+  }
+
+  CarpenterExplorerHistory<L> goBack() {
+    if (!canGoBack) return this;
+    return CarpenterExplorerHistory<L>(
+      current: backStack.last,
+      backStack: List<L>.unmodifiable(backStack.take(backStack.length - 1)),
+      forwardStack: List<L>.unmodifiable([current, ...forwardStack]),
+    );
+  }
+
+  CarpenterExplorerHistory<L> goForward() {
+    if (!canGoForward) return this;
+    return CarpenterExplorerHistory<L>(
+      current: forwardStack.first,
+      backStack: List<L>.unmodifiable([...backStack, current]),
+      forwardStack: List<L>.unmodifiable(forwardStack.skip(1)),
+    );
+  }
+}
+
 /// Explorer pattern with navigation, content and optional inspector regions.
 final class CarpenterExplorerPage extends StatelessWidget {
   const CarpenterExplorerPage({
