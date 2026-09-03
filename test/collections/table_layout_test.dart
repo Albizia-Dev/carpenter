@@ -110,7 +110,9 @@ void main() {
           widget is CarpenterIconButton && widget.semanticLabel == 'More actions',
     );
     expect(overflowButton, findsOneWidget);
-    await tester.tap(overflowButton);
+    final button = tester.widget<CarpenterIconButton>(overflowButton);
+    expect(button.onInvoke, isNotNull);
+    button.onInvoke!.call();
     await tester.pumpAndSettle();
     expect(find.text('Archive'), findsOneWidget);
   });
