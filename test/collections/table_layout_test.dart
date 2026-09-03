@@ -9,7 +9,7 @@ void main() {
     await tester.pumpWidget(
       carpenterHarness(
         CarpenterTable<_Row, int>(
-          snapshot: const CollectionSnapshot(items: [_Row(1, 'Alpha')]),
+          snapshot: CollectionSnapshot(items: const [_Row(1, 'Alpha')]),
           rowKey: (row) => row.id,
           rowSemanticLabel: (row) => row.name,
           selection: CollectionSelection<int>.none(),
@@ -50,7 +50,7 @@ void main() {
     await tester.pumpWidget(
       carpenterHarness(
         CarpenterTable<_Row, int>(
-          snapshot: const CollectionSnapshot(items: [_Row(1, 'Alpha')]),
+          snapshot: CollectionSnapshot(items: const [_Row(1, 'Alpha')]),
           rowKey: (row) => row.id,
           rowSemanticLabel: (row) => row.name,
           selection: CollectionSelection<int>.none(),
@@ -83,7 +83,7 @@ void main() {
     await tester.pumpWidget(
       carpenterHarness(
         CarpenterTable<_Row, int>(
-          snapshot: const CollectionSnapshot(items: [_Row(1, 'Alpha')]),
+          snapshot: CollectionSnapshot(items: const [_Row(1, 'Alpha')]),
           rowKey: (row) => row.id,
           rowSemanticLabel: (row) => row.name,
           selection: CollectionSelection<int>.none(),
