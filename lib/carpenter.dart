@@ -3,6 +3,7 @@ library;
 
 export 'package:carpenter_units/carpenter_units.dart';
 export 'package:yx_navigation/yx_navigation.dart';
+
 export 'gravity_icons.dart';
 
 // Application runtime and integration.
@@ -101,8 +102,10 @@ export 'src/components/collections/planning_board.dart';
 export 'src/components/collections/reorderable_collection.dart';
 export 'src/components/collections/table/editable_table.dart';
 export 'src/components/collections/table/table.dart';
+export 'src/components/collections/table/table_actions.dart';
 export 'src/components/collections/table/table_column.dart';
 export 'src/components/collections/table/table_state.dart';
+export 'src/components/collections/table/table_text.dart';
 export 'src/components/collections/tabs.dart';
 export 'src/components/collections/tree/tree_event.dart';
 export 'src/components/collections/tree/tree_state.dart';
