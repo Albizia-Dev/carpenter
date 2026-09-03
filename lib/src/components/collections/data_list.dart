@@ -10,10 +10,8 @@ import 'contracts/collection_load_phase.dart';
 import 'contracts/collection_snapshot.dart';
 import 'contracts/selection_state.dart';
 
-typedef CarpenterDataListItemBuilder<T> = Widget Function(
-  BuildContext context,
-  T item,
-);
+typedef CarpenterDataListItemBuilder<T> =
+    Widget Function(BuildContext context, T item);
 
 @immutable
 final class CarpenterDataListMessages {

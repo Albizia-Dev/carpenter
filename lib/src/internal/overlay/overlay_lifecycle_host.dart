@@ -2,11 +2,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-typedef OverlayLifecycleBuilder = Widget Function(
-  BuildContext context,
-  OverlayChildLayoutInfo info,
-  VoidCallback dismiss,
-);
+typedef OverlayLifecycleBuilder =
+    Widget Function(
+      BuildContext context,
+      OverlayChildLayoutInfo info,
+      VoidCallback dismiss,
+    );
 
 final class OverlayLifecycleHost extends StatefulWidget {
   const OverlayLifecycleHost({

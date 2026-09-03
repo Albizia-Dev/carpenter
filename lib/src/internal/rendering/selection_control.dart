@@ -10,11 +10,12 @@ import 'interactive_region.dart';
 
 enum SelectionControlKind { checkbox, radio, toggle }
 
-typedef SelectionIndicatorBuilder = Widget Function(
-  BuildContext context,
-  CarpenterSelectionStyle style,
-  Size size,
-);
+typedef SelectionIndicatorBuilder =
+    Widget Function(
+      BuildContext context,
+      CarpenterSelectionStyle style,
+      Size size,
+    );
 
 final class SelectionControl extends StatelessWidget {
   const SelectionControl({

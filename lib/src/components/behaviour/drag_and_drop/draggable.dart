@@ -7,10 +7,8 @@ import 'drag_transport.dart';
 
 enum CarpenterDragActivation { immediate, longPress }
 
-typedef CarpenterDragCanceledCallback = void Function(
-  Velocity velocity,
-  Offset offset,
-);
+typedef CarpenterDragCanceledCallback =
+    void Function(Velocity velocity, Offset offset);
 
 /// Typed pointer drag source backed by Flutter's drag recognizers and Carpenter sessions.
 final class CarpenterDraggable<T> extends StatefulWidget {

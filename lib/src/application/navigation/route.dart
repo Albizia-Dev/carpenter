@@ -3,17 +3,12 @@ import 'package:yx_navigation/yx_navigation.dart';
 
 import '../runtime/runtime.dart';
 
-typedef CarpenterRouteScopeBuilder = Widget Function(
-  CarpenterRouteContext context,
-  Widget child,
-);
-typedef CarpenterRouteShellBuilder = Widget Function(
-  CarpenterRouteContext context,
-  Widget child,
-);
-typedef CarpenterRoutePageBuilder = Widget Function(
-  CarpenterRouteContext context,
-);
+typedef CarpenterRouteScopeBuilder =
+    Widget Function(CarpenterRouteContext context, Widget child);
+typedef CarpenterRouteShellBuilder =
+    Widget Function(CarpenterRouteContext context, Widget child);
+typedef CarpenterRoutePageBuilder =
+    Widget Function(CarpenterRouteContext context);
 
 /// Carpenter declaration layered over yx_navigation route identity.
 final class CarpenterRoute {

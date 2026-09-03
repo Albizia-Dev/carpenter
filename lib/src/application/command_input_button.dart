@@ -4,9 +4,8 @@ import '../components/basic/button/button.dart';
 import '../foundation/roles.dart';
 import 'command.dart';
 
-typedef CarpenterCommandInputBuilder<I> = Future<I?> Function(
-  BuildContext context,
-);
+typedef CarpenterCommandInputBuilder<I> =
+    Future<I?> Function(BuildContext context);
 
 /// Presents a command whose input is collected just before execution.
 final class CarpenterCommandInputButton<I> extends StatelessWidget {

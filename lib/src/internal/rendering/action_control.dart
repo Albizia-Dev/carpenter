@@ -7,11 +7,12 @@ import 'focus_ring.dart';
 import 'interactive_region.dart';
 import 'loading_background.dart';
 
-typedef ActionControlChildBuilder = Widget Function(
-  BuildContext context,
-  CarpenterActionStyle style,
-  double iconDimension,
-);
+typedef ActionControlChildBuilder =
+    Widget Function(
+      BuildContext context,
+      CarpenterActionStyle style,
+      double iconDimension,
+    );
 
 final class ActionControl extends StatelessWidget {
   const ActionControl({

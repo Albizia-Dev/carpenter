@@ -14,10 +14,8 @@ import '../toolbar.dart';
 import 'header_actions.dart';
 import 'states/empty_state.dart';
 
-typedef CarpenterCollectionRenderer<T> = Widget Function(
-  BuildContext context,
-  CollectionSnapshot<T> snapshot,
-);
+typedef CarpenterCollectionRenderer<T> =
+    Widget Function(BuildContext context, CollectionSnapshot<T> snapshot);
 
 @immutable
 final class CarpenterCollectionPageMessages {

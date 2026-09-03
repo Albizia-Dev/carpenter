@@ -4,10 +4,11 @@ import '../../../foundation/adaptive.dart';
 
 enum CarpenterNavigationPresentation { side, compactSide, bottom }
 
-typedef CarpenterNavigationBuilder = Widget Function(
-  BuildContext context,
-  CarpenterNavigationPresentation presentation,
-);
+typedef CarpenterNavigationBuilder =
+    Widget Function(
+      BuildContext context,
+      CarpenterNavigationPresentation presentation,
+    );
 
 abstract interface class CarpenterNavigationPolicy {
   CarpenterNavigationPresentation resolve(CarpenterAdaptiveContext context);

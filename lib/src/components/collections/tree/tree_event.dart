@@ -18,15 +18,11 @@ final class CarpenterTreeDropDetails<T> {
   final CarpenterDragOperation operation;
 }
 
-typedef CarpenterTreeExpansionChanged = void Function(
-  Object nodeId,
-  bool expanded,
-);
+typedef CarpenterTreeExpansionChanged =
+    void Function(Object nodeId, bool expanded);
 typedef CarpenterTreeSelectionChanged = void Function(Set<Object> selectedIds);
-typedef CarpenterTreeDropCallback<T> = void Function(
-  CarpenterTreeDropDetails<T> details,
-);
-typedef CarpenterTreeDropAcceptance<T> = bool Function(
-  CarpenterTreeDropDetails<T> details,
-);
+typedef CarpenterTreeDropCallback<T> =
+    void Function(CarpenterTreeDropDetails<T> details);
+typedef CarpenterTreeDropAcceptance<T> =
+    bool Function(CarpenterTreeDropDetails<T> details);
 typedef CarpenterTreeNodeCallback<T> = void Function(CarpenterTreeNode<T> node);

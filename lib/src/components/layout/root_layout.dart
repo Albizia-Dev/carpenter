@@ -28,10 +28,8 @@ final class CarpenterRootLayoutContext {
   bool get isMobile => presentation == CarpenterRootLayoutPresentation.mobile;
 }
 
-typedef CarpenterRootHeaderBuilder = Widget Function(
-  BuildContext context,
-  CarpenterRootLayoutContext layout,
-);
+typedef CarpenterRootHeaderBuilder =
+    Widget Function(BuildContext context, CarpenterRootLayoutContext layout);
 
 /// Root application composition: navigation + (header + page content).
 ///

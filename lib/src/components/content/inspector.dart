@@ -8,10 +8,8 @@ import '../basic/text.dart';
 
 typedef CarpenterInspectorLabelBuilder = String Function(String key);
 typedef CarpenterInspectorScalarBuilder = String Function(Object? value);
-typedef CarpenterInspectorFieldFilter = bool Function(
-  String key,
-  Object? value,
-);
+typedef CarpenterInspectorFieldFilter =
+    bool Function(String key, Object? value);
 
 /// Recursive readable presentation for map/list payloads and diagnostic data.
 final class CarpenterInspector extends StatelessWidget {

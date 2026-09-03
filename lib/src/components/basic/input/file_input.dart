@@ -44,12 +44,10 @@ final class CarpenterFileDropData<T> {
   final List<CarpenterFileCandidate<T>> files;
 }
 
-typedef CarpenterFileAcceptance<T> = bool Function(
-  CarpenterFileCandidate<T> file,
-);
-typedef CarpenterFilesChanged<T> = void Function(
-  List<CarpenterFileCandidate<T>> files,
-);
+typedef CarpenterFileAcceptance<T> =
+    bool Function(CarpenterFileCandidate<T> file);
+typedef CarpenterFilesChanged<T> =
+    void Function(List<CarpenterFileCandidate<T>> files);
 
 /// Event bridge used by platform adapters and linked drop zones.
 ///

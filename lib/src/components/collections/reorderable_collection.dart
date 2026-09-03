@@ -41,14 +41,14 @@ final class CarpenterReorderItemState {
   final CarpenterDropPosition? dropPosition;
 }
 
-typedef CarpenterReorderItemBuilder<T> = Widget Function(
-  BuildContext context,
-  T item,
-  CarpenterReorderItemState state,
-);
-typedef CarpenterReorderCallback<T> = void Function(
-  CarpenterReorderDetails<T> details,
-);
+typedef CarpenterReorderItemBuilder<T> =
+    Widget Function(
+      BuildContext context,
+      T item,
+      CarpenterReorderItemState state,
+    );
+typedef CarpenterReorderCallback<T> =
+    void Function(CarpenterReorderDetails<T> details);
 
 @immutable
 final class _ReorderDragData<T> {
