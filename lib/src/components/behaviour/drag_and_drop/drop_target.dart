@@ -41,12 +41,16 @@ final class CarpenterDropTargetState<T> {
   final CarpenterDropPosition? position;
 }
 
-typedef CarpenterDropTargetBuilder<T> =
-    Widget Function(BuildContext context, CarpenterDropTargetState<T> state);
-typedef CarpenterDropAcceptance<T> =
-    bool Function(CarpenterDropDetails<T> details);
-typedef CarpenterDropCallback<T> =
-    void Function(CarpenterDropDetails<T> details);
+typedef CarpenterDropTargetBuilder<T> = Widget Function(
+  BuildContext context,
+  CarpenterDropTargetState<T> state,
+);
+typedef CarpenterDropAcceptance<T> = bool Function(
+  CarpenterDropDetails<T> details,
+);
+typedef CarpenterDropCallback<T> = void Function(
+  CarpenterDropDetails<T> details,
+);
 
 /// Typed drop target with operation negotiation and before/inside/after geometry.
 final class CarpenterDropTarget<T> extends StatefulWidget {

@@ -5,7 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/harness.dart';
 
 void main() {
-  testWidgets('resizable columns work without a width callback', (tester) async {
+  testWidgets('resizable columns work without a width callback', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       carpenterHarness(
         CarpenterTable<_Row, int>(
@@ -60,11 +62,8 @@ void main() {
               header: 'Aligned',
               alignment: CarpenterTableColumnAlignment.end,
               verticalAlignment: CarpenterTableColumnVerticalAlignment.bottom,
-              cellBuilder: (_, _) => const SizedBox(
-                key: cellKey,
-                width: 8,
-                height: 8,
-              ),
+              cellBuilder: (_, _) =>
+                  const SizedBox(key: cellKey, width: 8, height: 8),
             ),
           ],
         ),

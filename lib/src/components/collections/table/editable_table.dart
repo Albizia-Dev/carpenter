@@ -8,8 +8,10 @@ import '../../../foundation/theme.dart';
 import '../../basic/text.dart';
 import 'table_column.dart';
 
-typedef CarpenterTableFooterCellBuilder<T> =
-    Widget Function(BuildContext context, List<T> items);
+typedef CarpenterTableFooterCellBuilder<T> = Widget Function(
+  BuildContext context,
+  List<T> items,
+);
 
 /// Local-data table for editable business grids.
 ///

@@ -53,9 +53,8 @@ final class CarpenterListTile extends StatelessWidget {
     final radius = tableRow
         ? BorderRadius.zero
         : BorderRadius.circular(context.units(.5.rem));
-    final rowHeight = MediaQuery.textScalerOf(
-      context,
-    ).scale(context.units(theme.sizes.tableRowHeight));
+    final rowHeight = MediaQuery.textScalerOf(context)
+        .scale(context.units(theme.sizes.tableRowHeight));
     return Semantics(
       container: true,
       selected: selected,

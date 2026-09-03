@@ -18,10 +18,14 @@ import 'tree_event.dart';
 import 'tree_state.dart';
 import 'tree_view.dart';
 
-typedef CarpenterTreeTableCellBuilder<T> =
-    Widget Function(BuildContext context, CarpenterTreeNode<T> node);
-typedef CarpenterTreeTableColumnWidthChanged =
-    void Function(String columnId, LengthUnit width);
+typedef CarpenterTreeTableCellBuilder<T> = Widget Function(
+  BuildContext context,
+  CarpenterTreeNode<T> node,
+);
+typedef CarpenterTreeTableColumnWidthChanged = void Function(
+  String columnId,
+  LengthUnit width,
+);
 
 @immutable
 final class CarpenterTreeTableColumn<T> {
@@ -207,13 +211,8 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
           tableRows: true,
           dragActivation: widget.dragActivation,
           semanticLabel: '${widget.semanticLabel} rows',
-          rowBuilder: (context, node, state, _) => _buildRow(
-            context,
-            layout,
-            node,
-            state,
-            gap,
-          ),
+          rowBuilder: (context, node, state, _) =>
+              _buildRow(context, layout, node, state, gap),
         );
         Widget content = Column(
           mainAxisSize: widget.scrollController == null
@@ -221,7 +220,10 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
               : MainAxisSize.max,
           children: [
             _buildHeader(context, layout, outerPadding, gap),
-            if (widget.scrollController == null) tree else Expanded(child: tree),
+            if (widget.scrollController == null)
+              tree
+            else
+              Expanded(child: tree),
           ],
         );
         content = SingleChildScrollView(
@@ -235,7 +237,10 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
           content = DecoratedBox(
             decoration: BoxDecoration(
               color: theme.overlay.background,
-              border: Border.all(color: theme.overlay.border, width: borderWidth),
+              border: Border.all(
+                color: theme.overlay.border,
+                width: borderWidth,
+              ),
               borderRadius: BorderRadius.circular(radius),
             ),
             child: ClipRRect(
@@ -351,9 +356,8 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     double gap,
   ) {
     final theme = CarpenterTheme.of(context);
-    final height = MediaQuery.textScalerOf(
-      context,
-    ).scale(context.units(theme.sizes.tableHeaderHeight));
+    final height = MediaQuery.textScalerOf(context)
+        .scale(context.units(theme.sizes.tableHeaderHeight));
     return Container(
       color: theme.surface.subtle,
       height: height,
@@ -662,7 +666,9 @@ final class _TreeTablePrefix<T> extends StatelessWidget {
         SizedBox(width: indent),
         if (node.canExpand)
           CarpenterIconButton(
-            icon: expanded ? GravityIcons.chevronDown : GravityIcons.chevronRight,
+            icon: expanded
+                ? GravityIcons.chevronDown
+                : GravityIcons.chevronRight,
             semanticLabel: expanded
                 ? 'Collapse ${node.label}'
                 : 'Expand ${node.label}',

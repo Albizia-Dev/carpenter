@@ -63,9 +63,8 @@ final class _CarpenterDateWheelState extends State<CarpenterDateWheel> {
   @override
   void didUpdateWidget(CarpenterDateWheel oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final previousFirstYear = _dateOnly(
-      oldWidget.firstDate ?? DateTime(1900),
-    ).year;
+    final previousFirstYear = _dateOnly(oldWidget.firstDate ?? DateTime(1900))
+        .year;
     final next = _clampDate(widget.value, _first, _last);
     if (previousFirstYear != _first.year) {
       _yearController.dispose();

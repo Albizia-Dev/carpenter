@@ -23,21 +23,20 @@ import '../contracts/selection_mode.dart';
 import 'tree_event.dart';
 import 'tree_state.dart';
 
-typedef CarpenterTreeNodeBuilder<T> =
-    Widget Function(
-      BuildContext context,
-      CarpenterTreeNode<T> node,
-      CarpenterTreeRowState<T> state,
-    );
-typedef CarpenterTreeRowBuilder<T> =
-    Widget Function(
-      BuildContext context,
-      CarpenterTreeNode<T> node,
-      CarpenterTreeRowState<T> state,
-      Widget prefix,
-    );
-typedef CarpenterTreeIconBuilder<T> =
-    CarpenterIconSource? Function(CarpenterTreeNode<T> node);
+typedef CarpenterTreeNodeBuilder<T> = Widget Function(
+  BuildContext context,
+  CarpenterTreeNode<T> node,
+  CarpenterTreeRowState<T> state,
+);
+typedef CarpenterTreeRowBuilder<T> = Widget Function(
+  BuildContext context,
+  CarpenterTreeNode<T> node,
+  CarpenterTreeRowState<T> state,
+  Widget prefix,
+);
+typedef CarpenterTreeIconBuilder<T> = CarpenterIconSource? Function(
+  CarpenterTreeNode<T> node,
+);
 typedef CarpenterTreeActionsBuilder<T> =
     List<CarpenterActionDescriptor> Function(CarpenterTreeNode<T> node);
 typedef CarpenterTreeActivation<T> = void Function(CarpenterTreeNode<T> node);
@@ -718,9 +717,8 @@ final class _TreeBranchRevealState extends State<_TreeBranchReveal>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _controller.duration = CarpenterTheme.of(
-      context,
-    ).motion.transitionDuration(context);
+    _controller.duration = CarpenterTheme.of(context).motion
+        .transitionDuration(context);
   }
 
   @override

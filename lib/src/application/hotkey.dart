@@ -7,6 +7,7 @@ import '../components/basic/status_indicator.dart';
 import '../components/basic/text.dart';
 import '../foundation/roles.dart';
 import 'command.dart';
+
 import 'package:carpenter_units/carpenter_units.dart';
 
 extension CarpenterCommandPlatformShortcuts on CarpenterCommand<dynamic> {
@@ -148,8 +149,9 @@ final class _HotkeyIntent extends Intent {
   final CarpenterCommand<void> command;
 }
 
-typedef CarpenterHotkeyCommandCallback =
-    void Function(CarpenterCommand<void> command);
+typedef CarpenterHotkeyCommandCallback = void Function(
+  CarpenterCommand<void> command,
+);
 
 final class CarpenterHotkeyScope extends StatefulWidget {
   const CarpenterHotkeyScope({

@@ -811,9 +811,8 @@ final class CarpenterSizeTheme {
   };
 
   double actionExtent(BuildContext context, ControlSize value) =>
-      MediaQuery.textScalerOf(
-        context,
-      ).scale(context.units(actionHeight(value)));
+      MediaQuery.textScalerOf(context)
+          .scale(context.units(actionHeight(value)));
 
   IconSize iconForControl(ControlSize value) => switch (value) {
     ControlSize.xsmall => IconSize.xsmall,

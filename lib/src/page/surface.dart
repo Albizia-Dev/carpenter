@@ -14,8 +14,9 @@ abstract interface class CarpenterSurfaceController {
   Future<T?> openPage<T>(Object destination);
 }
 
-typedef CarpenterPageSurfaceOpener =
-    Future<Object?> Function(Object destination);
+typedef CarpenterPageSurfaceOpener = Future<Object?> Function(
+  Object destination,
+);
 
 final class CarpenterSurfaceHost extends StatefulWidget {
   const CarpenterSurfaceHost({

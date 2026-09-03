@@ -92,9 +92,8 @@ void main() {
             CarpenterTreeTableColumn<String>(
               id: 'value',
               header: 'Value',
-              cellBuilder: (_, node) => CarpenterTableText.cell(
-                'value-${node.label}',
-              ),
+              cellBuilder: (_, node) =>
+                  CarpenterTableText.cell('value-${node.label}'),
             ),
           ],
           actions: (node) => node.id == 'a'

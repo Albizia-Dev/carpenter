@@ -104,8 +104,9 @@ final class CarpenterDragController extends ChangeNotifier {
       first.targetAccepts == second.targetAccepts;
 }
 
-typedef CarpenterDragSessionCallback =
-    void Function(CarpenterDragSession? session);
+typedef CarpenterDragSessionCallback = void Function(
+  CarpenterDragSession? session,
+);
 
 /// Shared drag-and-drop runtime for coordinated sources and targets.
 final class CarpenterDragScope extends StatefulWidget {

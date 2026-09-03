@@ -27,8 +27,9 @@ final class CarpenterResourceLoadRequest {
   bool get refresh => reason == CarpenterResourceLoadReason.refresh;
 }
 
-typedef CarpenterResourceLoader<T> =
-    Future<T> Function(CarpenterResourceLoadRequest request);
+typedef CarpenterResourceLoader<T> = Future<T> Function(
+  CarpenterResourceLoadRequest request,
+);
 
 final class CarpenterResourceController<T>
     extends ValueNotifier<CarpenterPageState>

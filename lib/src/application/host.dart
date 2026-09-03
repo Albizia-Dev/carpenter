@@ -5,8 +5,10 @@ import 'module/module.dart';
 import 'runtime/runtime.dart';
 import 'shell/shell.dart';
 
-typedef CarpenterHostBuilder =
-    Widget Function(BuildContext context, Widget child);
+typedef CarpenterHostBuilder = Widget Function(
+  BuildContext context,
+  Widget child,
+);
 
 /// Hosts Carpenter application capabilities independently from app/routing setup.
 final class CarpenterHost extends StatelessWidget {

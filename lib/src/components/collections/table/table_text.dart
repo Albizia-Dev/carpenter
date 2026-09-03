@@ -59,10 +59,14 @@ final class CarpenterTableText extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final style = switch (role) {
-      CarpenterTableTypographyRole.header =>
-        theme.typography.tableHeader(context, emphasis),
-      CarpenterTableTypographyRole.cell =>
-        theme.typography.tableCell(context, emphasis),
+      CarpenterTableTypographyRole.header => theme.typography.tableHeader(
+        context,
+        emphasis,
+      ),
+      CarpenterTableTypographyRole.cell => theme.typography.tableCell(
+        context,
+        emphasis,
+      ),
     };
     return Text(
       data,

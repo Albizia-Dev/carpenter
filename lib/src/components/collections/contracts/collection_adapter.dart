@@ -9,8 +9,9 @@ abstract interface class CollectionAdapter<T, F> {
   Future<CollectionSnapshot<T>> load(CollectionQuery<F> query);
 }
 
-typedef CollectionLoader<T, F> =
-    Future<CollectionSnapshot<T>> Function(CollectionQuery<F> query);
+typedef CollectionLoader<T, F> = Future<CollectionSnapshot<T>> Function(
+  CollectionQuery<F> query,
+);
 
 final class CallbackCollectionAdapter<T, F> implements CollectionAdapter<T, F> {
   const CallbackCollectionAdapter(this.loader);

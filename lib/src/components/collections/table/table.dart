@@ -19,8 +19,10 @@ import 'table_column.dart';
 import 'table_state.dart';
 import 'table_text.dart';
 
-typedef CarpenterTableColumnWidthChanged =
-    void Function(String columnId, LengthUnit width);
+typedef CarpenterTableColumnWidthChanged = void Function(
+  String columnId,
+  LengthUnit width,
+);
 
 final class CarpenterTable<T, K> extends StatefulWidget {
   const CarpenterTable({
@@ -139,9 +141,8 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
         final layout = _resolveColumnLayout(context, constraints.maxWidth);
         final tableWidth = layout.totalWidth;
         final headerHeight = widget.stickyHeader
-            ? MediaQuery.textScalerOf(
-                context,
-              ).scale(context.units(theme.sizes.tableHeaderHeight))
+            ? MediaQuery.textScalerOf(context)
+                  .scale(context.units(theme.sizes.tableHeaderHeight))
             : 0.0;
         final availableBodyHeight = constraints.maxHeight.isFinite
             ? math.max(0.0, constraints.maxHeight - headerHeight)
@@ -211,11 +212,12 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
           _localColumnWidths[column.id] ??
           widget.columnWidths[column.id] ??
           column.width.preferred;
-      final preferred = (explicitWidth == null && column.isActionColumn
-              ? CarpenterTableActionCell.preferredColumnWidth(context)
-              : context.units(explicitWidth ?? theme.sizes.tableColumn))
-          .clamp(minimum, maximum)
-          .toDouble();
+      final preferred =
+          (explicitWidth == null && column.isActionColumn
+                  ? CarpenterTableActionCell.preferredColumnWidth(context)
+                  : context.units(explicitWidth ?? theme.sizes.tableColumn))
+              .clamp(minimum, maximum)
+              .toDouble();
       widths[column.id] = preferred;
       minimums[column.id] = minimum;
       maximums[column.id] = maximum;
@@ -257,9 +259,8 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
 
   Widget _buildHeader(BuildContext context, _TableColumnLayout layout) {
     final theme = CarpenterTheme.of(context);
-    final height = MediaQuery.textScalerOf(
-      context,
-    ).scale(context.units(theme.sizes.tableHeaderHeight));
+    final height = MediaQuery.textScalerOf(context)
+        .scale(context.units(theme.sizes.tableHeaderHeight));
     final loadedKeys = widget.snapshot.items.map(widget.rowKey).toList();
     final selectedCount = loadedKeys.where(widget.selection.contains).length;
     final checkboxValue = selectedCount == 0
@@ -314,15 +315,12 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
     required double? availableHeight,
   }) {
     final theme = CarpenterTheme.of(context);
-    final rowHeight = MediaQuery.textScalerOf(
-      context,
-    ).scale(context.units(theme.sizes.tableRowHeight));
-    final maxHeight = MediaQuery.textScalerOf(
-      context,
-    ).scale(context.units(theme.sizes.tableBodyMaxHeight));
-    final stateHeight = MediaQuery.textScalerOf(
-      context,
-    ).scale(context.units(theme.sizes.tableStateHeight));
+    final rowHeight = MediaQuery.textScalerOf(context)
+        .scale(context.units(theme.sizes.tableRowHeight));
+    final maxHeight = MediaQuery.textScalerOf(context)
+        .scale(context.units(theme.sizes.tableBodyMaxHeight));
+    final stateHeight = MediaQuery.textScalerOf(context)
+        .scale(context.units(theme.sizes.tableStateHeight));
     final state = _exclusiveState(context);
     final banner = _banner(context);
     final footer = _footer(context);

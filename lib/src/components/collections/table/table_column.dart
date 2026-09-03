@@ -37,8 +37,10 @@ final class CarpenterTableColumnWidth {
   final LengthUnit? maximum;
 }
 
-typedef CarpenterTableCellBuilder<T> =
-    Widget Function(BuildContext context, T item);
+typedef CarpenterTableCellBuilder<T> = Widget Function(
+  BuildContext context,
+  T item,
+);
 
 @immutable
 final class CarpenterTableColumn<T> {

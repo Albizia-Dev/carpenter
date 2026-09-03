@@ -18,7 +18,9 @@ final class CarpenterTableActions {
   bool get isEmpty => primary.isEmpty && secondary.isEmpty;
 }
 
-typedef CarpenterTableActionsBuilder<T> = CarpenterTableActions Function(T item);
+typedef CarpenterTableActionsBuilder<T> = CarpenterTableActions Function(
+  T item,
+);
 
 /// Compact action surface used by table and tree-table rows.
 ///
