@@ -1,4 +1,5 @@
 import 'package:carpenter/carpenter.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/harness.dart';
@@ -55,7 +56,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      carpenterHarness(
+      carpenterOverlayHarness(
         CarpenterTreeTable<String>(
           nodes: const [
             CarpenterTreeNode<String>(id: 'root', value: 'root', label: 'Root'),
