@@ -6,6 +6,9 @@ import 'package:flutter/widgets.dart';
 
 import '../../../foundation/roles.dart';
 import '../../../foundation/theme.dart';
+import '../../../foundation/icon_data.dart';
+import '../../basic/gravity_icons.g.dart';
+import '../../basic/icon.dart';
 import '../../basic/button/button.dart';
 import '../../basic/button/icon_button.dart';
 import '../../basic/icons.dart';
@@ -26,6 +29,15 @@ typedef CarpenterTreeNodeBuilder<T> =
       CarpenterTreeNode<T> node,
       CarpenterTreeRowState<T> state,
     );
+typedef CarpenterTreeRowBuilder<T> =
+    Widget Function(
+      BuildContext context,
+      CarpenterTreeNode<T> node,
+      CarpenterTreeRowState<T> state,
+      Widget prefix,
+    );
+typedef CarpenterTreeIconBuilder<T> =
+    CarpenterIconSource? Function(CarpenterTreeNode<T> node);
 typedef CarpenterTreeActionsBuilder<T> =
     List<CarpenterActionDescriptor> Function(CarpenterTreeNode<T> node);
 typedef CarpenterTreeActivation<T> = void Function(CarpenterTreeNode<T> node);
@@ -69,6 +81,9 @@ final class CarpenterTreeView<T> extends StatefulWidget {
     this.canDrop,
     this.onRetryLoad,
     this.itemBuilder,
+    this.rowBuilder,
+    this.iconBuilder,
+    this.tableRows = false,
     this.actions,
     this.dragActivation = CarpenterDragActivation.immediate,
     this.autoExpandOnHover = true,
@@ -90,6 +105,9 @@ final class CarpenterTreeView<T> extends StatefulWidget {
   final CarpenterTreeDropAcceptance<T>? canDrop;
   final CarpenterTreeNodeCallback<T>? onRetryLoad;
   final CarpenterTreeNodeBuilder<T>? itemBuilder;
+  final CarpenterTreeRowBuilder<T>? rowBuilder;
+  final CarpenterTreeIconBuilder<T>? iconBuilder;
+  final bool tableRows;
   final CarpenterTreeActionsBuilder<T>? actions;
   final CarpenterDragActivation dragActivation;
   final bool autoExpandOnHover;
@@ -390,52 +408,42 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
                 ? TypographyEmphasis.medium
                 : TypographyEmphasis.regular,
           );
-      final row = Padding(
-        padding: EdgeInsetsDirectional.only(start: indent),
-        child: CarpenterListTile(
-          selected: state.selected,
-          semanticLabel: node.effectiveSemanticLabel,
-          onInvoke: () => _select(node),
-          onDoubleInvoke: widget.onActivated == null
-              ? null
-              : () => _activate(node),
-          leading: node.canExpand
-              ? CarpenterIconButton(
-                  icon: expanded
-                      ? CarpenterIcons.sortDown
-                      : CarpenterIcons.chevronRight,
-                  semanticLabel: expanded
-                      ? 'Collapse ${node.label}'
-                      : 'Expand ${node.label}',
-                  prominence: ActionProminence.ghost,
-                  size: ControlSize.xsmall,
-                  onPressed: () => _toggleExpansion(node),
-                )
-              : SizedBox(
-                  width: context.units(theme.sizes.control(ControlSize.xsmall)),
-                ),
-          title: title,
-          trailing: actions.isEmpty
-              ? null
-              : Wrap(
-                  children: [
-                    for (final action in actions)
-                      if (action.icon != null)
-                        CarpenterIconButton.fromAction(
-                          action,
-                          prominence: ActionProminence.ghost,
-                          size: ControlSize.xsmall,
-                        )
-                      else
-                        CarpenterButton.fromAction(
-                          action,
-                          prominence: ActionProminence.ghost,
-                          size: ControlSize.xsmall,
-                        ),
-                  ],
-                ),
-        ),
+      final prefix = _TreeRowPrefix<T>(
+        node: node,
+        expanded: expanded,
+        indent: indent,
+        icon: widget.iconBuilder?.call(node),
+        onToggle: () => _toggleExpansion(node),
       );
+      final row = widget.tableRows
+          ? CarpenterListTile.tableRow(
+              selected: state.selected,
+              semanticLabel: node.effectiveSemanticLabel,
+              onInvoke: () => _select(node),
+              onDoubleInvoke: widget.onActivated == null
+                  ? null
+                  : () => _activate(node),
+              title:
+                  widget.rowBuilder?.call(context, node, state, prefix) ??
+                  Row(
+                    children: [
+                      prefix,
+                      Expanded(child: title),
+                    ],
+                  ),
+              trailing: _actions(context, actions),
+            )
+          : CarpenterListTile(
+              selected: state.selected,
+              semanticLabel: node.effectiveSemanticLabel,
+              onInvoke: () => _select(node),
+              onDoubleInvoke: widget.onActivated == null
+                  ? null
+                  : () => _activate(node),
+              leading: prefix,
+              title: title,
+              trailing: _actions(context, actions),
+            );
       if (widget.onDrop == null) return row;
       return CarpenterDraggable<CarpenterTreeNode<T>>(
         sourceId: node.id,
@@ -480,6 +488,29 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
     );
   }
 
+  Widget? _actions(
+    BuildContext context,
+    List<CarpenterActionDescriptor> actions,
+  ) => actions.isEmpty
+      ? null
+      : Wrap(
+          children: [
+            for (final action in actions)
+              if (action.icon != null)
+                CarpenterIconButton.fromAction(
+                  action,
+                  prominence: ActionProminence.ghost,
+                  size: ControlSize.xsmall,
+                )
+              else
+                CarpenterButton.fromAction(
+                  action,
+                  prominence: ActionProminence.ghost,
+                  size: ControlSize.xsmall,
+                ),
+          ],
+        );
+
   Widget _lazyState(BuildContext context, CarpenterTreeFlatNode<T> entry) {
     final theme = CarpenterTheme.of(context);
     final indent = context.units(theme.spacing.large) * (entry.depth + 1);
@@ -517,20 +548,32 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
 
   @override
   Widget build(BuildContext context) {
-    final flat = _flat;
     if (_pendingRevealId != null) _scheduleReveal(_pendingRevealId!);
     Widget rows = Column(
+      key: ValueKey<Object>(
+        Object.hashAll(widget.nodes.map((node) => node.id)),
+      ),
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        for (final entry in flat) ...[
-          _row(context, entry),
-          if (_visuallyExpanded(entry.node) &&
-              entry.node.children.isEmpty &&
-              entry.node.loadState != CarpenterTreeLoadState.ready)
-            _lazyState(context, entry),
-        ],
+        for (final node in widget.nodes) _branch(context, node, 0, null),
       ],
+    );
+    final theme = CarpenterTheme.of(context);
+    rows = AnimatedSize(
+      duration: theme.motion.transitionDuration(context),
+      curve: theme.motion.stateCurve,
+      alignment: AlignmentDirectional.topStart,
+      child: AnimatedSwitcher(
+        duration: theme.motion.transitionDuration(context),
+        switchInCurve: theme.motion.stateCurve,
+        switchOutCurve: theme.motion.stateCurve,
+        layoutBuilder: (currentChild, previousChildren) => Stack(
+          alignment: AlignmentDirectional.topStart,
+          children: [...previousChildren, ?currentChild],
+        ),
+        child: rows,
+      ),
     );
     if (widget.scrollController != null) {
       rows = SingleChildScrollView(
@@ -547,6 +590,170 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
           explicitChildNodes: true,
           label: widget.semanticLabel,
           child: rows,
+        ),
+      ),
+    );
+  }
+
+  Widget _branch(
+    BuildContext context,
+    CarpenterTreeNode<T> node,
+    int depth,
+    Object? parentId,
+  ) {
+    if (widget.filter != null && !_subtreeMatchesFilter(node)) {
+      return const SizedBox.shrink();
+    }
+    final entry = CarpenterTreeFlatNode<T>(
+      node: node,
+      depth: depth,
+      parentId: parentId,
+    );
+    final expanded = _visuallyExpanded(node);
+    final branchContent = Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        for (final child in node.children)
+          _branch(context, child, depth + 1, node.id),
+        if (node.children.isEmpty &&
+            node.loadState != CarpenterTreeLoadState.ready)
+          _lazyState(context, entry),
+      ],
+    );
+    return KeyedSubtree(
+      key: ValueKey<Object>(node.id),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _row(context, entry),
+          _TreeBranchReveal(expanded: expanded, child: branchContent),
+        ],
+      ),
+    );
+  }
+}
+
+final class _TreeRowPrefix<T> extends StatelessWidget {
+  const _TreeRowPrefix({
+    required this.node,
+    required this.expanded,
+    required this.indent,
+    required this.icon,
+    required this.onToggle,
+  });
+
+  final CarpenterTreeNode<T> node;
+  final bool expanded;
+  final double indent;
+  final CarpenterIconSource? icon;
+  final VoidCallback onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = CarpenterTheme.of(context);
+    final gap = context.units(theme.spacing.small);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(width: indent),
+        if (node.canExpand)
+          AnimatedRotation(
+            turns: expanded ? .25 : 0,
+            duration: theme.motion.transitionDuration(context),
+            curve: theme.motion.stateCurve,
+            child: CarpenterIconButton(
+              icon: GravityIcons.arrowChevronRight,
+              semanticLabel: expanded
+                  ? 'Collapse ${node.label}'
+                  : 'Expand ${node.label}',
+              prominence: ActionProminence.ghost,
+              size: ControlSize.xsmall,
+              onPressed: onToggle,
+            ),
+          )
+        else
+          SizedBox(
+            width: context.units(theme.sizes.control(ControlSize.xsmall)),
+          ),
+        if (icon != null) ...[
+          SizedBox(width: gap),
+          CarpenterIcon(icon!, size: IconSize.small),
+        ],
+      ],
+    );
+  }
+}
+
+final class _TreeBranchReveal extends StatefulWidget {
+  const _TreeBranchReveal({required this.expanded, required this.child});
+
+  final bool expanded;
+  final Widget child;
+
+  @override
+  State<_TreeBranchReveal> createState() => _TreeBranchRevealState();
+}
+
+final class _TreeBranchRevealState extends State<_TreeBranchReveal>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _curve;
+  late bool _visible = widget.expanded;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller =
+        AnimationController(vsync: this, value: widget.expanded ? 1 : 0)
+          ..addStatusListener((status) {
+            if (status == AnimationStatus.dismissed && mounted) {
+              setState(() => _visible = false);
+            }
+          });
+    _curve = CurvedAnimation(parent: _controller, curve: Curves.easeOut);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _controller.duration = CarpenterTheme.of(
+      context,
+    ).motion.transitionDuration(context);
+  }
+
+  @override
+  void didUpdateWidget(_TreeBranchReveal oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.expanded == widget.expanded) return;
+    if (widget.expanded) {
+      _visible = true;
+      _controller.forward();
+    } else {
+      _controller.reverse();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_visible) return const SizedBox.shrink();
+    return ClipRect(
+      child: SizeTransition(
+        sizeFactor: _curve,
+        alignment: AlignmentDirectional.topStart,
+        child: FadeTransition(
+          opacity: _curve,
+          child: ExcludeSemantics(
+            excluding: !widget.expanded,
+            child: widget.child,
+          ),
         ),
       ),
     );

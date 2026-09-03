@@ -60,7 +60,7 @@ final class CarpenterExplorerPage extends StatelessWidget {
   const CarpenterExplorerPage({
     super.key,
     required this.descriptor,
-    required this.navigation,
+    this.navigation,
     required this.content,
     this.search,
     this.inspector,
@@ -70,7 +70,7 @@ final class CarpenterExplorerPage extends StatelessWidget {
     this.breakpoint = 760,
   });
   final CarpenterPageDescriptor descriptor;
-  final Widget navigation;
+  final Widget? navigation;
   final Widget content;
   final Widget? search;
   final Widget? inspector;
@@ -97,8 +97,11 @@ final class CarpenterExplorerPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 if (search != null) ...[search!, SizedBox(height: gap)],
-                compactNavigation ?? navigation,
-                SizedBox(height: gap),
+                if (compactNavigation ?? navigation
+                    case final Widget value) ...[
+                  value,
+                  SizedBox(height: gap),
+                ],
                 Expanded(child: content),
               ],
             );
@@ -111,11 +114,10 @@ final class CarpenterExplorerPage extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    SizedBox(
-                      width: context.units(15.625.rem),
-                      child: navigation,
-                    ),
-                    SizedBox(width: gap),
+                    if (navigation case final Widget value) ...[
+                      SizedBox(width: context.units(15.625.rem), child: value),
+                      SizedBox(width: gap),
+                    ],
                     Expanded(child: content),
                     if (inspector != null) ...[
                       SizedBox(width: gap),

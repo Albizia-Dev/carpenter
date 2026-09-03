@@ -4,7 +4,6 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
-import 'package:carpenter_units/carpenter_units.dart';
 
 enum _AvatarContent { initials, icon, image }
 
@@ -39,6 +38,16 @@ final toggleButtonComponent = WidgetbookComponent(
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _toggleButton),
     WidgetbookUseCase(name: 'Roles and sizes', builder: _toggleMatrix),
+  ],
+);
+
+final selectionButtonGroupComponent = WidgetbookComponent(
+  name: 'Selection Button Group',
+  useCases: [
+    WidgetbookUseCase(
+      name: 'Playground',
+      builder: (_) => const _SelectionButtonGroupPreview(),
+    ),
   ],
 );
 
@@ -471,3 +480,42 @@ Widget _toggleMatrix(BuildContext context) => preview(
     ],
   ),
 );
+
+final class _SelectionButtonGroupPreview extends StatefulWidget {
+  const _SelectionButtonGroupPreview();
+
+  @override
+  State<_SelectionButtonGroupPreview> createState() =>
+      _SelectionButtonGroupPreviewState();
+}
+
+final class _SelectionButtonGroupPreviewState
+    extends State<_SelectionButtonGroupPreview> {
+  String _value = 'common';
+
+  @override
+  Widget build(BuildContext context) => preview(
+    CarpenterSelectionButtonGroup<String>(
+      value: _value,
+      semanticLabel: 'Project material scope',
+      onChanged: (value) => setState(() => _value = value),
+      options: const [
+        CarpenterSelectionButtonOption(
+          value: 'common',
+          label: 'Common',
+          icon: GravityIcons.folderOpen,
+        ),
+        CarpenterSelectionButtonOption(
+          value: 'p',
+          label: 'Stage P',
+          icon: GravityIcons.folder,
+        ),
+        CarpenterSelectionButtonOption(
+          value: 'r',
+          label: 'Stage R',
+          icon: GravityIcons.folder,
+        ),
+      ],
+    ),
+  );
+}

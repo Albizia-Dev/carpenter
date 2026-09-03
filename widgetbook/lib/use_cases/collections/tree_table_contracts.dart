@@ -128,6 +128,8 @@ final class _ProjectStructurePreviewState
               selectionMode: CarpenterTreeSelectionMode.multiple,
               multipleSelectionBehavior:
                   CollectionMultiSelectionBehavior.desktop,
+              iconBuilder: (node) =>
+                  node.canExpand ? GravityIcons.folder : GravityIcons.file,
               filter: _filtered
                   ? (node) => node.label.toLowerCase().contains('specification')
                   : null,

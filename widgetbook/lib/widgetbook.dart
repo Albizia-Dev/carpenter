@@ -75,6 +75,7 @@ Widget createCarpenterWidgetbook() => Widgetbook.material(
         buttonComponent,
         iconButtonComponent,
         toggleButtonComponent,
+        selectionButtonGroupComponent,
         cardComponent,
         linkComponent,
         inputComponent,

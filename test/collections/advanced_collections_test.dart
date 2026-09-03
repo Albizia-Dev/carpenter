@@ -191,6 +191,106 @@ void main() {
     expect(find.text('Material'), findsOneWidget);
   });
 
+  testWidgets('tree disclosure uses a rotating Gravity chevron', (
+    tester,
+  ) async {
+    var expanded = false;
+    const nodes = <CarpenterTreeNode<String>>[
+      CarpenterTreeNode<String>(
+        id: 'root',
+        value: 'root',
+        label: 'Root',
+        children: [
+          CarpenterTreeNode<String>(
+            id: 'child',
+            value: 'child',
+            label: 'Child',
+          ),
+        ],
+      ),
+    ];
+    await tester.pumpWidget(
+      carpenterHarness(
+        StatefulBuilder(
+          builder: (context, setState) => CarpenterTreeView<String>(
+            nodes: nodes,
+            expandedIds: expanded ? const {'root'} : const {},
+            onExpansionChanged: (_, value) => setState(() => expanded = value),
+          ),
+        ),
+      ),
+    );
+
+    final chevron = find.byWidgetPredicate(
+      (widget) =>
+          widget is CarpenterIconButton &&
+          widget.icon == GravityIcons.arrowChevronRight,
+    );
+    expect(chevron, findsOneWidget);
+    expect(
+      tester
+          .widget<AnimatedRotation>(
+            find.ancestor(of: chevron, matching: find.byType(AnimatedRotation)),
+          )
+          .turns,
+      0,
+    );
+
+    await tester.tap(chevron);
+    await tester.pump();
+    expect(find.text('Child'), findsOneWidget);
+    expect(
+      tester
+          .widget<AnimatedRotation>(
+            find.ancestor(of: chevron, matching: find.byType(AnimatedRotation)),
+          )
+          .turns,
+      .25,
+    );
+    await tester.pump(const Duration(milliseconds: 60));
+
+    await tester.tap(chevron);
+    await tester.pump();
+    expect(find.text('Child'), findsOneWidget);
+    await tester.pumpAndSettle();
+    expect(find.text('Child'), findsNothing);
+  });
+
+  testWidgets('tree table headers and cells share table column geometry', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      carpenterHarness(
+        SizedBox(
+          width: 640,
+          child: CarpenterTreeTable<String>(
+            nodes: const [
+              CarpenterTreeNode<String>(
+                id: 'root',
+                value: 'root',
+                label: 'Root',
+              ),
+            ],
+            iconBuilder: (_) => GravityIcons.file,
+            columns: [
+              CarpenterTreeTableColumn<String>(
+                id: 'state',
+                header: 'State',
+                cellBuilder: (_, _) => const CarpenterText.body('Ready'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      tester.getTopLeft(find.text('State')).dx,
+      closeTo(tester.getTopLeft(find.text('Ready')).dx, .01),
+    );
+    expect(tester.getCenter(find.text('Root')).dy, greaterThan(0));
+  });
+
   testWidgets('drag feedback preserves source geometry', (tester) async {
     await tester.pumpWidget(
       carpenterOverlayHarness(

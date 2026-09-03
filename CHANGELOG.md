@@ -1,3 +1,14 @@
+# 0.1.8
+
+- Added a controlled, keyboard-accessible joined selection-button group for
+  switching local content scopes without a navigation sidebar.
+- Unified tree-table headers and rows with Carpenter table geometry, spacing,
+  borders, hover transitions, selection states, and vertical alignment.
+- Replaced tree disclosure markers with animated Gravity chevrons, added typed
+  entity icons, and animated branch and root-content transitions.
+- Allowed explorer pages to omit navigation when their content scope is exposed
+  by another control.
+
 # 0.1.7
 
 - Added opt-in desktop multiple-selection semantics for trees and tree tables:

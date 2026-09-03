@@ -52,6 +52,7 @@ export 'src/components/basic/select/async_autosuggest.dart';
 export 'src/components/basic/select/autosuggest.dart';
 export 'src/components/basic/select/combo_box.dart';
 export 'src/components/basic/select/select.dart';
+export 'src/components/basic/select/selection_button_group.dart';
 export 'src/components/basic/status_indicator.dart';
 export 'src/components/basic/switch.dart';
 export 'src/components/basic/tag.dart';

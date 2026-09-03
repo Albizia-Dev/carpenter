@@ -45,9 +45,9 @@ final class CarpenterTreeTableColumn<T> {
 /// filtering, reveal and DnD use exactly the same contracts as the regular
 /// tree.
 ///
-/// The table is flat by default so it can participate in a continuous page
-/// flow. Set [framed] only when the table is intentionally an independent
-/// surface, for example inside an overlay or side panel.
+/// The table uses the same framed surface, header height, row height, borders
+/// and interaction surfaces as [CarpenterTable]. Set [framed] to false only
+/// when embedding it in a parent that already owns the table surface.
 final class CarpenterTreeTable<T> extends StatelessWidget {
   const CarpenterTreeTable({
     super.key,
@@ -71,8 +71,9 @@ final class CarpenterTreeTable<T> extends StatelessWidget {
     this.canDrop,
     this.onRetryLoad,
     this.actions,
+    this.iconBuilder,
     this.dragActivation = CarpenterDragActivation.immediate,
-    this.framed = false,
+    this.framed = true,
     this.semanticLabel = 'Tree table',
   }) : assert(treeFlex > 0);
 
@@ -96,6 +97,7 @@ final class CarpenterTreeTable<T> extends StatelessWidget {
   final CarpenterTreeDropAcceptance<T>? canDrop;
   final CarpenterTreeNodeCallback<T>? onRetryLoad;
   final CarpenterTreeActionsBuilder<T>? actions;
+  final CarpenterTreeIconBuilder<T>? iconBuilder;
   final CarpenterDragActivation dragActivation;
   final bool framed;
   final String semanticLabel;
@@ -123,20 +125,30 @@ final class CarpenterTreeTable<T> extends StatelessWidget {
       canDrop: canDrop,
       onRetryLoad: onRetryLoad,
       actions: actions,
+      iconBuilder: iconBuilder,
+      tableRows: true,
       dragActivation: dragActivation,
       semanticLabel: '$semanticLabel rows',
-      itemBuilder: (context, node, state) => Row(
+      rowBuilder: (context, node, state, prefix) => Row(
         children: [
           _TreeTableSlot(
             width: _effectiveTreeWidth,
             alignment: treeAlignment,
-            child: CarpenterText.label(
-              node.label,
-              emphasis: state.selected || state.focused
-                  ? TypographyEmphasis.medium
-                  : TypographyEmphasis.regular,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            child: Row(
+              children: [
+                prefix,
+                SizedBox(width: gap),
+                Expanded(
+                  child: CarpenterText.label(
+                    node.label,
+                    emphasis: state.selected || state.focused
+                        ? TypographyEmphasis.medium
+                        : TypographyEmphasis.regular,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
           ),
           for (final column in columns) ...[
@@ -157,7 +169,12 @@ final class CarpenterTreeTable<T> extends StatelessWidget {
       children: [
         Container(
           color: theme.surface.subtle,
-          padding: EdgeInsets.symmetric(horizontal: gap, vertical: gap / 2),
+          height: MediaQuery.textScalerOf(
+            context,
+          ).scale(context.units(theme.sizes.tableHeaderHeight)),
+          padding: EdgeInsetsDirectional.symmetric(
+            horizontal: context.units(theme.spacing.tableHorizontal),
+          ),
           child: Row(
             children: [
               _TreeTableSlot(

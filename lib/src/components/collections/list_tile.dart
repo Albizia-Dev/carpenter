@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import '../../foundation/theme.dart';
 import '../../internal/rendering/interactive_region.dart';
 
+enum CarpenterListTilePresentation { standard, tableRow }
+
 /// Interactive semantic row used by collection and navigation patterns.
 final class CarpenterListTile extends StatelessWidget {
   const CarpenterListTile({
@@ -16,7 +18,20 @@ final class CarpenterListTile extends StatelessWidget {
     this.onDoubleInvoke,
     this.selected = false,
     this.semanticLabel,
+    this.presentation = CarpenterListTilePresentation.standard,
   });
+
+  const CarpenterListTile.tableRow({
+    super.key,
+    required this.title,
+    this.leading,
+    this.subtitle,
+    this.trailing,
+    this.onInvoke,
+    this.onDoubleInvoke,
+    this.selected = false,
+    this.semanticLabel,
+  }) : presentation = CarpenterListTilePresentation.tableRow;
 
   final Widget title;
   final Widget? leading;
@@ -26,12 +41,21 @@ final class CarpenterListTile extends StatelessWidget {
   final VoidCallback? onDoubleInvoke;
   final bool selected;
   final String? semanticLabel;
+  final CarpenterListTilePresentation presentation;
 
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
-    final gap = context.units(theme.spacing.medium);
-    final radius = BorderRadius.circular(context.units(.5.rem));
+    final tableRow = presentation == CarpenterListTilePresentation.tableRow;
+    final gap = context.units(
+      tableRow ? theme.spacing.tableHorizontal : theme.spacing.medium,
+    );
+    final radius = tableRow
+        ? BorderRadius.zero
+        : BorderRadius.circular(context.units(.5.rem));
+    final rowHeight = MediaQuery.textScalerOf(
+      context,
+    ).scale(context.units(theme.sizes.tableRowHeight));
     return Semantics(
       container: true,
       selected: selected,
@@ -48,35 +72,70 @@ final class CarpenterListTile extends StatelessWidget {
               ? theme.overlay.selected
               : active
               ? theme.overlay.hovered
+              : tableRow
+              ? theme.overlay.background
               : const Color(0x00000000);
           return TweenAnimationBuilder<Color?>(
             duration: theme.motion.transitionDuration(context),
             curve: theme.motion.stateCurve,
             tween: ColorTween(end: background),
-            builder: (context, color, child) => DecoratedBox(
-              decoration: BoxDecoration(color: color, borderRadius: radius),
+            builder: (context, color, child) => Container(
+              height: tableRow ? rowHeight : null,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: radius,
+                border: tableRow
+                    ? Border(
+                        bottom: BorderSide(
+                          color: theme.overlay.border,
+                          width: context.units(theme.shapes.tableBorderWidth),
+                        ),
+                      )
+                    : null,
+              ),
+              foregroundDecoration: showFocusHighlight
+                  ? BoxDecoration(
+                      border: Border.all(
+                        color: theme.focus.color,
+                        width: context.units(theme.focus.width),
+                      ),
+                      borderRadius: radius,
+                    )
+                  : null,
               child: child,
             ),
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: gap,
-                vertical: gap * .75,
-              ),
+              padding: tableRow
+                  ? EdgeInsetsDirectional.symmetric(
+                      horizontal: gap,
+                      vertical: context.units(theme.spacing.tableVertical),
+                    )
+                  : EdgeInsets.symmetric(horizontal: gap, vertical: gap * .75),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: tableRow
+                    ? CrossAxisAlignment.center
+                    : CrossAxisAlignment.start,
                 children: [
                   if (leading != null) ...[leading!, SizedBox(width: gap)],
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        title,
-                        if (subtitle != null) ...[
-                          SizedBox(height: gap / 2),
-                          subtitle!,
-                        ],
-                      ],
-                    ),
+                    child: tableRow && subtitle == null
+                        ? Align(
+                            alignment: AlignmentDirectional.centerStart,
+                            child: title,
+                          )
+                        : Column(
+                            mainAxisAlignment: tableRow
+                                ? MainAxisAlignment.center
+                                : MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              title,
+                              if (subtitle != null) ...[
+                                SizedBox(height: gap / 2),
+                                subtitle!,
+                              ],
+                            ],
+                          ),
                   ),
                   if (trailing != null) ...[SizedBox(width: gap), trailing!],
                 ],

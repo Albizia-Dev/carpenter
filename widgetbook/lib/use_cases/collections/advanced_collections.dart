@@ -179,6 +179,8 @@ final class _TreeTablePreviewState extends State<_TreeTablePreview> {
     width: context.units(46.rem),
     child: CarpenterTreeTable<String>(
       nodes: _treeNodes,
+      iconBuilder: (node) =>
+          node.canExpand ? GravityIcons.folder : GravityIcons.file,
       expandedIds: _expanded,
       selectedIds: _selected,
       onExpansionChanged: (id, expanded) => setState(() {
