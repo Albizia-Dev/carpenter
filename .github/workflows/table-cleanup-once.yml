@@ -30,6 +30,20 @@ jobs:
             fi
           done < <(git diff --name-only origin/develop...HEAD -- lib)
 
+      - name: Remove table analyzer warning
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('lib/src/components/collections/tree/tree_table.dart')
+          text = path.read_text()
+          old = """  ) {\n    final theme = CarpenterTheme.of(context);\n    final primary ="""
+          new = """  ) {\n    final primary ="""
+          if old not in text:
+              raise SystemExit('target snippet not found')
+          path.write_text(text.replace(old, new, 1))
+          PY
+          git add lib/src/components/collections/tree/tree_table.dart
+
       - name: Commit cleanup
         run: |
           if git diff --cached --quiet; then
@@ -37,5 +51,5 @@ jobs:
           fi
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git commit -m "chore: remove unrelated formatter noise"
+          git commit -m "fix: remove tree table analyzer warning"
           git push origin HEAD:feat/table-layout-actions
