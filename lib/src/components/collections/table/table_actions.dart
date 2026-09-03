@@ -157,7 +157,7 @@ final class _TableOverflowMenuButtonState
     );
     final anchorRect = anchorTopLeft & anchorBox.size;
     final theme = CarpenterTheme.of(context);
-    final gap = context.units(theme.spacing.overlayGap);
+    final gap = context.units(theme.spacing.overlayAnchorGap);
     final inset = context.units(theme.spacing.overlayViewportInset);
 
     _entry = OverlayEntry(
@@ -230,14 +230,12 @@ final class _TableMenuLayoutDelegate extends SingleChildLayoutDelegate {
   BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
       BoxConstraints.loose(
         Size(
-          (constraints.maxWidth - viewportInset * 2).clamp(
-            0,
-            constraints.maxWidth,
-          ),
-          (constraints.maxHeight - viewportInset * 2).clamp(
-            0,
-            constraints.maxHeight,
-          ),
+          (constraints.maxWidth - viewportInset * 2)
+              .clamp(0, constraints.maxWidth)
+              .toDouble(),
+          (constraints.maxHeight - viewportInset * 2)
+              .clamp(0, constraints.maxHeight)
+              .toDouble(),
         ),
       );
 
