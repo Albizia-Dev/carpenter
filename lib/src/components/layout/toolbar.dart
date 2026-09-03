@@ -60,12 +60,14 @@ final class CarpenterToolbar extends StatefulWidget {
     required this.items,
     this.alignment = AlignmentDirectional.centerEnd,
     this.overflowLabel = 'More actions',
+    this.overflowSize = ControlSize.medium,
     this.semanticLabel = 'Toolbar',
   });
 
   final List<CarpenterToolbarItem> items;
   final AlignmentGeometry alignment;
   final String overflowLabel;
+  final ControlSize overflowSize;
   final String semanticLabel;
 
   @override
@@ -113,7 +115,7 @@ final class _CarpenterToolbarState extends State<CarpenterToolbar> {
                         CarpenterMenuItem(action: item.action),
                     ],
                     prominence: ActionProminence.ghost,
-                    size: ControlSize.medium,
+                    size: widget.overflowSize,
                     semanticLabel: widget.overflowLabel,
                   ),
                 ),
@@ -133,7 +135,7 @@ final class _CarpenterToolbarState extends State<CarpenterToolbar> {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.layoutToolbar);
     final overflowWidth = context.units(
-      theme.sizes.actionHeight(ControlSize.medium),
+      theme.sizes.actionHeight(widget.overflowSize),
     );
     final entries = [
       for (final item in widget.items)
