@@ -80,7 +80,7 @@ void main() {
 
   testWidgets('secondary row actions stay behind the ellipsis', (tester) async {
     await tester.pumpWidget(
-      carpenterHarness(
+      carpenterOverlayHarness(
         CarpenterTable<_Row, int>(
           snapshot: CollectionSnapshot(items: const [_Row(1, 'Alpha')]),
           rowKey: (row) => row.id,
