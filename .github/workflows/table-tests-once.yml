@@ -21,5 +21,8 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Analyze library
+        run: dart analyze lib
+
       - name: Run focused table tests
         run: flutter test test/collections/table_layout_test.dart test/collections/tree_table_layout_test.dart
