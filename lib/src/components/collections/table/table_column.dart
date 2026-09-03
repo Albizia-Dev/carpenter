@@ -2,11 +2,13 @@ import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../foundation/roles.dart';
-import '../../../foundation/theme.dart';
-import '../../basic/button/button.dart';
 import '../../basic/status_indicator.dart';
+import 'table_actions.dart';
+import 'table_text.dart';
 
 enum CarpenterTableColumnAlignment { start, center, end }
+
+enum CarpenterTableColumnVerticalAlignment { top, center, bottom }
 
 enum CarpenterTableColumnWidthPolicy { fixed, flexible }
 
@@ -45,10 +47,12 @@ final class CarpenterTableColumn<T> {
     required this.header,
     required this.cellBuilder,
     this.alignment = CarpenterTableColumnAlignment.start,
+    this.verticalAlignment = CarpenterTableColumnVerticalAlignment.center,
     this.width = const CarpenterTableColumnWidth.flexible(),
     this.sortable = false,
     this.resizable = true,
     this.semanticLabel,
+    this.isActionColumn = false,
   });
 
   factory CarpenterTableColumn.text({
@@ -57,6 +61,8 @@ final class CarpenterTableColumn<T> {
     required String Function(T item) value,
     CarpenterTableColumnAlignment alignment =
         CarpenterTableColumnAlignment.start,
+    CarpenterTableColumnVerticalAlignment verticalAlignment =
+        CarpenterTableColumnVerticalAlignment.center,
     CarpenterTableColumnWidth width =
         const CarpenterTableColumnWidth.flexible(),
     bool sortable = false,
@@ -66,12 +72,16 @@ final class CarpenterTableColumn<T> {
     id: id,
     header: header,
     alignment: alignment,
+    verticalAlignment: verticalAlignment,
     width: width,
     sortable: sortable,
     resizable: resizable,
     semanticLabel: semanticLabel,
-    cellBuilder: (context, item) =>
-        _TableText(value(item), maxLines: 2, overflow: TextOverflow.ellipsis),
+    cellBuilder: (context, item) => CarpenterTableText.cell(
+      value(item),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+    ),
   );
 
   factory CarpenterTableColumn.number({
@@ -79,6 +89,9 @@ final class CarpenterTableColumn<T> {
     required String header,
     required num? Function(T item) value,
     String Function(num value)? formatter,
+    CarpenterTableColumnAlignment alignment = CarpenterTableColumnAlignment.end,
+    CarpenterTableColumnVerticalAlignment verticalAlignment =
+        CarpenterTableColumnVerticalAlignment.center,
     CarpenterTableColumnWidth width =
         const CarpenterTableColumnWidth.flexible(),
     bool sortable = false,
@@ -87,16 +100,21 @@ final class CarpenterTableColumn<T> {
   }) => CarpenterTableColumn<T>.custom(
     id: id,
     header: header,
-    alignment: CarpenterTableColumnAlignment.end,
+    alignment: alignment,
+    verticalAlignment: verticalAlignment,
     width: width,
     sortable: sortable,
     resizable: resizable,
     semanticLabel: semanticLabel,
     cellBuilder: (context, item) {
       final number = value(item);
-      return _TableText(
+      return CarpenterTableText.cell(
         number == null ? '' : formatter?.call(number) ?? '$number',
-        textAlign: TextAlign.end,
+        textAlign: switch (alignment) {
+          CarpenterTableColumnAlignment.start => TextAlign.start,
+          CarpenterTableColumnAlignment.center => TextAlign.center,
+          CarpenterTableColumnAlignment.end => TextAlign.end,
+        },
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       );
@@ -108,6 +126,10 @@ final class CarpenterTableColumn<T> {
     required String header,
     required String Function(T item) label,
     required FeedbackColorRole Function(T item) role,
+    CarpenterTableColumnAlignment alignment =
+        CarpenterTableColumnAlignment.start,
+    CarpenterTableColumnVerticalAlignment verticalAlignment =
+        CarpenterTableColumnVerticalAlignment.center,
     CarpenterTableColumnWidth width =
         const CarpenterTableColumnWidth.flexible(),
     bool sortable = false,
@@ -116,42 +138,49 @@ final class CarpenterTableColumn<T> {
   }) => CarpenterTableColumn<T>.custom(
     id: id,
     header: header,
+    alignment: alignment,
+    verticalAlignment: verticalAlignment,
     width: width,
     sortable: sortable,
     resizable: resizable,
     semanticLabel: semanticLabel,
-    cellBuilder: (context, item) => Align(
-      alignment: AlignmentDirectional.centerStart,
-      child: CarpenterStatusIndicator(label: label(item), role: role(item)),
-    ),
+    cellBuilder: (context, item) =>
+        CarpenterStatusIndicator(label: label(item), role: role(item)),
   );
 
+  /// Creates a compact, geometry-stable action column.
+  ///
+  /// [actions] are the primary actions and are kept inline when possible.
+  /// [secondaryActions] always live under the ellipsis menu. The default action
+  /// column width is resolved by [CarpenterTable] from the compact control
+  /// tokens rather than growing like a regular data column.
   factory CarpenterTableColumn.actions({
     required String id,
     required String header,
     required List<CarpenterActionDescriptor> Function(T item) actions,
+    List<CarpenterActionDescriptor> Function(T item)? secondaryActions,
+    CarpenterTableColumnAlignment alignment = CarpenterTableColumnAlignment.end,
+    CarpenterTableColumnVerticalAlignment verticalAlignment =
+        CarpenterTableColumnVerticalAlignment.center,
     CarpenterTableColumnWidth width =
         const CarpenterTableColumnWidth.flexible(),
-    bool resizable = true,
+    bool resizable = false,
     String? semanticLabel,
+    String overflowLabel = 'More actions',
   }) => CarpenterTableColumn<T>.custom(
     id: id,
     header: header,
-    alignment: CarpenterTableColumnAlignment.end,
+    alignment: alignment,
+    verticalAlignment: verticalAlignment,
     width: width,
     resizable: resizable,
     semanticLabel: semanticLabel,
-    cellBuilder: (context, item) => Wrap(
-      alignment: WrapAlignment.end,
-      children: actions(item)
-          .map(
-            (action) => CarpenterButton.fromAction(
-              action,
-              prominence: ActionProminence.ghost,
-              size: ControlSize.xsmall,
-            ),
-          )
-          .toList(growable: false),
+    isActionColumn: true,
+    cellBuilder: (context, item) => CarpenterTableActionCell(
+      primary: actions(item),
+      secondary: secondaryActions?.call(item) ?? const [],
+      overflowLabel: overflowLabel,
+      semanticLabel: semanticLabel ?? header,
     ),
   );
 
@@ -160,35 +189,25 @@ final class CarpenterTableColumn<T> {
   final String? semanticLabel;
   final CarpenterTableCellBuilder<T> cellBuilder;
   final CarpenterTableColumnAlignment alignment;
+  final CarpenterTableColumnVerticalAlignment verticalAlignment;
   final CarpenterTableColumnWidth width;
   final bool sortable;
   final bool resizable;
+  final bool isActionColumn;
 }
 
-final class _TableText extends StatelessWidget {
-  const _TableText(
-    this.data, {
-    required this.maxLines,
-    required this.overflow,
-    this.textAlign,
-  });
-
-  final String data;
-  final int maxLines;
-  final TextOverflow overflow;
-  final TextAlign? textAlign;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = CarpenterTheme.of(context);
-    return Text(
-      data,
-      style: theme.typography
-          .tableCell(context, TypographyEmphasis.regular)
-          .copyWith(color: theme.content.primary),
-      maxLines: maxLines,
-      overflow: overflow,
-      textAlign: textAlign,
-    );
-  }
-}
+AlignmentDirectional carpenterTableCellAlignment(
+  CarpenterTableColumnAlignment horizontal,
+  CarpenterTableColumnVerticalAlignment vertical,
+) => AlignmentDirectional(
+  switch (horizontal) {
+    CarpenterTableColumnAlignment.start => -1,
+    CarpenterTableColumnAlignment.center => 0,
+    CarpenterTableColumnAlignment.end => 1,
+  },
+  switch (vertical) {
+    CarpenterTableColumnVerticalAlignment.top => -1,
+    CarpenterTableColumnVerticalAlignment.center => 0,
+    CarpenterTableColumnVerticalAlignment.bottom => 1,
+  },
+);
