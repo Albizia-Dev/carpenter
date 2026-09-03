@@ -1,0 +1,42 @@
+name: Cleanup table formatter noise once
+
+on:
+  push:
+    branches:
+      - feat/table-layout-actions
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feat/table-layout-actions
+          fetch-depth: 0
+
+      - name: Restore unrelated library formatting
+        shell: bash
+        run: |
+          git fetch origin develop
+          keep='^(lib/carpenter.dart|lib/src/components/layout/toolbar.dart|lib/src/components/collections/table/table_actions.dart|lib/src/components/collections/table/table_text.dart|lib/src/components/collections/table/table_column.dart|lib/src/components/collections/table/table.dart|lib/src/components/collections/tree/tree_table.dart)$'
+          while IFS= read -r file; do
+            if [[ ! "$file" =~ $keep ]]; then
+              git checkout origin/develop -- "$file"
+            fi
+          done < <(git diff --name-only origin/develop...HEAD -- lib)
+
+      - name: Commit cleanup
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lib
+          git commit -m "chore: remove unrelated formatter noise"
+          git push origin HEAD:feat/table-layout-actions
