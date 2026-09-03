@@ -208,6 +208,9 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
       final maximum = context.units(
         column.width.maximum ?? theme.sizes.tableColumnMax,
       );
+      final isPinned =
+          _localColumnWidths.containsKey(column.id) ||
+          widget.columnWidths.containsKey(column.id);
       final explicitWidth =
           _localColumnWidths[column.id] ??
           widget.columnWidths[column.id] ??
@@ -222,7 +225,8 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
       minimums[column.id] = minimum;
       maximums[column.id] = maximum;
       preferredTotal += preferred;
-      if (!column.isActionColumn &&
+      if (!isPinned &&
+          !column.isActionColumn &&
           column.width.policy == CarpenterTableColumnWidthPolicy.flexible) {
         totalFlex += column.width.flex;
       }
@@ -232,7 +236,11 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
         totalFlex > 0) {
       final available = viewportWidth - preferredTotal;
       for (final column in widget.columns) {
-        if (column.isActionColumn ||
+        final isPinned =
+            _localColumnWidths.containsKey(column.id) ||
+            widget.columnWidths.containsKey(column.id);
+        if (isPinned ||
+            column.isActionColumn ||
             column.width.policy != CarpenterTableColumnWidthPolicy.flexible) {
           continue;
         }
@@ -621,26 +629,54 @@ final class _ResizeHandle extends StatefulWidget {
 
 final class _ResizeHandleState extends State<_ResizeHandle> {
   late double _dragWidth;
+  bool _hovered = false;
+  bool _dragging = false;
 
   @override
-  Widget build(BuildContext context) => MouseRegion(
-    cursor: SystemMouseCursors.resizeColumn,
-    child: GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onHorizontalDragStart: (_) => _dragWidth = widget.currentWidth,
-      onHorizontalDragUpdate: (details) {
-        final logicalDelta = Directionality.of(context) == TextDirection.rtl
-            ? -details.delta.dx
-            : details.delta.dx;
-        _dragWidth = (_dragWidth + logicalDelta).clamp(
-          widget.minimumWidth,
-          widget.maximumWidth,
-        );
-        widget.onChanged(_dragWidth);
-      },
-      child: SizedBox(width: widget.width, height: double.infinity),
-    ),
-  );
+  Widget build(BuildContext context) {
+    final theme = CarpenterTheme.of(context);
+    final active = _hovered || _dragging;
+    final strokeWidth = active
+        ? context.units(theme.focus.width)
+        : context.units(theme.shapes.tableBorderWidth);
+    return MouseRegion(
+      cursor: SystemMouseCursors.resizeColumn,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onHorizontalDragStart: (_) {
+          _dragWidth = widget.currentWidth;
+          setState(() => _dragging = true);
+        },
+        onHorizontalDragUpdate: (details) {
+          final logicalDelta = Directionality.of(context) == TextDirection.rtl
+              ? -details.delta.dx
+              : details.delta.dx;
+          _dragWidth = (_dragWidth + logicalDelta).clamp(
+            widget.minimumWidth,
+            widget.maximumWidth,
+          );
+          widget.onChanged(_dragWidth);
+        },
+        onHorizontalDragEnd: (_) => setState(() => _dragging = false),
+        onHorizontalDragCancel: () => setState(() => _dragging = false),
+        child: SizedBox(
+          width: widget.width,
+          height: double.infinity,
+          child: Center(
+            child: SizedBox(
+              width: strokeWidth,
+              height: double.infinity,
+              child: ColoredBox(
+                color: active ? theme.focus.color : theme.overlay.border,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 final class _TableRow<T, K> extends StatefulWidget {
