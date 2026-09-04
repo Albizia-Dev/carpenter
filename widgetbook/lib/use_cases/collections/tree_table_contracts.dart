@@ -112,16 +112,17 @@ final class _ProjectStructurePreviewState
             id: const CarpenterPageSectionId('structure'),
             title: 'Structure',
             description:
+                'Drag the visible header dividers to resize columns. '
                 'Click selects, Ctrl/Cmd toggles, Shift selects a range. '
                 'Double-click or Enter activates.',
             child: CarpenterTreeTable<String>(
               nodes: _projectNodes,
               controller: _treeController,
               treeHeader: 'Object',
-              treeWidth: CarpenterTableColumnWidth.flexible(
-                flex: 3,
+              treeWidth: CarpenterTableColumnWidth.fixed(
+                width: 20.rem,
                 minimum: 12.rem,
-                maximum: 28.rem,
+                maximum: 34.rem,
               ),
               expandedIds: _expanded,
               selectedIds: _selected,
@@ -146,7 +147,11 @@ final class _ProjectStructurePreviewState
                 CarpenterTreeTableColumn<String>(
                   id: 'kind',
                   header: 'Kind',
-                  width: CarpenterTableColumnWidth.fixed(width: 7.rem),
+                  width: CarpenterTableColumnWidth.fixed(
+                    width: 8.rem,
+                    minimum: 6.rem,
+                    maximum: 16.rem,
+                  ),
                   cellBuilder: (context, node) => CarpenterText.caption(
                     node.canExpand ? 'Group' : 'File',
                     colorRole: ContentColorRole.secondary,
@@ -156,7 +161,11 @@ final class _ProjectStructurePreviewState
                   id: 'state',
                   header: 'State',
                   alignment: CarpenterTableColumnAlignment.end,
-                  width: CarpenterTableColumnWidth.fixed(width: 6.rem),
+                  width: CarpenterTableColumnWidth.fixed(
+                    width: 8.rem,
+                    minimum: 6.rem,
+                    maximum: 16.rem,
+                  ),
                   cellBuilder: (context, node) => CarpenterText.caption(
                     node.loadState.name,
                     textAlign: TextAlign.end,

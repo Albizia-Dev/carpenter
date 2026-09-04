@@ -300,6 +300,9 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
       final maximum = context.units(
         spec.width.maximum ?? theme.sizes.tableColumnMax,
       );
+      final isPinned =
+          _localColumnWidths.containsKey(spec.id) ||
+          widget.columnWidths.containsKey(spec.id);
       final explicit =
           _localColumnWidths[spec.id] ??
           widget.columnWidths[spec.id] ??
@@ -312,7 +315,8 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
       minimums[spec.id] = minimum;
       maximums[spec.id] = maximum;
       preferredTotal += preferred;
-      if (spec.width.policy == CarpenterTableColumnWidthPolicy.flexible) {
+      if (!isPinned &&
+          spec.width.policy == CarpenterTableColumnWidthPolicy.flexible) {
         totalFlex += spec.width.flex;
       }
     }
@@ -322,7 +326,11 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
         totalFlex > 0) {
       final extra = availableInner - preferredTotal;
       for (final spec in specs) {
-        if (spec.width.policy != CarpenterTableColumnWidthPolicy.flexible) {
+        final isPinned =
+            _localColumnWidths.containsKey(spec.id) ||
+            widget.columnWidths.containsKey(spec.id);
+        if (isPinned ||
+            spec.width.policy != CarpenterTableColumnWidthPolicy.flexible) {
           continue;
         }
         final share = extra * spec.width.flex / totalFlex;
@@ -594,26 +602,54 @@ final class _TreeResizeHandle extends StatefulWidget {
 
 final class _TreeResizeHandleState extends State<_TreeResizeHandle> {
   late double _dragWidth;
+  bool _hovered = false;
+  bool _dragging = false;
 
   @override
-  Widget build(BuildContext context) => MouseRegion(
-    cursor: SystemMouseCursors.resizeColumn,
-    child: GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onHorizontalDragStart: (_) => _dragWidth = widget.currentWidth,
-      onHorizontalDragUpdate: (details) {
-        final logicalDelta = Directionality.of(context) == TextDirection.rtl
-            ? -details.delta.dx
-            : details.delta.dx;
-        _dragWidth = (_dragWidth + logicalDelta).clamp(
-          widget.minimumWidth,
-          widget.maximumWidth,
-        );
-        widget.onChanged(_dragWidth);
-      },
-      child: SizedBox(width: widget.width, height: double.infinity),
-    ),
-  );
+  Widget build(BuildContext context) {
+    final theme = CarpenterTheme.of(context);
+    final active = _hovered || _dragging;
+    final strokeWidth = active
+        ? context.units(theme.focus.width)
+        : context.units(theme.shapes.tableBorderWidth);
+    return MouseRegion(
+      cursor: SystemMouseCursors.resizeColumn,
+      onEnter: (_) => setState(() => _hovered = true),
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onHorizontalDragStart: (_) {
+          _dragWidth = widget.currentWidth;
+          setState(() => _dragging = true);
+        },
+        onHorizontalDragUpdate: (details) {
+          final logicalDelta = Directionality.of(context) == TextDirection.rtl
+              ? -details.delta.dx
+              : details.delta.dx;
+          _dragWidth = (_dragWidth + logicalDelta).clamp(
+            widget.minimumWidth,
+            widget.maximumWidth,
+          );
+          widget.onChanged(_dragWidth);
+        },
+        onHorizontalDragEnd: (_) => setState(() => _dragging = false),
+        onHorizontalDragCancel: () => setState(() => _dragging = false),
+        child: SizedBox(
+          width: widget.width,
+          height: double.infinity,
+          child: Center(
+            child: SizedBox(
+              width: strokeWidth,
+              height: double.infinity,
+              child: ColoredBox(
+                color: active ? theme.focus.color : theme.overlay.border,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 final class _TreeTableSlot extends StatelessWidget {

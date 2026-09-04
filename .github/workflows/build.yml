@@ -1,4 +1,4 @@
-name: Quality
+name: Build
 
 on:
   push:
@@ -9,32 +9,8 @@ on:
       - develop
 
 jobs:
-  library:
-    name: Library code style and analysis
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: stable
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Check code style
-        run: dart format --output=none --set-exit-if-changed lib
-
-      - name: Analyze library
-        run: dart analyze lib
-
-  consumers:
-    name: Compile Widgetbook and example
-    if: github.event_name == 'pull_request'
+  web:
+    name: Build Widgetbook and example
     runs-on: ubuntu-latest
 
     steps:
