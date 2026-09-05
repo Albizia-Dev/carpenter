@@ -36,7 +36,8 @@ Each higher entrypoint includes the public layers below it, so prefer the lowest
 
 ## What is included
 
-- application runtime, modules, route rendering, commands, hotkeys, loading scopes, sidebar and root layouts;
+- application runtime, modules, route rendering, commands, hotkeys, sidebar and root layouts;
+- framework-neutral loading scopes and asynchronous behaviour primitives;
 - buttons, text, inputs, masks, number/date/time/range/file fields, select, combo box and autosuggest;
 - tables, filters, pagination, tabs, breadcrumbs, notifications, trees and tree tables;
 - typed drag-and-drop, reorderable collections, Kanban and planning boards;
@@ -46,6 +47,8 @@ Each higher entrypoint includes the public layers below it, so prefer the lowest
 ## State model
 
 Meaningful application state stays controlled by the caller. Ephemeral interaction state stays inside Carpenter unless you explicitly opt into controlling it.
+
+Carpenter does not require Bloc, Cubit, Riverpod, or another application state-management package. Reusable Carpenter behaviour is exposed through Flutter-native contracts such as `Listenable`, value snapshots, and explicit controllers, and application code is free to adapt those contracts to its own state manager.
 
 For example, a select normally needs only its domain value:
 
