@@ -6,95 +6,109 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test(
-    'loading cubit aggregates operations and start finish are idempotent',
+    'loading notifier aggregates operations and start finish are idempotent',
     () async {
-      final cubit = LoadingCubit();
-      addTearDown(cubit.close);
+      final controller = LoadingNotifier();
+      addTearDown(controller.close);
 
-      cubit.start('save');
-      cubit.start('save');
-      expect(cubit.state.activeCount, 1);
-      expect(cubit.state.isActive('save'), isTrue);
+      controller.start('save');
+      controller.start('save');
+      expect(controller.state.activeCount, 1);
+      expect(controller.state.isActive('save'), isTrue);
 
-      cubit.start('refresh');
-      expect(cubit.state.activeCount, 2);
+      controller.start('refresh');
+      expect(controller.state.activeCount, 2);
 
-      cubit.finish('save');
-      cubit.finish('save');
-      expect(cubit.state.isLoading, isTrue);
-      expect(cubit.state.activeOperations, contains('refresh'));
+      controller.finish('save');
+      controller.finish('save');
+      expect(controller.state.isLoading, isTrue);
+      expect(controller.state.activeOperations, contains('refresh'));
 
-      cubit.finish('refresh');
-      expect(cubit.state.isLoading, isFalse);
+      controller.finish('refresh');
+      expect(controller.state.isLoading, isFalse);
     },
   );
 
   test(
     'track keeps loading until every concurrent operation finishes',
     () async {
-      final cubit = LoadingCubit();
-      addTearDown(cubit.close);
+      final controller = LoadingNotifier();
+      addTearDown(controller.close);
       final first = Completer<int>();
       final second = Completer<int>();
 
-      final firstResult = cubit.track(() => first.future, id: 'first');
-      final secondResult = cubit.track(() => second.future, id: 'second');
-      expect(cubit.state.activeCount, 2);
+      final firstResult = controller.track(() => first.future, id: 'first');
+      final secondResult = controller.track(() => second.future, id: 'second');
+      expect(controller.state.activeCount, 2);
 
       first.complete(1);
       expect(await firstResult, 1);
-      expect(cubit.state.isLoading, isTrue);
-      expect(cubit.state.activeOperations, contains('second'));
+      expect(controller.state.isLoading, isTrue);
+      expect(controller.state.activeOperations, contains('second'));
 
       second.complete(2);
       expect(await secondResult, 2);
-      expect(cubit.state.isLoading, isFalse);
+      expect(controller.state.isLoading, isFalse);
     },
   );
 
   test('repeated tracked ids keep independent leases', () async {
-    final cubit = LoadingCubit();
-    addTearDown(cubit.close);
+    final controller = LoadingNotifier();
+    addTearDown(controller.close);
     final first = Completer<void>();
     final second = Completer<void>();
 
-    final firstResult = cubit.track(() => first.future, id: 'save');
-    final secondResult = cubit.track(() => second.future, id: 'save');
-    expect(cubit.state.activeOperations, <Object>{'save'});
-    expect(cubit.state.activeCount, 2);
-    expect(cubit.state.countFor('save'), 2);
+    final firstResult = controller.track(() => first.future, id: 'save');
+    final secondResult = controller.track(() => second.future, id: 'save');
+    expect(controller.state.activeOperations, <Object>{'save'});
+    expect(controller.state.activeCount, 2);
+    expect(controller.state.countFor('save'), 2);
 
     first.complete();
     await firstResult;
-    expect(cubit.state.isActive('save'), isTrue);
-    expect(cubit.state.activeCount, 1);
+    expect(controller.state.isActive('save'), isTrue);
+    expect(controller.state.activeCount, 1);
 
     second.complete();
     await secondResult;
-    expect(cubit.state.isLoading, isFalse);
+    expect(controller.state.isLoading, isFalse);
   });
 
   test('track clears loading and rethrows operation errors', () async {
-    final cubit = LoadingCubit();
-    addTearDown(cubit.close);
+    final controller = LoadingNotifier();
+    addTearDown(controller.close);
 
     await expectLater(
-      cubit.track<int>(() => throw StateError('failed'), id: 'failure'),
+      controller.track<int>(() => throw StateError('failed'), id: 'failure'),
       throwsStateError,
     );
-    expect(cubit.state.isLoading, isFalse);
+    expect(controller.state.isLoading, isFalse);
   });
 
-  test('tracked work may finish after the cubit is closed', () async {
-    final cubit = LoadingCubit();
+  test('tracked work may finish after the notifier is closed', () async {
+    final controller = LoadingNotifier();
     final operation = Completer<int>();
-    final result = cubit.track(() => operation.future, id: 'detached');
+    final result = controller.track(() => operation.future, id: 'detached');
 
-    await cubit.close();
+    await controller.close();
     operation.complete(7);
 
     expect(await result, 7);
   });
+
+  test(
+    'compatibility loading cubit keeps stream and close affordances',
+    () async {
+      final cubit = LoadingCubit();
+      final next = cubit.stream.first;
+
+      cubit.start('legacy');
+
+      expect((await next).isActive('legacy'), isTrue);
+      await cubit.close();
+      expect(cubit.isClosed, isTrue);
+    },
+  );
 
   testWidgets('nearest loading boundary intercepts descendant operations', (
     tester,

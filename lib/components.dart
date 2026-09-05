@@ -50,6 +50,7 @@ export 'src/components/behaviour/drag_and_drop/drag_scope.dart';
 export 'src/components/behaviour/drag_and_drop/draggable.dart';
 export 'src/components/behaviour/drag_and_drop/drop_target.dart';
 export 'src/components/behaviour/expander.dart';
+export 'src/components/behaviour/loading.dart';
 export 'src/components/behaviour/menu/dropdown.dart';
 export 'src/components/behaviour/menu/menu.dart';
 export 'src/components/behaviour/menu/menu_entry.dart';
