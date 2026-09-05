@@ -202,8 +202,7 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
         id: _legacyActionColumnId,
         header: widget.actionsHeader,
         semanticLabel: 'Actions',
-        actions:
-            widget.actions ?? (_) => const <CarpenterActionDescriptor>[],
+        actions: widget.actions ?? (_) => const <CarpenterActionDescriptor>[],
         secondaryActions: widget.secondaryActions,
         overflowLabel: widget.actionsOverflowLabel,
       ),
