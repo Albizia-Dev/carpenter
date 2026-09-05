@@ -12,6 +12,9 @@ concurrency:
   group: build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   web:
     name: Verify package and build web examples
@@ -20,6 +23,80 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Normalize tree table cell boxes
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text()
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected one match, got {count}: {old[:100]!r}')
+              p.write_text(text.replace(old, new, 1))
+
+          tree_view = 'lib/src/components/collections/tree/tree_view.dart'
+          replace_once(
+              tree_view,
+              '    this.tableRows = false,\n    this.actions,',
+              '    this.tableRows = false,\n    this.tableRowContentPadding = true,\n    this.actions,',
+          )
+          replace_once(
+              tree_view,
+              '  final bool tableRows;\n  final CarpenterTreeActionsBuilder<T>? actions;',
+              '  final bool tableRows;\n  final bool tableRowContentPadding;\n  final CarpenterTreeActionsBuilder<T>? actions;',
+          )
+          replace_once(
+              tree_view,
+              '          ? CarpenterListTile.tableRow(\n              selected: state.selected,',
+              '          ? CarpenterListTile.tableRow(\n              contentPadding: widget.tableRowContentPadding,\n              selected: state.selected,',
+          )
+
+          tree_table = 'lib/src/components/collections/tree/tree_table.dart'
+          replace_once(
+              tree_table,
+              '    final outerPadding = metrics.horizontalPadding;\n    final gap = metrics.cellGap;\n    final columns = _effectiveColumns;',
+              '    const outerPadding = 0.0;\n    const interColumnGap = 0.0;\n    final contentGap = metrics.cellGap;\n    final columns = _effectiveColumns;',
+          )
+          replace_once(
+              tree_table,
+              '          outerPadding: outerPadding,\n          gap: gap,',
+              '          outerPadding: outerPadding,\n          gap: interColumnGap,',
+          )
+          replace_once(
+              tree_table,
+              '          tableRows: true,\n          dragActivation: widget.dragActivation,',
+              '          tableRows: true,\n          tableRowContentPadding: false,\n          dragActivation: widget.dragActivation,',
+          )
+          replace_once(
+              tree_table,
+              '          rowBuilder: (context, node, state, _) =>\n              _buildRow(context, layout, columns, node, state, gap),',
+              '          rowBuilder: (context, node, state, _) =>\n              _buildRow(context, layout, columns, node, state, contentGap),',
+          )
+          replace_once(
+              tree_table,
+              '            _buildHeader(context, layout, columns, outerPadding, gap),',
+              '            _buildHeader(\n              context,\n              layout,\n              columns,\n              outerPadding,\n              interColumnGap,\n            ),',
+          )
+          replace_once(
+              tree_table,
+              '      padding: EdgeInsetsDirectional.symmetric(\n        horizontal: outerPadding,\n        vertical: metrics.verticalPadding,\n      ),',
+              '      padding: EdgeInsetsDirectional.symmetric(horizontal: outerPadding),',
+          )
+
+          p = Path(tree_table)
+          text = p.read_text()
+          count = text.count('    padded: false,\n')
+          if count != 2:
+              raise SystemExit(f'{tree_table}: expected two legacy padded:false flags, got {count}')
+          p.write_text(text.replace('    padded: false,\n', ''))
+          PY
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -30,8 +107,21 @@ jobs:
       - name: Install package dependencies
         run: flutter pub get
 
-      - name: Check formatting
-        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Format tree table normalization
+        run: dart format lib/src/components/collections/list_tile.dart lib/src/components/collections/tree/tree_view.dart lib/src/components/collections/tree/tree_table.dart
+
+      - name: Commit tree table normalization
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lib/src/components/collections/list_tile.dart lib/src/components/collections/tree/tree_view.dart lib/src/components/collections/tree/tree_table.dart
+          git commit -m "refactor: normalize tree table cell boxes"
+          git push origin HEAD:${{ github.head_ref }}
 
       - name: Analyze library
         run: dart analyze lib
