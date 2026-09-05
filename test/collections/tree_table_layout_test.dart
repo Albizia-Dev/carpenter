@@ -5,6 +5,21 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/harness.dart';
 
 void main() {
+  test('tree action columns use the semantic action-lane width policy', () {
+    final column = CarpenterTreeTableColumn<String>.actions(
+      id: 'actions',
+      header: 'Actions',
+      actions: (_) => const [],
+    );
+
+    expect(
+      column.effectiveWidth.policy,
+      CarpenterTableColumnWidthPolicy.actionLane,
+    );
+    expect(column.effectiveWidth.flex, 0);
+    expect(column.resizable, isFalse);
+  });
+
   testWidgets('tree table uses chevrons and resizes without a callback', (
     tester,
   ) async {
@@ -52,7 +67,40 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  testWidgets('tree table secondary row actions use the ellipsis lane', (
+  testWidgets('explicit tree action columns share the ellipsis contract', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      carpenterOverlayHarness(
+        CarpenterTreeTable<String>(
+          nodes: const [
+            CarpenterTreeNode<String>(id: 'root', value: 'root', label: 'Root'),
+          ],
+          columns: [
+            CarpenterTreeTableColumn<String>.actions(
+              id: 'actions',
+              header: 'Actions',
+              actions: (_) => const [],
+              secondaryActions: (_) => [
+                const CarpenterActionDescriptor(
+                  id: 'archive',
+                  label: 'Archive',
+                  onInvoke: null,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+
+    expect(find.text('Archive'), findsNothing);
+    await tester.tap(find.bySemanticsLabel('More actions'));
+    await tester.pumpAndSettle();
+    expect(find.text('Archive'), findsOneWidget);
+  });
+
+  testWidgets('legacy tree row actions still use the ellipsis lane', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -79,7 +127,7 @@ void main() {
     expect(find.text('Archive'), findsOneWidget);
   });
 
-  testWidgets('tree table reserves the action lane for every row', (
+  testWidgets('legacy tree action shorthand keeps row geometry stable', (
     tester,
   ) async {
     await tester.pumpWidget(
