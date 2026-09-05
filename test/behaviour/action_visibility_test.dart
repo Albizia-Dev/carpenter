@@ -1,4 +1,5 @@
 import 'package:carpenter/carpenter.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/harness.dart';
