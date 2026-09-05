@@ -33,6 +33,7 @@ final class CallbackCollectionAdapter<T, F> implements CollectionAdapter<T, F> {
 /// made the two collection APIs subtly diverge. Existing adapter-based callers
 /// may keep using this facade while all loading, failure, refresh, cancellation,
 /// and event semantics are owned by one lifecycle implementation underneath.
+@Deprecated('Use CollectionLifecycleController for new collection data flows.')
 final class CollectionController<T, K, F> extends ChangeNotifier {
   CollectionController({
     required CollectionAdapter<T, F> adapter,
@@ -53,8 +54,7 @@ final class CollectionController<T, K, F> extends ChangeNotifier {
   CollectionQuery<F> get query => _lifecycle.query;
   CollectionSnapshot<T> get snapshot => _lifecycle.snapshot;
 
-  Future<void> load(CollectionQuery<F> query) =>
-      _lifecycle.updateQuery(query);
+  Future<void> load(CollectionQuery<F> query) => _lifecycle.updateQuery(query);
 
   Future<void> refresh() => _lifecycle.refresh();
 
