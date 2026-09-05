@@ -57,9 +57,7 @@ void main() {
     );
 
     final context = tester.element(find.text('Value'));
-    final danger = CarpenterTheme.of(
-      context,
-    ).feedback.resolve(FeedbackColorRole.danger);
+    final fieldError = CarpenterTheme.of(context).fields.borderError;
     final container = tester.widget<AnimatedContainer>(
       find.descendant(
         of: find.byType(CarpenterFieldShell),
@@ -70,7 +68,7 @@ void main() {
 
     expect(find.text('Invalid value'), findsOneWidget);
     expect(find.text('Looks good'), findsNothing);
-    expect((decoration.border! as Border).top.color, danger.foreground);
+    expect((decoration.border! as Border).top.color, fieldError);
     expect(tester.takeException(), isNull);
   });
 
