@@ -1,10 +1,15 @@
 import 'package:flutter/foundation.dart';
 
 import 'collection_event.dart';
-import 'collection_load_phase.dart';
+import 'collection_lifecycle_controller.dart';
 import 'collection_query.dart';
 import 'collection_snapshot.dart';
 
+/// Minimal compatibility adapter for collection sources that only expose load.
+///
+/// New integrations that need cancellation, load-more, or request reasons
+/// should construct [CollectionLifecycleController] with a lifecycle loader
+/// directly. This adapter deliberately remains transport-neutral.
 abstract interface class CollectionAdapter<T, F> {
   Future<CollectionSnapshot<T>> load(CollectionQuery<F> query);
 }
@@ -21,51 +26,46 @@ final class CallbackCollectionAdapter<T, F> implements CollectionAdapter<T, F> {
   Future<CollectionSnapshot<T>> load(CollectionQuery<F> query) => loader(query);
 }
 
+/// Compatibility facade over Carpenter's canonical collection lifecycle.
+///
+/// Historically this controller implemented its own generation-based stale
+/// response protection. That duplicated [CollectionLifecycleController] and
+/// made the two collection APIs subtly diverge. Existing adapter-based callers
+/// may keep using this facade while all loading, failure, refresh, cancellation,
+/// and event semantics are owned by one lifecycle implementation underneath.
+@Deprecated('Use CollectionLifecycleController for new collection data flows.')
 final class CollectionController<T, K, F> extends ChangeNotifier {
   CollectionController({
-    required this._adapter,
-    required this._query,
-    required this._snapshot,
-    required this._keyOf,
-  });
-
-  final CollectionAdapter<T, F> _adapter;
-  final K Function(T item) _keyOf;
-  CollectionQuery<F> _query;
-  CollectionSnapshot<T> _snapshot;
-  int _requestGeneration = 0;
-
-  CollectionQuery<F> get query => _query;
-  CollectionSnapshot<T> get snapshot => _snapshot;
-
-  Future<void> load(CollectionQuery<F> query) async {
-    _query = query;
-    final generation = ++_requestGeneration;
-    _snapshot = _snapshot.beginRefresh();
-    notifyListeners();
-    try {
-      final result = await _adapter.load(query);
-      if (generation != _requestGeneration) return;
-      _snapshot = result.copyWith(
-        loadPhase: CollectionLoadPhase.ready,
-        freshness: CollectionFreshness.current,
-        clearInitialFailure: true,
-        clearRefreshFailure: true,
-      );
-      notifyListeners();
-    } catch (error, stackTrace) {
-      if (generation != _requestGeneration) return;
-      _snapshot = _snapshot.withLoadFailure(
-        CollectionFailure(error: error, stackTrace: stackTrace),
-      );
-      notifyListeners();
-    }
+    required CollectionAdapter<T, F> adapter,
+    required CollectionQuery<F> query,
+    required CollectionSnapshot<T> snapshot,
+    required K Function(T item) keyOf,
+  }) : _lifecycle = CollectionLifecycleController<T, K, F>(
+         load: (query, request) => adapter.load(query),
+         query: query,
+         keyOf: keyOf,
+         initialSnapshot: snapshot,
+       ) {
+    _lifecycle.addListener(_forwardLifecycleChange);
   }
 
-  Future<void> refresh() => load(_query);
+  final CollectionLifecycleController<T, K, F> _lifecycle;
 
-  void apply(CollectionEvent<T, K> event) {
-    _snapshot = _snapshot.applyEvent(event, keyOf: _keyOf);
-    notifyListeners();
+  CollectionQuery<F> get query => _lifecycle.query;
+  CollectionSnapshot<T> get snapshot => _lifecycle.snapshot;
+
+  Future<void> load(CollectionQuery<F> query) => _lifecycle.updateQuery(query);
+
+  Future<void> refresh() => _lifecycle.refresh();
+
+  void apply(CollectionEvent<T, K> event) => _lifecycle.apply(event);
+
+  void _forwardLifecycleChange() => notifyListeners();
+
+  @override
+  void dispose() {
+    _lifecycle.removeListener(_forwardLifecycleChange);
+    _lifecycle.dispose();
+    super.dispose();
   }
 }
