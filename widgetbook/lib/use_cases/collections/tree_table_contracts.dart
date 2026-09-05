@@ -73,6 +73,10 @@ final class _ProjectStructurePreviewState
     super.dispose();
   }
 
+  void _report(String action, CarpenterTreeNode<String> node) {
+    setState(() => _lastActivated = '$action: ${node.label}');
+  }
+
   @override
   Widget build(BuildContext context) => SizedBox(
     height: context.units(42.rem),
@@ -114,7 +118,9 @@ final class _ProjectStructurePreviewState
             description:
                 'Drag the visible header dividers to resize columns. '
                 'Click selects, Ctrl/Cmd toggles, Shift selects a range. '
-                'Double-click or Enter activates.',
+                'Double-click or Enter activates. Two primary row actions stay '
+                'inline; extra primary and secondary actions stay behind the '
+                'ellipsis without changing row geometry.',
             child: CarpenterTreeTable<String>(
               nodes: _projectNodes,
               controller: _treeController,
@@ -140,37 +146,69 @@ final class _ProjectStructurePreviewState
                     : _expanded.difference({id});
               }),
               onSelectionChanged: (ids) => setState(() => _selected = ids),
-              onActivated: (node) => setState(() {
-                _lastActivated = 'Activated: ${node.label}';
-              }),
+              onActivated: (node) => _report('Activated', node),
               columns: [
-                CarpenterTreeTableColumn<String>(
+                CarpenterTreeTableColumn<String>.text(
                   id: 'kind',
                   header: 'Kind',
+                  value: (node) => node.canExpand ? 'Group' : 'File',
                   width: CarpenterTableColumnWidth.fixed(
                     width: 8.rem,
                     minimum: 6.rem,
                     maximum: 16.rem,
                   ),
-                  cellBuilder: (context, node) => CarpenterText.caption(
-                    node.canExpand ? 'Group' : 'File',
-                    colorRole: ContentColorRole.secondary,
-                  ),
                 ),
-                CarpenterTreeTableColumn<String>(
+                CarpenterTreeTableColumn<String>.status(
                   id: 'state',
                   header: 'State',
+                  label: (node) => switch (node.loadState) {
+                    CarpenterTreeLoadState.ready => 'Ready',
+                    CarpenterTreeLoadState.loading => 'Loading',
+                    CarpenterTreeLoadState.failed => 'Failed',
+                  },
+                  role: (node) => switch (node.loadState) {
+                    CarpenterTreeLoadState.ready => FeedbackColorRole.success,
+                    CarpenterTreeLoadState.loading => FeedbackColorRole.info,
+                    CarpenterTreeLoadState.failed => FeedbackColorRole.danger,
+                  },
                   alignment: CarpenterTableColumnAlignment.end,
                   width: CarpenterTableColumnWidth.fixed(
                     width: 8.rem,
                     minimum: 6.rem,
                     maximum: 16.rem,
                   ),
-                  cellBuilder: (context, node) => CarpenterText.caption(
-                    node.loadState.name,
-                    textAlign: TextAlign.end,
-                    colorRole: ContentColorRole.secondary,
-                  ),
+                ),
+                CarpenterTreeTableColumn<String>.actions(
+                  id: 'actions',
+                  header: 'Actions',
+                  actions: (node) => [
+                    CarpenterActionDescriptor(
+                      id: 'open-${node.id}',
+                      label: 'Open',
+                      icon: CarpenterIcons.openFile,
+                      onInvoke: () => _report('Open', node),
+                    ),
+                    CarpenterActionDescriptor(
+                      id: 'edit-${node.id}',
+                      label: 'Edit',
+                      icon: CarpenterIcons.edit,
+                      onInvoke: () => _report('Edit', node),
+                    ),
+                    CarpenterActionDescriptor(
+                      id: 'copy-${node.id}',
+                      label: 'Duplicate',
+                      icon: CarpenterIcons.copy,
+                      onInvoke: () => _report('Duplicate', node),
+                    ),
+                  ],
+                  secondaryActions: (node) => [
+                    CarpenterActionDescriptor(
+                      id: 'archive-${node.id}',
+                      label: 'Archive',
+                      icon: CarpenterIcons.archive,
+                      onInvoke: () => _report('Archive', node),
+                    ),
+                  ],
                 ),
               ],
             ),
