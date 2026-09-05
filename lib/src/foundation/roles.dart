@@ -1,7 +1,12 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'icon_data.dart';
+
+enum TypographyRole { display, title, body, label, caption }
+
+enum TypographyEmphasis { regular, medium, strong }
+
+enum ContentColorRole { primary, secondary, muted, inverse, disabled }
 
 enum ActionColorRole {
   neutral,
@@ -13,7 +18,11 @@ enum ActionColorRole {
   info,
 }
 
-enum ActionProminence { ghost, normal, high, filled, outlined }
+enum ActionProminence { normal, ghost, outlined, low, high, filled }
+
+enum ActionColorSlot { background, foreground, icon, border }
+
+enum FeedbackColorRole { neutral, success, warning, danger, info }
 
 enum ControlSize { xsmall, small, medium, large, xlarge }
 
@@ -23,9 +32,7 @@ enum FieldSize { xsmall, small, medium, large, xlarge }
 
 enum FieldAvailability { enabled, readOnly, disabled }
 
-enum ContentColorRole { primary, secondary, muted, inverse, disabled }
-
-enum FeedbackColorRole { neutral, success, warning, danger, info }
+enum CheckboxValue { unchecked, checked, mixed }
 
 enum SelectionColorRole {
   neutral,
@@ -37,32 +44,39 @@ enum SelectionColorRole {
   info,
 }
 
-enum TypographyRole { display, title, body, label, caption }
-
-enum TypographyEmphasis { regular, medium, strong }
-
-enum ShapeRole {
-  none,
-  roundedXsmall,
-  roundedSmall,
-  rounded,
-  roundedLarge,
-  roundedXlarge,
-  circular,
+enum OverlayPlacement {
+  top,
+  bottom,
+  left,
+  right,
+  topStart,
+  topEnd,
+  bottomStart,
+  bottomEnd,
 }
+
+enum TooltipDelay { immediate, short, long }
+
+enum OptionsLoadState { ready, loading, failed }
+
+enum ToastDuration { persistent, short, long }
+
+enum DialogDismissPolicy { explicitOnly, escapeOnly, outsideAndEscape }
+
+enum ShapeRole { none, rounded, circular }
 
 @immutable
 final class CarpenterShape {
   const CarpenterShape({required this.start, required this.end});
 
-  const CarpenterShape.uniform(ShapeRole role) : start = role, end = role;
-
-  static const none = CarpenterShape.uniform(ShapeRole.none);
-  static const roundedXsmall = CarpenterShape.uniform(ShapeRole.roundedXsmall);
-  static const roundedSmall = CarpenterShape.uniform(ShapeRole.roundedSmall);
-  static const rounded = CarpenterShape.uniform(ShapeRole.rounded);
-  static const roundedLarge = CarpenterShape.uniform(ShapeRole.roundedLarge);
-  static const roundedXlarge = CarpenterShape.uniform(ShapeRole.roundedXlarge);
+  static const none = CarpenterShape(
+    start: ShapeRole.none,
+    end: ShapeRole.none,
+  );
+  static const rounded = CarpenterShape(
+    start: ShapeRole.rounded,
+    end: ShapeRole.rounded,
+  );
   static const circular = CarpenterShape(
     start: ShapeRole.circular,
     end: ShapeRole.circular,
