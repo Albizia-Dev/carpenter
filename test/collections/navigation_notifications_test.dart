@@ -13,10 +13,7 @@ void main() {
         CarpenterBreadcrumbs(
           maxVisibleItems: 3,
           items: [
-            CarpenterBreadcrumb(
-              label: 'Home',
-              onInvoke: () => invoked = true,
-            ),
+            CarpenterBreadcrumb(label: 'Home', onInvoke: () => invoked = true),
             CarpenterBreadcrumb(label: 'Area', onInvoke: () {}),
             CarpenterBreadcrumb(label: 'Section', onInvoke: () {}),
             CarpenterBreadcrumb(label: 'Object', onInvoke: () {}),

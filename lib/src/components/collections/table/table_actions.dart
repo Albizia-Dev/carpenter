@@ -18,9 +18,8 @@ final class CarpenterTableActions {
   bool get isEmpty => primary.isEmpty && secondary.isEmpty;
 }
 
-typedef CarpenterTableActionsBuilder<T> = CarpenterTableActions Function(
-  T item,
-);
+typedef CarpenterTableActionsBuilder<T> =
+    CarpenterTableActions Function(T item);
 
 /// Compact, geometry-stable action projection used by table and tree-table rows.
 ///

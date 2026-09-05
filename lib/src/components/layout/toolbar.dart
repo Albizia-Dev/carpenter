@@ -78,7 +78,8 @@ final class CarpenterToolbar extends StatelessWidget {
             CarpenterToolbarGroup.primary => CarpenterActionStripGroup.primary,
             CarpenterToolbarGroup.secondary =>
               CarpenterActionStripGroup.secondary,
-            CarpenterToolbarGroup.overflow => CarpenterActionStripGroup.overflow,
+            CarpenterToolbarGroup.overflow =>
+              CarpenterActionStripGroup.overflow,
           },
           presentation: switch (item.presentation) {
             CarpenterToolbarPresentation.label =>

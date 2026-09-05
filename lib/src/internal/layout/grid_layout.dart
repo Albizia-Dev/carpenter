@@ -99,7 +99,10 @@ final class GridLayoutResolver {
       // Without this pass a capped column can leave visible space unused even
       // though another flexible column is still able to grow.
       while (remaining > 0.0001 && active.isNotEmpty) {
-        final activeFlex = active.fold<int>(0, (sum, column) => sum + column.flex);
+        final activeFlex = active.fold<int>(
+          0,
+          (sum, column) => sum + column.flex,
+        );
         var consumed = 0.0;
         for (final column in active) {
           final share = remaining * column.flex / activeFlex;
@@ -117,7 +120,8 @@ final class GridLayoutResolver {
     }
 
     final innerWidth =
-        fixedExtent + widths.values.fold<double>(0, (sum, width) => sum + width);
+        fixedExtent +
+        widths.values.fold<double>(0, (sum, width) => sum + width);
     final naturalWidth = innerWidth + chrome;
     return GridLayout(
       widths: Map.unmodifiable(widths),

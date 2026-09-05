@@ -107,7 +107,8 @@ void main() {
     expect(find.text('Archive'), findsNothing);
     final overflowButton = find.byWidgetPredicate(
       (widget) =>
-          widget is CarpenterIconButton && widget.semanticLabel == 'More actions',
+          widget is CarpenterIconButton &&
+          widget.semanticLabel == 'More actions',
     );
     expect(overflowButton, findsOneWidget);
     final button = tester.widget<CarpenterIconButton>(overflowButton);

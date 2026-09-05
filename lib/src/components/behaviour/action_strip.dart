@@ -132,7 +132,8 @@ final class CarpenterActionStrip extends StatelessWidget {
           value: item,
           group: switch (item.group) {
             CarpenterActionStripGroup.primary => ActionOverflowGroup.primary,
-            CarpenterActionStripGroup.secondary => ActionOverflowGroup.secondary,
+            CarpenterActionStripGroup.secondary =>
+              ActionOverflowGroup.secondary,
             CarpenterActionStripGroup.overflow => ActionOverflowGroup.overflow,
           },
           expandedWidth: _itemWidth(context, item),

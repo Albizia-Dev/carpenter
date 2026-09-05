@@ -75,17 +75,16 @@ void main() {
     expect(value, DateTime(2026, 9, 1));
   });
 
-  testWidgets('time and range inputs parse masked manual entry', (tester) async {
+  testWidgets('time and range inputs parse masked manual entry', (
+    tester,
+  ) async {
     CarpenterTime? time;
     CarpenterDateRange? range;
     await tester.pumpWidget(
       carpenterOverlayHarness(
         Column(
           children: [
-            CarpenterTimeInput(
-              value: null,
-              onChanged: (next) => time = next,
-            ),
+            CarpenterTimeInput(value: null, onChanged: (next) => time = next),
             CarpenterDateRangeInput(
               value: null,
               onChanged: (next) => range = next,

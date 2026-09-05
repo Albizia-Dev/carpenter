@@ -2,34 +2,37 @@ import 'package:carpenter/src/internal/layout/grid_layout.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  test('keeps pinned columns stable while flexible columns fill the viewport', () {
-    final layout = GridLayoutResolver.resolve(
-      viewportWidth: 500,
-      columns: const [
-        GridColumnSpec(
-          id: 'pinned',
-          preferred: 120,
-          minimum: 80,
-          maximum: 240,
-          flexible: true,
-          flex: 1,
-          pinned: true,
-        ),
-        GridColumnSpec(
-          id: 'flex',
-          preferred: 100,
-          minimum: 80,
-          maximum: 500,
-          flexible: true,
-          flex: 1,
-        ),
-      ],
-    );
+  test(
+    'keeps pinned columns stable while flexible columns fill the viewport',
+    () {
+      final layout = GridLayoutResolver.resolve(
+        viewportWidth: 500,
+        columns: const [
+          GridColumnSpec(
+            id: 'pinned',
+            preferred: 120,
+            minimum: 80,
+            maximum: 240,
+            flexible: true,
+            flex: 1,
+            pinned: true,
+          ),
+          GridColumnSpec(
+            id: 'flex',
+            preferred: 100,
+            minimum: 80,
+            maximum: 500,
+            flexible: true,
+            flex: 1,
+          ),
+        ],
+      );
 
-    expect(layout.widths['pinned'], 120);
-    expect(layout.widths['flex'], 380);
-    expect(layout.totalWidth, 500);
-  });
+      expect(layout.widths['pinned'], 120);
+      expect(layout.widths['flex'], 380);
+      expect(layout.totalWidth, 500);
+    },
+  );
 
   test('redistributes flex space when a column reaches its maximum', () {
     final layout = GridLayoutResolver.resolve(
@@ -67,18 +70,8 @@ void main() {
       gap: 8,
       additionalCells: 1,
       columns: const [
-        GridColumnSpec(
-          id: 'a',
-          preferred: 100,
-          minimum: 80,
-          maximum: 200,
-        ),
-        GridColumnSpec(
-          id: 'b',
-          preferred: 120,
-          minimum: 80,
-          maximum: 200,
-        ),
+        GridColumnSpec(id: 'a', preferred: 100, minimum: 80, maximum: 200),
+        GridColumnSpec(id: 'b', preferred: 120, minimum: 80, maximum: 200),
       ],
     );
 

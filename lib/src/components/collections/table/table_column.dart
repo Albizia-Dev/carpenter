@@ -51,10 +51,8 @@ final class CarpenterTableColumnWidth {
   bool get isFlexible => policy == CarpenterTableColumnWidthPolicy.flexible;
 }
 
-typedef CarpenterTableCellBuilder<T> = Widget Function(
-  BuildContext context,
-  T item,
-);
+typedef CarpenterTableCellBuilder<T> =
+    Widget Function(BuildContext context, T item);
 
 @immutable
 final class CarpenterTableColumn<T> {
