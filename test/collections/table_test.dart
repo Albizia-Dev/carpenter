@@ -224,6 +224,7 @@ void main() {
                 CarpenterActionDescriptor(
                   id: 'open',
                   label: 'Open',
+                  icon: CarpenterIcons.openFile,
                   onInvoke: () => actions += 1,
                 ),
               ],
@@ -235,7 +236,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.text('Open').first);
+    await tester.tap(find.bySemanticsLabel('Open').first);
     await tester.pump();
 
     expect(actions, 1);
