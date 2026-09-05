@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import '../../../foundation/icon_data.dart';
 import '../../../foundation/roles.dart';
 import '../../../foundation/theme.dart';
+import '../../../internal/layout/grid_layout.dart';
 import '../../basic/button/icon_button.dart';
 import '../../basic/gravity_icons.g.dart';
 import '../../basic/icon.dart';
@@ -204,8 +205,6 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
           onDrop: widget.onDrop,
           canDrop: widget.canDrop,
           onRetryLoad: widget.onRetryLoad,
-          // Tree-table actions live inside the grid so their lane is reserved
-          // identically in every row and header.
           actions: null,
           iconBuilder: null,
           tableRows: true,
@@ -266,94 +265,56 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     required double gap,
   }) {
     final theme = CarpenterTheme.of(context);
-    final widths = <String, double>{};
-    final minimums = <String, double>{};
-    final maximums = <String, double>{};
-    final specs = <_TreeColumnSpec>[
-      _TreeColumnSpec(
-        id: widget.treeColumnId,
-        width: _effectiveTreeWidth,
-        resizable: widget.treeResizable,
-      ),
-      for (final column in widget.columns)
-        _TreeColumnSpec(
-          id: column.id,
-          width: column.effectiveWidth,
-          resizable: column.resizable,
-        ),
-    ];
     final actionWidth = _hasActionLane
         ? CarpenterTableActionCell.preferredColumnWidth(context)
         : 0.0;
-    final cellCount = specs.length + (_hasActionLane ? 1 : 0);
-    final totalGap = math.max(0, cellCount - 1) * gap;
-    final availableInner = viewportWidth.isFinite
-        ? math.max(0.0, viewportWidth - outerPadding * 2 - totalGap)
-        : double.infinity;
-
-    var preferredTotal = actionWidth;
-    var totalFlex = 0;
-    for (final spec in specs) {
+    final publicSpecs = <({String id, CarpenterTableColumnWidth width})>[
+      (id: widget.treeColumnId, width: _effectiveTreeWidth),
+      for (final column in widget.columns)
+        (id: column.id, width: column.effectiveWidth),
+    ];
+    final columns = <GridColumnSpec>[];
+    for (final spec in publicSpecs) {
       final minimum = context.units(
         spec.width.minimum ?? theme.sizes.tableColumnMin,
       );
       final maximum = context.units(
         spec.width.maximum ?? theme.sizes.tableColumnMax,
       );
-      final isPinned =
+      final pinned =
           _localColumnWidths.containsKey(spec.id) ||
           widget.columnWidths.containsKey(spec.id);
       final explicit =
           _localColumnWidths[spec.id] ??
           widget.columnWidths[spec.id] ??
           spec.width.preferred;
-      final preferred = context
-          .units(explicit ?? theme.sizes.tableColumn)
-          .clamp(minimum, maximum)
-          .toDouble();
-      widths[spec.id] = preferred;
-      minimums[spec.id] = minimum;
-      maximums[spec.id] = maximum;
-      preferredTotal += preferred;
-      if (!isPinned &&
-          spec.width.policy == CarpenterTableColumnWidthPolicy.flexible) {
-        totalFlex += spec.width.flex;
-      }
+      columns.add(
+        GridColumnSpec(
+          id: spec.id,
+          preferred: context.units(explicit ?? theme.sizes.tableColumn),
+          minimum: minimum,
+          maximum: maximum,
+          flex: spec.width.flex,
+          flexible:
+              spec.width.policy == CarpenterTableColumnWidthPolicy.flexible,
+          pinned: pinned,
+        ),
+      );
     }
-
-    if (availableInner.isFinite &&
-        preferredTotal < availableInner &&
-        totalFlex > 0) {
-      final extra = availableInner - preferredTotal;
-      for (final spec in specs) {
-        final isPinned =
-            _localColumnWidths.containsKey(spec.id) ||
-            widget.columnWidths.containsKey(spec.id);
-        if (isPinned ||
-            spec.width.policy != CarpenterTableColumnWidthPolicy.flexible) {
-          continue;
-        }
-        final share = extra * spec.width.flex / totalFlex;
-        widths[spec.id] = (widths[spec.id]! + share).clamp(
-          minimums[spec.id]!,
-          maximums[spec.id]!,
-        );
-      }
-    }
-
-    final innerWidth =
-        widths.values.fold(0.0, (sum, width) => sum + width) +
-        actionWidth +
-        totalGap;
-    final naturalWidth = innerWidth + outerPadding * 2;
+    final resolved = GridLayoutResolver.resolve(
+      columns: columns,
+      viewportWidth: viewportWidth,
+      fixedExtent: actionWidth,
+      outerInset: outerPadding,
+      gap: gap,
+      additionalCells: _hasActionLane ? 1 : 0,
+    );
     return _TreeTableLayout(
-      widths: widths,
-      minimums: minimums,
-      maximums: maximums,
+      widths: resolved.widths,
+      minimums: resolved.minimums,
+      maximums: resolved.maximums,
       actionWidth: actionWidth,
-      totalWidth: viewportWidth.isFinite
-          ? math.max(viewportWidth, naturalWidth)
-          : naturalWidth,
+      totalWidth: resolved.totalWidth,
     );
   }
 
@@ -489,18 +450,6 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
       ],
     );
   }
-}
-
-final class _TreeColumnSpec {
-  const _TreeColumnSpec({
-    required this.id,
-    required this.width,
-    required this.resizable,
-  });
-
-  final String id;
-  final CarpenterTableColumnWidth width;
-  final bool resizable;
 }
 
 final class _TreeTableLayout {
