@@ -85,6 +85,11 @@ final class CarpenterFieldShell extends StatelessWidget {
         effectiveFeedback != null && availability != FieldAvailability.disabled
         ? theme.feedback.resolve(effectiveFeedback.role)
         : null;
+    final feedbackForeground = availability == FieldAvailability.disabled
+        ? null
+        : effectiveFeedback?.isError ?? false
+        ? style.error
+        : feedbackStyle?.foreground;
     final startRadius = Radius.circular(
       context.units(theme.shapes.radiusForField(shape.start, size)),
     );
@@ -102,7 +107,7 @@ final class CarpenterFieldShell extends StatelessWidget {
         .copyWith(color: style.label);
     final supportingStyle = theme.typography
         .fieldSupporting(context, size, TypographyEmphasis.regular)
-        .copyWith(color: feedbackStyle?.foreground ?? style.supporting);
+        .copyWith(color: feedbackForeground ?? style.supporting);
     final fieldHeight = theme.sizes.fieldExtent(context, size);
     final horizontal = context.units(theme.spacing.fieldHorizontal(size));
     final vertical = context.units(theme.spacing.fieldVertical(size));
@@ -150,7 +155,7 @@ final class CarpenterFieldShell extends StatelessWidget {
                 color: style.background,
                 borderRadius: borderRadius,
                 border: Border.all(
-                  color: feedbackStyle?.foreground ?? style.border,
+                  color: feedbackForeground ?? style.border,
                   width: context.units(theme.shapes.fieldBorderWidth),
                 ),
               ),
