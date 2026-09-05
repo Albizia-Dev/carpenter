@@ -344,8 +344,9 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final metrics = CarpenterTableMetrics.resolve(context);
-    final outerPadding = metrics.horizontalPadding;
-    final gap = metrics.cellGap;
+    const outerPadding = 0.0;
+    const interColumnGap = 0.0;
+    final contentGap = metrics.cellGap;
     final columns = _effectiveColumns;
 
     return LayoutBuilder(
@@ -355,7 +356,7 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
           constraints.maxWidth,
           columns: columns,
           outerPadding: outerPadding,
-          gap: gap,
+          gap: interColumnGap,
         );
         final tree = CarpenterTreeView<T>(
           nodes: widget.nodes,
@@ -375,17 +376,31 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
           actions: null,
           iconBuilder: null,
           tableRows: true,
+          tableRowContentPadding: false,
           dragActivation: widget.dragActivation,
           semanticLabel: '${widget.semanticLabel} rows',
-          rowBuilder: (context, node, state, _) =>
-              _buildRow(context, layout, columns, node, state, gap),
+          rowBuilder: (context, node, state, _) => _buildRow(
+            context,
+            layout,
+            columns,
+            node,
+            state,
+            contentGap,
+            interColumnGap,
+          ),
         );
         Widget content = Column(
           mainAxisSize: widget.scrollController == null
               ? MainAxisSize.min
               : MainAxisSize.max,
           children: [
-            _buildHeader(context, layout, columns, outerPadding, gap),
+            _buildHeader(
+              context,
+              layout,
+              columns,
+              outerPadding,
+              interColumnGap,
+            ),
             if (widget.scrollController == null)
               tree
             else
@@ -499,10 +514,7 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     return Container(
       color: theme.surface.subtle,
       height: height,
-      padding: EdgeInsetsDirectional.symmetric(
-        horizontal: outerPadding,
-        vertical: metrics.verticalPadding,
-      ),
+      padding: EdgeInsetsDirectional.symmetric(horizontal: outerPadding),
       child: Row(
         children: [
           _TreeHeaderCell(
@@ -545,7 +557,8 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     List<CarpenterTreeTableColumn<T>> columns,
     CarpenterTreeNode<T> node,
     CarpenterTreeRowState<T> state,
-    double gap,
+    double contentGap,
+    double interColumnGap,
   ) {
     return Row(
       children: [
@@ -565,7 +578,7 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
                   !widget.expandedIds.contains(node.id),
                 ),
               ),
-              SizedBox(width: gap),
+              SizedBox(width: contentGap),
               Expanded(
                 child: CarpenterTableText.cell(
                   node.label,
@@ -580,7 +593,7 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
           ),
         ),
         for (final column in columns) ...[
-          SizedBox(width: gap),
+          SizedBox(width: interColumnGap),
           _TreeTableSlot(
             width: layout.widths[column.id]!,
             alignment: column.alignment,
@@ -641,7 +654,6 @@ final class _TreeHeaderCell extends StatelessWidget {
     alignment: alignment,
     verticalAlignment: verticalAlignment,
     resizable: resizable,
-    padded: false,
     resizeHandleKey: ValueKey('tree-table-resize-$id'),
     onWidthChanged: onWidthChanged,
     child: CarpenterTableText.header(label, semanticsLabel: semanticLabel),
@@ -666,7 +678,6 @@ final class _TreeTableSlot extends StatelessWidget {
     width: width,
     alignment: alignment,
     verticalAlignment: verticalAlignment,
-    padded: false,
     child: child,
   );
 }
