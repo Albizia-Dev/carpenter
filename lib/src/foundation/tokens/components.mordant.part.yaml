@@ -35,6 +35,13 @@ component:
       large: "${spacing.control.gap}"
       xlarge: "${spacing.control.gap}"
 
+    compactGap:
+      xsmall: "${spacing.control.compactGap}"
+      small: "${spacing.control.compactGap}"
+      medium: "${spacing.control.compactGap}"
+      large: "${spacing.control.compactGap}"
+      xlarge: "${spacing.control.compactGap}"
+
     icon:
       xsmall: "${size.icon.xsmall}"
       small: "${size.icon.small}"
@@ -81,12 +88,26 @@ component:
       large: "${spacing.control.horizontalLarge}"
       xlarge: "${spacing.control.horizontalXlarge}"
 
+    compactHorizontalPadding:
+      xsmall: "${spacing.control.compactHorizontalXsmall}"
+      small: "${spacing.control.compactHorizontalSmall}"
+      medium: "${spacing.control.compactHorizontalMedium}"
+      large: "${spacing.control.compactHorizontalLarge}"
+      xlarge: "${spacing.control.compactHorizontalXlarge}"
+
     verticalPadding:
       xsmall: "${component.action.verticalPadding.xsmall}"
       small: "${component.action.verticalPadding.small}"
       medium: "${component.action.verticalPadding.medium}"
       large: "${component.action.verticalPadding.large}"
       xlarge: "${component.action.verticalPadding.xlarge}"
+
+    compactVerticalPadding:
+      xsmall: "${spacing.field.compactVerticalXsmall}"
+      small: "${spacing.field.compactVerticalSmall}"
+      medium: "${spacing.field.compactVerticalMedium}"
+      large: "${spacing.field.compactVerticalLarge}"
+      xlarge: "${spacing.field.compactVerticalXlarge}"
 
     contentGap:
       xsmall: "${spacing.field.contentGap}"
@@ -95,12 +116,26 @@ component:
       large: "${spacing.field.contentGap}"
       xlarge: "${spacing.field.contentGap}"
 
+    compactContentGap:
+      xsmall: "${spacing.field.compactContentGap}"
+      small: "${spacing.field.compactContentGap}"
+      medium: "${spacing.field.compactContentGap}"
+      large: "${spacing.field.compactContentGap}"
+      xlarge: "${spacing.field.compactContentGap}"
+
     labelGap:
       xsmall: "${spacing.field.labelGap}"
       small: "${spacing.field.labelGap}"
       medium: "${spacing.field.labelGap}"
       large: "${spacing.field.labelGap}"
       xlarge: "${spacing.field.labelGap}"
+
+    compactLabelGap:
+      xsmall: "${spacing.field.compactLabelGap}"
+      small: "${spacing.field.compactLabelGap}"
+      medium: "${spacing.field.compactLabelGap}"
+      large: "${spacing.field.compactLabelGap}"
+      xlarge: "${spacing.field.compactLabelGap}"
 
     supportingGap:
       xsmall: "${spacing.field.supportingGap}"
@@ -109,12 +144,26 @@ component:
       large: "${spacing.field.supportingGap}"
       xlarge: "${spacing.field.supportingGap}"
 
+    compactSupportingGap:
+      xsmall: "${spacing.field.compactSupportingGap}"
+      small: "${spacing.field.compactSupportingGap}"
+      medium: "${spacing.field.compactSupportingGap}"
+      large: "${spacing.field.compactSupportingGap}"
+      xlarge: "${spacing.field.compactSupportingGap}"
+
     scrollPadding:
       xsmall: "${spacing.field.scrollPadding}"
       small: "${spacing.field.scrollPadding}"
       medium: "${spacing.field.scrollPadding}"
       large: "${spacing.field.scrollPadding}"
       xlarge: "${spacing.field.scrollPadding}"
+
+    compactScrollPadding:
+      xsmall: "${spacing.field.compactScrollPadding}"
+      small: "${spacing.field.compactScrollPadding}"
+      medium: "${spacing.field.compactScrollPadding}"
+      large: "${spacing.field.compactScrollPadding}"
+      xlarge: "${spacing.field.compactScrollPadding}"
 
     icon:
       xsmall: "${size.icon.xsmall}"
@@ -186,12 +235,26 @@ component:
       large: "${spacing.selection.labelGap}"
       xlarge: "${spacing.selection.labelGap}"
 
+    compactLabelGap:
+      xsmall: "${spacing.selection.compactLabelGap}"
+      small: "${spacing.selection.compactLabelGap}"
+      medium: "${spacing.selection.compactLabelGap}"
+      large: "${spacing.selection.compactLabelGap}"
+      xlarge: "${spacing.selection.compactLabelGap}"
+
     supportingGap:
       xsmall: "${spacing.selection.supportingGap}"
       small: "${spacing.selection.supportingGap}"
       medium: "${spacing.selection.supportingGap}"
       large: "${spacing.selection.supportingGap}"
       xlarge: "${spacing.selection.supportingGap}"
+
+    compactSupportingGap:
+      xsmall: "${spacing.selection.compactSupportingGap}"
+      small: "${spacing.selection.compactSupportingGap}"
+      medium: "${spacing.selection.compactSupportingGap}"
+      large: "${spacing.selection.compactSupportingGap}"
+      xlarge: "${spacing.selection.compactSupportingGap}"
 
     labelFont:
       size:
@@ -299,6 +362,8 @@ component:
   status:
     horizontalPadding: "${spacing.status.horizontal}"
     verticalPadding: "${spacing.status.vertical}"
+    compactHorizontalPadding: "${spacing.status.compactHorizontal}"
+    compactVerticalPadding: "${spacing.status.compactVertical}"
     radius: "${shape.circular}"
     roundedRadius: "${shape.rounded}"
     circularRadius: "${shape.circular}"
@@ -312,6 +377,9 @@ component:
     itemHorizontalPadding: "${spacing.overlay.menuItemHorizontal}"
     itemVerticalPadding: "${spacing.overlay.menuItemVertical}"
     itemGap: "${spacing.overlay.menuItemGap}"
+    compactItemHorizontalPadding: "${spacing.overlay.compactMenuItemHorizontal}"
+    compactItemVerticalPadding: "${spacing.overlay.compactMenuItemVertical}"
+    compactItemGap: "${spacing.overlay.compactMenuItemGap}"
 
     itemRadius: "${shape.roundedSmall}"
     itemIcon: "${size.icon.small}"
@@ -373,6 +441,10 @@ component:
     verticalPadding: "${spacing.table.vertical}"
     cellGap: "${spacing.table.cellGap}"
     stateGap: "${spacing.table.stateGap}"
+    compactHorizontalPadding: "${spacing.table.compactHorizontal}"
+    compactVerticalPadding: "${spacing.table.compactVertical}"
+    compactCellGap: "${spacing.table.compactCellGap}"
+    compactStateGap: "${spacing.table.compactStateGap}"
 
     surfaceRadius: "${shape.rounded}"
     borderWidth: "${border.standard}"

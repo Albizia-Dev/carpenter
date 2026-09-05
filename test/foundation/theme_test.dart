@@ -60,13 +60,68 @@ void main() {
     });
   }
 
-  test('compact density reduces semantic control padding', () {
+  test('compact density reduces spacing across component families', () {
     final normal = CarpenterThemeData.light();
     final compact = CarpenterThemeData.light(density: CarpenterDensity.compact);
+
     expect(
       compact.spacing.controlHorizontal(ControlSize.medium).value,
       lessThan(normal.spacing.controlHorizontal(ControlSize.medium).value),
     );
+    expect(
+      compact.spacing.actionGap(ControlSize.medium).value,
+      lessThan(normal.spacing.actionGap(ControlSize.medium).value),
+    );
+    expect(
+      compact.spacing.fieldHorizontal(FieldSize.medium).value,
+      lessThan(normal.spacing.fieldHorizontal(FieldSize.medium).value),
+    );
+    expect(
+      compact.spacing.fieldVertical(FieldSize.medium).value,
+      lessThan(normal.spacing.fieldVertical(FieldSize.medium).value),
+    );
+    expect(
+      compact.spacing.fieldContentGapFor(FieldSize.medium).value,
+      lessThan(normal.spacing.fieldContentGapFor(FieldSize.medium).value),
+    );
+    expect(
+      compact.spacing.selectionLabelGapFor(ControlSize.medium).value,
+      lessThan(normal.spacing.selectionLabelGapFor(ControlSize.medium).value),
+    );
+    expect(
+      compact.spacing.selectionGroupGap.value,
+      lessThan(normal.spacing.selectionGroupGap.value),
+    );
+    expect(
+      compact.spacing.statusHorizontal.value,
+      lessThan(normal.spacing.statusHorizontal.value),
+    );
+    expect(
+      compact.spacing.overlayMenuItemHorizontal.value,
+      lessThan(normal.spacing.overlayMenuItemHorizontal.value),
+    );
+    expect(
+      compact.spacing.overlayMenuItemVertical.value,
+      lessThan(normal.spacing.overlayMenuItemVertical.value),
+    );
+    expect(
+      compact.spacing.tableHorizontal.value,
+      lessThan(normal.spacing.tableHorizontal.value),
+    );
+    expect(
+      compact.spacing.tableVertical.value,
+      lessThan(normal.spacing.tableVertical.value),
+    );
+    expect(
+      compact.spacing.layoutToolbar.value,
+      lessThan(normal.spacing.layoutToolbar.value),
+    );
+
+    expect(
+      compact.sizes.control(ControlSize.medium),
+      normal.sizes.control(ControlSize.medium),
+    );
+    expect(compact.sizes.minimumTarget, normal.sizes.minimumTarget);
   });
 
   test('extra size roles extend control and icon scales', () {

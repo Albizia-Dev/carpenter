@@ -953,15 +953,34 @@ final class CarpenterSpacingTheme {
   };
 
   LengthUnit get controlGap => actionGap(ControlSize.medium);
-  LengthUnit actionGap(ControlSize value) => switch (value) {
-    ControlSize.xsmall => tokens.component.action.gap.xsmall,
-    ControlSize.small => tokens.component.action.gap.small,
-    ControlSize.medium => tokens.component.action.gap.medium,
-    ControlSize.large => tokens.component.action.gap.large,
-    ControlSize.xlarge => tokens.component.action.gap.xlarge,
+  LengthUnit actionGap(ControlSize value) => switch ((density, value)) {
+    (CarpenterDensity.normal, ControlSize.xsmall) =>
+      tokens.component.action.gap.xsmall,
+    (CarpenterDensity.normal, ControlSize.small) =>
+      tokens.component.action.gap.small,
+    (CarpenterDensity.normal, ControlSize.medium) =>
+      tokens.component.action.gap.medium,
+    (CarpenterDensity.normal, ControlSize.large) =>
+      tokens.component.action.gap.large,
+    (CarpenterDensity.normal, ControlSize.xlarge) =>
+      tokens.component.action.gap.xlarge,
+    (CarpenterDensity.compact, ControlSize.xsmall) =>
+      tokens.component.action.compactGap.xsmall,
+    (CarpenterDensity.compact, ControlSize.small) =>
+      tokens.component.action.compactGap.small,
+    (CarpenterDensity.compact, ControlSize.medium) =>
+      tokens.component.action.compactGap.medium,
+    (CarpenterDensity.compact, ControlSize.large) =>
+      tokens.component.action.compactGap.large,
+    (CarpenterDensity.compact, ControlSize.xlarge) =>
+      tokens.component.action.compactGap.xlarge,
   };
-  LengthUnit get statusHorizontal => tokens.component.status.horizontalPadding;
-  LengthUnit get statusVertical => tokens.component.status.verticalPadding;
+  LengthUnit get statusHorizontal => density == CarpenterDensity.compact
+      ? tokens.component.status.compactHorizontalPadding
+      : tokens.component.status.horizontalPadding;
+  LengthUnit get statusVertical => density == CarpenterDensity.compact
+      ? tokens.component.status.compactVerticalPadding
+      : tokens.component.status.verticalPadding;
   LengthUnit get small => tokens.spacing.small;
   LengthUnit get medium => tokens.spacing.medium;
   LengthUnit get large => tokens.spacing.large;
@@ -972,7 +991,9 @@ final class CarpenterSpacingTheme {
   LengthUnit get selectionLabelGap => selectionLabelGapFor(ControlSize.medium);
   LengthUnit get selectionSupportingGap =>
       selectionSupportingGapFor(ControlSize.medium);
-  LengthUnit get selectionGroupGap => tokens.spacing.selection.groupGap;
+  LengthUnit get selectionGroupGap => density == CarpenterDensity.compact
+      ? tokens.spacing.selection.compactGroupGap
+      : tokens.spacing.selection.groupGap;
   LengthUnit get selectionMarkInset => checkboxMarkInset(ControlSize.medium);
   LengthUnit get switchInset => switchInsetFor(ControlSize.medium);
   LengthUnit get overlayViewportInset => tokens.component.overlay.viewportInset;
@@ -980,10 +1001,15 @@ final class CarpenterSpacingTheme {
   LengthUnit get overlaySurfacePadding =>
       tokens.component.overlay.surfacePadding;
   LengthUnit get overlayMenuItemHorizontal =>
-      tokens.component.menu.itemHorizontalPadding;
-  LengthUnit get overlayMenuItemVertical =>
-      tokens.component.menu.itemVerticalPadding;
-  LengthUnit get overlayMenuItemGap => tokens.component.menu.itemGap;
+      density == CarpenterDensity.compact
+      ? tokens.component.menu.compactItemHorizontalPadding
+      : tokens.component.menu.itemHorizontalPadding;
+  LengthUnit get overlayMenuItemVertical => density == CarpenterDensity.compact
+      ? tokens.component.menu.compactItemVerticalPadding
+      : tokens.component.menu.itemVerticalPadding;
+  LengthUnit get overlayMenuItemGap => density == CarpenterDensity.compact
+      ? tokens.component.menu.compactItemGap
+      : tokens.component.menu.itemGap;
   LengthUnit get overlayTooltipHorizontal =>
       tokens.component.overlay.tooltipHorizontalPadding;
   LengthUnit get overlayTooltipVertical =>
@@ -999,81 +1025,215 @@ final class CarpenterSpacingTheme {
   LengthUnit get overlayToastGap => tokens.component.overlay.toastGap;
   LengthUnit get overlayToastContentGap =>
       tokens.component.overlay.toastContentGap;
-  LengthUnit get tableHorizontal => tokens.component.table.horizontalPadding;
-  LengthUnit get tableVertical => tokens.component.table.verticalPadding;
-  LengthUnit get tableCellGap => tokens.component.table.cellGap;
-  LengthUnit get tableStateGap => tokens.component.table.stateGap;
+  LengthUnit get tableHorizontal => density == CarpenterDensity.compact
+      ? tokens.component.table.compactHorizontalPadding
+      : tokens.component.table.horizontalPadding;
+  LengthUnit get tableVertical => density == CarpenterDensity.compact
+      ? tokens.component.table.compactVerticalPadding
+      : tokens.component.table.verticalPadding;
+  LengthUnit get tableCellGap => density == CarpenterDensity.compact
+      ? tokens.component.table.compactCellGap
+      : tokens.component.table.cellGap;
+  LengthUnit get tableStateGap => density == CarpenterDensity.compact
+      ? tokens.component.table.compactStateGap
+      : tokens.component.table.stateGap;
   LengthUnit get layoutShell => tokens.spacing.layout.shell;
   LengthUnit get layoutRegion => tokens.spacing.layout.region;
   LengthUnit get layoutPage => tokens.spacing.layout.page;
   LengthUnit get layoutPageCompact => tokens.spacing.layout.pageCompact;
   LengthUnit get layoutHeader => tokens.spacing.layout.header;
   LengthUnit get layoutSection => tokens.spacing.layout.section;
-  LengthUnit get layoutToolbar => tokens.spacing.layout.toolbar;
+  LengthUnit get layoutToolbar => density == CarpenterDensity.compact
+      ? tokens.spacing.layout.compactToolbar
+      : tokens.spacing.layout.toolbar;
 
-  LengthUnit fieldHorizontal(FieldSize value) => switch (value) {
-    FieldSize.xsmall => tokens.component.field.horizontalPadding.xsmall,
-    FieldSize.small => tokens.component.field.horizontalPadding.small,
-    FieldSize.medium => tokens.component.field.horizontalPadding.medium,
-    FieldSize.large => tokens.component.field.horizontalPadding.large,
-    FieldSize.xlarge => tokens.component.field.horizontalPadding.xlarge,
+  LengthUnit fieldHorizontal(FieldSize value) => switch ((density, value)) {
+    (CarpenterDensity.normal, FieldSize.xsmall) =>
+      tokens.component.field.horizontalPadding.xsmall,
+    (CarpenterDensity.normal, FieldSize.small) =>
+      tokens.component.field.horizontalPadding.small,
+    (CarpenterDensity.normal, FieldSize.medium) =>
+      tokens.component.field.horizontalPadding.medium,
+    (CarpenterDensity.normal, FieldSize.large) =>
+      tokens.component.field.horizontalPadding.large,
+    (CarpenterDensity.normal, FieldSize.xlarge) =>
+      tokens.component.field.horizontalPadding.xlarge,
+    (CarpenterDensity.compact, FieldSize.xsmall) =>
+      tokens.component.field.compactHorizontalPadding.xsmall,
+    (CarpenterDensity.compact, FieldSize.small) =>
+      tokens.component.field.compactHorizontalPadding.small,
+    (CarpenterDensity.compact, FieldSize.medium) =>
+      tokens.component.field.compactHorizontalPadding.medium,
+    (CarpenterDensity.compact, FieldSize.large) =>
+      tokens.component.field.compactHorizontalPadding.large,
+    (CarpenterDensity.compact, FieldSize.xlarge) =>
+      tokens.component.field.compactHorizontalPadding.xlarge,
   };
 
-  LengthUnit fieldVertical(FieldSize value) => switch (value) {
-    FieldSize.xsmall => tokens.component.field.verticalPadding.xsmall,
-    FieldSize.small => tokens.component.field.verticalPadding.small,
-    FieldSize.medium => tokens.component.field.verticalPadding.medium,
-    FieldSize.large => tokens.component.field.verticalPadding.large,
-    FieldSize.xlarge => tokens.component.field.verticalPadding.xlarge,
+  LengthUnit fieldVertical(FieldSize value) => switch ((density, value)) {
+    (CarpenterDensity.normal, FieldSize.xsmall) =>
+      tokens.component.field.verticalPadding.xsmall,
+    (CarpenterDensity.normal, FieldSize.small) =>
+      tokens.component.field.verticalPadding.small,
+    (CarpenterDensity.normal, FieldSize.medium) =>
+      tokens.component.field.verticalPadding.medium,
+    (CarpenterDensity.normal, FieldSize.large) =>
+      tokens.component.field.verticalPadding.large,
+    (CarpenterDensity.normal, FieldSize.xlarge) =>
+      tokens.component.field.verticalPadding.xlarge,
+    (CarpenterDensity.compact, FieldSize.xsmall) =>
+      tokens.component.field.compactVerticalPadding.xsmall,
+    (CarpenterDensity.compact, FieldSize.small) =>
+      tokens.component.field.compactVerticalPadding.small,
+    (CarpenterDensity.compact, FieldSize.medium) =>
+      tokens.component.field.compactVerticalPadding.medium,
+    (CarpenterDensity.compact, FieldSize.large) =>
+      tokens.component.field.compactVerticalPadding.large,
+    (CarpenterDensity.compact, FieldSize.xlarge) =>
+      tokens.component.field.compactVerticalPadding.xlarge,
   };
 
-  LengthUnit fieldContentGapFor(FieldSize value) => switch (value) {
-    FieldSize.xsmall => tokens.component.field.contentGap.xsmall,
-    FieldSize.small => tokens.component.field.contentGap.small,
-    FieldSize.medium => tokens.component.field.contentGap.medium,
-    FieldSize.large => tokens.component.field.contentGap.large,
-    FieldSize.xlarge => tokens.component.field.contentGap.xlarge,
+  LengthUnit fieldContentGapFor(FieldSize value) => switch ((density, value)) {
+    (CarpenterDensity.normal, FieldSize.xsmall) =>
+      tokens.component.field.contentGap.xsmall,
+    (CarpenterDensity.normal, FieldSize.small) =>
+      tokens.component.field.contentGap.small,
+    (CarpenterDensity.normal, FieldSize.medium) =>
+      tokens.component.field.contentGap.medium,
+    (CarpenterDensity.normal, FieldSize.large) =>
+      tokens.component.field.contentGap.large,
+    (CarpenterDensity.normal, FieldSize.xlarge) =>
+      tokens.component.field.contentGap.xlarge,
+    (CarpenterDensity.compact, FieldSize.xsmall) =>
+      tokens.component.field.compactContentGap.xsmall,
+    (CarpenterDensity.compact, FieldSize.small) =>
+      tokens.component.field.compactContentGap.small,
+    (CarpenterDensity.compact, FieldSize.medium) =>
+      tokens.component.field.compactContentGap.medium,
+    (CarpenterDensity.compact, FieldSize.large) =>
+      tokens.component.field.compactContentGap.large,
+    (CarpenterDensity.compact, FieldSize.xlarge) =>
+      tokens.component.field.compactContentGap.xlarge,
   };
 
-  LengthUnit fieldLabelGapFor(FieldSize value) => switch (value) {
-    FieldSize.xsmall => tokens.component.field.labelGap.xsmall,
-    FieldSize.small => tokens.component.field.labelGap.small,
-    FieldSize.medium => tokens.component.field.labelGap.medium,
-    FieldSize.large => tokens.component.field.labelGap.large,
-    FieldSize.xlarge => tokens.component.field.labelGap.xlarge,
+  LengthUnit fieldLabelGapFor(FieldSize value) => switch ((density, value)) {
+    (CarpenterDensity.normal, FieldSize.xsmall) =>
+      tokens.component.field.labelGap.xsmall,
+    (CarpenterDensity.normal, FieldSize.small) =>
+      tokens.component.field.labelGap.small,
+    (CarpenterDensity.normal, FieldSize.medium) =>
+      tokens.component.field.labelGap.medium,
+    (CarpenterDensity.normal, FieldSize.large) =>
+      tokens.component.field.labelGap.large,
+    (CarpenterDensity.normal, FieldSize.xlarge) =>
+      tokens.component.field.labelGap.xlarge,
+    (CarpenterDensity.compact, FieldSize.xsmall) =>
+      tokens.component.field.compactLabelGap.xsmall,
+    (CarpenterDensity.compact, FieldSize.small) =>
+      tokens.component.field.compactLabelGap.small,
+    (CarpenterDensity.compact, FieldSize.medium) =>
+      tokens.component.field.compactLabelGap.medium,
+    (CarpenterDensity.compact, FieldSize.large) =>
+      tokens.component.field.compactLabelGap.large,
+    (CarpenterDensity.compact, FieldSize.xlarge) =>
+      tokens.component.field.compactLabelGap.xlarge,
   };
 
-  LengthUnit fieldSupportingGapFor(FieldSize value) => switch (value) {
-    FieldSize.xsmall => tokens.component.field.supportingGap.xsmall,
-    FieldSize.small => tokens.component.field.supportingGap.small,
-    FieldSize.medium => tokens.component.field.supportingGap.medium,
-    FieldSize.large => tokens.component.field.supportingGap.large,
-    FieldSize.xlarge => tokens.component.field.supportingGap.xlarge,
-  };
+  LengthUnit fieldSupportingGapFor(FieldSize value) =>
+      switch ((density, value)) {
+        (CarpenterDensity.normal, FieldSize.xsmall) =>
+          tokens.component.field.supportingGap.xsmall,
+        (CarpenterDensity.normal, FieldSize.small) =>
+          tokens.component.field.supportingGap.small,
+        (CarpenterDensity.normal, FieldSize.medium) =>
+          tokens.component.field.supportingGap.medium,
+        (CarpenterDensity.normal, FieldSize.large) =>
+          tokens.component.field.supportingGap.large,
+        (CarpenterDensity.normal, FieldSize.xlarge) =>
+          tokens.component.field.supportingGap.xlarge,
+        (CarpenterDensity.compact, FieldSize.xsmall) =>
+          tokens.component.field.compactSupportingGap.xsmall,
+        (CarpenterDensity.compact, FieldSize.small) =>
+          tokens.component.field.compactSupportingGap.small,
+        (CarpenterDensity.compact, FieldSize.medium) =>
+          tokens.component.field.compactSupportingGap.medium,
+        (CarpenterDensity.compact, FieldSize.large) =>
+          tokens.component.field.compactSupportingGap.large,
+        (CarpenterDensity.compact, FieldSize.xlarge) =>
+          tokens.component.field.compactSupportingGap.xlarge,
+      };
 
-  LengthUnit fieldScrollPaddingFor(FieldSize value) => switch (value) {
-    FieldSize.xsmall => tokens.component.field.scrollPadding.xsmall,
-    FieldSize.small => tokens.component.field.scrollPadding.small,
-    FieldSize.medium => tokens.component.field.scrollPadding.medium,
-    FieldSize.large => tokens.component.field.scrollPadding.large,
-    FieldSize.xlarge => tokens.component.field.scrollPadding.xlarge,
-  };
+  LengthUnit fieldScrollPaddingFor(FieldSize value) =>
+      switch ((density, value)) {
+        (CarpenterDensity.normal, FieldSize.xsmall) =>
+          tokens.component.field.scrollPadding.xsmall,
+        (CarpenterDensity.normal, FieldSize.small) =>
+          tokens.component.field.scrollPadding.small,
+        (CarpenterDensity.normal, FieldSize.medium) =>
+          tokens.component.field.scrollPadding.medium,
+        (CarpenterDensity.normal, FieldSize.large) =>
+          tokens.component.field.scrollPadding.large,
+        (CarpenterDensity.normal, FieldSize.xlarge) =>
+          tokens.component.field.scrollPadding.xlarge,
+        (CarpenterDensity.compact, FieldSize.xsmall) =>
+          tokens.component.field.compactScrollPadding.xsmall,
+        (CarpenterDensity.compact, FieldSize.small) =>
+          tokens.component.field.compactScrollPadding.small,
+        (CarpenterDensity.compact, FieldSize.medium) =>
+          tokens.component.field.compactScrollPadding.medium,
+        (CarpenterDensity.compact, FieldSize.large) =>
+          tokens.component.field.compactScrollPadding.large,
+        (CarpenterDensity.compact, FieldSize.xlarge) =>
+          tokens.component.field.compactScrollPadding.xlarge,
+      };
 
-  LengthUnit selectionLabelGapFor(ControlSize value) => switch (value) {
-    ControlSize.xsmall => tokens.component.selection.labelGap.xsmall,
-    ControlSize.small => tokens.component.selection.labelGap.small,
-    ControlSize.medium => tokens.component.selection.labelGap.medium,
-    ControlSize.large => tokens.component.selection.labelGap.large,
-    ControlSize.xlarge => tokens.component.selection.labelGap.xlarge,
-  };
+  LengthUnit selectionLabelGapFor(ControlSize value) =>
+      switch ((density, value)) {
+        (CarpenterDensity.normal, ControlSize.xsmall) =>
+          tokens.component.selection.labelGap.xsmall,
+        (CarpenterDensity.normal, ControlSize.small) =>
+          tokens.component.selection.labelGap.small,
+        (CarpenterDensity.normal, ControlSize.medium) =>
+          tokens.component.selection.labelGap.medium,
+        (CarpenterDensity.normal, ControlSize.large) =>
+          tokens.component.selection.labelGap.large,
+        (CarpenterDensity.normal, ControlSize.xlarge) =>
+          tokens.component.selection.labelGap.xlarge,
+        (CarpenterDensity.compact, ControlSize.xsmall) =>
+          tokens.component.selection.compactLabelGap.xsmall,
+        (CarpenterDensity.compact, ControlSize.small) =>
+          tokens.component.selection.compactLabelGap.small,
+        (CarpenterDensity.compact, ControlSize.medium) =>
+          tokens.component.selection.compactLabelGap.medium,
+        (CarpenterDensity.compact, ControlSize.large) =>
+          tokens.component.selection.compactLabelGap.large,
+        (CarpenterDensity.compact, ControlSize.xlarge) =>
+          tokens.component.selection.compactLabelGap.xlarge,
+      };
 
-  LengthUnit selectionSupportingGapFor(ControlSize value) => switch (value) {
-    ControlSize.xsmall => tokens.component.selection.supportingGap.xsmall,
-    ControlSize.small => tokens.component.selection.supportingGap.small,
-    ControlSize.medium => tokens.component.selection.supportingGap.medium,
-    ControlSize.large => tokens.component.selection.supportingGap.large,
-    ControlSize.xlarge => tokens.component.selection.supportingGap.xlarge,
-  };
+  LengthUnit selectionSupportingGapFor(ControlSize value) =>
+      switch ((density, value)) {
+        (CarpenterDensity.normal, ControlSize.xsmall) =>
+          tokens.component.selection.supportingGap.xsmall,
+        (CarpenterDensity.normal, ControlSize.small) =>
+          tokens.component.selection.supportingGap.small,
+        (CarpenterDensity.normal, ControlSize.medium) =>
+          tokens.component.selection.supportingGap.medium,
+        (CarpenterDensity.normal, ControlSize.large) =>
+          tokens.component.selection.supportingGap.large,
+        (CarpenterDensity.normal, ControlSize.xlarge) =>
+          tokens.component.selection.supportingGap.xlarge,
+        (CarpenterDensity.compact, ControlSize.xsmall) =>
+          tokens.component.selection.compactSupportingGap.xsmall,
+        (CarpenterDensity.compact, ControlSize.small) =>
+          tokens.component.selection.compactSupportingGap.small,
+        (CarpenterDensity.compact, ControlSize.medium) =>
+          tokens.component.selection.compactSupportingGap.medium,
+        (CarpenterDensity.compact, ControlSize.large) =>
+          tokens.component.selection.compactSupportingGap.large,
+        (CarpenterDensity.compact, ControlSize.xlarge) =>
+          tokens.component.selection.compactSupportingGap.xlarge,
+      };
 
   LengthUnit checkboxMarkInset(ControlSize value) => switch (value) {
     ControlSize.xsmall => tokens.component.selection.checkbox.markInset.xsmall,
