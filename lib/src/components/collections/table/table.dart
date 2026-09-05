@@ -762,7 +762,7 @@ final class _TableRowState<T, K> extends State<_TableRow<T, K>> {
                 border: Border(
                   bottom: BorderSide(
                     color: theme.overlay.border,
-                    width: context.units(theme.shapes.tableBorderWidth),
+                    width: metrics.borderWidth,
                   ),
                 ),
               ),
@@ -832,7 +832,6 @@ final class _StatePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = CarpenterTheme.of(context);
     final metrics = CarpenterTableMetrics.resolve(context);
     return Center(
       child: Padding(
