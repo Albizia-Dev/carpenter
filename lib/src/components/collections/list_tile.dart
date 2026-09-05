@@ -20,6 +20,7 @@ final class CarpenterListTile extends StatelessWidget {
     this.selected = false,
     this.semanticLabel,
     this.presentation = CarpenterListTilePresentation.standard,
+    this.contentPadding = true,
   });
 
   const CarpenterListTile.tableRow({
@@ -32,6 +33,7 @@ final class CarpenterListTile extends StatelessWidget {
     this.onDoubleInvoke,
     this.selected = false,
     this.semanticLabel,
+    this.contentPadding = true,
   }) : presentation = CarpenterListTilePresentation.tableRow;
 
   final Widget title;
@@ -43,6 +45,12 @@ final class CarpenterListTile extends StatelessWidget {
   final bool selected;
   final String? semanticLabel;
   final CarpenterListTilePresentation presentation;
+
+  /// Whether this tile owns edge padding around its content.
+  ///
+  /// Table-shaped parents can disable it when their individual cells already
+  /// own the table padding contract.
+  final bool contentPadding;
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +64,43 @@ final class CarpenterListTile extends StatelessWidget {
         ? BorderRadius.zero
         : BorderRadius.circular(context.units(.5.rem));
     final rowHeight = metrics.rowHeight;
+    final row = Row(
+      crossAxisAlignment: tableRow
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
+      children: [
+        if (leading != null) ...[leading!, SizedBox(width: gap)],
+        Expanded(
+          child: tableRow && subtitle == null
+              ? Align(alignment: AlignmentDirectional.centerStart, child: title)
+              : Column(
+                  mainAxisAlignment: tableRow
+                      ? MainAxisAlignment.center
+                      : MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    title,
+                    if (subtitle != null) ...[
+                      SizedBox(height: gap / 2),
+                      subtitle!,
+                    ],
+                  ],
+                ),
+        ),
+        if (trailing != null) ...[SizedBox(width: gap), trailing!],
+      ],
+    );
+    final content = contentPadding
+        ? Padding(
+            padding: tableRow
+                ? EdgeInsetsDirectional.symmetric(
+                    horizontal: gap,
+                    vertical: metrics.verticalPadding,
+                  )
+                : EdgeInsets.symmetric(horizontal: gap, vertical: gap * .75),
+            child: row,
+          )
+        : row;
     return Semantics(
       container: true,
       selected: selected,
@@ -104,43 +149,7 @@ final class CarpenterListTile extends StatelessWidget {
                   : null,
               child: child,
             ),
-            child: Padding(
-              padding: tableRow
-                  ? EdgeInsetsDirectional.symmetric(
-                      horizontal: gap,
-                      vertical: metrics.verticalPadding,
-                    )
-                  : EdgeInsets.symmetric(horizontal: gap, vertical: gap * .75),
-              child: Row(
-                crossAxisAlignment: tableRow
-                    ? CrossAxisAlignment.center
-                    : CrossAxisAlignment.start,
-                children: [
-                  if (leading != null) ...[leading!, SizedBox(width: gap)],
-                  Expanded(
-                    child: tableRow && subtitle == null
-                        ? Align(
-                            alignment: AlignmentDirectional.centerStart,
-                            child: title,
-                          )
-                        : Column(
-                            mainAxisAlignment: tableRow
-                                ? MainAxisAlignment.center
-                                : MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              title,
-                              if (subtitle != null) ...[
-                                SizedBox(height: gap / 2),
-                                subtitle!,
-                              ],
-                            ],
-                          ),
-                  ),
-                  if (trailing != null) ...[SizedBox(width: gap), trailing!],
-                ],
-              ),
-            ),
+            child: content,
           );
         },
       ),
