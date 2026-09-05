@@ -27,6 +27,9 @@ typedef CarpenterTreeTableColumnWidthChanged =
 
 @immutable
 final class CarpenterTreeTableColumn<T> {
+  @Deprecated(
+    'Use CarpenterTreeTableColumn.custom(...) with an explicit width contract.',
+  )
   const CarpenterTreeTableColumn({
     required this.id,
     required this.header,
@@ -42,6 +45,17 @@ final class CarpenterTreeTableColumn<T> {
     this.semanticLabel,
   }) : assert(flex > 0);
 
+  const CarpenterTreeTableColumn.custom({
+    required this.id,
+    required this.header,
+    required this.cellBuilder,
+    this.width = const CarpenterTableColumnWidth.flexible(),
+    this.alignment = CarpenterTableColumnAlignment.start,
+    this.verticalAlignment = CarpenterTableColumnVerticalAlignment.center,
+    this.resizable = true,
+    this.semanticLabel,
+  }) : flex = 1;
+
   factory CarpenterTreeTableColumn.text({
     required String id,
     required String header,
@@ -54,7 +68,7 @@ final class CarpenterTreeTableColumn<T> {
         const CarpenterTableColumnWidth.flexible(),
     bool resizable = true,
     String? semanticLabel,
-  }) => CarpenterTreeTableColumn<T>(
+  }) => CarpenterTreeTableColumn<T>.custom(
     id: id,
     header: header,
     alignment: alignment,
@@ -81,7 +95,7 @@ final class CarpenterTreeTableColumn<T> {
         const CarpenterTableColumnWidth.flexible(),
     bool resizable = true,
     String? semanticLabel,
-  }) => CarpenterTreeTableColumn<T>(
+  }) => CarpenterTreeTableColumn<T>.custom(
     id: id,
     header: header,
     alignment: alignment,
@@ -117,7 +131,7 @@ final class CarpenterTreeTableColumn<T> {
         const CarpenterTableColumnWidth.flexible(),
     bool resizable = true,
     String? semanticLabel,
-  }) => CarpenterTreeTableColumn<T>(
+  }) => CarpenterTreeTableColumn<T>.custom(
     id: id,
     header: header,
     alignment: alignment,
@@ -144,7 +158,7 @@ final class CarpenterTreeTableColumn<T> {
     bool resizable = false,
     String? semanticLabel,
     String overflowLabel = 'More actions',
-  }) => CarpenterTreeTableColumn<T>(
+  }) => CarpenterTreeTableColumn<T>.custom(
     id: id,
     header: header,
     alignment: alignment,

@@ -5,6 +5,39 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/harness.dart';
 
 void main() {
+  test(
+    'tree custom columns use the same explicit width contract as tables',
+    () {
+      final column = CarpenterTreeTableColumn<String>.custom(
+        id: 'value',
+        header: 'Value',
+        cellBuilder: (_, node) => Text(node.label),
+      );
+
+      expect(column.width, isNotNull);
+      expect(
+        column.effectiveWidth.policy,
+        CarpenterTableColumnWidthPolicy.flexible,
+      );
+      expect(column.effectiveWidth.flex, 1);
+    },
+  );
+
+  test('legacy tree flex still resolves through the compatibility path', () {
+    const column = CarpenterTreeTableColumn<String>(
+      id: 'legacy',
+      header: 'Legacy',
+      flex: 3,
+      cellBuilder: _legacyTreeCell,
+    );
+
+    expect(column.width, isNull);
+    expect(
+      column.effectiveWidth.policy,
+      CarpenterTableColumnWidthPolicy.flexible,
+    );
+    expect(column.effectiveWidth.flex, 3);
+  });
   test('tree action columns use the semantic action-lane width policy', () {
     final column = CarpenterTreeTableColumn<String>.actions(
       id: 'actions',
@@ -165,3 +198,6 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 }
+
+Widget _legacyTreeCell(BuildContext context, CarpenterTreeNode<String> node) =>
+    Text(node.label);
