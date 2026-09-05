@@ -18,6 +18,7 @@ final class SelectableField extends StatelessWidget {
     this.placeholder,
     this.label,
     this.description,
+    this.feedback,
     this.errorText,
     this.semanticLabel,
     this.required = false,
@@ -29,6 +30,7 @@ final class SelectableField extends StatelessWidget {
   final String? placeholder;
   final String? label;
   final String? description;
+  final CarpenterFieldFeedback? feedback;
   final String? errorText;
   final String? semanticLabel;
   final bool required;
@@ -40,11 +42,16 @@ final class SelectableField extends StatelessWidget {
   final FocusNode? focusNode;
   final bool autofocus;
 
+  CarpenterFieldFeedback? get _effectiveFeedback => errorText != null
+      ? CarpenterFieldFeedback.danger(errorText!)
+      : feedback;
+
   @override
   Widget build(BuildContext context) {
     final disabled = availability == FieldAvailability.disabled;
     final readOnly = availability == FieldAvailability.readOnly;
     final focusableAction = disabled ? null : (onActivate ?? () {});
+    final effectiveFeedback = _effectiveFeedback;
     return Semantics(
       container: true,
       textField: true,
@@ -54,7 +61,7 @@ final class SelectableField extends StatelessWidget {
       isRequired: required ? true : null,
       label: semanticLabel ?? label,
       value: valueText,
-      hint: errorText ?? description ?? placeholder,
+      hint: effectiveFeedback?.message ?? description ?? placeholder,
       onTap: readOnly || disabled ? null : onActivate,
       excludeSemantics: true,
       child: InteractiveRegion(
@@ -70,12 +77,12 @@ final class SelectableField extends StatelessWidget {
           final theme = CarpenterTheme.of(context);
           final fieldStates = <WidgetState>{
             ...states,
-            if (errorText != null) WidgetState.error,
+            if (effectiveFeedback?.isError ?? false) WidgetState.error,
           };
           final style = theme.fields.resolve(
             availability: availability,
             states: fieldStates,
-            hasError: errorText != null,
+            hasError: effectiveFeedback?.isError ?? false,
           );
           final hasValue = valueText != null && valueText!.isNotEmpty;
           return MouseRegion(
@@ -89,6 +96,7 @@ final class SelectableField extends StatelessWidget {
               states: fieldStates,
               label: label,
               description: description,
+              feedback: feedback,
               errorText: errorText,
               required: required,
               child: Text(
