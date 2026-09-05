@@ -78,7 +78,9 @@ void main() {
       onInvoke: null,
     );
 
-    await tester.pumpWidget(carpenterHarness(CarpenterButton.fromAction(action)));
+    await tester.pumpWidget(
+      carpenterHarness(CarpenterButton.fromAction(action)),
+    );
 
     final semantics = tester.getSemantics(
       find.bySemanticsLabel('Archive record'),
