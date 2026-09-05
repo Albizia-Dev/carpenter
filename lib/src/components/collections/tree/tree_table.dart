@@ -344,8 +344,6 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final metrics = CarpenterTableMetrics.resolve(context);
-    const outerPadding = 0.0;
-    const interColumnGap = 0.0;
     final contentGap = metrics.cellGap;
     final columns = _effectiveColumns;
 
@@ -355,8 +353,6 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
           context,
           constraints.maxWidth,
           columns: columns,
-          outerPadding: outerPadding,
-          gap: interColumnGap,
         );
         final tree = CarpenterTreeView<T>(
           nodes: widget.nodes,
@@ -379,28 +375,15 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
           tableRowContentPadding: false,
           dragActivation: widget.dragActivation,
           semanticLabel: '${widget.semanticLabel} rows',
-          rowBuilder: (context, node, state, _) => _buildRow(
-            context,
-            layout,
-            columns,
-            node,
-            state,
-            contentGap,
-            interColumnGap,
-          ),
+          rowBuilder: (context, node, state, _) =>
+              _buildRow(context, layout, columns, node, state, contentGap),
         );
         Widget content = Column(
           mainAxisSize: widget.scrollController == null
               ? MainAxisSize.min
               : MainAxisSize.max,
           children: [
-            _buildHeader(
-              context,
-              layout,
-              columns,
-              outerPadding,
-              interColumnGap,
-            ),
+            _buildHeader(context, layout, columns),
             if (widget.scrollController == null)
               tree
             else
@@ -444,8 +427,6 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     BuildContext context,
     double viewportWidth, {
     required List<CarpenterTreeTableColumn<T>> columns,
-    required double outerPadding,
-    required double gap,
   }) {
     final metrics = CarpenterTableMetrics.resolve(context);
     final publicSpecs = <({String id, CarpenterTableColumnWidth width})>[
@@ -490,8 +471,6 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     final resolved = GridLayoutResolver.resolve(
       columns: resolvedColumns,
       viewportWidth: viewportWidth,
-      outerInset: outerPadding,
-      gap: gap,
     );
     return _TreeTableLayout(
       widths: resolved.widths,
@@ -505,8 +484,6 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     BuildContext context,
     _TreeTableLayout layout,
     List<CarpenterTreeTableColumn<T>> columns,
-    double outerPadding,
-    double gap,
   ) {
     final theme = CarpenterTheme.of(context);
     final metrics = CarpenterTableMetrics.resolve(context);
@@ -514,7 +491,6 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     return Container(
       color: theme.surface.subtle,
       height: height,
-      padding: EdgeInsetsDirectional.symmetric(horizontal: outerPadding),
       child: Row(
         children: [
           _TreeHeaderCell(
@@ -530,8 +506,7 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
             onWidthChanged: (value) =>
                 _resizeColumn(widget.treeColumnId, value, context),
           ),
-          for (final column in columns) ...[
-            SizedBox(width: gap),
+          for (final column in columns)
             _TreeHeaderCell(
               id: column.id,
               label: column.header,
@@ -545,7 +520,6 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
               onWidthChanged: (value) =>
                   _resizeColumn(column.id, value, context),
             ),
-          ],
         ],
       ),
     );
@@ -558,7 +532,6 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     CarpenterTreeNode<T> node,
     CarpenterTreeRowState<T> state,
     double contentGap,
-    double interColumnGap,
   ) {
     return Row(
       children: [
@@ -592,15 +565,13 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
             ],
           ),
         ),
-        for (final column in columns) ...[
-          SizedBox(width: interColumnGap),
+        for (final column in columns)
           _TreeTableSlot(
             width: layout.widths[column.id]!,
             alignment: column.alignment,
             verticalAlignment: column.verticalAlignment,
             child: column.cellBuilder(context, node),
           ),
-        ],
       ],
     );
   }
