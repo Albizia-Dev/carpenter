@@ -13,6 +13,7 @@ import '../../behaviour/drag_and_drop/draggable.dart';
 import '../contracts/selection_mode.dart';
 import '../table_metrics.dart';
 import '../table/table_actions.dart';
+import '../table/table_cell.dart';
 import '../table/table_column.dart';
 import '../table/table_text.dart';
 import 'tree_event.dart';
@@ -618,112 +619,19 @@ final class _TreeHeaderCell extends StatelessWidget {
   final ValueChanged<double> onWidthChanged;
 
   @override
-  Widget build(BuildContext context) {
-    final metrics = CarpenterTableMetrics.resolve(context);
-    return SizedBox(
-      width: width,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Align(
-            alignment: carpenterTableCellAlignment(
-              alignment,
-              verticalAlignment,
-            ),
-            child: CarpenterTableText.header(
-              label,
-              semanticsLabel: semanticLabel,
-            ),
-          ),
-          if (resizable)
-            Align(
-              alignment: AlignmentDirectional.centerEnd,
-              child: _TreeResizeHandle(
-                key: ValueKey('tree-table-resize-$id'),
-                width: metrics.resizeHandleWidth,
-                currentWidth: width,
-                minimumWidth: minimumWidth,
-                maximumWidth: maximumWidth,
-                onChanged: onWidthChanged,
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-final class _TreeResizeHandle extends StatefulWidget {
-  const _TreeResizeHandle({
-    super.key,
-    required this.width,
-    required this.currentWidth,
-    required this.minimumWidth,
-    required this.maximumWidth,
-    required this.onChanged,
-  });
-
-  final double width;
-  final double currentWidth;
-  final double minimumWidth;
-  final double maximumWidth;
-  final ValueChanged<double> onChanged;
-
-  @override
-  State<_TreeResizeHandle> createState() => _TreeResizeHandleState();
-}
-
-final class _TreeResizeHandleState extends State<_TreeResizeHandle> {
-  late double _dragWidth;
-  bool _hovered = false;
-  bool _dragging = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = CarpenterTheme.of(context);
-    final metrics = CarpenterTableMetrics.resolve(context);
-    final active = _hovered || _dragging;
-    final strokeWidth = active
-        ? context.units(theme.focus.width)
-        : metrics.borderWidth;
-    return MouseRegion(
-      cursor: SystemMouseCursors.resizeColumn,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onHorizontalDragStart: (_) {
-          _dragWidth = widget.currentWidth;
-          setState(() => _dragging = true);
-        },
-        onHorizontalDragUpdate: (details) {
-          final logicalDelta = Directionality.of(context) == TextDirection.rtl
-              ? -details.delta.dx
-              : details.delta.dx;
-          _dragWidth = (_dragWidth + logicalDelta).clamp(
-            widget.minimumWidth,
-            widget.maximumWidth,
-          );
-          widget.onChanged(_dragWidth);
-        },
-        onHorizontalDragEnd: (_) => setState(() => _dragging = false),
-        onHorizontalDragCancel: () => setState(() => _dragging = false),
-        child: SizedBox(
-          width: widget.width,
-          height: double.infinity,
-          child: Center(
-            child: SizedBox(
-              width: strokeWidth,
-              height: double.infinity,
-              child: ColoredBox(
-                color: active ? theme.focus.color : theme.overlay.border,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => CarpenterTableHeaderCellChrome(
+    id: id,
+    width: width,
+    minimumWidth: minimumWidth,
+    maximumWidth: maximumWidth,
+    alignment: alignment,
+    verticalAlignment: verticalAlignment,
+    resizable: resizable,
+    padded: false,
+    resizeHandleKey: ValueKey('tree-table-resize-$id'),
+    onWidthChanged: onWidthChanged,
+    child: CarpenterTableText.header(label, semanticsLabel: semanticLabel),
+  );
 }
 
 final class _TreeTableSlot extends StatelessWidget {
@@ -740,12 +648,12 @@ final class _TreeTableSlot extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => SizedBox(
+  Widget build(BuildContext context) => CarpenterTableCellChrome(
     width: width,
-    child: Align(
-      alignment: carpenterTableCellAlignment(alignment, verticalAlignment),
-      child: child,
-    ),
+    alignment: alignment,
+    verticalAlignment: verticalAlignment,
+    padded: false,
+    child: child,
   );
 }
 

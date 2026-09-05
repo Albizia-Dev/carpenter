@@ -7,7 +7,6 @@ import 'package:flutter/widgets.dart';
 import '../../../foundation/roles.dart';
 import '../../../foundation/theme.dart';
 import '../../../internal/layout/grid_layout.dart';
-import '../../../internal/rendering/interactive_region.dart';
 import '../../basic/button/button.dart';
 import '../../basic/checkbox.dart';
 import '../../basic/status_indicator.dart';
@@ -17,6 +16,7 @@ import '../contracts/collection_snapshot.dart';
 import '../contracts/selection_state.dart';
 import '../table_metrics.dart';
 import 'table_actions.dart';
+import 'table_cell.dart';
 import 'table_column.dart';
 import 'table_state.dart';
 import 'table_text.dart';
@@ -284,9 +284,6 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
               sorting: widget.sorting,
               onSortingChanged: widget.onSortingChanged,
               multiSort: widget.multiSort,
-              resizeHandleWidth: metrics.resizeHandleWidth,
-              horizontalPadding: metrics.horizontalPadding,
-              verticalPadding: metrics.verticalPadding,
               onWidthChanged: _resizeColumn,
             ),
         ],
@@ -462,9 +459,6 @@ final class _HeaderCell<T> extends StatelessWidget {
     required this.sorting,
     required this.onSortingChanged,
     required this.multiSort,
-    required this.resizeHandleWidth,
-    required this.horizontalPadding,
-    required this.verticalPadding,
     required this.onWidthChanged,
   });
 
@@ -475,9 +469,6 @@ final class _HeaderCell<T> extends StatelessWidget {
   final List<CollectionSort> sorting;
   final ValueChanged<List<CollectionSort>>? onSortingChanged;
   final bool multiSort;
-  final double resizeHandleWidth;
-  final double horizontalPadding;
-  final double verticalPadding;
   final CarpenterTableColumnWidthChanged onWidthChanged;
 
   void _toggleSort() {
@@ -513,7 +504,6 @@ final class _HeaderCell<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = CarpenterTheme.of(context);
     final sort = sorting
         .where((candidate) => candidate.id == column.id)
         .firstOrNull;
@@ -522,133 +512,24 @@ final class _HeaderCell<T> extends StatelessWidget {
       CollectionSortDirection.descending => ' ↓',
       null => '',
     };
-    return SizedBox(
+    return CarpenterTableHeaderCellChrome(
+      id: column.id,
       width: width,
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          InteractiveRegion(
-            onActivate: column.sortable && onSortingChanged != null
-                ? _toggleSort
-                : null,
-            builder: (context, states, showFocusHighlight) => DecoratedBox(
-              decoration: BoxDecoration(
-                color: states.contains(WidgetState.hovered)
-                    ? theme.overlay.hovered
-                    : theme.surface.subtle,
-                border: showFocusHighlight
-                    ? Border.all(
-                        color: theme.focus.color,
-                        width: context.units(theme.focus.width),
-                      )
-                    : null,
-              ),
-              child: Padding(
-                padding: EdgeInsetsDirectional.symmetric(
-                  horizontal: horizontalPadding,
-                  vertical: verticalPadding,
-                ),
-                child: Align(
-                  alignment: carpenterTableCellAlignment(
-                    column.alignment,
-                    column.verticalAlignment,
-                  ),
-                  child: CarpenterTableText.header(
-                    '${column.header}$suffix',
-                    semanticsLabel: column.semanticLabel ?? column.header,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          if (column.resizable)
-            Align(
-              alignment: AlignmentDirectional.centerEnd,
-              child: _ResizeHandle(
-                key: ValueKey('table-resize-${column.id}'),
-                width: resizeHandleWidth,
-                currentWidth: width,
-                minimumWidth: minimumWidth,
-                maximumWidth: maximumWidth,
-                onChanged: (value) => onWidthChanged(
-                  column.id,
-                  Rem(value / context.units(1.rem)),
-                ),
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-}
-
-final class _ResizeHandle extends StatefulWidget {
-  const _ResizeHandle({
-    super.key,
-    required this.width,
-    required this.currentWidth,
-    required this.minimumWidth,
-    required this.maximumWidth,
-    required this.onChanged,
-  });
-  final double width;
-  final double currentWidth;
-  final double minimumWidth;
-  final double maximumWidth;
-  final ValueChanged<double> onChanged;
-
-  @override
-  State<_ResizeHandle> createState() => _ResizeHandleState();
-}
-
-final class _ResizeHandleState extends State<_ResizeHandle> {
-  late double _dragWidth;
-  bool _hovered = false;
-  bool _dragging = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = CarpenterTheme.of(context);
-    final metrics = CarpenterTableMetrics.resolve(context);
-    final active = _hovered || _dragging;
-    final strokeWidth = active
-        ? context.units(theme.focus.width)
-        : metrics.borderWidth;
-    return MouseRegion(
-      cursor: SystemMouseCursors.resizeColumn,
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onHorizontalDragStart: (_) {
-          _dragWidth = widget.currentWidth;
-          setState(() => _dragging = true);
-        },
-        onHorizontalDragUpdate: (details) {
-          final logicalDelta = Directionality.of(context) == TextDirection.rtl
-              ? -details.delta.dx
-              : details.delta.dx;
-          _dragWidth = (_dragWidth + logicalDelta).clamp(
-            widget.minimumWidth,
-            widget.maximumWidth,
-          );
-          widget.onChanged(_dragWidth);
-        },
-        onHorizontalDragEnd: (_) => setState(() => _dragging = false),
-        onHorizontalDragCancel: () => setState(() => _dragging = false),
-        child: SizedBox(
-          width: widget.width,
-          height: double.infinity,
-          child: Center(
-            child: SizedBox(
-              width: strokeWidth,
-              height: double.infinity,
-              child: ColoredBox(
-                color: active ? theme.focus.color : theme.overlay.border,
-              ),
-            ),
-          ),
-        ),
+      minimumWidth: minimumWidth,
+      maximumWidth: maximumWidth,
+      alignment: column.alignment,
+      verticalAlignment: column.verticalAlignment,
+      resizable: column.resizable,
+      hoverFeedback: true,
+      resizeHandleKey: ValueKey('table-resize-${column.id}'),
+      onActivate: column.sortable && onSortingChanged != null
+          ? _toggleSort
+          : null,
+      onWidthChanged: (value) =>
+          onWidthChanged(column.id, Rem(value / context.units(1.rem))),
+      child: CarpenterTableText.header(
+        '${column.header}$suffix',
+        semanticsLabel: column.semanticLabel ?? column.header,
       ),
     );
   }
@@ -794,21 +675,11 @@ final class _TableRowState<T, K> extends State<_TableRow<T, K>> {
                       ),
                     ),
                   for (final column in widget.columns)
-                    SizedBox(
-                      width: widget.widths[column.id],
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.symmetric(
-                          horizontal: metrics.horizontalPadding,
-                          vertical: metrics.verticalPadding,
-                        ),
-                        child: Align(
-                          alignment: carpenterTableCellAlignment(
-                            column.alignment,
-                            column.verticalAlignment,
-                          ),
-                          child: column.cellBuilder(context, widget.item),
-                        ),
-                      ),
+                    CarpenterTableCellChrome(
+                      width: widget.widths[column.id]!,
+                      alignment: column.alignment,
+                      verticalAlignment: column.verticalAlignment,
+                      child: column.cellBuilder(context, widget.item),
                     ),
                 ],
               ),
