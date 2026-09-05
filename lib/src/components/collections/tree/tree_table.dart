@@ -11,6 +11,7 @@ import '../../basic/icon.dart';
 import '../../basic/status_indicator.dart';
 import '../../behaviour/drag_and_drop/draggable.dart';
 import '../contracts/selection_mode.dart';
+import '../table_metrics.dart';
 import '../table/table_actions.dart';
 import '../table/table_column.dart';
 import '../table/table_text.dart';
@@ -327,8 +328,9 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
-    final outerPadding = context.units(theme.spacing.tableHorizontal);
-    final gap = context.units(theme.spacing.tableCellGap);
+    final metrics = CarpenterTableMetrics.resolve(context);
+    final outerPadding = metrics.horizontalPadding;
+    final gap = metrics.cellGap;
     final columns = _effectiveColumns;
 
     return LayoutBuilder(
@@ -381,8 +383,8 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
         );
 
         if (widget.framed) {
-          final borderWidth = context.units(theme.shapes.tableBorderWidth);
-          final radius = context.units(theme.shapes.tableSurfaceRadius);
+          final borderWidth = metrics.borderWidth;
+          final radius = metrics.surfaceRadius;
           content = DecoratedBox(
             decoration: BoxDecoration(
               color: theme.overlay.background,
@@ -415,7 +417,7 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     required double outerPadding,
     required double gap,
   }) {
-    final theme = CarpenterTheme.of(context);
+    final metrics = CarpenterTableMetrics.resolve(context);
     final publicSpecs = <({String id, CarpenterTableColumnWidth width})>[
       (id: widget.treeColumnId, width: _effectiveTreeWidth),
       for (final column in columns)
@@ -423,12 +425,12 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     ];
     final resolvedColumns = <GridColumnSpec>[];
     for (final spec in publicSpecs) {
-      final minimum = context.units(
-        spec.width.minimum ?? theme.sizes.tableColumnMin,
-      );
-      final maximum = context.units(
-        spec.width.maximum ?? theme.sizes.tableColumnMax,
-      );
+      final minimum = spec.width.minimum == null
+          ? metrics.minimumColumnWidth
+          : context.units(spec.width.minimum!);
+      final maximum = spec.width.maximum == null
+          ? metrics.maximumColumnWidth
+          : context.units(spec.width.maximum!);
       final pinned =
           _localColumnWidths.containsKey(spec.id) ||
           widget.columnWidths.containsKey(spec.id);
@@ -440,7 +442,9 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
           explicit == null &&
               spec.width.policy == CarpenterTableColumnWidthPolicy.actionLane
           ? CarpenterTableActionCell.preferredColumnWidth(context)
-          : context.units(explicit ?? theme.sizes.tableColumn);
+          : explicit == null
+          ? metrics.defaultColumnWidth
+          : context.units(explicit);
       resolvedColumns.add(
         GridColumnSpec(
           id: spec.id,
@@ -475,15 +479,14 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     double gap,
   ) {
     final theme = CarpenterTheme.of(context);
-    final height = MediaQuery.textScalerOf(
-      context,
-    ).scale(context.units(theme.sizes.tableHeaderHeight));
+    final metrics = CarpenterTableMetrics.resolve(context);
+    final height = metrics.headerHeight;
     return Container(
       color: theme.surface.subtle,
       height: height,
       padding: EdgeInsetsDirectional.symmetric(
         horizontal: outerPadding,
-        vertical: context.units(theme.spacing.tableVertical),
+        vertical: metrics.verticalPadding,
       ),
       child: Row(
         children: [
@@ -616,7 +619,7 @@ final class _TreeHeaderCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = CarpenterTheme.of(context);
+    final metrics = CarpenterTableMetrics.resolve(context);
     return SizedBox(
       width: width,
       child: Stack(
@@ -637,7 +640,7 @@ final class _TreeHeaderCell extends StatelessWidget {
               alignment: AlignmentDirectional.centerEnd,
               child: _TreeResizeHandle(
                 key: ValueKey('tree-table-resize-$id'),
-                width: context.units(theme.sizes.tableResizeHandle),
+                width: metrics.resizeHandleWidth,
                 currentWidth: width,
                 minimumWidth: minimumWidth,
                 maximumWidth: maximumWidth,
@@ -678,10 +681,11 @@ final class _TreeResizeHandleState extends State<_TreeResizeHandle> {
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
+    final metrics = CarpenterTableMetrics.resolve(context);
     final active = _hovered || _dragging;
     final strokeWidth = active
         ? context.units(theme.focus.width)
-        : context.units(theme.shapes.tableBorderWidth);
+        : metrics.borderWidth;
     return MouseRegion(
       cursor: SystemMouseCursors.resizeColumn,
       onEnter: (_) => setState(() => _hovered = true),
