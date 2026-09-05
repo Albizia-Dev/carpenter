@@ -25,7 +25,9 @@ void main() {
     addTearDown(controller.dispose);
 
     final initial = controller.initialize();
-    final query = controller.updateQuery(CollectionQuery<String>(search: 'new'));
+    final query = controller.updateQuery(
+      CollectionQuery<String>(search: 'new'),
+    );
 
     expect(firstCancellation?.isCancelled, isTrue);
 
