@@ -42,9 +42,9 @@ final class CarpenterCommandInputButton<I> extends StatelessWidget {
         final input = await inputBuilder(context);
         if (input == null) return;
         try {
-          await command.execute(input);
+          await context.executeCommand(command, input);
         } catch (_) {
-          // Command state is the canonical error channel.
+          // Command state and execution listeners are the canonical channels.
         }
       }
 

@@ -25,6 +25,7 @@ final class CarpenterApp extends StatelessWidget {
     this.routes = const [],
     this.missingRouteBuilder,
     this.commands = const [],
+    this.commandExecutor,
     this.onHotkeyCommand,
     this.hotkeyController,
     this.enableHotkeys = true,
@@ -51,6 +52,13 @@ final class CarpenterApp extends StatelessWidget {
   final Widget Function(BuildContext context, Object? node)?
   missingRouteBuilder;
   final List<CarpenterCommand<void>> commands;
+
+  /// Optional application-wide execution policy for command surfaces.
+  ///
+  /// When provided, Carpenter command buttons, command-input buttons, and
+  /// shortcut scopes below the app emit their executions through this executor.
+  final CarpenterCommandExecutor? commandExecutor;
+
   final CarpenterHotkeyCommandCallback? onHotkeyCommand;
   final CarpenterHotkeyController? hotkeyController;
   final bool enableHotkeys;
@@ -126,13 +134,18 @@ final class CarpenterApp extends StatelessWidget {
     } else {
       content = routedChild ?? const SizedBox.shrink();
     }
-    return CarpenterHost(
+    Widget host = CarpenterHost(
       shells: _effectiveShells(),
       modules: modules,
       platform: platform,
       locale: locale,
       child: content,
     );
+    final executor = commandExecutor;
+    if (executor != null) {
+      host = CarpenterCommandExecutionScope(executor: executor, child: host);
+    }
+    return host;
   }
 
   @override
