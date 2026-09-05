@@ -12,8 +12,7 @@ enum CollectionRequestReason { initial, query, refresh, loadMore }
 
 /// Collection-specific compatibility type over Carpenter's shared cancellation
 /// signal.
-final class CollectionRequestCancellation
-    extends CarpenterCancellationSignal {}
+final class CollectionRequestCancellation extends CarpenterCancellationSignal {}
 
 final class CollectionLoadRequest {
   const CollectionLoadRequest({
@@ -97,10 +96,7 @@ final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
     try {
       final result = await _load(
         _query,
-        CollectionLoadRequest(
-          reason: reason,
-          cancellation: lease.cancellation,
-        ),
+        CollectionLoadRequest(reason: reason, cancellation: lease.cancellation),
       );
       if (!_requests.isCurrent(lease)) return;
       _snapshot = result.copyWith(
