@@ -19,6 +19,7 @@ void main() {
     expect(action.id, 'save');
     expect(action.label, 'Save');
     expect(action.colorRole, ActionColorRole.primary);
+    expect(action.visible, isTrue);
     expect(action.isEnabled, isTrue);
 
     action.onInvoke!.call();
@@ -26,7 +27,7 @@ void main() {
     expect(received, 42);
   });
 
-  test('command projection reflects current availability', () {
+  test('command projection reflects current availability and visibility', () {
     final command = CarpenterCommandController<int>(
       id: 'archive',
       title: 'Archive',
@@ -36,8 +37,22 @@ void main() {
 
     expect(command.toAction(1).colorRole, ActionColorRole.danger);
     expect(command.toAction(1).isEnabled, isTrue);
+    expect(command.toAction(1).visible, isTrue);
 
     command.setAvailability(enabled: false, disabledReason: 'Not allowed');
-    expect(command.toAction(1).isEnabled, isFalse);
+    final disabled = command.toAction(1);
+    expect(disabled.isEnabled, isFalse);
+    expect(disabled.visible, isTrue);
+    expect(disabled.disabledReason, 'Not allowed');
+
+    command.setAvailability(
+      visibility: CarpenterCommandVisibility.hidden,
+      enabled: false,
+      disabledReason: 'No matching context',
+    );
+    final hidden = command.toAction(1);
+    expect(hidden.visible, isFalse);
+    expect(hidden.isEnabled, isFalse);
+    expect(hidden.disabledReason, 'No matching context');
   });
 }
