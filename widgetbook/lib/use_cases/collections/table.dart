@@ -10,6 +10,7 @@ final tableComponent = WidgetbookComponent(
   name: 'Table',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
+    WidgetbookUseCase(name: 'Alignment contract', builder: _alignmentContract),
     WidgetbookUseCase(name: 'Edge cases', builder: _edgeCases),
   ],
 );
@@ -57,6 +58,55 @@ Widget _playground(BuildContext context) {
     ),
   );
 }
+
+Widget _alignmentContract(BuildContext context) => preview(
+  SizedBox(
+    width: context.units(38.rem),
+    child: CarpenterTable<_ExampleRow, int>(
+      semanticLabel: 'Table cell alignment contract',
+      snapshot: demoCollectionSnapshot<_ExampleRow>(
+        items: const [
+          _ExampleRow(id: 1, name: 'Alignment probe', amount: 42, active: true),
+        ],
+        scenario: DemoCollectionScenario.loaded,
+        pagination: DemoPaginationFixture.cursor,
+      ),
+      rowKey: (row) => row.id,
+      rowSemanticLabel: (row) => row.name,
+      selection: CollectionSelection<int>.none(),
+      showSelectionColumn: false,
+      columns: [
+        CarpenterTableColumn<_ExampleRow>.text(
+          id: 'start-top',
+          header: 'Start / top',
+          value: (_) => 'Start / top',
+          alignment: CarpenterTableColumnAlignment.start,
+          verticalAlignment: CarpenterTableColumnVerticalAlignment.top,
+          width: CarpenterTableColumnWidth.fixed(width: 12.rem),
+          resizable: false,
+        ),
+        CarpenterTableColumn<_ExampleRow>.text(
+          id: 'center-center',
+          header: 'Center / center',
+          value: (_) => 'Center / center',
+          alignment: CarpenterTableColumnAlignment.center,
+          verticalAlignment: CarpenterTableColumnVerticalAlignment.center,
+          width: CarpenterTableColumnWidth.fixed(width: 12.rem),
+          resizable: false,
+        ),
+        CarpenterTableColumn<_ExampleRow>.text(
+          id: 'end-bottom',
+          header: 'End / bottom',
+          value: (_) => 'End / bottom',
+          alignment: CarpenterTableColumnAlignment.end,
+          verticalAlignment: CarpenterTableColumnVerticalAlignment.bottom,
+          width: CarpenterTableColumnWidth.fixed(width: 12.rem),
+          resizable: false,
+        ),
+      ],
+    ),
+  ),
+);
 
 Widget _edgeCases(BuildContext context) => preview(
   SizedBox(
