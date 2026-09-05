@@ -72,8 +72,8 @@ final class CarpenterTableColumn<T> {
       'Use width: CarpenterTableColumnWidth.actionLane(). '
       'isActionColumn is retained for source compatibility.',
     )
-    this.isActionColumn = false,
-  });
+    bool isActionColumn = false,
+  }) : _legacyIsActionColumn = isActionColumn;
 
   factory CarpenterTableColumn.text({
     required String id,
@@ -213,12 +213,15 @@ final class CarpenterTableColumn<T> {
   final CarpenterTableColumnWidth width;
   final bool sortable;
   final bool resizable;
+  final bool _legacyIsActionColumn;
 
   @Deprecated(
     'Use width: CarpenterTableColumnWidth.actionLane(). '
     'isActionColumn is retained for source compatibility.',
   )
-  final bool isActionColumn;
+  bool get isActionColumn =>
+      _legacyIsActionColumn ||
+      width.policy == CarpenterTableColumnWidthPolicy.actionLane;
 
   /// Resolves the legacy action-column marker into the semantic width contract.
   CarpenterTableColumnWidth get effectiveWidth {
