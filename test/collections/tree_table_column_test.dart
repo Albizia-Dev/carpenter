@@ -46,11 +46,7 @@ void main() {
       carpenterHarness(
         CarpenterTreeTable<String>(
           nodes: const [
-            CarpenterTreeNode<String>(
-              id: 'root',
-              value: 'root',
-              label: 'Root',
-            ),
+            CarpenterTreeNode<String>(id: 'root', value: 'root', label: 'Root'),
           ],
           columns: [
             CarpenterTreeTableColumn<String>.text(
