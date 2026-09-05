@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:bloc/bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
@@ -63,17 +62,32 @@ abstract interface class LoadingController {
   Future<T> track<T>(FutureOr<T> Function() operation, {Object? id});
 }
 
-/// Cubit backing a loading boundary.
+/// Framework-neutral loading state owner.
 ///
 /// Manual start/finish calls are idempotent per id. Tracked calls use internal
 /// leases, so two overlapping `track(..., id: 'save')` calls are both counted
 /// and the loading state survives until both complete.
-final class LoadingCubit extends Cubit<LoadingState>
+///
+/// [stream] and [close] are retained as lightweight compatibility affordances
+/// for older code that consumed [LoadingCubit] directly. Carpenter itself uses
+/// the notifier contract and does not depend on Bloc or another state manager.
+class LoadingNotifier extends ValueNotifier<LoadingState>
     implements LoadingController {
-  LoadingCubit() : super(LoadingState.idle);
+  LoadingNotifier() : super(LoadingState.idle);
 
   final Object _manualLease = Object();
   final Map<Object, Set<Object>> _leasesById = <Object, Set<Object>>{};
+  final StreamController<LoadingState> _streamController =
+      StreamController<LoadingState>.broadcast(sync: true);
+  bool _closed = false;
+
+  @override
+  LoadingState get state => value;
+
+  /// Compatibility stream for callers that previously listened to a Cubit.
+  Stream<LoadingState> get stream => _streamController.stream;
+
+  bool get isClosed => _closed;
 
   @override
   void start(Object id) => _acquire(id, _manualLease);
@@ -93,8 +107,16 @@ final class LoadingCubit extends Cubit<LoadingState>
     }
   }
 
+  /// Closes compatibility streams and notifier listeners.
+  Future<void> close() {
+    if (_closed) return Future<void>.value();
+    _closed = true;
+    super.dispose();
+    return _streamController.close();
+  }
+
   void _acquire(Object id, Object lease) {
-    if (isClosed) return;
+    if (_closed) return;
     final leases = _leasesById.putIfAbsent(id, () => <Object>{});
     if (!leases.add(lease)) return;
     _emitSnapshot();
@@ -108,10 +130,24 @@ final class LoadingCubit extends Cubit<LoadingState>
   }
 
   void _emitSnapshot() {
-    if (isClosed) return;
-    emit(LoadingState._from(_leasesById));
+    if (_closed) return;
+    value = LoadingState._from(_leasesById);
+    _streamController.add(value);
+  }
+
+  @override
+  void dispose() {
+    if (_closed) return;
+    _closed = true;
+    super.dispose();
+    unawaited(_streamController.close());
   }
 }
+
+/// Compatibility name for code written against Carpenter's former Bloc-backed
+/// loading implementation.
+@Deprecated('Use LoadingNotifier. Carpenter no longer depends on Bloc.')
+final class LoadingCubit extends LoadingNotifier {}
 
 /// Dependency-injection boundary for loading state.
 ///
@@ -134,7 +170,7 @@ final class LoadingScope extends InheritedWidget {
       oldWidget.controller != controller;
 }
 
-/// Builds UI around a locally-owned [LoadingCubit].
+/// Builds UI around a locally-owned [LoadingNotifier].
 typedef LoadingBoundaryBuilder =
     Widget Function(BuildContext context, LoadingState state, Widget child);
 
@@ -158,29 +194,30 @@ final class LoadingBoundary extends StatefulWidget {
 }
 
 final class _LoadingBoundaryState extends State<LoadingBoundary> {
-  late final LoadingCubit _cubit = LoadingCubit();
-  late LoadingState _state = _cubit.state;
-  StreamSubscription<LoadingState>? _subscription;
+  late final LoadingNotifier _controller = LoadingNotifier();
+  late LoadingState _state = _controller.state;
 
   @override
   void initState() {
     super.initState();
-    _subscription = _cubit.stream.listen((state) {
-      if (!mounted) return;
-      setState(() => _state = state);
-    });
+    _controller.addListener(_handleStateChanged);
+  }
+
+  void _handleStateChanged() {
+    if (!mounted) return;
+    setState(() => _state = _controller.state);
   }
 
   @override
   void dispose() {
-    unawaited(_subscription?.cancel());
-    unawaited(_cubit.close());
+    _controller.removeListener(_handleStateChanged);
+    unawaited(_controller.close());
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) => LoadingScope(
-    controller: _cubit,
+    controller: _controller,
     child: Builder(
       builder: (context) => widget.builder(context, _state, widget.child),
     ),
