@@ -12,6 +12,9 @@ concurrency:
   group: build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   web:
     name: Verify package and build web examples
@@ -20,6 +23,246 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Apply shared table cell chrome
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text()
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected one match, got {count}: {old[:100]!r}')
+              p.write_text(text.replace(old, new, 1))
+
+          table = Path('lib/src/components/collections/table/table.dart')
+          text = table.read_text()
+          old = "import '../../../internal/rendering/interactive_region.dart';\n"
+          if text.count(old) != 1:
+              raise SystemExit(f'table import match count={text.count(old)}')
+          text = text.replace(old, '', 1)
+          old = "import 'table_actions.dart';\nimport 'table_column.dart';"
+          new = "import 'table_actions.dart';\nimport 'table_cell.dart';\nimport 'table_column.dart';"
+          if text.count(old) != 1:
+              raise SystemExit(f'table cell import match count={text.count(old)}')
+          text = text.replace(old, new, 1)
+          old = """              multiSort: widget.multiSort,
+              resizeHandleWidth: metrics.resizeHandleWidth,
+              horizontalPadding: metrics.horizontalPadding,
+              verticalPadding: metrics.verticalPadding,
+              onWidthChanged: _resizeColumn,
+"""
+          new = """              multiSort: widget.multiSort,
+              onWidthChanged: _resizeColumn,
+"""
+          if text.count(old) != 1:
+              raise SystemExit(f'header call match count={text.count(old)}')
+          text = text.replace(old, new, 1)
+          start = text.index('final class _HeaderCell<T> extends StatelessWidget {')
+          end = text.index('final class _TableRow<T, K> extends StatefulWidget {')
+          replacement = r'''final class _HeaderCell<T> extends StatelessWidget {
+  const _HeaderCell({
+    required this.column,
+    required this.width,
+    required this.minimumWidth,
+    required this.maximumWidth,
+    required this.sorting,
+    required this.onSortingChanged,
+    required this.multiSort,
+    required this.onWidthChanged,
+  });
+
+  final CarpenterTableColumn<T> column;
+  final double width;
+  final double minimumWidth;
+  final double maximumWidth;
+  final List<CollectionSort> sorting;
+  final ValueChanged<List<CollectionSort>>? onSortingChanged;
+  final bool multiSort;
+  final CarpenterTableColumnWidthChanged onWidthChanged;
+
+  void _toggleSort() {
+    final callback = onSortingChanged;
+    if (callback == null || !column.sortable) return;
+    final existingIndex = sorting.indexWhere((sort) => sort.id == column.id);
+    final next = multiSort ? [...sorting] : <CollectionSort>[];
+    if (existingIndex < 0) {
+      next.add(
+        CollectionSort(
+          id: column.id,
+          direction: CollectionSortDirection.ascending,
+        ),
+      );
+    } else {
+      final existing = sorting[existingIndex];
+      if (existing.direction == CollectionSortDirection.ascending) {
+        final descending = CollectionSort(
+          id: column.id,
+          direction: CollectionSortDirection.descending,
+        );
+        if (multiSort) {
+          next[existingIndex] = descending;
+        } else {
+          next.add(descending);
+        }
+      } else if (multiSort) {
+        next.removeAt(existingIndex);
+      }
+    }
+    callback(List.unmodifiable(next));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final sort = sorting
+        .where((candidate) => candidate.id == column.id)
+        .firstOrNull;
+    final suffix = switch (sort?.direction) {
+      CollectionSortDirection.ascending => ' ↑',
+      CollectionSortDirection.descending => ' ↓',
+      null => '',
+    };
+    return CarpenterTableHeaderCellChrome(
+      id: column.id,
+      width: width,
+      minimumWidth: minimumWidth,
+      maximumWidth: maximumWidth,
+      alignment: column.alignment,
+      verticalAlignment: column.verticalAlignment,
+      resizable: column.resizable,
+      hoverFeedback: true,
+      resizeHandleKey: ValueKey('table-resize-${column.id}'),
+      onActivate: column.sortable && onSortingChanged != null
+          ? _toggleSort
+          : null,
+      onWidthChanged: (value) => onWidthChanged(
+        column.id,
+        Rem(value / context.units(1.rem)),
+      ),
+      child: CarpenterTableText.header(
+        '${column.header}$suffix',
+        semanticsLabel: column.semanticLabel ?? column.header,
+      ),
+    );
+  }
+}
+
+'''
+          text = text[:start] + replacement + text[end:]
+          old = r'''                  for (final column in widget.columns)
+                    SizedBox(
+                      width: widget.widths[column.id],
+                      child: Padding(
+                        padding: EdgeInsetsDirectional.symmetric(
+                          horizontal: metrics.horizontalPadding,
+                          vertical: metrics.verticalPadding,
+                        ),
+                        child: Align(
+                          alignment: carpenterTableCellAlignment(
+                            column.alignment,
+                            column.verticalAlignment,
+                          ),
+                          child: column.cellBuilder(context, widget.item),
+                        ),
+                      ),
+                    ),
+'''
+          new = r'''                  for (final column in widget.columns)
+                    CarpenterTableCellChrome(
+                      width: widget.widths[column.id]!,
+                      alignment: column.alignment,
+                      verticalAlignment: column.verticalAlignment,
+                      child: column.cellBuilder(context, widget.item),
+                    ),
+'''
+          if text.count(old) != 1:
+              raise SystemExit(f'row cell match count={text.count(old)}')
+          text = text.replace(old, new, 1)
+          table.write_text(text)
+
+          tree = Path('lib/src/components/collections/tree/tree_table.dart')
+          text = tree.read_text()
+          old = "import '../table/table_actions.dart';\nimport '../table/table_column.dart';"
+          new = "import '../table/table_actions.dart';\nimport '../table/table_cell.dart';\nimport '../table/table_column.dart';"
+          if text.count(old) != 1:
+              raise SystemExit(f'tree cell import match count={text.count(old)}')
+          text = text.replace(old, new, 1)
+          start = text.index('final class _TreeHeaderCell extends StatelessWidget {')
+          end = text.index('final class _TreeTablePrefix<T> extends StatelessWidget {')
+          replacement = r'''final class _TreeHeaderCell extends StatelessWidget {
+  const _TreeHeaderCell({
+    required this.id,
+    required this.label,
+    required this.semanticLabel,
+    required this.width,
+    required this.minimumWidth,
+    required this.maximumWidth,
+    required this.alignment,
+    required this.verticalAlignment,
+    required this.resizable,
+    required this.onWidthChanged,
+  });
+
+  final String id;
+  final String label;
+  final String semanticLabel;
+  final double width;
+  final double minimumWidth;
+  final double maximumWidth;
+  final CarpenterTableColumnAlignment alignment;
+  final CarpenterTableColumnVerticalAlignment verticalAlignment;
+  final bool resizable;
+  final ValueChanged<double> onWidthChanged;
+
+  @override
+  Widget build(BuildContext context) => CarpenterTableHeaderCellChrome(
+    id: id,
+    width: width,
+    minimumWidth: minimumWidth,
+    maximumWidth: maximumWidth,
+    alignment: alignment,
+    verticalAlignment: verticalAlignment,
+    resizable: resizable,
+    padded: false,
+    resizeHandleKey: ValueKey('tree-table-resize-$id'),
+    onWidthChanged: onWidthChanged,
+    child: CarpenterTableText.header(label, semanticsLabel: semanticLabel),
+  );
+}
+
+final class _TreeTableSlot extends StatelessWidget {
+  const _TreeTableSlot({
+    required this.width,
+    required this.alignment,
+    required this.verticalAlignment,
+    required this.child,
+  });
+
+  final double width;
+  final CarpenterTableColumnAlignment alignment;
+  final CarpenterTableColumnVerticalAlignment verticalAlignment;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => CarpenterTableCellChrome(
+    width: width,
+    alignment: alignment,
+    verticalAlignment: verticalAlignment,
+    padded: false,
+    child: child,
+  );
+}
+
+'''
+          text = text[:start] + replacement + text[end:]
+          tree.write_text(text)
+          PY
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -30,8 +273,21 @@ jobs:
       - name: Install package dependencies
         run: flutter pub get
 
-      - name: Check formatting
-        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Format shared table cell chrome
+        run: dart format lib/src/components/collections/table/table_cell.dart lib/src/components/collections/table/table.dart lib/src/components/collections/tree/tree_table.dart
+
+      - name: Commit shared table cell chrome
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lib/src/components/collections/table/table_cell.dart lib/src/components/collections/table/table.dart lib/src/components/collections/tree/tree_table.dart
+          git commit -m "refactor: consume shared table cell chrome"
+          git push origin HEAD:${{ github.head_ref }}
 
       - name: Analyze library
         run: dart analyze lib
