@@ -2,9 +2,9 @@ import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../components/basic/input/field_shell.dart';
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
-import 'field_shell.dart';
 
 final class TextEditingField extends StatefulWidget {
   const TextEditingField({
@@ -81,9 +81,7 @@ final class _TextEditingFieldState extends State<TextEditingField>
   @override
   void initState() {
     super.initState();
-    _selectionGestureBuilder = TextSelectionGestureDetectorBuilder(
-      delegate: this,
-    );
+    _selectionGestureBuilder = TextSelectionGestureDetectorBuilder(delegate: this);
     _attachFocusNode();
     widget.controller.addListener(_handleControllerChanged);
   }
@@ -177,9 +175,7 @@ final class _TextEditingFieldState extends State<TextEditingField>
       alignment: AlignmentDirectional.centerStart,
       children: [
         if (widget.controller.text.isEmpty && widget.placeholder != null)
-          IgnorePointer(
-            child: Text(widget.placeholder!, style: placeholderStyle),
-          ),
+          IgnorePointer(child: Text(widget.placeholder!, style: placeholderStyle)),
         Semantics(
           container: true,
           textField: true,
@@ -192,10 +188,7 @@ final class _TextEditingFieldState extends State<TextEditingField>
           hint: widget.errorText ?? widget.description ?? widget.placeholder,
           child: ExcludeFocus(
             excluding: _disabled,
-            child: IgnorePointer(
-              ignoring: _disabled,
-              child: interactiveEditable,
-            ),
+            child: IgnorePointer(ignoring: _disabled, child: interactiveEditable),
           ),
         ),
       ],
@@ -205,7 +198,7 @@ final class _TextEditingFieldState extends State<TextEditingField>
       cursor: _disabled ? SystemMouseCursors.basic : SystemMouseCursors.text,
       onEnter: _disabled ? null : (_) => setState(() => _hovered = true),
       onExit: _disabled ? null : (_) => setState(() => _hovered = false),
-      child: FieldShell(
+      child: CarpenterFieldShell(
         availability: widget.availability,
         size: widget.size,
         shape: widget.shape,

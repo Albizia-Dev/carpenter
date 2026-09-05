@@ -38,6 +38,7 @@ export 'src/components/basic/icon.dart';
 export 'src/components/basic/icons.dart';
 export 'src/components/basic/input/date_input.dart';
 export 'src/components/basic/input/date_range_input.dart';
+export 'src/components/basic/input/field_shell.dart';
 export 'src/components/basic/input/file_input.dart';
 export 'src/components/basic/input/input.dart';
 export 'src/components/basic/input/masked_input.dart';

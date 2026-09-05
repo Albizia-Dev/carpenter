@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../../foundation/roles.dart';
 import '../../../foundation/theme.dart';
+import '../../../internal/layout/grid_layout.dart';
 import '../../../internal/rendering/interactive_region.dart';
 import '../../basic/button/button.dart';
 import '../../basic/checkbox.dart';
@@ -196,11 +197,7 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
         widget.showSelectionColumn && widget.selection.isEnabled
         ? context.units(theme.sizes.tableSelectionColumn)
         : 0.0;
-    final widths = <String, double>{};
-    final minimums = <String, double>{};
-    final maximums = <String, double>{};
-    var preferredTotal = selectionWidth;
-    var totalFlex = 0;
+    final columns = <GridColumnSpec>[];
     for (final column in widget.columns) {
       final minimum = context.units(
         column.width.minimum ?? theme.sizes.tableColumnMin,
@@ -208,60 +205,41 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
       final maximum = context.units(
         column.width.maximum ?? theme.sizes.tableColumnMax,
       );
-      final isPinned =
+      final pinned =
           _localColumnWidths.containsKey(column.id) ||
           widget.columnWidths.containsKey(column.id);
       final explicitWidth =
           _localColumnWidths[column.id] ??
           widget.columnWidths[column.id] ??
           column.width.preferred;
-      final preferred =
-          (explicitWidth == null && column.isActionColumn
-                  ? CarpenterTableActionCell.preferredColumnWidth(context)
-                  : context.units(explicitWidth ?? theme.sizes.tableColumn))
-              .clamp(minimum, maximum)
-              .toDouble();
-      widths[column.id] = preferred;
-      minimums[column.id] = minimum;
-      maximums[column.id] = maximum;
-      preferredTotal += preferred;
-      if (!isPinned &&
-          !column.isActionColumn &&
-          column.width.policy == CarpenterTableColumnWidthPolicy.flexible) {
-        totalFlex += column.width.flex;
-      }
+      final preferred = explicitWidth == null && column.isActionColumn
+          ? CarpenterTableActionCell.preferredColumnWidth(context)
+          : context.units(explicitWidth ?? theme.sizes.tableColumn);
+      columns.add(
+        GridColumnSpec(
+          id: column.id,
+          preferred: preferred,
+          minimum: minimum,
+          maximum: maximum,
+          flex: column.width.flex,
+          flexible:
+              !column.isActionColumn &&
+              column.width.policy == CarpenterTableColumnWidthPolicy.flexible,
+          pinned: pinned,
+        ),
+      );
     }
-    if (viewportWidth.isFinite &&
-        preferredTotal < viewportWidth &&
-        totalFlex > 0) {
-      final available = viewportWidth - preferredTotal;
-      for (final column in widget.columns) {
-        final isPinned =
-            _localColumnWidths.containsKey(column.id) ||
-            widget.columnWidths.containsKey(column.id);
-        if (isPinned ||
-            column.isActionColumn ||
-            column.width.policy != CarpenterTableColumnWidthPolicy.flexible) {
-          continue;
-        }
-        final share = available * column.width.flex / totalFlex;
-        widths[column.id] = (widths[column.id]! + share).clamp(
-          minimums[column.id]!,
-          maximums[column.id]!,
-        );
-      }
-    }
-    final totalWidth =
-        selectionWidth + widths.values.fold(0.0, (a, b) => a + b);
+    final resolved = GridLayoutResolver.resolve(
+      columns: columns,
+      viewportWidth: viewportWidth,
+      fixedExtent: selectionWidth,
+    );
     return _TableColumnLayout(
-      widths: widths,
-      minimums: minimums,
-      maximums: maximums,
+      widths: resolved.widths,
+      minimums: resolved.minimums,
+      maximums: resolved.maximums,
       selectionWidth: selectionWidth,
-      totalWidth: math.max(
-        totalWidth,
-        viewportWidth.isFinite ? viewportWidth : totalWidth,
-      ),
+      totalWidth: resolved.totalWidth,
     );
   }
 

@@ -1,9 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../components/basic/input/field_shell.dart';
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
-import 'field_shell.dart';
 import 'interactive_region.dart';
 
 final class SelectableField extends StatelessWidget {
@@ -82,7 +82,7 @@ final class SelectableField extends StatelessWidget {
             cursor: readOnly || disabled
                 ? SystemMouseCursors.basic
                 : SystemMouseCursors.click,
-            child: FieldShell(
+            child: CarpenterFieldShell(
               availability: availability,
               size: size,
               shape: shape,
