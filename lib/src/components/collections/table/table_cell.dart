@@ -10,6 +10,7 @@ import 'table_column.dart';
 ///
 /// Width, two-axis alignment and optional content padding live here so regular
 /// tables and tree tables do not reimplement cell placement independently.
+/// [padded] is explicit so legacy tree-table geometry can migrate separately.
 final class CarpenterTableCellChrome extends StatelessWidget {
   const CarpenterTableCellChrome({
     super.key,
