@@ -120,15 +120,7 @@ void main() {
     );
 
     expect(find.text('Archive'), findsNothing);
-    final overflowButton = find.byWidgetPredicate(
-      (widget) =>
-          widget is CarpenterIconButton &&
-          widget.semanticLabel == 'More actions',
-    );
-    expect(overflowButton, findsOneWidget);
-    final button = tester.widget<CarpenterIconButton>(overflowButton);
-    expect(button.onInvoke, isNotNull);
-    button.onInvoke!.call();
+    await tester.tap(find.bySemanticsLabel('More actions'));
     await tester.pumpAndSettle();
     expect(find.text('Archive'), findsOneWidget);
   });
