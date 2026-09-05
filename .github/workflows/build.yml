@@ -32,14 +32,10 @@ jobs:
         run: |
           python3 - <<'PY'
           from pathlib import Path
+          import base64
 
-          def replace_once(path, old, new):
-              p = Path(path)
-              text = p.read_text()
-              count = text.count(old)
-              if count != 1:
-                  raise SystemExit(f'{path}: expected one match, got {count}: {old[:100]!r}')
-              p.write_text(text.replace(old, new, 1))
+          def dec(value):
+              return base64.b64decode(value).decode()
 
           table = Path('lib/src/components/collections/table/table.dart')
           text = table.read_text()
@@ -52,139 +48,20 @@ jobs:
           if text.count(old) != 1:
               raise SystemExit(f'table cell import match count={text.count(old)}')
           text = text.replace(old, new, 1)
-          old = """              multiSort: widget.multiSort,
-              resizeHandleWidth: metrics.resizeHandleWidth,
-              horizontalPadding: metrics.horizontalPadding,
-              verticalPadding: metrics.verticalPadding,
-              onWidthChanged: _resizeColumn,
-"""
-          new = """              multiSort: widget.multiSort,
-              onWidthChanged: _resizeColumn,
-"""
+          old = dec('ICAgICAgICAgICAgICBtdWx0aVNvcnQ6IHdpZGdldC5tdWx0aVNvcnQsCiAgICAgICAgICAgICAgcmVzaXplSGFuZGxlV2lkdGg6IG1ldHJpY3MucmVzaXplSGFuZGxlV2lkdGgsCiAgICAgICAgICAgICAgaG9yaXpvbnRhbFBhZGRpbmc6IG1ldHJpY3MuaG9yaXpvbnRhbFBhZGRpbmcsCiAgICAgICAgICAgICAgdmVydGljYWxQYWRkaW5nOiBtZXRyaWNzLnZlcnRpY2FsUGFkZGluZywKICAgICAgICAgICAgICBvbldpZHRoQ2hhbmdlZDogX3Jlc2l6ZUNvbHVtbiwK')
+          new = dec('ICAgICAgICAgICAgICBtdWx0aVNvcnQ6IHdpZGdldC5tdWx0aVNvcnQsCiAgICAgICAgICAgICAgb25XaWR0aENoYW5nZWQ6IF9yZXNpemVDb2x1bW4sCg==')
           if text.count(old) != 1:
               raise SystemExit(f'header call match count={text.count(old)}')
           text = text.replace(old, new, 1)
           start = text.index('final class _HeaderCell<T> extends StatelessWidget {')
           end = text.index('final class _TableRow<T, K> extends StatefulWidget {')
-          replacement = r'''final class _HeaderCell<T> extends StatelessWidget {
-  const _HeaderCell({
-    required this.column,
-    required this.width,
-    required this.minimumWidth,
-    required this.maximumWidth,
-    required this.sorting,
-    required this.onSortingChanged,
-    required this.multiSort,
-    required this.onWidthChanged,
-  });
-
-  final CarpenterTableColumn<T> column;
-  final double width;
-  final double minimumWidth;
-  final double maximumWidth;
-  final List<CollectionSort> sorting;
-  final ValueChanged<List<CollectionSort>>? onSortingChanged;
-  final bool multiSort;
-  final CarpenterTableColumnWidthChanged onWidthChanged;
-
-  void _toggleSort() {
-    final callback = onSortingChanged;
-    if (callback == null || !column.sortable) return;
-    final existingIndex = sorting.indexWhere((sort) => sort.id == column.id);
-    final next = multiSort ? [...sorting] : <CollectionSort>[];
-    if (existingIndex < 0) {
-      next.add(
-        CollectionSort(
-          id: column.id,
-          direction: CollectionSortDirection.ascending,
-        ),
-      );
-    } else {
-      final existing = sorting[existingIndex];
-      if (existing.direction == CollectionSortDirection.ascending) {
-        final descending = CollectionSort(
-          id: column.id,
-          direction: CollectionSortDirection.descending,
-        );
-        if (multiSort) {
-          next[existingIndex] = descending;
-        } else {
-          next.add(descending);
-        }
-      } else if (multiSort) {
-        next.removeAt(existingIndex);
-      }
-    }
-    callback(List.unmodifiable(next));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final sort = sorting
-        .where((candidate) => candidate.id == column.id)
-        .firstOrNull;
-    final suffix = switch (sort?.direction) {
-      CollectionSortDirection.ascending => ' ↑',
-      CollectionSortDirection.descending => ' ↓',
-      null => '',
-    };
-    return CarpenterTableHeaderCellChrome(
-      id: column.id,
-      width: width,
-      minimumWidth: minimumWidth,
-      maximumWidth: maximumWidth,
-      alignment: column.alignment,
-      verticalAlignment: column.verticalAlignment,
-      resizable: column.resizable,
-      hoverFeedback: true,
-      resizeHandleKey: ValueKey('table-resize-${column.id}'),
-      onActivate: column.sortable && onSortingChanged != null
-          ? _toggleSort
-          : null,
-      onWidthChanged: (value) => onWidthChanged(
-        column.id,
-        Rem(value / context.units(1.rem)),
-      ),
-      child: CarpenterTableText.header(
-        '${column.header}$suffix',
-        semanticsLabel: column.semanticLabel ?? column.header,
-      ),
-    );
-  }
-}
-
-'''
-          text = text[:start] + replacement + text[end:]
-          old = r'''                  for (final column in widget.columns)
-                    SizedBox(
-                      width: widget.widths[column.id],
-                      child: Padding(
-                        padding: EdgeInsetsDirectional.symmetric(
-                          horizontal: metrics.horizontalPadding,
-                          vertical: metrics.verticalPadding,
-                        ),
-                        child: Align(
-                          alignment: carpenterTableCellAlignment(
-                            column.alignment,
-                            column.verticalAlignment,
-                          ),
-                          child: column.cellBuilder(context, widget.item),
-                        ),
-                      ),
-                    ),
-'''
-          new = r'''                  for (final column in widget.columns)
-                    CarpenterTableCellChrome(
-                      width: widget.widths[column.id]!,
-                      alignment: column.alignment,
-                      verticalAlignment: column.verticalAlignment,
-                      child: column.cellBuilder(context, widget.item),
-                    ),
-'''
+          header = dec('ZmluYWwgY2xhc3MgX0hlYWRlckNlbGw8VD4gZXh0ZW5kcyBTdGF0ZWxlc3NXaWRnZXQgewogIGNvbnN0IF9IZWFkZXJDZWxsKHsKICAgIHJlcXVpcmVkIHRoaXMuY29sdW1uLAogICAgcmVxdWlyZWQgdGhpcy53aWR0aCwKICAgIHJlcXVpcmVkIHRoaXMubWluaW11bVdpZHRoLAogICAgcmVxdWlyZWQgdGhpcy5tYXhpbXVtV2lkdGgsCiAgICByZXF1aXJlZCB0aGlzLnNvcnRpbmcsCiAgICByZXF1aXJlZCB0aGlzLm9uU29ydGluZ0NoYW5nZWQsCiAgICByZXF1aXJlZCB0aGlzLm11bHRpU29ydCwKICAgIHJlcXVpcmVkIHRoaXMub25XaWR0aENoYW5nZWQsCiAgfSk7CgogIGZpbmFsIENhcnBlbnRlclRhYmxlQ29sdW1uPFQ+IGNvbHVtbjsKICBmaW5hbCBkb3VibGUgd2lkdGg7CiAgZmluYWwgZG91YmxlIG1pbmltdW1XaWR0aDsKICBmaW5hbCBkb3VibGUgbWF4aW11bVdpZHRoOwogIGZpbmFsIExpc3Q8Q29sbGVjdGlvblNvcnQ+IHNvcnRpbmc7CiAgZmluYWwgVmFsdWVDaGFuZ2VkPExpc3Q8Q29sbGVjdGlvblNvcnQ+Pj8gb25Tb3J0aW5nQ2hhbmdlZDsKICBmaW5hbCBib29sIG11bHRpU29ydDsKICBmaW5hbCBDYXJwZW50ZXJUYWJsZUNvbHVtbldpZHRoQ2hhbmdlZCBvbldpZHRoQ2hhbmdlZDsKCiAgdm9pZCBfdG9nZ2xlU29ydCgpIHsKICAgIGZpbmFsIGNhbGxiYWNrID0gb25Tb3J0aW5nQ2hhbmdlZDsKICAgIGlmIChjYWxsYmFjayA9PSBudWxsIHx8ICFjb2x1bW4uc29ydGFibGUpIHJldHVybjsKICAgIGZpbmFsIGV4aXN0aW5nSW5kZXggPSBzb3J0aW5nLmluZGV4V2hlcmUoKHNvcnQpID0+IHNvcnQuaWQgPT0gY29sdW1uLmlkKTsKICAgIGZpbmFsIG5leHQgPSBtdWx0aVNvcnQgPyBbLi4uc29ydGluZ10gOiA8Q29sbGVjdGlvblNvcnQ+W107CiAgICBpZiAoZXhpc3RpbmdJbmRleCA8IDApIHsKICAgICAgbmV4dC5hZGQoCiAgICAgICAgQ29sbGVjdGlvblNvcnQoCiAgICAgICAgICBpZDogY29sdW1uLmlkLAogICAgICAgICAgZGlyZWN0aW9uOiBDb2xsZWN0aW9uU29ydERpcmVjdGlvbi5hc2NlbmRpbmcsCiAgICAgICAgKSwKICAgICAgKTsKICAgIH0gZWxzZSB7CiAgICAgIGZpbmFsIGV4aXN0aW5nID0gc29ydGluZ1tleGlzdGluZ0luZGV4XTsKICAgICAgaWYgKGV4aXN0aW5nLmRpcmVjdGlvbiA9PSBDb2xsZWN0aW9uU29ydERpcmVjdGlvbi5hc2NlbmRpbmcpIHsKICAgICAgICBmaW5hbCBkZXNjZW5kaW5nID0gQ29sbGVjdGlvblNvcnQoCiAgICAgICAgICBpZDogY29sdW1uLmlkLAogICAgICAgICAgZGlyZWN0aW9uOiBDb2xsZWN0aW9uU29ydERpcmVjdGlvbi5kZXNjZW5kaW5nLAogICAgICAgICk7CiAgICAgICAgaWYgKG11bHRpU29ydCkgewogICAgICAgICAgbmV4dFtleGlzdGluZ0luZGV4XSA9IGRlc2NlbmRpbmc7CiAgICAgICAgfSBlbHNlIHsKICAgICAgICAgIG5leHQuYWRkKGRlc2NlbmRpbmcpOwogICAgICAgIH0KICAgICAgfSBlbHNlIGlmIChtdWx0aVNvcnQpIHsKICAgICAgICBuZXh0LnJlbW92ZUF0KGV4aXN0aW5nSW5kZXgpOwogICAgICB9CiAgICB9CiAgICBjYWxsYmFjayhMaXN0LnVubW9kaWZpYWJsZShuZXh0KSk7CiAgfQoKICBAb3ZlcnJpZGUKICBXaWRnZXQgYnVpbGQoQnVpbGRDb250ZXh0IGNvbnRleHQpIHsKICAgIGZpbmFsIHNvcnQgPSBzb3J0aW5nCiAgICAgICAgLndoZXJlKChjYW5kaWRhdGUpID0+IGNhbmRpZGF0ZS5pZCA9PSBjb2x1bW4uaWQpCiAgICAgICAgLmZpcnN0T3JOdWxsOwogICAgZmluYWwgc3VmZml4ID0gc3dpdGNoIChzb3J0Py5kaXJlY3Rpb24pIHsKICAgICAgQ29sbGVjdGlvblNvcnREaXJlY3Rpb24uYXNjZW5kaW5nID0+ICcg4oaRJywKICAgICAgQ29sbGVjdGlvblNvcnREaXJlY3Rpb24uZGVzY2VuZGluZyA9PiAnIOKGkycsCiAgICAgIG51bGwgPT4gJycsCiAgICB9OwogICAgcmV0dXJuIENhcnBlbnRlclRhYmxlSGVhZGVyQ2VsbENocm9tZSgKICAgICAgaWQ6IGNvbHVtbi5pZCwKICAgICAgd2lkdGg6IHdpZHRoLAogICAgICBtaW5pbXVtV2lkdGg6IG1pbmltdW1XaWR0aCwKICAgICAgbWF4aW11bVdpZHRoOiBtYXhpbXVtV2lkdGgsCiAgICAgIGFsaWdubWVudDogY29sdW1uLmFsaWdubWVudCwKICAgICAgdmVydGljYWxBbGlnbm1lbnQ6IGNvbHVtbi52ZXJ0aWNhbEFsaWdubWVudCwKICAgICAgcmVzaXphYmxlOiBjb2x1bW4ucmVzaXphYmxlLAogICAgICBob3ZlckZlZWRiYWNrOiB0cnVlLAogICAgICByZXNpemVIYW5kbGVLZXk6IFZhbHVlS2V5KCd0YWJsZS1yZXNpemUtJHtjb2x1bW4uaWR9JyksCiAgICAgIG9uQWN0aXZhdGU6IGNvbHVtbi5zb3J0YWJsZSAmJiBvblNvcnRpbmdDaGFuZ2VkICE9IG51bGwKICAgICAgICAgID8gX3RvZ2dsZVNvcnQKICAgICAgICAgIDogbnVsbCwKICAgICAgb25XaWR0aENoYW5nZWQ6ICh2YWx1ZSkgPT4gb25XaWR0aENoYW5nZWQoCiAgICAgICAgY29sdW1uLmlkLAogICAgICAgIFJlbSh2YWx1ZSAvIGNvbnRleHQudW5pdHMoMS5yZW0pKSwKICAgICAgKSwKICAgICAgY2hpbGQ6IENhcnBlbnRlclRhYmxlVGV4dC5oZWFkZXIoCiAgICAgICAgJyR7Y29sdW1uLmhlYWRlcn0kc3VmZml4JywKICAgICAgICBzZW1hbnRpY3NMYWJlbDogY29sdW1uLnNlbWFudGljTGFiZWwgPz8gY29sdW1uLmhlYWRlciwKICAgICAgKSwKICAgICk7CiAgfQp9Cgo=')
+          text = text[:start] + header + text[end:]
+          old = dec('ICAgICAgICAgICAgICAgICAgZm9yIChmaW5hbCBjb2x1bW4gaW4gd2lkZ2V0LmNvbHVtbnMpCiAgICAgICAgICAgICAgICAgICAgU2l6ZWRCb3goCiAgICAgICAgICAgICAgICAgICAgICB3aWR0aDogd2lkZ2V0LndpZHRoc1tjb2x1bW4uaWRdLAogICAgICAgICAgICAgICAgICAgICAgY2hpbGQ6IFBhZGRpbmcoCiAgICAgICAgICAgICAgICAgICAgICAgIHBhZGRpbmc6IEVkZ2VJbnNldHNEaXJlY3Rpb25hbC5zeW1tZXRyaWMoCiAgICAgICAgICAgICAgICAgICAgICAgICAgaG9yaXpvbnRhbDogbWV0cmljcy5ob3Jpem9udGFsUGFkZGluZywKICAgICAgICAgICAgICAgICAgICAgICAgICB2ZXJ0aWNhbDogbWV0cmljcy52ZXJ0aWNhbFBhZGRpbmcsCiAgICAgICAgICAgICAgICAgICAgICAgICksCiAgICAgICAgICAgICAgICAgICAgICAgIGNoaWxkOiBBbGlnbigKICAgICAgICAgICAgICAgICAgICAgICAgICBhbGlnbm1lbnQ6IGNhcnBlbnRlclRhYmxlQ2VsbEFsaWdubWVudCgKICAgICAgICAgICAgICAgICAgICAgICAgICAgIGNvbHVtbi5hbGlnbm1lbnQsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICBjb2x1bW4udmVydGljYWxBbGlnbm1lbnQsCiAgICAgICAgICAgICAgICAgICAgICAgICAgKSwKICAgICAgICAgICAgICAgICAgICAgICAgICBjaGlsZDogY29sdW1uLmNlbGxCdWlsZGVyKGNvbnRleHQsIHdpZGdldC5pdGVtKSwKICAgICAgICAgICAgICAgICAgICAgICAgKSwKICAgICAgICAgICAgICAgICAgICAgICksCiAgICAgICAgICAgICAgICAgICAgKSwK')
+          new = dec('ICAgICAgICAgICAgICAgICAgZm9yIChmaW5hbCBjb2x1bW4gaW4gd2lkZ2V0LmNvbHVtbnMpCiAgICAgICAgICAgICAgICAgICAgQ2FycGVudGVyVGFibGVDZWxsQ2hyb21lKAogICAgICAgICAgICAgICAgICAgICAgd2lkdGg6IHdpZGdldC53aWR0aHNbY29sdW1uLmlkXSEsCiAgICAgICAgICAgICAgICAgICAgICBhbGlnbm1lbnQ6IGNvbHVtbi5hbGlnbm1lbnQsCiAgICAgICAgICAgICAgICAgICAgICB2ZXJ0aWNhbEFsaWdubWVudDogY29sdW1uLnZlcnRpY2FsQWxpZ25tZW50LAogICAgICAgICAgICAgICAgICAgICAgY2hpbGQ6IGNvbHVtbi5jZWxsQnVpbGRlcihjb250ZXh0LCB3aWRnZXQuaXRlbSksCiAgICAgICAgICAgICAgICAgICAgKSwK')
           if text.count(old) != 1:
               raise SystemExit(f'row cell match count={text.count(old)}')
-          text = text.replace(old, new, 1)
-          table.write_text(text)
+          table.write_text(text.replace(old, new, 1))
 
           tree = Path('lib/src/components/collections/tree/tree_table.dart')
           text = tree.read_text()
@@ -195,73 +72,8 @@ jobs:
           text = text.replace(old, new, 1)
           start = text.index('final class _TreeHeaderCell extends StatelessWidget {')
           end = text.index('final class _TreeTablePrefix<T> extends StatelessWidget {')
-          replacement = r'''final class _TreeHeaderCell extends StatelessWidget {
-  const _TreeHeaderCell({
-    required this.id,
-    required this.label,
-    required this.semanticLabel,
-    required this.width,
-    required this.minimumWidth,
-    required this.maximumWidth,
-    required this.alignment,
-    required this.verticalAlignment,
-    required this.resizable,
-    required this.onWidthChanged,
-  });
-
-  final String id;
-  final String label;
-  final String semanticLabel;
-  final double width;
-  final double minimumWidth;
-  final double maximumWidth;
-  final CarpenterTableColumnAlignment alignment;
-  final CarpenterTableColumnVerticalAlignment verticalAlignment;
-  final bool resizable;
-  final ValueChanged<double> onWidthChanged;
-
-  @override
-  Widget build(BuildContext context) => CarpenterTableHeaderCellChrome(
-    id: id,
-    width: width,
-    minimumWidth: minimumWidth,
-    maximumWidth: maximumWidth,
-    alignment: alignment,
-    verticalAlignment: verticalAlignment,
-    resizable: resizable,
-    padded: false,
-    resizeHandleKey: ValueKey('tree-table-resize-$id'),
-    onWidthChanged: onWidthChanged,
-    child: CarpenterTableText.header(label, semanticsLabel: semanticLabel),
-  );
-}
-
-final class _TreeTableSlot extends StatelessWidget {
-  const _TreeTableSlot({
-    required this.width,
-    required this.alignment,
-    required this.verticalAlignment,
-    required this.child,
-  });
-
-  final double width;
-  final CarpenterTableColumnAlignment alignment;
-  final CarpenterTableColumnVerticalAlignment verticalAlignment;
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context) => CarpenterTableCellChrome(
-    width: width,
-    alignment: alignment,
-    verticalAlignment: verticalAlignment,
-    padded: false,
-    child: child,
-  );
-}
-
-'''
-          text = text[:start] + replacement + text[end:]
-          tree.write_text(text)
+          tree_block = dec('ZmluYWwgY2xhc3MgX1RyZWVIZWFkZXJDZWxsIGV4dGVuZHMgU3RhdGVsZXNzV2lkZ2V0IHsKICBjb25zdCBfVHJlZUhlYWRlckNlbGwoewogICAgcmVxdWlyZWQgdGhpcy5pZCwKICAgIHJlcXVpcmVkIHRoaXMubGFiZWwsCiAgICByZXF1aXJlZCB0aGlzLnNlbWFudGljTGFiZWwsCiAgICByZXF1aXJlZCB0aGlzLndpZHRoLAogICAgcmVxdWlyZWQgdGhpcy5taW5pbXVtV2lkdGgsCiAgICByZXF1aXJlZCB0aGlzLm1heGltdW1XaWR0aCwKICAgIHJlcXVpcmVkIHRoaXMuYWxpZ25tZW50LAogICAgcmVxdWlyZWQgdGhpcy52ZXJ0aWNhbEFsaWdubWVudCwKICAgIHJlcXVpcmVkIHRoaXMucmVzaXphYmxlLAogICAgcmVxdWlyZWQgdGhpcy5vbldpZHRoQ2hhbmdlZCwKICB9KTsKCiAgZmluYWwgU3RyaW5nIGlkOwogIGZpbmFsIFN0cmluZyBsYWJlbDsKICBmaW5hbCBTdHJpbmcgc2VtYW50aWNMYWJlbDsKICBmaW5hbCBkb3VibGUgd2lkdGg7CiAgZmluYWwgZG91YmxlIG1pbmltdW1XaWR0aDsKICBmaW5hbCBkb3VibGUgbWF4aW11bVdpZHRoOwogIGZpbmFsIENhcnBlbnRlclRhYmxlQ29sdW1uQWxpZ25tZW50IGFsaWdubWVudDsKICBmaW5hbCBDYXJwZW50ZXJUYWJsZUNvbHVtblZlcnRpY2FsQWxpZ25tZW50IHZlcnRpY2FsQWxpZ25tZW50OwogIGZpbmFsIGJvb2wgcmVzaXphYmxlOwogIGZpbmFsIFZhbHVlQ2hhbmdlZDxkb3VibGU+IG9uV2lkdGhDaGFuZ2VkOwoKICBAb3ZlcnJpZGUKICBXaWRnZXQgYnVpbGQoQnVpbGRDb250ZXh0IGNvbnRleHQpID0+IENhcnBlbnRlclRhYmxlSGVhZGVyQ2VsbENocm9tZSgKICAgIGlkOiBpZCwKICAgIHdpZHRoOiB3aWR0aCwKICAgIG1pbmltdW1XaWR0aDogbWluaW11bVdpZHRoLAogICAgbWF4aW11bVdpZHRoOiBtYXhpbXVtV2lkdGgsCiAgICBhbGlnbm1lbnQ6IGFsaWdubWVudCwKICAgIHZlcnRpY2FsQWxpZ25tZW50OiB2ZXJ0aWNhbEFsaWdubWVudCwKICAgIHJlc2l6YWJsZTogcmVzaXphYmxlLAogICAgcGFkZGVkOiBmYWxzZSwKICAgIHJlc2l6ZUhhbmRsZUtleTogVmFsdWVLZXkoJ3RyZWUtdGFibGUtcmVzaXplLSRpZCcpLAogICAgb25XaWR0aENoYW5nZWQ6IG9uV2lkdGhDaGFuZ2VkLAogICAgY2hpbGQ6IENhcnBlbnRlclRhYmxlVGV4dC5oZWFkZXIobGFiZWwsIHNlbWFudGljc0xhYmVsOiBzZW1hbnRpY0xhYmVsKSwKICApOwp9CgpmaW5hbCBjbGFzcyBfVHJlZVRhYmxlU2xvdCBleHRlbmRzIFN0YXRlbGVzc1dpZGdldCB7CiAgY29uc3QgX1RyZWVUYWJsZVNsb3QoewogICAgcmVxdWlyZWQgdGhpcy53aWR0aCwKICAgIHJlcXVpcmVkIHRoaXMuYWxpZ25tZW50LAogICAgcmVxdWlyZWQgdGhpcy52ZXJ0aWNhbEFsaWdubWVudCwKICAgIHJlcXVpcmVkIHRoaXMuY2hpbGQsCiAgfSk7CgogIGZpbmFsIGRvdWJsZSB3aWR0aDsKICBmaW5hbCBDYXJwZW50ZXJUYWJsZUNvbHVtbkFsaWdubWVudCBhbGlnbm1lbnQ7CiAgZmluYWwgQ2FycGVudGVyVGFibGVDb2x1bW5WZXJ0aWNhbEFsaWdubWVudCB2ZXJ0aWNhbEFsaWdubWVudDsKICBmaW5hbCBXaWRnZXQgY2hpbGQ7CgogIEBvdmVycmlkZQogIFdpZGdldCBidWlsZChCdWlsZENvbnRleHQgY29udGV4dCkgPT4gQ2FycGVudGVyVGFibGVDZWxsQ2hyb21lKAogICAgd2lkdGg6IHdpZHRoLAogICAgYWxpZ25tZW50OiBhbGlnbm1lbnQsCiAgICB2ZXJ0aWNhbEFsaWdubWVudDogdmVydGljYWxBbGlnbm1lbnQsCiAgICBwYWRkZWQ6IGZhbHNlLAogICAgY2hpbGQ6IGNoaWxkLAogICk7Cn0KCg==')
+          tree.write_text(text[:start] + tree_block + text[end:])
           PY
 
       - name: Setup Flutter
