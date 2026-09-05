@@ -5,36 +5,39 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/harness.dart';
 
 void main() {
-  test('executor emits semantic lifecycle and combines refresh scopes', () async {
-    final events = <CarpenterCommandExecutionEvent>[];
-    final command = CarpenterCommandController<int>(
-      id: 'payment.archive',
-      title: 'Archive payment',
-      group: 'Payments',
-      effects: const [
-        CarpenterRefreshCommandEffect({'payments'}),
-        CarpenterBlockingCommandEffect(),
-      ],
-      execute: (input) => CarpenterCommandResult(
-        message: 'Archived $input',
-        refreshScopes: const {'balances'},
-      ),
-    );
-    addTearDown(command.dispose);
-    final executor = CarpenterCommandExecutor(listeners: [events.add]);
+  test(
+    'executor emits semantic lifecycle and combines refresh scopes',
+    () async {
+      final events = <CarpenterCommandExecutionEvent>[];
+      final command = CarpenterCommandController<int>(
+        id: 'payment.archive',
+        title: 'Archive payment',
+        group: 'Payments',
+        effects: const [
+          CarpenterRefreshCommandEffect({'payments'}),
+          CarpenterBlockingCommandEffect(),
+        ],
+        execute: (input) => CarpenterCommandResult(
+          message: 'Archived $input',
+          refreshScopes: const {'balances'},
+        ),
+      );
+      addTearDown(command.dispose);
+      final executor = CarpenterCommandExecutor(listeners: [events.add]);
 
-    final result = await executor.execute(command, 42);
+      final result = await executor.execute(command, 42);
 
-    expect(result.message, 'Archived 42');
-    expect(events, hasLength(2));
-    expect(events.first, isA<CarpenterCommandStarted>());
-    expect(events.first.isBlocking, isTrue);
+      expect(result.message, 'Archived 42');
+      expect(events, hasLength(2));
+      expect(events.first, isA<CarpenterCommandStarted>());
+      expect(events.first.isBlocking, isTrue);
 
-    final succeeded = events.last as CarpenterCommandSucceeded;
-    expect(succeeded.message, 'Archived 42');
-    expect(succeeded.refreshScopes, {'payments', 'balances'});
-    expect(succeeded.isBlocking, isTrue);
-  });
+      final succeeded = events.last as CarpenterCommandSucceeded;
+      expect(succeeded.message, 'Archived 42');
+      expect(succeeded.refreshScopes, {'payments', 'balances'});
+      expect(succeeded.isBlocking, isTrue);
+    },
+  );
 
   test('executor emits failure and preserves command failure state', () async {
     final events = <CarpenterCommandExecutionEvent>[];
@@ -69,10 +72,7 @@ void main() {
     );
     addTearDown(command.dispose);
     final executor = CarpenterCommandExecutor(
-      listeners: [
-        (_) => throw StateError('broken listener'),
-        received.add,
-      ],
+      listeners: [(_) => throw StateError('broken listener'), received.add],
     );
 
     final result = await executor.execute(command, null);
@@ -84,7 +84,9 @@ void main() {
     expect(reported.first.exception, isA<StateError>());
   });
 
-  testWidgets('command button uses the nearest execution scope', (tester) async {
+  testWidgets('command button uses the nearest execution scope', (
+    tester,
+  ) async {
     final events = <CarpenterCommandExecutionEvent>[];
     final command = CarpenterCommandController<void>(
       id: 'save',

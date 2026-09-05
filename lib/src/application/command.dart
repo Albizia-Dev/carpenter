@@ -248,7 +248,8 @@ final class CarpenterCommandExecutionScope extends InheritedWidget {
   final CarpenterCommandExecutor executor;
 
   static CarpenterCommandExecutionScope? maybeOf(BuildContext context) =>
-      context.dependOnInheritedWidgetOfExactType<CarpenterCommandExecutionScope>();
+      context
+          .dependOnInheritedWidgetOfExactType<CarpenterCommandExecutionScope>();
 
   @override
   bool updateShouldNotify(CarpenterCommandExecutionScope oldWidget) =>
@@ -508,34 +509,32 @@ final class CarpenterCommandButton<I> extends StatelessWidget {
   final I input;
 
   @override
-  Widget build(BuildContext context) =>
-      ValueListenableBuilder<CarpenterCommandState>(
-        valueListenable: command.state,
-        builder: (context, state, _) {
-          if (state.visibility == CarpenterCommandVisibility.hidden) {
-            return const SizedBox.shrink();
-          }
-          final presentation = command.presentation;
-          return CarpenterButton.fromAction(
-            command.toAction(
-              input,
-              label: state.execution == CarpenterCommandExecution.executing
-                  ? '${command.title}…'
-                  : command.title,
-              executor: CarpenterCommandExecutionScope.maybeOf(
-                context,
-              )?.executor,
-            ),
-            prominence: presentation == CarpenterCommandPresentation.primary
-                ? ActionProminence.high
-                : ActionProminence.outlined,
-            executionPhase: switch (state.execution) {
-              CarpenterCommandExecution.idle => ActionExecutionPhase.idle,
-              CarpenterCommandExecution.executing =>
-                ActionExecutionPhase.running,
-              CarpenterCommandExecution.failed => ActionExecutionPhase.failed,
-            },
-          );
+  Widget build(
+    BuildContext context,
+  ) => ValueListenableBuilder<CarpenterCommandState>(
+    valueListenable: command.state,
+    builder: (context, state, _) {
+      if (state.visibility == CarpenterCommandVisibility.hidden) {
+        return const SizedBox.shrink();
+      }
+      final presentation = command.presentation;
+      return CarpenterButton.fromAction(
+        command.toAction(
+          input,
+          label: state.execution == CarpenterCommandExecution.executing
+              ? '${command.title}…'
+              : command.title,
+          executor: CarpenterCommandExecutionScope.maybeOf(context)?.executor,
+        ),
+        prominence: presentation == CarpenterCommandPresentation.primary
+            ? ActionProminence.high
+            : ActionProminence.outlined,
+        executionPhase: switch (state.execution) {
+          CarpenterCommandExecution.idle => ActionExecutionPhase.idle,
+          CarpenterCommandExecution.executing => ActionExecutionPhase.running,
+          CarpenterCommandExecution.failed => ActionExecutionPhase.failed,
         },
       );
+    },
+  );
 }
