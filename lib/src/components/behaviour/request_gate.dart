@@ -37,13 +37,16 @@ final class CarpenterRequestLease<C extends CarpenterCancellationSignal> {
 ///
 /// Starting a new request cancels the previous one. A late completion never
 /// becomes current again, even when the underlying transport cannot actually
-/// abort its work. The gate deliberately knows nothing about loading, page,
+/// abort its work. Cancelled request signals stay alive until their own request
+/// finishes, so transport adapters may safely observe cancellation across their
+/// asynchronous setup. The gate deliberately knows nothing about loading, page,
 /// collection, or transport semantics; those remain with the owning feature.
 final class CarpenterRequestGate<C extends CarpenterCancellationSignal> {
   CarpenterRequestGate({required C Function() createCancellation})
     : _createCancellation = createCancellation;
 
   final C Function() _createCancellation;
+  final Set<CarpenterRequestLease<C>> _live = {};
   CarpenterRequestLease<C>? _active;
   int _generation = 0;
 
@@ -55,6 +58,7 @@ final class CarpenterRequestGate<C extends CarpenterCancellationSignal> {
       generation: ++_generation,
       cancellation: _createCancellation(),
     );
+    _live.add(lease);
     _active = lease;
     return lease;
   }
@@ -63,20 +67,25 @@ final class CarpenterRequestGate<C extends CarpenterCancellationSignal> {
       identical(_active, lease) && !lease.cancellation.isCancelled;
 
   void finish(CarpenterRequestLease<C> lease) {
-    if (!identical(_active, lease)) return;
-    _active = null;
-    lease.cancellation.dispose();
+    if (identical(_active, lease)) _active = null;
+    if (_live.remove(lease)) lease.cancellation.dispose();
   }
 
   void cancel() => _cancelActive();
 
-  void dispose() => _cancelActive();
+  void dispose() {
+    _active = null;
+    for (final lease in _live) {
+      lease.cancellation.cancel();
+      lease.cancellation.dispose();
+    }
+    _live.clear();
+  }
 
   void _cancelActive() {
     final active = _active;
     if (active == null) return;
     _active = null;
     active.cancellation.cancel();
-    active.cancellation.dispose();
   }
 }
