@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+import '../../components/basic/input/field_shell.dart';
 import '../../components/basic/input/input.dart';
 import '../../foundation/roles.dart';
 import '../overlay/anchored_overlay_host.dart';
@@ -24,6 +25,7 @@ final class SuggestionField<T> extends StatefulWidget {
     this.label,
     this.placeholder,
     this.description,
+    this.feedback,
     this.errorText,
     this.semanticLabel,
     this.required = false,
@@ -51,6 +53,7 @@ final class SuggestionField<T> extends StatefulWidget {
   final String? label;
   final String? placeholder;
   final String? description;
+  final CarpenterFieldFeedback? feedback;
   final String? errorText;
   final String? semanticLabel;
   final bool required;
@@ -245,6 +248,7 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
           label: widget.label,
           placeholder: widget.placeholder,
           description: widget.description,
+          feedback: widget.feedback,
           errorText: widget.errorText,
           semanticLabel: widget.semanticLabel,
           required: widget.required,
