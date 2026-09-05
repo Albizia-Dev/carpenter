@@ -10,7 +10,7 @@ enum CarpenterTableColumnAlignment { start, center, end }
 
 enum CarpenterTableColumnVerticalAlignment { top, center, bottom }
 
-enum CarpenterTableColumnWidthPolicy { fixed, flexible }
+enum CarpenterTableColumnWidthPolicy { fixed, flexible, actionLane }
 
 @immutable
 final class CarpenterTableColumnWidth {
@@ -30,11 +30,25 @@ final class CarpenterTableColumnWidth {
        preferred = width,
        flex = 0;
 
+  /// Compact non-flexing lane for semantic row actions.
+  ///
+  /// When [preferred] is omitted, the table resolves the extent from its action
+  /// control size, gaps, and cell padding instead of coupling layout to a
+  /// concrete action-cell widget.
+  const CarpenterTableColumnWidth.actionLane({
+    this.preferred,
+    this.minimum,
+    this.maximum,
+  }) : policy = CarpenterTableColumnWidthPolicy.actionLane,
+       flex = 0;
+
   final CarpenterTableColumnWidthPolicy policy;
   final int flex;
   final LengthUnit? preferred;
   final LengthUnit? minimum;
   final LengthUnit? maximum;
+
+  bool get isFlexible => policy == CarpenterTableColumnWidthPolicy.flexible;
 }
 
 typedef CarpenterTableCellBuilder<T> = Widget Function(
@@ -54,6 +68,10 @@ final class CarpenterTableColumn<T> {
     this.sortable = false,
     this.resizable = true,
     this.semanticLabel,
+    @Deprecated(
+      'Use width: CarpenterTableColumnWidth.actionLane(). '
+      'isActionColumn is retained for source compatibility.',
+    )
     this.isActionColumn = false,
   });
 
@@ -152,10 +170,10 @@ final class CarpenterTableColumn<T> {
 
   /// Creates a compact, geometry-stable action column.
   ///
-  /// [actions] are the primary actions and are kept inline when possible.
-  /// [secondaryActions] always live under the ellipsis menu. The default action
-  /// column width is resolved by [CarpenterTable] from the compact control
-  /// tokens rather than growing like a regular data column.
+  /// [actions] are primary actions. Up to two icon-bearing actions stay inline;
+  /// remaining primary actions and every [secondaryActions] entry live under
+  /// overflow. The default [width] is a semantic action lane and therefore does
+  /// not participate in flexible data-column growth.
   factory CarpenterTableColumn.actions({
     required String id,
     required String header,
@@ -165,7 +183,7 @@ final class CarpenterTableColumn<T> {
     CarpenterTableColumnVerticalAlignment verticalAlignment =
         CarpenterTableColumnVerticalAlignment.center,
     CarpenterTableColumnWidth width =
-        const CarpenterTableColumnWidth.flexible(),
+        const CarpenterTableColumnWidth.actionLane(),
     bool resizable = false,
     String? semanticLabel,
     String overflowLabel = 'More actions',
@@ -195,7 +213,26 @@ final class CarpenterTableColumn<T> {
   final CarpenterTableColumnWidth width;
   final bool sortable;
   final bool resizable;
+
+  @Deprecated(
+    'Use width: CarpenterTableColumnWidth.actionLane(). '
+    'isActionColumn is retained for source compatibility.',
+  )
   final bool isActionColumn;
+
+  /// Resolves the legacy action-column marker into the semantic width contract.
+  CarpenterTableColumnWidth get effectiveWidth {
+    if (!isActionColumn ||
+        width.policy == CarpenterTableColumnWidthPolicy.fixed ||
+        width.policy == CarpenterTableColumnWidthPolicy.actionLane) {
+      return width;
+    }
+    return CarpenterTableColumnWidth.actionLane(
+      preferred: width.preferred,
+      minimum: width.minimum,
+      maximum: width.maximum,
+    );
+  }
 }
 
 AlignmentDirectional carpenterTableCellAlignment(
