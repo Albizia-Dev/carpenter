@@ -72,6 +72,7 @@ Widget _alignmentContract(BuildContext context) => preview(
         pagination: DemoPaginationFixture.cursor,
       ),
       rowKey: (row) => row.id,
+      rowSemanticLabel: (row) => row.name,
       columns: [
         CarpenterTableColumn<_ExampleRow>.text(
           id: 'start-top',
