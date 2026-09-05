@@ -365,8 +365,15 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
           tableRowContentPadding: false,
           dragActivation: widget.dragActivation,
           semanticLabel: '${widget.semanticLabel} rows',
-          rowBuilder: (context, node, state, _) =>
-              _buildRow(context, layout, columns, node, state, contentGap),
+          rowBuilder: (context, node, state, _) => _buildRow(
+            context,
+            layout,
+            columns,
+            node,
+            state,
+            contentGap,
+            interColumnGap,
+          ),
         );
         Widget content = Column(
           mainAxisSize: widget.scrollController == null
@@ -536,7 +543,8 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     List<CarpenterTreeTableColumn<T>> columns,
     CarpenterTreeNode<T> node,
     CarpenterTreeRowState<T> state,
-    double gap,
+    double contentGap,
+    double interColumnGap,
   ) {
     return Row(
       children: [
@@ -556,7 +564,7 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
                   !widget.expandedIds.contains(node.id),
                 ),
               ),
-              SizedBox(width: gap),
+              SizedBox(width: contentGap),
               Expanded(
                 child: CarpenterTableText.cell(
                   node.label,
@@ -571,7 +579,7 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
           ),
         ),
         for (final column in columns) ...[
-          SizedBox(width: gap),
+          SizedBox(width: interColumnGap),
           _TreeTableSlot(
             width: layout.widths[column.id]!,
             alignment: column.alignment,
