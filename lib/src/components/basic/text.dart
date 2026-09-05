@@ -16,7 +16,7 @@ final class CarpenterText extends StatelessWidget {
     this.softWrap,
     this.textDirection,
     this.semanticsLabel,
-  });
+  }) : feedbackRole = null;
 
   const CarpenterText.title(
     this.data, {
@@ -29,7 +29,8 @@ final class CarpenterText extends StatelessWidget {
     this.softWrap,
     this.textDirection,
     this.semanticsLabel,
-  }) : role = TypographyRole.title;
+  }) : role = TypographyRole.title,
+       feedbackRole = null;
 
   const CarpenterText.body(
     this.data, {
@@ -42,7 +43,8 @@ final class CarpenterText extends StatelessWidget {
     this.softWrap,
     this.textDirection,
     this.semanticsLabel,
-  }) : role = TypographyRole.body;
+  }) : role = TypographyRole.body,
+       feedbackRole = null;
 
   const CarpenterText.label(
     this.data, {
@@ -55,7 +57,8 @@ final class CarpenterText extends StatelessWidget {
     this.softWrap,
     this.textDirection,
     this.semanticsLabel,
-  }) : role = TypographyRole.label;
+  }) : role = TypographyRole.label,
+       feedbackRole = null;
 
   const CarpenterText.caption(
     this.data, {
@@ -68,12 +71,28 @@ final class CarpenterText extends StatelessWidget {
     this.softWrap,
     this.textDirection,
     this.semanticsLabel,
-  }) : role = TypographyRole.caption;
+  }) : role = TypographyRole.caption,
+       feedbackRole = null;
+
+  const CarpenterText.feedback(
+    this.data, {
+    super.key,
+    required this.feedbackRole,
+    this.role = TypographyRole.body,
+    this.emphasis = TypographyEmphasis.regular,
+    this.textAlign,
+    this.maxLines,
+    this.overflow,
+    this.softWrap,
+    this.textDirection,
+    this.semanticsLabel,
+  }) : colorRole = ContentColorRole.primary;
 
   final String data;
   final TypographyRole role;
   final TypographyEmphasis emphasis;
   final ContentColorRole colorRole;
+  final FeedbackColorRole? feedbackRole;
   final TextAlign? textAlign;
   final int? maxLines;
   final TextOverflow? overflow;
@@ -85,9 +104,12 @@ final class CarpenterText extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final style = theme.typography.resolve(context, role, emphasis);
+    final color = feedbackRole == null
+        ? theme.content.resolve(colorRole)
+        : theme.feedback.resolve(feedbackRole!).foreground;
     return Text(
       data,
-      style: style.copyWith(color: theme.content.resolve(colorRole)),
+      style: style.copyWith(color: color),
       textAlign: textAlign,
       maxLines: maxLines,
       overflow: overflow,
