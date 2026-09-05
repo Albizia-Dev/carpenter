@@ -94,10 +94,7 @@ Widget _cardPlayground(BuildContext context) {
                   ),
           ),
           if (showStatus)
-            const CarpenterTag(
-              label: 'Ready',
-              tone: CarpenterTagTone.success,
-            ),
+            const CarpenterTag(label: 'Ready', tone: CarpenterTagTone.success),
         ],
       ),
       SizedBox(height: context.units(.5.rem)),

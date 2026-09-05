@@ -79,7 +79,8 @@ final class CarpenterCard extends StatelessWidget {
     final feedback = feedbackRole == null
         ? null
         : theme.feedback.resolve(feedbackRole!);
-    final semanticBackground = feedback?.background ??
+    final semanticBackground =
+        feedback?.background ??
         switch (surfaceRole) {
           CarpenterCardSurfaceRole.overlay => theme.overlay.background,
           CarpenterCardSurfaceRole.base => theme.surface.base,
