@@ -9,6 +9,7 @@ final treeTableContractsComponent = WidgetbookComponent(
       name: 'Project structure',
       builder: (_) => const _ProjectStructurePreview(),
     ),
+    WidgetbookUseCase(name: 'Alignment contract', builder: _alignmentContract),
   ],
 );
 
@@ -50,6 +51,67 @@ const _projectNodes = <CarpenterTreeNode<String>>[
     ],
   ),
 ];
+
+const _alignmentNodes = <CarpenterTreeNode<String>>[
+  CarpenterTreeNode<String>(
+    id: 'alignment-root',
+    value: 'root',
+    label: 'Tree / top',
+    children: [
+      CarpenterTreeNode<String>(
+        id: 'alignment-child',
+        value: 'child',
+        label: 'Nested probe',
+      ),
+    ],
+  ),
+];
+
+Widget _alignmentContract(BuildContext context) => Center(
+  child: SizedBox(
+    width: context.units(48.rem),
+    child: CarpenterTreeTable<String>(
+      nodes: _alignmentNodes,
+      expandedIds: const {'alignment-root'},
+      treeHeader: 'Tree / top',
+      treeWidth: CarpenterTableColumnWidth.fixed(width: 16.rem),
+      treeAlignment: CarpenterTableColumnAlignment.start,
+      treeVerticalAlignment: CarpenterTableColumnVerticalAlignment.top,
+      treeResizable: false,
+      iconBuilder: (node) =>
+          node.canExpand ? GravityIcons.folder : GravityIcons.file,
+      columns: [
+        CarpenterTreeTableColumn<String>.text(
+          id: 'start-top',
+          header: 'Start / top',
+          value: (_) => 'Start / top',
+          alignment: CarpenterTableColumnAlignment.start,
+          verticalAlignment: CarpenterTableColumnVerticalAlignment.top,
+          width: CarpenterTableColumnWidth.fixed(width: 10.rem),
+          resizable: false,
+        ),
+        CarpenterTreeTableColumn<String>.text(
+          id: 'center-center',
+          header: 'Center / center',
+          value: (_) => 'Center / center',
+          alignment: CarpenterTableColumnAlignment.center,
+          verticalAlignment: CarpenterTableColumnVerticalAlignment.center,
+          width: CarpenterTableColumnWidth.fixed(width: 10.rem),
+          resizable: false,
+        ),
+        CarpenterTreeTableColumn<String>.text(
+          id: 'end-bottom',
+          header: 'End / bottom',
+          value: (_) => 'End / bottom',
+          alignment: CarpenterTableColumnAlignment.end,
+          verticalAlignment: CarpenterTableColumnVerticalAlignment.bottom,
+          width: CarpenterTableColumnWidth.fixed(width: 10.rem),
+          resizable: false,
+        ),
+      ],
+    ),
+  ),
+);
 
 final class _ProjectStructurePreview extends StatefulWidget {
   const _ProjectStructurePreview();
