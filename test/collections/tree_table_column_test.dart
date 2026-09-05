@@ -22,9 +22,18 @@ void main() {
       role: (_) => FeedbackColorRole.success,
     );
 
-    expect(text.effectiveWidth.policy, CarpenterTableColumnWidthPolicy.flexible);
-    expect(number.effectiveWidth.policy, CarpenterTableColumnWidthPolicy.flexible);
-    expect(status.effectiveWidth.policy, CarpenterTableColumnWidthPolicy.flexible);
+    expect(
+      text.effectiveWidth.policy,
+      CarpenterTableColumnWidthPolicy.flexible,
+    );
+    expect(
+      number.effectiveWidth.policy,
+      CarpenterTableColumnWidthPolicy.flexible,
+    );
+    expect(
+      status.effectiveWidth.policy,
+      CarpenterTableColumnWidthPolicy.flexible,
+    );
     expect(number.alignment, CarpenterTableColumnAlignment.end);
     expect(text.resizable, isTrue);
     expect(status.resizable, isTrue);
@@ -37,7 +46,11 @@ void main() {
       carpenterHarness(
         CarpenterTreeTable<String>(
           nodes: const [
-            CarpenterTreeNode<String>(id: 'root', value: 'root', label: 'Root'),
+            CarpenterTreeNode<String>(
+              id: 'root',
+              value: 'root',
+              label: 'Root',
+            ),
           ],
           columns: [
             CarpenterTreeTableColumn<String>.text(
