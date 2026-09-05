@@ -4,6 +4,7 @@ import '../../../foundation/roles.dart';
 import '../../../internal/overlay/anchored_overlay_host.dart';
 import '../../../internal/rendering/selectable_field.dart';
 import '../../../internal/selection/menu_panel.dart';
+import '../input/field_shell.dart';
 
 typedef CarpenterValueEquality<T> = bool Function(T first, T second);
 
@@ -23,6 +24,7 @@ final class CarpenterSelect<T> extends StatefulWidget {
     this.label,
     this.placeholder,
     this.description,
+    this.feedback,
     this.errorText,
     this.semanticLabel,
     this.required = false,
@@ -52,6 +54,7 @@ final class CarpenterSelect<T> extends StatefulWidget {
   final String? label;
   final String? placeholder;
   final String? description;
+  final CarpenterFieldFeedback? feedback;
   final String? errorText;
   final String? semanticLabel;
   final bool required;
@@ -116,6 +119,7 @@ final class _CarpenterSelectState<T> extends State<CarpenterSelect<T>> {
         placeholder: widget.placeholder,
         label: widget.label,
         description: widget.description,
+        feedback: widget.feedback,
         errorText: widget.errorText,
         semanticLabel: widget.semanticLabel,
         required: widget.required,

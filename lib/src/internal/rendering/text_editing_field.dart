@@ -18,6 +18,7 @@ final class TextEditingField extends StatefulWidget {
     this.label,
     this.placeholder,
     this.description,
+    this.feedback,
     this.errorText,
     this.semanticLabel,
     this.required = false,
@@ -41,6 +42,7 @@ final class TextEditingField extends StatefulWidget {
   final String? label;
   final String? placeholder;
   final String? description;
+  final CarpenterFieldFeedback? feedback;
   final String? errorText;
   final String? semanticLabel;
   final bool required;
@@ -53,6 +55,9 @@ final class TextEditingField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final FocusNode? focusNode;
   final bool autofocus;
+
+  CarpenterFieldFeedback? get effectiveFeedback =>
+      errorText != null ? CarpenterFieldFeedback.danger(errorText!) : feedback;
 
   @override
   State<TextEditingField> createState() => _TextEditingFieldState();
@@ -130,16 +135,17 @@ final class _TextEditingFieldState extends State<TextEditingField>
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
+    final effectiveFeedback = widget.effectiveFeedback;
     final states = <WidgetState>{
       if (_hovered && !_disabled) WidgetState.hovered,
       if (_focusNode.hasFocus && !_disabled) WidgetState.focused,
       if (_disabled) WidgetState.disabled,
-      if (widget.errorText != null) WidgetState.error,
+      if (effectiveFeedback?.isError ?? false) WidgetState.error,
     };
     final style = theme.fields.resolve(
       availability: widget.availability,
       states: states,
-      hasError: widget.errorText != null,
+      hasError: effectiveFeedback?.isError ?? false,
     );
     final textStyle = theme.typography
         .fieldInput(context, widget.size, TypographyEmphasis.regular)
@@ -189,7 +195,10 @@ final class _TextEditingFieldState extends State<TextEditingField>
           isRequired: widget.required ? true : null,
           label: widget.semanticLabel ?? widget.label,
           value: widget.controller.text,
-          hint: widget.errorText ?? widget.description ?? widget.placeholder,
+          hint:
+              effectiveFeedback?.message ??
+              widget.description ??
+              widget.placeholder,
           child: ExcludeFocus(
             excluding: _disabled,
             child: IgnorePointer(
@@ -212,6 +221,7 @@ final class _TextEditingFieldState extends State<TextEditingField>
         states: states,
         label: widget.label,
         description: widget.description,
+        feedback: widget.feedback,
         errorText: widget.errorText,
         required: widget.required,
         leading: widget.leading,

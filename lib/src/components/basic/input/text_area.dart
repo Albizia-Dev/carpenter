@@ -8,6 +8,7 @@ import '../../../foundation/theme.dart';
 import '../../../internal/rendering/icon_renderer.dart';
 import '../../../internal/rendering/text_editing_field.dart';
 import '../button/icon_button.dart';
+import 'field_shell.dart';
 
 final class CarpenterTextArea extends StatelessWidget {
   const CarpenterTextArea({
@@ -16,6 +17,7 @@ final class CarpenterTextArea extends StatelessWidget {
     this.label,
     this.placeholder,
     this.description,
+    this.feedback,
     this.errorText,
     this.semanticLabel,
     this.required = false,
@@ -39,6 +41,7 @@ final class CarpenterTextArea extends StatelessWidget {
   final String? label;
   final String? placeholder;
   final String? description;
+  final CarpenterFieldFeedback? feedback;
   final String? errorText;
   final String? semanticLabel;
   final bool required;
@@ -56,6 +59,9 @@ final class CarpenterTextArea extends StatelessWidget {
   final int minLines;
   final int? maxLines;
 
+  CarpenterFieldFeedback? get _effectiveFeedback =>
+      errorText != null ? CarpenterFieldFeedback.danger(errorText!) : feedback;
+
   @override
   Widget build(BuildContext context) {
     assert(
@@ -63,12 +69,15 @@ final class CarpenterTextArea extends StatelessWidget {
       'A trailing field action requires an icon.',
     );
     final theme = CarpenterTheme.of(context);
+    final effectiveFeedback = _effectiveFeedback;
     final fieldStyle = theme.fields.resolve(
       availability: availability,
       states: availability == FieldAvailability.disabled
           ? const <WidgetState>{WidgetState.disabled}
+          : effectiveFeedback?.isError ?? false
+          ? const <WidgetState>{WidgetState.error}
           : const <WidgetState>{},
-      hasError: errorText != null,
+      hasError: effectiveFeedback?.isError ?? false,
     );
     final iconDimension = context.units(theme.sizes.fieldIcon(size));
     return TextEditingField(
@@ -81,6 +90,7 @@ final class CarpenterTextArea extends StatelessWidget {
       label: label,
       placeholder: placeholder,
       description: description,
+      feedback: feedback,
       errorText: errorText,
       semanticLabel: semanticLabel,
       required: required,

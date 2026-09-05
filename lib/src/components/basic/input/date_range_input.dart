@@ -8,6 +8,7 @@ import '../icons.dart';
 import '../text.dart';
 import 'adaptive_picker.dart';
 import 'date_input.dart';
+import 'field_shell.dart';
 import 'masked_input.dart';
 
 @immutable
@@ -51,6 +52,7 @@ final class CarpenterDateRangeInput extends StatefulWidget {
     this.label,
     this.placeholder,
     this.description,
+    this.feedback,
     this.errorText,
     this.firstDate,
     this.lastDate,
@@ -69,6 +71,7 @@ final class CarpenterDateRangeInput extends StatefulWidget {
   final String? label;
   final String? placeholder;
   final String? description;
+  final CarpenterFieldFeedback? feedback;
   final String? errorText;
   final DateTime? firstDate;
   final DateTime? lastDate;
@@ -273,6 +276,7 @@ final class _CarpenterDateRangeInputState
         label: widget.label,
         placeholder: widget.placeholder,
         description: widget.description,
+        feedback: widget.feedback,
         errorText: widget.errorText ?? _validationError,
         semanticLabel: widget.semanticLabel,
         required: widget.required,

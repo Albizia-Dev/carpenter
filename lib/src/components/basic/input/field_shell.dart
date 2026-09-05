@@ -5,11 +5,37 @@ import '../../../foundation/roles.dart';
 import '../../../foundation/theme.dart';
 import '../../../internal/rendering/focus_ring.dart';
 
+/// Semantic supporting feedback for a Carpenter field.
+///
+/// [errorText] on existing field APIs remains a compatibility shorthand for
+/// danger feedback and always takes precedence when both are provided.
+@immutable
+final class CarpenterFieldFeedback {
+  const CarpenterFieldFeedback({required this.message, required this.role});
+
+  const CarpenterFieldFeedback.info(String message)
+    : this(message: message, role: FeedbackColorRole.info);
+
+  const CarpenterFieldFeedback.success(String message)
+    : this(message: message, role: FeedbackColorRole.success);
+
+  const CarpenterFieldFeedback.warning(String message)
+    : this(message: message, role: FeedbackColorRole.warning);
+
+  const CarpenterFieldFeedback.danger(String message)
+    : this(message: message, role: FeedbackColorRole.danger);
+
+  final String message;
+  final FeedbackColorRole role;
+
+  bool get isError => role == FeedbackColorRole.danger;
+}
+
 /// Shared semantic frame for Carpenter field controls.
 ///
 /// Field widgets own their interaction and value semantics. This shell owns the
 /// common visual anatomy: label, required marker, control surface, leading and
-/// trailing slots, supporting text, error presentation, focus ring, minimum
+/// trailing slots, supporting text, semantic feedback, focus ring, minimum
 /// target size, and field-role theming.
 final class CarpenterFieldShell extends StatelessWidget {
   const CarpenterFieldShell({
@@ -22,6 +48,7 @@ final class CarpenterFieldShell extends StatelessWidget {
     this.fixedHeight = true,
     this.label,
     this.description,
+    this.feedback,
     this.errorText,
     this.required = false,
     this.leading,
@@ -36,19 +63,33 @@ final class CarpenterFieldShell extends StatelessWidget {
   final bool fixedHeight;
   final String? label;
   final String? description;
+  final CarpenterFieldFeedback? feedback;
   final String? errorText;
   final bool required;
   final Widget? leading;
   final Widget? trailing;
 
+  CarpenterFieldFeedback? get _effectiveFeedback =>
+      errorText != null ? CarpenterFieldFeedback.danger(errorText!) : feedback;
+
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
+    final effectiveFeedback = _effectiveFeedback;
     final style = theme.fields.resolve(
       availability: availability,
       states: states,
-      hasError: errorText != null,
+      hasError: effectiveFeedback?.isError ?? false,
     );
+    final feedbackStyle =
+        effectiveFeedback != null && availability != FieldAvailability.disabled
+        ? theme.feedback.resolve(effectiveFeedback.role)
+        : null;
+    final feedbackForeground = availability == FieldAvailability.disabled
+        ? null
+        : effectiveFeedback?.isError ?? false
+        ? style.error
+        : feedbackStyle?.foreground;
     final startRadius = Radius.circular(
       context.units(theme.shapes.radiusForField(shape.start, size)),
     );
@@ -66,11 +107,12 @@ final class CarpenterFieldShell extends StatelessWidget {
         .copyWith(color: style.label);
     final supportingStyle = theme.typography
         .fieldSupporting(context, size, TypographyEmphasis.regular)
-        .copyWith(color: errorText == null ? style.supporting : style.error);
+        .copyWith(color: feedbackForeground ?? style.supporting);
     final fieldHeight = theme.sizes.fieldExtent(context, size);
     final horizontal = context.units(theme.spacing.fieldHorizontal(size));
     final vertical = context.units(theme.spacing.fieldVertical(size));
     final contentGap = context.units(theme.spacing.fieldContentGapFor(size));
+    final supportingText = effectiveFeedback?.message ?? description;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,7 +155,7 @@ final class CarpenterFieldShell extends StatelessWidget {
                 color: style.background,
                 borderRadius: borderRadius,
                 border: Border.all(
-                  color: style.border,
+                  color: feedbackForeground ?? style.border,
                   width: context.units(theme.shapes.fieldBorderWidth),
                 ),
               ),
@@ -134,11 +176,11 @@ final class CarpenterFieldShell extends StatelessWidget {
             ),
           ),
         ),
-        if (errorText != null || description != null) ...[
+        if (supportingText != null) ...[
           SizedBox(
             height: context.units(theme.spacing.fieldSupportingGapFor(size)),
           ),
-          Text(errorText ?? description!, style: supportingStyle),
+          Text(supportingText, style: supportingStyle),
         ],
       ],
     );

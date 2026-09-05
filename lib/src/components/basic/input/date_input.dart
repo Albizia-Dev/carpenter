@@ -5,6 +5,7 @@ import '../../behaviour/dialog.dart';
 import '../calendar.dart';
 import '../icons.dart';
 import 'adaptive_picker.dart';
+import 'field_shell.dart';
 import 'masked_input.dart';
 
 DateTime? carpenterParseDate(String value) {
@@ -33,6 +34,7 @@ final class CarpenterDateInput extends StatefulWidget {
     this.label,
     this.placeholder,
     this.description,
+    this.feedback,
     this.errorText,
     this.firstDate,
     this.lastDate,
@@ -51,6 +53,7 @@ final class CarpenterDateInput extends StatefulWidget {
   final String? label;
   final String? placeholder;
   final String? description;
+  final CarpenterFieldFeedback? feedback;
   final String? errorText;
   final DateTime? firstDate;
   final DateTime? lastDate;
@@ -200,6 +203,7 @@ final class _CarpenterDateInputState extends State<CarpenterDateInput> {
         label: widget.label,
         placeholder: widget.placeholder,
         description: widget.description,
+        feedback: widget.feedback,
         errorText: widget.errorText ?? _validationError,
         semanticLabel: widget.semanticLabel,
         required: widget.required,
