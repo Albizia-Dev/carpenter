@@ -13,6 +13,7 @@ import '../icon.dart';
 import '../icons.dart';
 import '../progress.dart';
 import '../text.dart';
+import 'field_shell.dart';
 import 'input.dart';
 
 @immutable
@@ -80,6 +81,7 @@ final class CarpenterFileInput<T> extends StatefulWidget {
     this.label,
     this.placeholder = 'Choose or drop files',
     this.description,
+    this.feedback,
     this.errorText,
     this.semanticLabel,
     this.required = false,
@@ -97,6 +99,7 @@ final class CarpenterFileInput<T> extends StatefulWidget {
   final String? label;
   final String placeholder;
   final String? description;
+  final CarpenterFieldFeedback? feedback;
   final String? errorText;
   final String? semanticLabel;
   final bool required;
@@ -200,6 +203,7 @@ final class _CarpenterFileInputState<T> extends State<CarpenterFileInput<T>> {
                 ? 'Drop files here'
                 : widget.placeholder,
             description: widget.description,
+            feedback: widget.feedback,
             errorText: widget.errorText,
             semanticLabel: widget.semanticLabel,
             required: widget.required,

@@ -4,6 +4,7 @@ import '../../../foundation/roles.dart';
 import '../../behaviour/dialog.dart';
 import '../icons.dart';
 import 'adaptive_picker.dart';
+import 'field_shell.dart';
 import 'masked_input.dart';
 
 @immutable
@@ -45,6 +46,7 @@ final class CarpenterTimeInput extends StatefulWidget {
     this.label,
     this.placeholder,
     this.description,
+    this.feedback,
     this.errorText,
     this.minuteStep = 5,
     this.enabled = true,
@@ -62,6 +64,7 @@ final class CarpenterTimeInput extends StatefulWidget {
   final String? label;
   final String? placeholder;
   final String? description;
+  final CarpenterFieldFeedback? feedback;
   final String? errorText;
   final int minuteStep;
   final bool enabled;
@@ -222,6 +225,7 @@ final class _CarpenterTimeInputState extends State<CarpenterTimeInput> {
         label: widget.label,
         placeholder: widget.placeholder,
         description: widget.description,
+        feedback: widget.feedback,
         errorText: widget.errorText ?? _validationError,
         semanticLabel: widget.semanticLabel,
         required: widget.required,

@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../../foundation/icon_data.dart';
 import '../../../foundation/roles.dart';
+import 'field_shell.dart';
 import 'input.dart';
 
 @immutable
@@ -158,6 +159,7 @@ final class CarpenterMaskedInput extends StatelessWidget {
     this.label,
     this.placeholder,
     this.description,
+    this.feedback,
     this.errorText,
     this.semanticLabel,
     this.required = false,
@@ -179,6 +181,7 @@ final class CarpenterMaskedInput extends StatelessWidget {
   final String? label;
   final String? placeholder;
   final String? description;
+  final CarpenterFieldFeedback? feedback;
   final String? errorText;
   final String? semanticLabel;
   final bool required;
@@ -202,6 +205,7 @@ final class CarpenterMaskedInput extends StatelessWidget {
     label: label,
     placeholder: placeholder ?? mask.placeholder,
     description: description,
+    feedback: feedback,
     errorText: errorText,
     semanticLabel: semanticLabel,
     required: required,

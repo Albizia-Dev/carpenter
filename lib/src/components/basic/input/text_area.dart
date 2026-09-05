@@ -59,9 +59,8 @@ final class CarpenterTextArea extends StatelessWidget {
   final int minLines;
   final int? maxLines;
 
-  CarpenterFieldFeedback? get _effectiveFeedback => errorText != null
-      ? CarpenterFieldFeedback.danger(errorText!)
-      : feedback;
+  CarpenterFieldFeedback? get _effectiveFeedback =>
+      errorText != null ? CarpenterFieldFeedback.danger(errorText!) : feedback;
 
   @override
   Widget build(BuildContext context) {

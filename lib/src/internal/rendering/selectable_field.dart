@@ -42,9 +42,8 @@ final class SelectableField extends StatelessWidget {
   final FocusNode? focusNode;
   final bool autofocus;
 
-  CarpenterFieldFeedback? get _effectiveFeedback => errorText != null
-      ? CarpenterFieldFeedback.danger(errorText!)
-      : feedback;
+  CarpenterFieldFeedback? get _effectiveFeedback =>
+      errorText != null ? CarpenterFieldFeedback.danger(errorText!) : feedback;
 
   @override
   Widget build(BuildContext context) {

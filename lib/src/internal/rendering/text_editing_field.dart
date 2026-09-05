@@ -56,9 +56,8 @@ final class TextEditingField extends StatefulWidget {
   final FocusNode? focusNode;
   final bool autofocus;
 
-  CarpenterFieldFeedback? get effectiveFeedback => errorText != null
-      ? CarpenterFieldFeedback.danger(errorText!)
-      : feedback;
+  CarpenterFieldFeedback? get effectiveFeedback =>
+      errorText != null ? CarpenterFieldFeedback.danger(errorText!) : feedback;
 
   @override
   State<TextEditingField> createState() => _TextEditingFieldState();

@@ -12,6 +12,7 @@ final inputComponent = WidgetbookComponent(
     WidgetbookUseCase(name: 'Playground', builder: _playground),
     WidgetbookUseCase(name: 'Size comparison', builder: _sizeComparison),
     WidgetbookUseCase(name: 'Availability', builder: _availabilityComparison),
+    WidgetbookUseCase(name: 'Feedback', builder: _feedbackComparison),
     WidgetbookUseCase(name: 'Accessibility', builder: _accessibility),
   ],
 );
@@ -21,6 +22,29 @@ Widget _sizeComparison(BuildContext context) =>
 
 Widget _availabilityComparison(BuildContext context) =>
     preview(const _InputAvailabilityComparison());
+
+Widget _feedbackComparison(BuildContext context) => previewColumn(const [
+  _InputPreview(
+    initialText: 'Draft',
+    label: 'Information',
+    feedback: CarpenterFieldFeedback.info('Saved remotely'),
+  ),
+  _InputPreview(
+    initialText: 'Approved',
+    label: 'Success',
+    feedback: CarpenterFieldFeedback.success('Ready to submit'),
+  ),
+  _InputPreview(
+    initialText: 'Needs review',
+    label: 'Warning',
+    feedback: CarpenterFieldFeedback.warning('Check this value'),
+  ),
+  _InputPreview(
+    initialText: 'Invalid',
+    label: 'Danger',
+    feedback: CarpenterFieldFeedback.danger('Enter a valid value'),
+  ),
+]);
 
 Widget _playground(BuildContext context) {
   final initialText = context.knobs.string(
@@ -116,6 +140,7 @@ final class _InputPreview extends StatefulWidget {
     this.label,
     this.placeholder,
     this.description,
+    this.feedback,
     this.errorText,
     this.availability = FieldAvailability.enabled,
     this.size = FieldSize.medium,
@@ -130,6 +155,7 @@ final class _InputPreview extends StatefulWidget {
   final String? label;
   final String? placeholder;
   final String? description;
+  final CarpenterFieldFeedback? feedback;
   final String? errorText;
   final FieldAvailability availability;
   final FieldSize size;
@@ -164,6 +190,7 @@ final class _InputPreviewState extends State<_InputPreview> {
     label: widget.label,
     placeholder: widget.placeholder,
     description: widget.description,
+    feedback: widget.feedback,
     errorText: widget.errorText,
     availability: widget.availability,
     size: widget.size,

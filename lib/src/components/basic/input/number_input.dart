@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../foundation/roles.dart';
+import 'field_shell.dart';
 import 'input.dart';
 
 /// Controlled numeric field with locale-tolerant decimal parsing.
@@ -13,6 +14,7 @@ final class CarpenterNumberInput extends StatefulWidget {
     this.label,
     this.placeholder,
     this.description,
+    this.feedback,
     this.errorText,
     this.semanticLabel,
     this.required = false,
@@ -33,6 +35,7 @@ final class CarpenterNumberInput extends StatefulWidget {
   final String? label;
   final String? placeholder;
   final String? description;
+  final CarpenterFieldFeedback? feedback;
   final String? errorText;
   final String? semanticLabel;
   final bool required;
@@ -121,6 +124,7 @@ final class _CarpenterNumberInputState extends State<CarpenterNumberInput> {
     label: widget.label,
     placeholder: widget.placeholder,
     description: widget.description,
+    feedback: widget.feedback,
     errorText: widget.errorText ?? _localError,
     semanticLabel: widget.semanticLabel,
     required: widget.required,

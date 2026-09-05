@@ -69,9 +69,8 @@ final class CarpenterFieldShell extends StatelessWidget {
   final Widget? leading;
   final Widget? trailing;
 
-  CarpenterFieldFeedback? get _effectiveFeedback => errorText != null
-      ? CarpenterFieldFeedback.danger(errorText!)
-      : feedback;
+  CarpenterFieldFeedback? get _effectiveFeedback =>
+      errorText != null ? CarpenterFieldFeedback.danger(errorText!) : feedback;
 
   @override
   Widget build(BuildContext context) {
