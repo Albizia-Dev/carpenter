@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../../foundation/roles.dart';
 import '../../../internal/selection/suggestion_field.dart';
+import '../input/field_shell.dart';
 import 'select.dart';
 
 /// An editable controlled field whose query may resolve to one selected option.
@@ -22,6 +23,7 @@ final class CarpenterComboBox<T> extends StatefulWidget {
     this.label,
     this.placeholder,
     this.description,
+    this.feedback,
     this.errorText,
     this.semanticLabel,
     this.required = false,
@@ -57,6 +59,7 @@ final class CarpenterComboBox<T> extends StatefulWidget {
   final String? label;
   final String? placeholder;
   final String? description;
+  final CarpenterFieldFeedback? feedback;
   final String? errorText;
   final String? semanticLabel;
   final bool required;
@@ -118,6 +121,7 @@ final class _CarpenterComboBoxState<T> extends State<CarpenterComboBox<T>> {
     label: widget.label,
     placeholder: widget.placeholder,
     description: widget.description,
+    feedback: widget.feedback,
     errorText: widget.errorText,
     semanticLabel: widget.semanticLabel,
     required: widget.required,
