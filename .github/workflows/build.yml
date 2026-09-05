@@ -10,7 +10,7 @@ on:
 
 jobs:
   web:
-    name: Build Widgetbook and example
+    name: Verify package and build web examples
     runs-on: ubuntu-latest
 
     steps:
@@ -25,6 +25,18 @@ jobs:
 
       - name: Install package dependencies
         run: flutter pub get
+
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test
+
+      - name: Analyze library
+        run: dart analyze lib
+
+      - name: Test package without goldens
+        shell: bash
+        run: |
+          mapfile -t tests < <(find test -name '*_test.dart' -not -path 'test/goldens/*' -print | sort)
+          flutter test "${tests[@]}"
 
       - name: Install Widgetbook dependencies
         working-directory: widgetbook
