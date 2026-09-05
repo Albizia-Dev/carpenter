@@ -97,6 +97,7 @@ final class _TablePreviewState extends State<_TablePreview> {
   var _sorting = <CollectionSort>[];
   var _selection = CollectionSelection<int>.multiple();
   final _widths = <String, LengthUnit>{};
+  String _lastAction = 'No row action invoked';
 
   @override
   void didUpdateWidget(_TablePreview oldWidget) {
@@ -104,6 +105,10 @@ final class _TablePreviewState extends State<_TablePreview> {
     if (oldWidget.selectionMode != widget.selectionMode) {
       _selection = _selectionFor(widget.selectionMode);
     }
+  }
+
+  void _reportAction(String action, _ExampleRow row) {
+    setState(() => _lastAction = '$action: ${row.name}');
   }
 
   @override
@@ -127,88 +132,121 @@ final class _TablePreviewState extends State<_TablePreview> {
       scenario: widget.scenario,
       pagination: widget.pagination,
     );
-    return CarpenterTable<_ExampleRow, int>(
-      semanticLabel: 'Example records',
-      snapshot: snapshot,
-      rowKey: (row) => row.id,
-      rowSemanticLabel: (row) => '${row.name}, ${row.amount}',
-      columns: [
-        CarpenterTableColumn<_ExampleRow>.text(
-          id: 'name',
-          header: 'Name',
-          value: (row) => row.name,
-          sortable: true,
-          width: CarpenterTableColumnWidth.flexible(
-            flex: 2,
-            preferred: 14.rem,
-            minimum: 8.rem,
-            maximum: 30.rem,
-          ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        CarpenterText.caption(
+          '$_lastAction · Two primary actions stay inline; extra primary and '
+          'secondary actions stay behind the ellipsis.',
+          colorRole: ContentColorRole.secondary,
         ),
-        CarpenterTableColumn<_ExampleRow>.number(
-          id: 'amount',
-          header: 'Amount',
-          value: (row) => row.amount,
-          formatter: (value) => '${value.toInt()} ₽',
-          sortable: true,
-          width: CarpenterTableColumnWidth.fixed(
-            width: 10.rem,
-            minimum: 6.rem,
-            maximum: 18.rem,
-          ),
-        ),
-        CarpenterTableColumn<_ExampleRow>.status(
-          id: 'state',
-          header: 'State',
-          label: (row) => row.active ? 'Active' : 'Paused',
-          role: (row) => row.active
-              ? FeedbackColorRole.success
-              : FeedbackColorRole.warning,
-          width: CarpenterTableColumnWidth.fixed(
-            width: 8.rem,
-            minimum: 6.rem,
-            maximum: 14.rem,
-          ),
-        ),
-        if (widget.manyColumns)
-          CarpenterTableColumn<_ExampleRow>.text(
-            id: 'identity',
-            header: 'Stable identity',
-            value: (row) => 'record-${row.id}',
-            width: CarpenterTableColumnWidth.fixed(
-              width: 12.rem,
-              minimum: 8.rem,
-              maximum: 20.rem,
+        SizedBox(height: context.units(.5.rem)),
+        CarpenterTable<_ExampleRow, int>(
+          semanticLabel: 'Example records',
+          snapshot: snapshot,
+          rowKey: (row) => row.id,
+          rowSemanticLabel: (row) => '${row.name}, ${row.amount}',
+          columns: [
+            CarpenterTableColumn<_ExampleRow>.text(
+              id: 'name',
+              header: 'Name',
+              value: (row) => row.name,
+              sortable: true,
+              width: CarpenterTableColumnWidth.flexible(
+                flex: 2,
+                preferred: 14.rem,
+                minimum: 8.rem,
+                maximum: 30.rem,
+              ),
             ),
-          ),
-        CarpenterTableColumn<_ExampleRow>.actions(
-          id: 'actions',
-          header: 'Actions',
-          actions: (row) => [
-            CarpenterActionDescriptor(
-              id: 'open-${row.id}',
-              label: 'Open',
-              onInvoke: () {},
+            CarpenterTableColumn<_ExampleRow>.number(
+              id: 'amount',
+              header: 'Amount',
+              value: (row) => row.amount,
+              formatter: (value) => '${value.toInt()} ₽',
+              sortable: true,
+              width: CarpenterTableColumnWidth.fixed(
+                width: 10.rem,
+                minimum: 6.rem,
+                maximum: 18.rem,
+              ),
+            ),
+            CarpenterTableColumn<_ExampleRow>.status(
+              id: 'state',
+              header: 'State',
+              label: (row) => row.active ? 'Active' : 'Paused',
+              role: (row) => row.active
+                  ? FeedbackColorRole.success
+                  : FeedbackColorRole.warning,
+              width: CarpenterTableColumnWidth.fixed(
+                width: 8.rem,
+                minimum: 6.rem,
+                maximum: 14.rem,
+              ),
+            ),
+            if (widget.manyColumns)
+              CarpenterTableColumn<_ExampleRow>.text(
+                id: 'identity',
+                header: 'Stable identity',
+                value: (row) => 'record-${row.id}',
+                width: CarpenterTableColumnWidth.fixed(
+                  width: 12.rem,
+                  minimum: 8.rem,
+                  maximum: 20.rem,
+                ),
+              ),
+            CarpenterTableColumn<_ExampleRow>.actions(
+              id: 'actions',
+              header: 'Actions',
+              actions: (row) => [
+                CarpenterActionDescriptor(
+                  id: 'open-${row.id}',
+                  label: 'Open',
+                  icon: CarpenterIcons.openFile,
+                  onInvoke: () => _reportAction('Open', row),
+                ),
+                CarpenterActionDescriptor(
+                  id: 'edit-${row.id}',
+                  label: 'Edit',
+                  icon: CarpenterIcons.edit,
+                  onInvoke: () => _reportAction('Edit', row),
+                ),
+                CarpenterActionDescriptor(
+                  id: 'copy-${row.id}',
+                  label: 'Duplicate',
+                  icon: CarpenterIcons.copy,
+                  onInvoke: () => _reportAction('Duplicate', row),
+                ),
+              ],
+              secondaryActions: (row) => [
+                CarpenterActionDescriptor(
+                  id: 'archive-${row.id}',
+                  label: 'Archive',
+                  icon: CarpenterIcons.archive,
+                  onInvoke: () => _reportAction('Archive', row),
+                ),
+              ],
             ),
           ],
+          selection: _selection,
+          onSelectionChanged:
+              widget.selectionMode == CollectionSelectionMode.none
+              ? null
+              : (value) => setState(() => _selection = value),
+          sorting: _sorting,
+          onSortingChanged: (value) => setState(() => _sorting = value),
+          multiSort: true,
+          columnWidths: _widths,
+          onColumnWidthChanged: (id, width) =>
+              setState(() => _widths[id] = width),
+          onLoadMore: snapshot.pageInfo.hasNext ? () {} : null,
+          retryAction: CarpenterActionDescriptor(
+            id: 'retry',
+            label: 'Retry',
+            onInvoke: () {},
+          ),
         ),
       ],
-      selection: _selection,
-      onSelectionChanged: widget.selectionMode == CollectionSelectionMode.none
-          ? null
-          : (value) => setState(() => _selection = value),
-      sorting: _sorting,
-      onSortingChanged: (value) => setState(() => _sorting = value),
-      multiSort: true,
-      columnWidths: _widths,
-      onColumnWidthChanged: (id, width) =>
-          setState(() => _widths[id] = width),
-      onLoadMore: snapshot.pageInfo.hasNext ? () {} : null,
-      retryAction: CarpenterActionDescriptor(
-        id: 'retry',
-        label: 'Retry',
-        onInvoke: () {},
-      ),
     );
   }
 }
