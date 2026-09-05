@@ -12,10 +12,7 @@ void main() {
       actions: (_) => const [],
     );
 
-    expect(
-      column.width.policy,
-      CarpenterTableColumnWidthPolicy.actionLane,
-    );
+    expect(column.width.policy, CarpenterTableColumnWidthPolicy.actionLane);
     expect(column.width.flex, 0);
     expect(column.resizable, isFalse);
   });
