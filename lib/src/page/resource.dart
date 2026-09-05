@@ -1,21 +1,15 @@
 import 'package:flutter/widgets.dart';
 
 import '../application/command.dart';
+import '../components/behaviour/request_gate.dart';
 import 'controller.dart';
 import 'state.dart';
 
 enum CarpenterResourceLoadReason { initial, refresh }
 
-final class CarpenterResourceCancellation extends ChangeNotifier {
-  bool _cancelled = false;
-  bool get isCancelled => _cancelled;
-  void cancel() {
-    if (!_cancelled) {
-      _cancelled = true;
-      notifyListeners();
-    }
-  }
-}
+/// Resource-specific compatibility type over Carpenter's shared cancellation
+/// signal.
+final class CarpenterResourceCancellation extends CarpenterCancellationSignal {}
 
 final class CarpenterResourceLoadRequest {
   const CarpenterResourceLoadRequest({
@@ -59,8 +53,10 @@ final class CarpenterResourceController<T>
 
   final CarpenterResourceLoader<T> _load;
   final String Function(Object error)? errorMessage;
-  CarpenterResourceCancellation? _cancellation;
-  int _generation = 0;
+  final CarpenterRequestGate<CarpenterResourceCancellation> _requests =
+      CarpenterRequestGate<CarpenterResourceCancellation>(
+        createCancellation: CarpenterResourceCancellation.new,
+      );
   T? data;
   late final CarpenterCommandController<void> refreshCommand;
   late final CarpenterCommandController<void> retryCommand;
@@ -75,10 +71,7 @@ final class CarpenterResourceController<T>
   Future<void> refresh() => _run(CarpenterResourceLoadReason.refresh);
 
   Future<void> _run(CarpenterResourceLoadReason reason) async {
-    final generation = ++_generation;
-    _cancellation?.cancel();
-    final cancellation = CarpenterResourceCancellation();
-    _cancellation = cancellation;
+    final lease = _requests.begin();
     value = data == null
         ? const CarpenterPageInitialLoading()
         : const CarpenterPageRefreshing();
@@ -86,29 +79,27 @@ final class CarpenterResourceController<T>
       final loaded = await _load(
         CarpenterResourceLoadRequest(
           reason: reason,
-          cancellation: cancellation,
+          cancellation: lease.cancellation,
         ),
       );
-      if (generation != _generation || cancellation.isCancelled) return;
+      if (!_requests.isCurrent(lease)) return;
       data = loaded;
       value = const CarpenterPageReady();
     } catch (error) {
-      if (generation != _generation || cancellation.isCancelled) return;
+      if (!_requests.isCurrent(lease)) return;
       value = CarpenterPageFailure(
         error: error,
         message: errorMessage?.call(error),
         retryCommand: retryCommand,
       );
     } finally {
-      if (identical(_cancellation, cancellation)) _cancellation = null;
-      cancellation.dispose();
+      _requests.finish(lease);
     }
   }
 
   @override
   void dispose() {
-    _cancellation?.cancel();
-    _cancellation?.dispose();
+    _requests.dispose();
     refreshCommand.dispose();
     retryCommand.dispose();
     super.dispose();

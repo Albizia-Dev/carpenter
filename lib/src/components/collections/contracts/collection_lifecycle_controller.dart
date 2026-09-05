@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../../behaviour/request_gate.dart';
 import 'collection_event.dart';
 import 'collection_load_phase.dart';
 import 'collection_query.dart';
@@ -9,16 +10,9 @@ import 'collection_snapshot.dart';
 
 enum CollectionRequestReason { initial, query, refresh, loadMore }
 
-final class CollectionRequestCancellation extends ChangeNotifier {
-  bool _cancelled = false;
-  bool get isCancelled => _cancelled;
-  void cancel() {
-    if (!_cancelled) {
-      _cancelled = true;
-      notifyListeners();
-    }
-  }
-}
+/// Collection-specific compatibility type over Carpenter's shared cancellation
+/// signal.
+final class CollectionRequestCancellation extends CarpenterCancellationSignal {}
 
 final class CollectionLoadRequest {
   const CollectionLoadRequest({
@@ -41,7 +35,8 @@ typedef CollectionLoadMore<T, F> =
       CollectionLoadRequest request,
     );
 
-/// Full collection lifecycle controller: debounce, cancellation, stale-response protection, refresh and progressive loading.
+/// Full collection lifecycle controller: debounce, cancellation,
+/// stale-response protection, refresh and progressive loading.
 final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
   CollectionLifecycleController({
     required CollectionLifecycleLoader<T, F> load,
@@ -60,11 +55,13 @@ final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
   final CollectionLoadMore<T, F>? _loadMore;
   final K Function(T item) _keyOf;
   final Duration searchDebounce;
+  final CarpenterRequestGate<CollectionRequestCancellation> _requests =
+      CarpenterRequestGate<CollectionRequestCancellation>(
+        createCancellation: CollectionRequestCancellation.new,
+      );
   CollectionQuery<F> _query;
   CollectionSnapshot<T> _snapshot;
   Timer? _searchTimer;
-  CollectionRequestCancellation? _cancellation;
-  int _generation = 0;
 
   CollectionQuery<F> get query => _query;
   CollectionSnapshot<T> get snapshot => _snapshot;
@@ -93,19 +90,15 @@ final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
       updateQuery(_query.copyWith(page: page));
 
   Future<void> _run(CollectionRequestReason reason) async {
-    final generation = ++_generation;
-    _cancellation?.cancel();
-    _cancellation?.dispose();
-    final cancellation = CollectionRequestCancellation();
-    _cancellation = cancellation;
+    final lease = _requests.begin();
     _snapshot = _snapshot.beginRefresh();
     notifyListeners();
     try {
       final result = await _load(
         _query,
-        CollectionLoadRequest(reason: reason, cancellation: cancellation),
+        CollectionLoadRequest(reason: reason, cancellation: lease.cancellation),
       );
-      if (generation != _generation || cancellation.isCancelled) return;
+      if (!_requests.isCurrent(lease)) return;
       _snapshot = result.copyWith(
         loadPhase: CollectionLoadPhase.ready,
         freshness: CollectionFreshness.current,
@@ -114,22 +107,20 @@ final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
       );
       notifyListeners();
     } catch (error, stackTrace) {
-      if (generation != _generation || cancellation.isCancelled) return;
+      if (!_requests.isCurrent(lease)) return;
       _snapshot = _snapshot.withLoadFailure(
         CollectionFailure(error: error, stackTrace: stackTrace),
       );
       notifyListeners();
+    } finally {
+      _requests.finish(lease);
     }
   }
 
   Future<void> loadMore() async {
     final loader = _loadMore;
     if (loader == null || _snapshot.isLoadingMore) return;
-    final generation = ++_generation;
-    final cancellation = CollectionRequestCancellation();
-    _cancellation?.cancel();
-    _cancellation?.dispose();
-    _cancellation = cancellation;
+    final lease = _requests.begin();
     final current = _snapshot;
     _snapshot = current.beginLoadingMore();
     notifyListeners();
@@ -139,23 +130,25 @@ final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
         current,
         CollectionLoadRequest(
           reason: CollectionRequestReason.loadMore,
-          cancellation: cancellation,
+          cancellation: lease.cancellation,
         ),
       );
-      if (generation != _generation || cancellation.isCancelled) return;
+      if (!_requests.isCurrent(lease)) return;
       _snapshot = result.copyWith(
         loadPhase: CollectionLoadPhase.ready,
         clearRefreshFailure: true,
       );
       notifyListeners();
     } catch (error, stackTrace) {
-      if (generation != _generation || cancellation.isCancelled) return;
+      if (!_requests.isCurrent(lease)) return;
       _snapshot = current.copyWith(
         loadPhase: CollectionLoadPhase.ready,
         freshness: CollectionFreshness.stale,
         refreshFailure: CollectionFailure(error: error, stackTrace: stackTrace),
       );
       notifyListeners();
+    } finally {
+      _requests.finish(lease);
     }
   }
 
@@ -167,8 +160,7 @@ final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
   @override
   void dispose() {
     _searchTimer?.cancel();
-    _cancellation?.cancel();
-    _cancellation?.dispose();
+    _requests.dispose();
     super.dispose();
   }
 }
