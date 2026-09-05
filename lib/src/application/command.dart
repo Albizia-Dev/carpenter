@@ -92,6 +92,184 @@ abstract interface class CarpenterCommand<I> {
   Future<CarpenterCommandResult> execute(I input);
 }
 
+/// One application-level execution event emitted around a command invocation.
+///
+/// The event carries semantic command metadata only. It deliberately does not
+/// know how feedback is rendered, how data is cached, or which state-management
+/// package an application uses.
+@immutable
+sealed class CarpenterCommandExecutionEvent {
+  const CarpenterCommandExecutionEvent({
+    required this.commandId,
+    required this.title,
+    required this.group,
+    required this.effects,
+  });
+
+  final String commandId;
+  final String title;
+  final String group;
+  final List<CarpenterCommandEffect> effects;
+
+  bool get isBlocking =>
+      effects.any((effect) => effect is CarpenterBlockingCommandEffect);
+}
+
+final class CarpenterCommandStarted extends CarpenterCommandExecutionEvent {
+  const CarpenterCommandStarted({
+    required super.commandId,
+    required super.title,
+    required super.group,
+    required super.effects,
+  });
+}
+
+final class CarpenterCommandSucceeded extends CarpenterCommandExecutionEvent {
+  const CarpenterCommandSucceeded({
+    required super.commandId,
+    required super.title,
+    required super.group,
+    required super.effects,
+    required this.result,
+  });
+
+  final CarpenterCommandResult result;
+
+  String? get message => result.message;
+  FutureOr<void> Function()? get undo => result.undo;
+
+  Set<String> get refreshScopes => Set<String>.unmodifiable({
+    for (final effect in effects)
+      if (effect is CarpenterRefreshCommandEffect) ...effect.scopes,
+    ...result.refreshScopes,
+  });
+
+  @override
+  bool get isBlocking => super.isBlocking || result.blockingEffect;
+}
+
+final class CarpenterCommandFailed extends CarpenterCommandExecutionEvent {
+  const CarpenterCommandFailed({
+    required super.commandId,
+    required super.title,
+    required super.group,
+    required super.effects,
+    required this.error,
+    required this.stackTrace,
+  });
+
+  final Object error;
+  final StackTrace stackTrace;
+}
+
+typedef CarpenterCommandExecutionListener =
+    void Function(CarpenterCommandExecutionEvent event);
+
+/// Executes commands and emits one uniform lifecycle for application policy.
+///
+/// Listeners can translate command outcomes into feedback, undo registration,
+/// cache invalidation, blocking presentation, analytics, or other application
+/// concerns without those concerns leaking into the command itself. Listener
+/// failures are reported to Flutter but never turn a successful business
+/// command into a failed command.
+final class CarpenterCommandExecutor {
+  const CarpenterCommandExecutor({this.listeners = const []});
+
+  final List<CarpenterCommandExecutionListener> listeners;
+
+  Future<CarpenterCommandResult> execute<I>(
+    CarpenterCommand<I> command,
+    I input,
+  ) async {
+    final effects = List<CarpenterCommandEffect>.unmodifiable(command.effects);
+    _emit(
+      CarpenterCommandStarted(
+        commandId: command.id,
+        title: command.title,
+        group: command.group,
+        effects: effects,
+      ),
+    );
+    try {
+      final result = await command.execute(input);
+      _emit(
+        CarpenterCommandSucceeded(
+          commandId: command.id,
+          title: command.title,
+          group: command.group,
+          effects: effects,
+          result: result,
+        ),
+      );
+      return result;
+    } catch (error, stackTrace) {
+      _emit(
+        CarpenterCommandFailed(
+          commandId: command.id,
+          title: command.title,
+          group: command.group,
+          effects: effects,
+          error: error,
+          stackTrace: stackTrace,
+        ),
+      );
+      rethrow;
+    }
+  }
+
+  void _emit(CarpenterCommandExecutionEvent event) {
+    for (final listener in listeners) {
+      try {
+        listener(event);
+      } catch (error, stackTrace) {
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: error,
+            stack: stackTrace,
+            library: 'carpenter',
+            context: ErrorDescription(
+              'while dispatching a Carpenter command execution event',
+            ),
+          ),
+        );
+      }
+    }
+  }
+}
+
+/// Supplies the application command execution policy to descendant surfaces.
+final class CarpenterCommandExecutionScope extends InheritedWidget {
+  const CarpenterCommandExecutionScope({
+    super.key,
+    required this.executor,
+    required super.child,
+  });
+
+  final CarpenterCommandExecutor executor;
+
+  static CarpenterCommandExecutionScope? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<CarpenterCommandExecutionScope>();
+
+  @override
+  bool updateShouldNotify(CarpenterCommandExecutionScope oldWidget) =>
+      oldWidget.executor != executor;
+}
+
+extension CarpenterCommandExecutionBuildContext on BuildContext {
+  CarpenterCommandExecutor? get commandExecutor =>
+      CarpenterCommandExecutionScope.maybeOf(this)?.executor;
+
+  Future<CarpenterCommandResult> executeCommand<I>(
+    CarpenterCommand<I> command,
+    I input,
+  ) {
+    final executor = commandExecutor;
+    return executor == null
+        ? command.execute(input)
+        : executor.execute(command, input);
+  }
+}
+
 /// Projects an executable application command into Carpenter's shared action
 /// language. The returned descriptor is a snapshot of the command state; build
 /// it inside a listener when the presentation must react to availability or
@@ -104,6 +282,7 @@ extension CarpenterCommandActionProjection<I> on CarpenterCommand<I> {
     CarpenterIconSource? icon,
     ActionColorRole? colorRole,
     ShortcutActivator? shortcut,
+    CarpenterCommandExecutor? executor,
   }) {
     final current = state.value;
     final visible = current.visibility == CarpenterCommandVisibility.visible;
@@ -122,7 +301,11 @@ extension CarpenterCommandActionProjection<I> on CarpenterCommand<I> {
       disabledReason: available ? null : current.disabledReason,
       onInvoke: available
           ? () {
-              unawaited(execute(input));
+              unawaited(
+                executor == null
+                    ? execute(input)
+                    : executor.execute(this, input),
+              );
             }
           : null,
     );
@@ -287,6 +470,7 @@ final class CarpenterCommandShortcutScope extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final shortcuts = <ShortcutActivator, Intent>{};
+    final executor = CarpenterCommandExecutionScope.maybeOf(context)?.executor;
     for (final binding in bindings) {
       final state = binding.command.state.value;
       if (!state.enabled ||
@@ -295,7 +479,11 @@ final class CarpenterCommandShortcutScope extends StatelessWidget {
       }
       for (final activator in binding.shortcuts ?? binding.command.shortcuts) {
         shortcuts[activator] = _CarpenterCommandIntent(() async {
-          await binding.command.execute(binding.input);
+          if (executor == null) {
+            await binding.command.execute(binding.input);
+          } else {
+            await executor.execute(binding.command, binding.input);
+          }
         });
       }
     }
@@ -334,6 +522,9 @@ final class CarpenterCommandButton<I> extends StatelessWidget {
               label: state.execution == CarpenterCommandExecution.executing
                   ? '${command.title}…'
                   : command.title,
+              executor: CarpenterCommandExecutionScope.maybeOf(
+                context,
+              )?.executor,
             ),
             prominence: presentation == CarpenterCommandPresentation.primary
                 ? ActionProminence.high
