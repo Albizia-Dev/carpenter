@@ -73,6 +73,8 @@ Widget _alignmentContract(BuildContext context) => preview(
       ),
       rowKey: (row) => row.id,
       rowSemanticLabel: (row) => row.name,
+      selection: CollectionSelection<int>.none(),
+      showSelectionColumn: false,
       columns: [
         CarpenterTableColumn<_ExampleRow>.text(
           id: 'start-top',
