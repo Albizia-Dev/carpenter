@@ -44,10 +44,25 @@ final List<WidgetbookAddon> carpenterAddons = [
   ThemeAddon<CarpenterThemeData>(
     themes: [
       WidgetbookTheme(name: 'Light', data: CarpenterThemeData.light()),
+      WidgetbookTheme(
+        name: 'Light · compact',
+        data: CarpenterThemeData.light(density: CarpenterDensity.compact),
+      ),
       WidgetbookTheme(name: 'Dark', data: CarpenterThemeData.dark()),
+      WidgetbookTheme(
+        name: 'Dark · compact',
+        data: CarpenterThemeData.dark(density: CarpenterDensity.compact),
+      ),
       WidgetbookTheme(
         name: 'High contrast',
         data: CarpenterThemeData.light(contrast: ContrastMode.high),
+      ),
+      WidgetbookTheme(
+        name: 'High contrast · compact',
+        data: CarpenterThemeData.light(
+          contrast: ContrastMode.high,
+          density: CarpenterDensity.compact,
+        ),
       ),
     ],
     themeBuilder: (context, theme, child) => CarpenterTheme(
