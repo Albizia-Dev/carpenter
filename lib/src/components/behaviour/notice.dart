@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
 import '../basic/button/button.dart';
+import '../basic/card.dart';
 import '../basic/text.dart';
 
 /// Semantic feedback surface for page and action-level messages.
@@ -36,19 +37,15 @@ final class CarpenterNotice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
-    final feedback = theme.feedback.resolve(_role);
     final gap = context.units(theme.spacing.medium);
     return Semantics(
       container: true,
       liveRegion:
           tone == CarpenterNoticeTone.danger ||
           tone == CarpenterNoticeTone.warning,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          color: feedback.background,
-          border: Border.all(color: feedback.foreground.withValues(alpha: .35)),
-          borderRadius: BorderRadius.circular(context.units(.5.rem)),
-        ),
+      child: CarpenterCard.feedback(
+        role: _role,
+        padded: false,
         child: Padding(
           padding: EdgeInsets.all(gap),
           child: LayoutBuilder(
@@ -57,13 +54,15 @@ final class CarpenterNotice extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CarpenterText.label(
+                  CarpenterText.feedback(
                     title,
+                    feedbackRole: _role,
+                    role: TypographyRole.label,
                     emphasis: TypographyEmphasis.strong,
                   ),
                   if (message != null) ...[
                     SizedBox(height: gap / 2),
-                    CarpenterText.body(message!),
+                    CarpenterText.feedback(message!, feedbackRole: _role),
                   ],
                 ],
               );

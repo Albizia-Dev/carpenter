@@ -261,47 +261,65 @@ final class CarpenterFileDropZone<T> extends StatelessWidget {
         canAccept: (details) => details.payload.data.files.any(_acceptsFile),
         onDrop: (details) => _submit(details.payload.data.files),
         builder: (context, state) {
-          final theme = CarpenterTheme.of(context);
-          final role = !state.hovering
-              ? FeedbackColorRole.neutral
-              : state.accepts
+          final role = state.accepts
               ? FeedbackColorRole.success
               : FeedbackColorRole.danger;
-          final colors = theme.feedback.resolve(role);
-          return CarpenterCard(
-            semanticLabel: semanticLabel,
-            borderColor: state.hovering ? colors.foreground : null,
-            backgroundColor: state.hovering ? colors.background : null,
-            child: SizedBox(
-              height: context.units(7.rem),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  CarpenterIcon(
+          final content = SizedBox(
+            height: context.units(7.rem),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (state.hovering)
+                  CarpenterIcon.feedback(
                     CarpenterIcons.upload,
-                    colorRole: state.hovering && state.accepts
-                        ? ContentColorRole.primary
-                        : ContentColorRole.secondary,
+                    feedbackRole: role,
+                  )
+                else
+                  const CarpenterIcon(
+                    CarpenterIcons.upload,
+                    colorRole: ContentColorRole.secondary,
                   ),
-                  SizedBox(height: context.units(.5.rem)),
+                SizedBox(height: context.units(.5.rem)),
+                if (state.hovering)
+                  CarpenterText.feedback(
+                    title,
+                    feedbackRole: role,
+                    role: TypographyRole.label,
+                    emphasis: TypographyEmphasis.strong,
+                    textAlign: TextAlign.center,
+                  )
+                else
                   CarpenterText.label(
                     title,
                     emphasis: TypographyEmphasis.strong,
                     textAlign: TextAlign.center,
                   ),
+                if (state.hovering)
+                  CarpenterText.feedback(
+                    state.accepts
+                        ? 'Release to add files'
+                        : 'These files are not accepted',
+                    feedbackRole: role,
+                    role: TypographyRole.caption,
+                    textAlign: TextAlign.center,
+                  )
+                else
                   CarpenterText.caption(
-                    state.hovering
-                        ? state.accepts
-                              ? 'Release to add files'
-                              : 'These files are not accepted'
-                        : description,
+                    description,
                     colorRole: ContentColorRole.secondary,
                     textAlign: TextAlign.center,
                   ),
-                ],
-              ),
+              ],
             ),
           );
+          if (state.hovering) {
+            return CarpenterCard.feedback(
+              semanticLabel: semanticLabel,
+              role: role,
+              child: content,
+            );
+          }
+          return CarpenterCard(semanticLabel: semanticLabel, child: content);
         },
       );
 }

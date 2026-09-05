@@ -17,7 +17,6 @@ final linkComponent = WidgetbookComponent(
 );
 
 Widget _cardPlayground(BuildContext context) {
-  final theme = CarpenterTheme.of(context);
   final title = context.knobs.string(
     label: 'Content · Title',
     initialValue: 'Payment summary',
@@ -34,14 +33,6 @@ Widget _cardPlayground(BuildContext context) {
   final padded = context.knobs.boolean(
     label: 'Layout · Default padding',
     initialValue: true,
-  );
-  final customPadding = context.knobs.boolean(label: 'Layout · Custom padding');
-  final padding = context.knobs.double.slider(
-    label: 'Layout · Padding',
-    initialValue: 16,
-    min: 0,
-    max: 48,
-    divisions: 24,
   );
   final width = context.knobs.double.slider(
     label: 'Layout · Width',
@@ -60,19 +51,20 @@ Widget _cardPlayground(BuildContext context) {
     initialOption: ShapeRole.rounded,
     labelBuilder: semanticValueLabel,
   );
-  final customBackground = context.knobs.boolean(
-    label: 'Appearance · Custom background',
+  final surfaceRole = context.knobs.object.segmented(
+    label: 'Appearance · Surface role',
+    options: CarpenterCardSurfaceRole.values,
+    initialOption: CarpenterCardSurfaceRole.overlay,
+    labelBuilder: semanticValueLabel,
   );
-  final background = context.knobs.color(
-    label: 'Appearance · Background',
-    initialValue: theme.overlay.background,
+  final feedbackSurface = context.knobs.boolean(
+    label: 'Appearance · Feedback surface',
   );
-  final customBorder = context.knobs.boolean(
-    label: 'Appearance · Custom border color',
-  );
-  final border = context.knobs.color(
-    label: 'Appearance · Border color',
-    initialValue: theme.overlay.border,
+  final feedbackRole = context.knobs.object.segmented(
+    label: 'Appearance · Feedback role',
+    options: FeedbackColorRole.values,
+    initialOption: FeedbackColorRole.info,
+    labelBuilder: semanticValueLabel,
   );
   final showStatus = context.knobs.boolean(
     label: 'Content · Status',
@@ -83,44 +75,60 @@ Widget _cardPlayground(BuildContext context) {
     initialValue: true,
   );
 
-  return preview(
-    SizedBox(
-      width: width,
-      child: CarpenterCard(
-        semanticLabel: semanticLabel,
-        padded: padded,
-        padding: customPadding ? EdgeInsets.all(padding) : null,
-        bordered: bordered,
-        shape: shape,
-        backgroundColor: customBackground ? background : null,
-        borderColor: customBorder ? border : null,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: CarpenterText.title(
+  final content = Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Row(
+        children: [
+          Expanded(
+            child: feedbackSurface
+                ? CarpenterText.feedback(
+                    title,
+                    feedbackRole: feedbackRole,
+                    role: TypographyRole.title,
+                    emphasis: TypographyEmphasis.strong,
+                  )
+                : CarpenterText.title(
                     title,
                     emphasis: TypographyEmphasis.strong,
                   ),
-                ),
-                if (showStatus)
-                  const CarpenterTag(
-                    label: 'Ready',
-                    tone: CarpenterTagTone.success,
-                  ),
-              ],
-            ),
-            SizedBox(height: context.units(.5.rem)),
-            CarpenterText.body(body, colorRole: ContentColorRole.secondary),
-            if (showAction) ...[
-              SizedBox(height: context.units(1.rem)),
-              CarpenterButton.text(label: 'Open details', onPressed: () {}),
-            ],
-          ],
-        ),
+          ),
+          if (showStatus)
+            const CarpenterTag(label: 'Ready', tone: CarpenterTagTone.success),
+        ],
       ),
+      SizedBox(height: context.units(.5.rem)),
+      if (feedbackSurface)
+        CarpenterText.feedback(body, feedbackRole: feedbackRole)
+      else
+        CarpenterText.body(body, colorRole: ContentColorRole.secondary),
+      if (showAction) ...[
+        SizedBox(height: context.units(1.rem)),
+        CarpenterButton.text(label: 'Open details', onPressed: () {}),
+      ],
+    ],
+  );
+
+  return preview(
+    SizedBox(
+      width: width,
+      child: feedbackSurface
+          ? CarpenterCard.feedback(
+              semanticLabel: semanticLabel,
+              role: feedbackRole,
+              padded: padded,
+              bordered: bordered,
+              shape: shape,
+              child: content,
+            )
+          : CarpenterCard(
+              semanticLabel: semanticLabel,
+              padded: padded,
+              bordered: bordered,
+              shape: shape,
+              surfaceRole: surfaceRole,
+              child: content,
+            ),
     ),
   );
 }
