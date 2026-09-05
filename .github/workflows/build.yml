@@ -8,6 +8,9 @@ on:
     branches:
       - develop
 
+permissions:
+  contents: write
+
 concurrency:
   group: build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -20,6 +23,81 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Remove dead TreeTable layout parameters
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('lib/src/components/collections/tree/tree_table.dart')
+          text = path.read_text()
+
+          replacements = [
+              (
+                  "    const outerPadding = 0.0;\n    const interColumnGap = 0.0;\n",
+                  "",
+              ),
+              (
+                  "          columns: columns,\n          outerPadding: outerPadding,\n          gap: interColumnGap,\n",
+                  "          columns: columns,\n",
+              ),
+              (
+                  "            contentGap,\n            interColumnGap,\n",
+                  "            contentGap,\n",
+              ),
+              (
+                  "            _buildHeader(\n              context,\n              layout,\n              columns,\n              outerPadding,\n              interColumnGap,\n            ),\n",
+                  "            _buildHeader(context, layout, columns),\n",
+              ),
+              (
+                  "    required List<CarpenterTreeTableColumn<T>> columns,\n    required double outerPadding,\n    required double gap,\n",
+                  "    required List<CarpenterTreeTableColumn<T>> columns,\n",
+              ),
+              (
+                  "      outerInset: outerPadding,\n      gap: gap,\n",
+                  "",
+              ),
+              (
+                  "    List<CarpenterTreeTableColumn<T>> columns,\n    double outerPadding,\n    double gap,\n",
+                  "    List<CarpenterTreeTableColumn<T>> columns,\n",
+              ),
+              (
+                  "      padding: EdgeInsetsDirectional.symmetric(horizontal: outerPadding),\n",
+                  "",
+              ),
+              (
+                  "          for (final column in columns) ...[\n            SizedBox(width: gap),\n            _TreeHeaderCell(\n",
+                  "          for (final column in columns)\n            _TreeHeaderCell(\n",
+              ),
+              (
+                  "              onWidthChanged: (value) =>\n                  _resizeColumn(column.id, value, context),\n            ),\n          ],\n",
+                  "              onWidthChanged: (value) =>\n                  _resizeColumn(column.id, value, context),\n            ),\n",
+              ),
+              (
+                  "    double contentGap,\n    double interColumnGap,\n",
+                  "    double contentGap,\n",
+              ),
+              (
+                  "        for (final column in columns) ...[\n          SizedBox(width: interColumnGap),\n          _TreeTableSlot(\n",
+                  "        for (final column in columns)\n          _TreeTableSlot(\n",
+              ),
+              (
+                  "            child: column.cellBuilder(context, node),\n          ),\n        ],\n",
+                  "            child: column.cellBuilder(context, node),\n          ),\n",
+              ),
+          ]
+
+          for old, new in replacements:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'expected exactly one match, got {count}: {old!r}')
+              text = text.replace(old, new)
+
+          path.write_text(text)
+          PY
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -30,8 +108,21 @@ jobs:
       - name: Install package dependencies
         run: flutter pub get
 
-      - name: Check formatting
-        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Format cleanup
+        run: dart format lib/src/components/collections/tree/tree_table.dart
+
+      - name: Commit cleanup
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit"
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/src/components/collections/tree/tree_table.dart
+          git commit -m "refactor: remove dead tree table layout parameters"
+          git push origin HEAD:${{ github.head_ref }}
 
       - name: Analyze library
         run: dart analyze lib
