@@ -12,7 +12,8 @@ enum CollectionRequestReason { initial, query, refresh, loadMore }
 
 /// Collection-specific compatibility type over Carpenter's shared cancellation
 /// signal.
-final class CollectionRequestCancellation extends CarpenterCancellationSignal {}
+final class CollectionRequestCancellation
+    extends CarpenterCancellationSignal {}
 
 final class CollectionLoadRequest {
   const CollectionLoadRequest({
