@@ -3,7 +3,15 @@ import 'package:flutter/widgets.dart';
 
 import 'icon_data.dart';
 
-enum ActionColorRole { neutral, primary, utility, danger, warning, success, info }
+enum ActionColorRole {
+  neutral,
+  primary,
+  utility,
+  danger,
+  warning,
+  success,
+  info,
+}
 
 enum ActionProminence { ghost, normal, high, filled, outlined }
 
@@ -19,13 +27,29 @@ enum ContentColorRole { primary, secondary, muted, inverse, disabled }
 
 enum FeedbackColorRole { neutral, success, warning, danger, info }
 
-enum SelectionColorRole { neutral, primary, utility, danger, warning, success, info }
+enum SelectionColorRole {
+  neutral,
+  primary,
+  utility,
+  danger,
+  warning,
+  success,
+  info,
+}
 
 enum TypographyRole { display, title, body, label, caption }
 
 enum TypographyEmphasis { regular, medium, strong }
 
-enum ShapeRole { none, roundedXsmall, roundedSmall, rounded, roundedLarge, roundedXlarge, circular }
+enum ShapeRole {
+  none,
+  roundedXsmall,
+  roundedSmall,
+  rounded,
+  roundedLarge,
+  roundedXlarge,
+  circular,
+}
 
 @immutable
 final class CarpenterShape {

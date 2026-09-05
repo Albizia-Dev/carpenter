@@ -20,6 +20,7 @@ final class MenuPanelEntry {
     required this.semanticLabel,
     required this.enabled,
     required this.onActivate,
+    this.semanticHint,
     this.icon,
     this.selected = false,
   });
@@ -27,6 +28,7 @@ final class MenuPanelEntry {
   final Object id;
   final String label;
   final String semanticLabel;
+  final String? semanticHint;
   final CarpenterIconSource? icon;
   final bool enabled;
   final bool selected;
@@ -241,6 +243,7 @@ final class _MenuPanelItem extends StatelessWidget {
       enabled: entry.enabled,
       selected: entry.selected,
       label: entry.semanticLabel,
+      hint: entry.semanticHint,
       onTap: entry.enabled ? onActivate : null,
       excludeSemantics: true,
       child: InteractiveRegion(

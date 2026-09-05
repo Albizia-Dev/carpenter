@@ -26,11 +26,13 @@ final class ActionControl extends StatelessWidget {
     required this.shape,
     required this.iconOnly,
     required this.childBuilder,
+    this.semanticHint,
     this.focusNode,
     this.autofocus = false,
   });
 
   final String semanticLabel;
+  final String? semanticHint;
   final VoidCallback? onInvoke;
   final ActionColorRole colorRole;
   final ActionProminence prominence;
@@ -78,6 +80,7 @@ final class ActionControl extends StatelessWidget {
       button: true,
       enabled: onInvoke != null,
       label: semanticLabel,
+      hint: semanticHint,
       value: _running ? 'running' : null,
       liveRegion: _running,
       onTap: _running ? null : onInvoke,
