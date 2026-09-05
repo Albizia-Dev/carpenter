@@ -1,5 +1,6 @@
 import 'package:carpenter/carpenter.dart';
 import 'package:flutter/semantics.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../helpers/harness.dart';
@@ -39,7 +40,7 @@ void main() {
       carpenterHarness(
         Column(
           children: [
-            const CarpenterButton.fromAction(hiddenButton),
+            CarpenterButton.fromAction(hiddenButton),
             CarpenterMenu(
               autofocus: false,
               items: [
@@ -77,9 +78,7 @@ void main() {
       onInvoke: null,
     );
 
-    await tester.pumpWidget(
-      carpenterHarness(const CarpenterButton.fromAction(action)),
-    );
+    await tester.pumpWidget(carpenterHarness(CarpenterButton.fromAction(action)));
 
     final semantics = tester.getSemantics(
       find.bySemanticsLabel('Archive record'),
