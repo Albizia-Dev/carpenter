@@ -1,8 +1,6 @@
-import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../foundation/roles.dart';
-import '../../../foundation/theme.dart';
 import '../../behaviour/action_strip.dart';
 import '../table_metrics.dart';
 
