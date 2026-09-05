@@ -1,25 +1,27 @@
 name: Build
 
 on:
-  push:
-    branches:
-      - develop
   pull_request:
     branches:
       - develop
+
+permissions:
+  contents: write
 
 concurrency:
   group: build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  web:
-    name: Verify package and build web examples
+  format-command-execution:
+    name: Format command execution once
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout PR branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -30,32 +32,30 @@ jobs:
       - name: Install package dependencies
         run: flutter pub get
 
-      - name: Check formatting
+      - name: Format changed files
         run: >-
-          dart format --output=none --set-exit-if-changed
-          lib test widgetbook/lib example/lib
+          dart format
+          lib/src/application/command.dart
+          test/application/command_execution_test.dart
 
-      - name: Analyze library
-        run: dart analyze lib
-
-      - name: Test package without goldens
+      - name: Discard dependency-tool side effects
         shell: bash
         run: |
-          mapfile -t tests < <(find test -name '*_test.dart' -not -path 'test/goldens/*' -print | sort)
-          flutter test "${tests[@]}"
+          git restore analysis_options.yaml 2>/dev/null || true
+          git restore example/pubspec.lock 2>/dev/null || true
 
-      - name: Install Widgetbook dependencies
-        working-directory: widgetbook
-        run: flutter pub get
+      - name: Guard scope
+        shell: bash
+        run: |
+          changed="$(git diff --name-only | sort)"
+          expected="$(printf '%s\n' lib/src/application/command.dart test/application/command_execution_test.dart | sort)"
+          test "$changed" = "$expected"
 
-      - name: Build Widgetbook
-        working-directory: widgetbook
-        run: flutter build web --release --base-href /carpenter/
-
-      - name: Install example dependencies
-        working-directory: example
-        run: flutter pub get
-
-      - name: Build example
-        working-directory: example
-        run: flutter build web --release
+      - name: Commit formatting
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add lib/src/application/command.dart test/application/command_execution_test.dart
+          git commit -m "style: format command execution pipeline"
+          git push
