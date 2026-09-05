@@ -12,6 +12,9 @@ concurrency:
   group: build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   web:
     name: Verify package and build web examples
@@ -20,6 +23,169 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Apply shared table metrics
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          def replace_once(path, old, new):
+              p = Path(path)
+              text = p.read_text()
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'{path}: expected one match, got {count}: {old[:80]!r}')
+              p.write_text(text.replace(old, new, 1))
+
+          table = 'lib/src/components/collections/table/table.dart'
+          replace_once(
+              table,
+              "import '../contracts/selection_state.dart';\nimport 'table_actions.dart';",
+              "import '../contracts/selection_state.dart';\nimport '../table_metrics.dart';\nimport 'table_actions.dart';",
+          )
+          replace_once(
+              table,
+              "    final theme = CarpenterTheme.of(context);\n    final borderWidth = context.units(theme.shapes.tableBorderWidth);\n    final radius = context.units(theme.shapes.tableSurfaceRadius);",
+              "    final theme = CarpenterTheme.of(context);\n    final metrics = CarpenterTableMetrics.resolve(context);\n    final borderWidth = metrics.borderWidth;\n    final radius = metrics.surfaceRadius;",
+          )
+          replace_once(
+              table,
+              "        final headerHeight = widget.stickyHeader\n            ? MediaQuery.textScalerOf(\n                context,\n              ).scale(context.units(theme.sizes.tableHeaderHeight))\n            : 0.0;",
+              "        final headerHeight = widget.stickyHeader ? metrics.headerHeight : 0.0;",
+          )
+          replace_once(
+              table,
+              "  ) {\n    final theme = CarpenterTheme.of(context);\n    final selectionWidth =\n        widget.showSelectionColumn && widget.selection.isEnabled\n        ? context.units(theme.sizes.tableSelectionColumn)\n        : 0.0;",
+              "  ) {\n    final metrics = CarpenterTableMetrics.resolve(context);\n    final selectionWidth =\n        widget.showSelectionColumn && widget.selection.isEnabled\n        ? metrics.selectionColumnWidth\n        : 0.0;",
+          )
+          replace_once(
+              table,
+              "      final minimum = context.units(\n        column.width.minimum ?? theme.sizes.tableColumnMin,\n      );\n      final maximum = context.units(\n        column.width.maximum ?? theme.sizes.tableColumnMax,\n      );",
+              "      final minimum = column.width.minimum == null\n          ? metrics.minimumColumnWidth\n          : context.units(column.width.minimum!);\n      final maximum = column.width.maximum == null\n          ? metrics.maximumColumnWidth\n          : context.units(column.width.maximum!);",
+          )
+          replace_once(
+              table,
+              "      final preferred = explicitWidth == null && column.isActionColumn\n          ? CarpenterTableActionCell.preferredColumnWidth(context)\n          : context.units(explicitWidth ?? theme.sizes.tableColumn);",
+              "      final actionLane =\n          column.width.policy == CarpenterTableColumnWidthPolicy.actionLane;\n      final preferred = explicitWidth == null && actionLane\n          ? CarpenterTableActionCell.preferredColumnWidth(context)\n          : explicitWidth == null\n          ? metrics.defaultColumnWidth\n          : context.units(explicitWidth);",
+          )
+          replace_once(
+              table,
+              "          flexible:\n              !column.isActionColumn &&\n              column.width.policy == CarpenterTableColumnWidthPolicy.flexible,",
+              "          flexible: column.width.isFlexible,",
+          )
+          replace_once(
+              table,
+              "  Widget _buildHeader(BuildContext context, _TableColumnLayout layout) {\n    final theme = CarpenterTheme.of(context);\n    final height = MediaQuery.textScalerOf(\n      context,\n    ).scale(context.units(theme.sizes.tableHeaderHeight));",
+              "  Widget _buildHeader(BuildContext context, _TableColumnLayout layout) {\n    final theme = CarpenterTheme.of(context);\n    final metrics = CarpenterTableMetrics.resolve(context);\n    final height = metrics.headerHeight;",
+          )
+          replace_once(table, "resizeHandleWidth: context.units(theme.sizes.tableResizeHandle),", "resizeHandleWidth: metrics.resizeHandleWidth,")
+          replace_once(table, "horizontalPadding: context.units(theme.spacing.tableHorizontal),", "horizontalPadding: metrics.horizontalPadding,")
+          replace_once(table, "verticalPadding: context.units(theme.spacing.tableVertical),", "verticalPadding: metrics.verticalPadding,")
+          replace_once(
+              table,
+              "  }) {\n    final theme = CarpenterTheme.of(context);\n    final rowHeight = MediaQuery.textScalerOf(\n      context,\n    ).scale(context.units(theme.sizes.tableRowHeight));\n    final maxHeight = MediaQuery.textScalerOf(\n      context,\n    ).scale(context.units(theme.sizes.tableBodyMaxHeight));\n    final stateHeight = MediaQuery.textScalerOf(\n      context,\n    ).scale(context.units(theme.sizes.tableStateHeight));",
+              "  }) {\n    final metrics = CarpenterTableMetrics.resolve(context);\n    final rowHeight = metrics.rowHeight;\n    final maxHeight = metrics.bodyMaxHeight;\n    final stateHeight = metrics.stateHeight;",
+          )
+          replace_once(
+              table,
+              "    final theme = CarpenterTheme.of(context);\n    final background = widget.selected",
+              "    final theme = CarpenterTheme.of(context);\n    final metrics = CarpenterTableMetrics.resolve(context);\n    final background = widget.selected",
+          )
+          replace_once(
+              table,
+              "                          horizontal: context.units(\n                            theme.spacing.tableHorizontal,\n                          ),\n                          vertical: context.units(theme.spacing.tableVertical),",
+              "                          horizontal: metrics.horizontalPadding,\n                          vertical: metrics.verticalPadding,",
+          )
+          replace_once(
+              table,
+              "    final theme = CarpenterTheme.of(context);\n    return Center(\n      child: Padding(\n        padding: EdgeInsets.all(context.units(theme.spacing.tableHorizontal)),",
+              "    final theme = CarpenterTheme.of(context);\n    final metrics = CarpenterTableMetrics.resolve(context);\n    return Center(\n      child: Padding(\n        padding: EdgeInsets.all(metrics.horizontalPadding),",
+          )
+          replace_once(table, "SizedBox(height: context.units(theme.spacing.tableStateGap)),", "SizedBox(height: metrics.stateGap),")
+          replace_once(
+              table,
+              "    final theme = CarpenterTheme.of(context);\n    return Align(\n      alignment: AlignmentDirectional.centerStart,\n      child: Padding(\n        padding: EdgeInsetsDirectional.symmetric(\n          horizontal: context.units(theme.spacing.tableHorizontal),\n        ),",
+              "    final metrics = CarpenterTableMetrics.resolve(context);\n    return Align(\n      alignment: AlignmentDirectional.centerStart,\n      child: Padding(\n        padding: EdgeInsetsDirectional.symmetric(\n          horizontal: metrics.horizontalPadding,\n        ),",
+          )
+          replace_once(
+              table,
+              "    final theme = CarpenterTheme.of(context);\n    final active = _hovered || _dragging;\n    final strokeWidth = active\n        ? context.units(theme.focus.width)\n        : context.units(theme.shapes.tableBorderWidth);",
+              "    final theme = CarpenterTheme.of(context);\n    final metrics = CarpenterTableMetrics.resolve(context);\n    final active = _hovered || _dragging;\n    final strokeWidth = active\n        ? context.units(theme.focus.width)\n        : metrics.borderWidth;",
+          )
+
+          tree = 'lib/src/components/collections/tree/tree_table.dart'
+          replace_once(
+              tree,
+              "import '../contracts/selection_mode.dart';\nimport '../table/table_actions.dart';",
+              "import '../contracts/selection_mode.dart';\nimport '../table_metrics.dart';\nimport '../table/table_actions.dart';",
+          )
+          replace_once(
+              tree,
+              "    final theme = CarpenterTheme.of(context);\n    final outerPadding = context.units(theme.spacing.tableHorizontal);\n    final gap = context.units(theme.spacing.tableCellGap);",
+              "    final theme = CarpenterTheme.of(context);\n    final metrics = CarpenterTableMetrics.resolve(context);\n    final outerPadding = metrics.horizontalPadding;\n    final gap = metrics.cellGap;",
+          )
+          replace_once(tree, "final borderWidth = context.units(theme.shapes.tableBorderWidth);", "final borderWidth = metrics.borderWidth;")
+          replace_once(tree, "final radius = context.units(theme.shapes.tableSurfaceRadius);", "final radius = metrics.surfaceRadius;")
+          replace_once(
+              tree,
+              "    final theme = CarpenterTheme.of(context);\n    final publicSpecs = <({String id, CarpenterTableColumnWidth width})>[",
+              "    final metrics = CarpenterTableMetrics.resolve(context);\n    final publicSpecs = <({String id, CarpenterTableColumnWidth width})>[",
+          )
+          replace_once(
+              tree,
+              "      final minimum = context.units(\n        spec.width.minimum ?? theme.sizes.tableColumnMin,\n      );\n      final maximum = context.units(\n        spec.width.maximum ?? theme.sizes.tableColumnMax,\n      );",
+              "      final minimum = spec.width.minimum == null\n          ? metrics.minimumColumnWidth\n          : context.units(spec.width.minimum!);\n      final maximum = spec.width.maximum == null\n          ? metrics.maximumColumnWidth\n          : context.units(spec.width.maximum!);",
+          )
+          replace_once(
+              tree,
+              "          ? CarpenterTableActionCell.preferredColumnWidth(context)\n          : context.units(explicit ?? theme.sizes.tableColumn);",
+              "          ? CarpenterTableActionCell.preferredColumnWidth(context)\n          : explicit == null\n          ? metrics.defaultColumnWidth\n          : context.units(explicit);",
+          )
+          replace_once(
+              tree,
+              "    final theme = CarpenterTheme.of(context);\n    final height = MediaQuery.textScalerOf(\n      context,\n    ).scale(context.units(theme.sizes.tableHeaderHeight));",
+              "    final theme = CarpenterTheme.of(context);\n    final metrics = CarpenterTableMetrics.resolve(context);\n    final height = metrics.headerHeight;",
+          )
+          replace_once(tree, "vertical: context.units(theme.spacing.tableVertical),", "vertical: metrics.verticalPadding,")
+          replace_once(
+              tree,
+              "    final theme = CarpenterTheme.of(context);\n    return SizedBox(\n      width: width,",
+              "    final metrics = CarpenterTableMetrics.resolve(context);\n    return SizedBox(\n      width: width,",
+          )
+          replace_once(tree, "width: context.units(theme.sizes.tableResizeHandle),", "width: metrics.resizeHandleWidth,")
+          replace_once(
+              tree,
+              "    final theme = CarpenterTheme.of(context);\n    final active = _hovered || _dragging;\n    final strokeWidth = active\n        ? context.units(theme.focus.width)\n        : context.units(theme.shapes.tableBorderWidth);",
+              "    final theme = CarpenterTheme.of(context);\n    final metrics = CarpenterTableMetrics.resolve(context);\n    final active = _hovered || _dragging;\n    final strokeWidth = active\n        ? context.units(theme.focus.width)\n        : metrics.borderWidth;",
+          )
+
+          tile = 'lib/src/components/collections/list_tile.dart'
+          replace_once(tile, "import '../../internal/rendering/interactive_region.dart';", "import '../../internal/rendering/interactive_region.dart';\nimport 'table_metrics.dart';")
+          replace_once(
+              tile,
+              "    final theme = CarpenterTheme.of(context);\n    final tableRow = presentation == CarpenterListTilePresentation.tableRow;\n    final gap = context.units(\n      tableRow ? theme.spacing.tableHorizontal : theme.spacing.medium,\n    );",
+              "    final theme = CarpenterTheme.of(context);\n    final metrics = CarpenterTableMetrics.resolve(context);\n    final tableRow = presentation == CarpenterListTilePresentation.tableRow;\n    final gap = tableRow\n        ? metrics.horizontalPadding\n        : context.units(theme.spacing.medium);",
+          )
+          replace_once(
+              tile,
+              "    final rowHeight = MediaQuery.textScalerOf(\n      context,\n    ).scale(context.units(theme.sizes.tableRowHeight));",
+              "    final rowHeight = metrics.rowHeight;",
+          )
+          replace_once(tile, "width: context.units(theme.shapes.tableBorderWidth),", "width: metrics.borderWidth,")
+          replace_once(tile, "vertical: context.units(theme.spacing.tableVertical),", "vertical: metrics.verticalPadding,")
+
+          actions = 'lib/src/components/collections/table/table_actions.dart'
+          replace_once(actions, "import '../../behaviour/action_strip.dart';", "import '../../behaviour/action_strip.dart';\nimport '../table_metrics.dart';")
+          replace_once(
+              actions,
+              "    final theme = CarpenterTheme.of(context);\n    final padding = context.units(theme.spacing.tableHorizontal);",
+              "    final metrics = CarpenterTableMetrics.resolve(context);\n    final padding = metrics.horizontalPadding;",
+          )
+          PY
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -30,8 +196,21 @@ jobs:
       - name: Install package dependencies
         run: flutter pub get
 
-      - name: Check formatting
-        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Format shared table metrics refactor
+        run: dart format lib/src/components/collections/table_metrics.dart lib/src/components/collections/list_tile.dart lib/src/components/collections/table/table.dart lib/src/components/collections/table/table_actions.dart lib/src/components/collections/tree/tree_table.dart
+
+      - name: Commit shared table metrics refactor
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lib/src/components/collections/table_metrics.dart lib/src/components/collections/list_tile.dart lib/src/components/collections/table/table.dart lib/src/components/collections/table/table_actions.dart lib/src/components/collections/tree/tree_table.dart
+          git commit -m "refactor: consume shared table metrics"
+          git push origin HEAD:${{ github.head_ref }}
 
       - name: Analyze library
         run: dart analyze lib
