@@ -74,6 +74,7 @@ export 'src/components/behaviour/menu/menu.dart';
 export 'src/components/behaviour/menu/menu_entry.dart';
 export 'src/components/behaviour/notice.dart';
 export 'src/components/behaviour/popover.dart';
+export 'src/components/behaviour/request_gate.dart';
 export 'src/components/behaviour/toast/toast.dart';
 export 'src/components/behaviour/toast/toast_region.dart';
 export 'src/components/behaviour/toast/toaster_controller.dart';
