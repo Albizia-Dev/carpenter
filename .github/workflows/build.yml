@@ -41,6 +41,9 @@ jobs:
       - name: Format changed Dart
         run: dart format lib/src/foundation/theme.dart test/foundation/theme_test.dart
 
+      - name: Discard dependency-tool side effects
+        run: git checkout -- analysis_options.yaml example/pubspec.lock
+
       - name: Guard migration scope
         shell: bash
         run: |
