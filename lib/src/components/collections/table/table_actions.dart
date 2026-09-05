@@ -1,9 +1,8 @@
-import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../foundation/roles.dart';
-import '../../../foundation/theme.dart';
 import '../../behaviour/action_strip.dart';
+import '../table_metrics.dart';
 
 @immutable
 final class CarpenterTableActions {
@@ -45,8 +44,8 @@ final class CarpenterTableActionCell extends StatelessWidget {
   final String semanticLabel;
 
   static double preferredColumnWidth(BuildContext context) {
-    final theme = CarpenterTheme.of(context);
-    final padding = context.units(theme.spacing.tableHorizontal);
+    final metrics = CarpenterTableMetrics.resolve(context);
+    final padding = metrics.horizontalPadding;
     return CarpenterActionStrip.compactExtent(
           context,
           inlineActions: inlinePrimaryLimit,

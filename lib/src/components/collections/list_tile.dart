@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../foundation/theme.dart';
 import '../../internal/rendering/interactive_region.dart';
+import 'table_metrics.dart';
 
 enum CarpenterListTilePresentation { standard, tableRow }
 
@@ -46,16 +47,15 @@ final class CarpenterListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
+    final metrics = CarpenterTableMetrics.resolve(context);
     final tableRow = presentation == CarpenterListTilePresentation.tableRow;
-    final gap = context.units(
-      tableRow ? theme.spacing.tableHorizontal : theme.spacing.medium,
-    );
+    final gap = tableRow
+        ? metrics.horizontalPadding
+        : context.units(theme.spacing.medium);
     final radius = tableRow
         ? BorderRadius.zero
         : BorderRadius.circular(context.units(.5.rem));
-    final rowHeight = MediaQuery.textScalerOf(
-      context,
-    ).scale(context.units(theme.sizes.tableRowHeight));
+    final rowHeight = metrics.rowHeight;
     return Semantics(
       container: true,
       selected: selected,
@@ -88,7 +88,7 @@ final class CarpenterListTile extends StatelessWidget {
                     ? Border(
                         bottom: BorderSide(
                           color: theme.overlay.border,
-                          width: context.units(theme.shapes.tableBorderWidth),
+                          width: metrics.borderWidth,
                         ),
                       )
                     : null,
@@ -108,7 +108,7 @@ final class CarpenterListTile extends StatelessWidget {
               padding: tableRow
                   ? EdgeInsetsDirectional.symmetric(
                       horizontal: gap,
-                      vertical: context.units(theme.spacing.tableVertical),
+                      vertical: metrics.verticalPadding,
                     )
                   : EdgeInsets.symmetric(horizontal: gap, vertical: gap * .75),
               child: Row(

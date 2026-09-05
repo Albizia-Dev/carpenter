@@ -15,6 +15,7 @@ import '../contracts/collection_load_phase.dart';
 import '../contracts/collection_query.dart';
 import '../contracts/collection_snapshot.dart';
 import '../contracts/selection_state.dart';
+import '../table_metrics.dart';
 import 'table_actions.dart';
 import 'table_column.dart';
 import 'table_state.dart';
@@ -133,17 +134,14 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
-    final borderWidth = context.units(theme.shapes.tableBorderWidth);
-    final radius = context.units(theme.shapes.tableSurfaceRadius);
+    final metrics = CarpenterTableMetrics.resolve(context);
+    final borderWidth = metrics.borderWidth;
+    final radius = metrics.surfaceRadius;
     return LayoutBuilder(
       builder: (context, constraints) {
         final layout = _resolveColumnLayout(context, constraints.maxWidth);
         final tableWidth = layout.totalWidth;
-        final headerHeight = widget.stickyHeader
-            ? MediaQuery.textScalerOf(
-                context,
-              ).scale(context.units(theme.sizes.tableHeaderHeight))
-            : 0.0;
+        final headerHeight = widget.stickyHeader ? metrics.headerHeight : 0.0;
         final availableBodyHeight = constraints.maxHeight.isFinite
             ? math.max(0.0, constraints.maxHeight - headerHeight)
             : null;
@@ -191,19 +189,19 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
     BuildContext context,
     double viewportWidth,
   ) {
-    final theme = CarpenterTheme.of(context);
+    final metrics = CarpenterTableMetrics.resolve(context);
     final selectionWidth =
         widget.showSelectionColumn && widget.selection.isEnabled
-        ? context.units(theme.sizes.tableSelectionColumn)
+        ? metrics.selectionColumnWidth
         : 0.0;
     final columns = <GridColumnSpec>[];
     for (final column in widget.columns) {
-      final minimum = context.units(
-        column.width.minimum ?? theme.sizes.tableColumnMin,
-      );
-      final maximum = context.units(
-        column.width.maximum ?? theme.sizes.tableColumnMax,
-      );
+      final minimum = column.width.minimum == null
+          ? metrics.minimumColumnWidth
+          : context.units(column.width.minimum!);
+      final maximum = column.width.maximum == null
+          ? metrics.maximumColumnWidth
+          : context.units(column.width.maximum!);
       final pinned =
           _localColumnWidths.containsKey(column.id) ||
           widget.columnWidths.containsKey(column.id);
@@ -211,9 +209,13 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
           _localColumnWidths[column.id] ??
           widget.columnWidths[column.id] ??
           column.width.preferred;
-      final preferred = explicitWidth == null && column.isActionColumn
+      final actionLane =
+          column.width.policy == CarpenterTableColumnWidthPolicy.actionLane;
+      final preferred = explicitWidth == null && actionLane
           ? CarpenterTableActionCell.preferredColumnWidth(context)
-          : context.units(explicitWidth ?? theme.sizes.tableColumn);
+          : explicitWidth == null
+          ? metrics.defaultColumnWidth
+          : context.units(explicitWidth);
       columns.add(
         GridColumnSpec(
           id: column.id,
@@ -221,9 +223,7 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
           minimum: minimum,
           maximum: maximum,
           flex: column.width.flex,
-          flexible:
-              !column.isActionColumn &&
-              column.width.policy == CarpenterTableColumnWidthPolicy.flexible,
+          flexible: column.width.isFlexible,
           pinned: pinned,
         ),
       );
@@ -244,9 +244,8 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
 
   Widget _buildHeader(BuildContext context, _TableColumnLayout layout) {
     final theme = CarpenterTheme.of(context);
-    final height = MediaQuery.textScalerOf(
-      context,
-    ).scale(context.units(theme.sizes.tableHeaderHeight));
+    final metrics = CarpenterTableMetrics.resolve(context);
+    final height = metrics.headerHeight;
     final loadedKeys = widget.snapshot.items.map(widget.rowKey).toList();
     final selectedCount = loadedKeys.where(widget.selection.contains).length;
     final checkboxValue = selectedCount == 0
@@ -285,9 +284,9 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
               sorting: widget.sorting,
               onSortingChanged: widget.onSortingChanged,
               multiSort: widget.multiSort,
-              resizeHandleWidth: context.units(theme.sizes.tableResizeHandle),
-              horizontalPadding: context.units(theme.spacing.tableHorizontal),
-              verticalPadding: context.units(theme.spacing.tableVertical),
+              resizeHandleWidth: metrics.resizeHandleWidth,
+              horizontalPadding: metrics.horizontalPadding,
+              verticalPadding: metrics.verticalPadding,
               onWidthChanged: _resizeColumn,
             ),
         ],
@@ -300,16 +299,10 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
     _TableColumnLayout layout, {
     required double? availableHeight,
   }) {
-    final theme = CarpenterTheme.of(context);
-    final rowHeight = MediaQuery.textScalerOf(
-      context,
-    ).scale(context.units(theme.sizes.tableRowHeight));
-    final maxHeight = MediaQuery.textScalerOf(
-      context,
-    ).scale(context.units(theme.sizes.tableBodyMaxHeight));
-    final stateHeight = MediaQuery.textScalerOf(
-      context,
-    ).scale(context.units(theme.sizes.tableStateHeight));
+    final metrics = CarpenterTableMetrics.resolve(context);
+    final rowHeight = metrics.rowHeight;
+    final maxHeight = metrics.bodyMaxHeight;
+    final stateHeight = metrics.stateHeight;
     final state = _exclusiveState(context);
     final banner = _banner(context);
     final footer = _footer(context);
@@ -616,10 +609,11 @@ final class _ResizeHandleState extends State<_ResizeHandle> {
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
+    final metrics = CarpenterTableMetrics.resolve(context);
     final active = _hovered || _dragging;
     final strokeWidth = active
         ? context.units(theme.focus.width)
-        : context.units(theme.shapes.tableBorderWidth);
+        : metrics.borderWidth;
     return MouseRegion(
       cursor: SystemMouseCursors.resizeColumn,
       onEnter: (_) => setState(() => _hovered = true),
@@ -731,6 +725,7 @@ final class _TableRowState<T, K> extends State<_TableRow<T, K>> {
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
+    final metrics = CarpenterTableMetrics.resolve(context);
     final background = widget.selected
         ? theme.overlay.selected
         : _hovered
@@ -767,7 +762,7 @@ final class _TableRowState<T, K> extends State<_TableRow<T, K>> {
                 border: Border(
                   bottom: BorderSide(
                     color: theme.overlay.border,
-                    width: context.units(theme.shapes.tableBorderWidth),
+                    width: metrics.borderWidth,
                   ),
                 ),
               ),
@@ -803,10 +798,8 @@ final class _TableRowState<T, K> extends State<_TableRow<T, K>> {
                       width: widget.widths[column.id],
                       child: Padding(
                         padding: EdgeInsetsDirectional.symmetric(
-                          horizontal: context.units(
-                            theme.spacing.tableHorizontal,
-                          ),
-                          vertical: context.units(theme.spacing.tableVertical),
+                          horizontal: metrics.horizontalPadding,
+                          vertical: metrics.verticalPadding,
                         ),
                         child: Align(
                           alignment: carpenterTableCellAlignment(
@@ -839,16 +832,16 @@ final class _StatePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = CarpenterTheme.of(context);
+    final metrics = CarpenterTableMetrics.resolve(context);
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(context.units(theme.spacing.tableHorizontal)),
+        padding: EdgeInsets.all(metrics.horizontalPadding),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             CarpenterStatusIndicator(label: message, role: role),
             if (action != null) ...[
-              SizedBox(height: context.units(theme.spacing.tableStateGap)),
+              SizedBox(height: metrics.stateGap),
               CarpenterButton.fromAction(action!),
             ],
           ],
@@ -865,12 +858,12 @@ final class _TableBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = CarpenterTheme.of(context);
+    final metrics = CarpenterTableMetrics.resolve(context);
     return Align(
       alignment: AlignmentDirectional.centerStart,
       child: Padding(
         padding: EdgeInsetsDirectional.symmetric(
-          horizontal: context.units(theme.spacing.tableHorizontal),
+          horizontal: metrics.horizontalPadding,
         ),
         child: CarpenterStatusIndicator(label: message, role: role),
       ),
