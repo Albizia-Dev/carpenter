@@ -8,6 +8,10 @@ on:
     branches:
       - develop
 
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   web:
     name: Verify package and build web examples
