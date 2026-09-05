@@ -193,7 +193,6 @@ final class CarpenterTableColumn<T> {
     width: width,
     resizable: resizable,
     semanticLabel: semanticLabel,
-    isActionColumn: true,
     cellBuilder: (context, item) => CarpenterTableActionCell(
       primary: actions(item),
       secondary: secondaryActions?.call(item) ?? const [],
