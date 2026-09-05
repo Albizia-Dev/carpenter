@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import '../components/basic/button/button.dart';
+import '../foundation/icon_data.dart';
 import '../foundation/roles.dart';
 
 extension type const CarpenterCommandId(String value) {}
@@ -336,7 +337,8 @@ final class CarpenterCommandButton<I> extends StatelessWidget {
                 : ActionProminence.outlined,
             executionPhase: switch (state.execution) {
               CarpenterCommandExecution.idle => ActionExecutionPhase.idle,
-              CarpenterCommandExecution.executing => ActionExecutionPhase.running,
+              CarpenterCommandExecution.executing =>
+                ActionExecutionPhase.running,
               CarpenterCommandExecution.failed => ActionExecutionPhase.failed,
             },
           );
