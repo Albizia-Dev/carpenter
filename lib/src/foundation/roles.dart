@@ -1,28 +1,11 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import 'icon_data.dart';
 
-enum TypographyRole { display, title, body, label, caption }
+enum ActionColorRole { neutral, primary, utility, danger, warning, success, info }
 
-enum TypographyEmphasis { regular, medium, strong }
-
-enum ContentColorRole { primary, secondary, muted, inverse, disabled }
-
-enum ActionColorRole {
-  neutral,
-  primary,
-  utility,
-  danger,
-  warning,
-  success,
-  info,
-}
-
-enum ActionProminence { normal, ghost, outlined, low, high, filled }
-
-enum ActionColorSlot { background, foreground, icon, border }
-
-enum FeedbackColorRole { neutral, success, warning, danger, info }
+enum ActionProminence { ghost, normal, high, filled, outlined }
 
 enum ControlSize { xsmall, small, medium, large, xlarge }
 
@@ -32,51 +15,30 @@ enum FieldSize { xsmall, small, medium, large, xlarge }
 
 enum FieldAvailability { enabled, readOnly, disabled }
 
-enum CheckboxValue { unchecked, checked, mixed }
+enum ContentColorRole { primary, secondary, muted, inverse, disabled }
 
-enum SelectionColorRole {
-  neutral,
-  primary,
-  utility,
-  danger,
-  warning,
-  success,
-  info,
-}
+enum FeedbackColorRole { neutral, success, warning, danger, info }
 
-enum OverlayPlacement {
-  top,
-  bottom,
-  left,
-  right,
-  topStart,
-  topEnd,
-  bottomStart,
-  bottomEnd,
-}
+enum SelectionColorRole { neutral, primary, utility, danger, warning, success, info }
 
-enum TooltipDelay { immediate, short, long }
+enum TypographyRole { display, title, body, label, caption }
 
-enum OptionsLoadState { ready, loading, failed }
+enum TypographyEmphasis { regular, medium, strong }
 
-enum ToastDuration { persistent, short, long }
-
-enum DialogDismissPolicy { explicitOnly, escapeOnly, outsideAndEscape }
-
-enum ShapeRole { none, rounded, circular }
+enum ShapeRole { none, roundedXsmall, roundedSmall, rounded, roundedLarge, roundedXlarge, circular }
 
 @immutable
 final class CarpenterShape {
   const CarpenterShape({required this.start, required this.end});
 
-  static const none = CarpenterShape(
-    start: ShapeRole.none,
-    end: ShapeRole.none,
-  );
-  static const rounded = CarpenterShape(
-    start: ShapeRole.rounded,
-    end: ShapeRole.rounded,
-  );
+  const CarpenterShape.uniform(ShapeRole role) : start = role, end = role;
+
+  static const none = CarpenterShape.uniform(ShapeRole.none);
+  static const roundedXsmall = CarpenterShape.uniform(ShapeRole.roundedXsmall);
+  static const roundedSmall = CarpenterShape.uniform(ShapeRole.roundedSmall);
+  static const rounded = CarpenterShape.uniform(ShapeRole.rounded);
+  static const roundedLarge = CarpenterShape.uniform(ShapeRole.roundedLarge);
+  static const roundedXlarge = CarpenterShape.uniform(ShapeRole.roundedXlarge);
   static const circular = CarpenterShape(
     start: ShapeRole.circular,
     end: ShapeRole.circular,
@@ -104,6 +66,8 @@ final class CarpenterActionDescriptor {
     this.semanticLabel,
     this.colorRole = ActionColorRole.neutral,
     this.shortcut,
+    this.visible = true,
+    this.disabledReason,
   });
 
   final String id;
@@ -112,6 +76,16 @@ final class CarpenterActionDescriptor {
   final String? semanticLabel;
   final ActionColorRole colorRole;
   final ShortcutActivator? shortcut;
+
+  /// Logical visibility independent of how a surface presents this action.
+  final bool visible;
+
+  /// Optional application reason for an unavailable action.
+  ///
+  /// Surfaces may expose this through accessibility or explanatory UI without
+  /// treating it as presentation configuration on the descriptor itself.
+  final String? disabledReason;
+
   final VoidCallback? onInvoke;
 
   bool get isEnabled => onInvoke != null;
