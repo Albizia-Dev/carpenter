@@ -454,6 +454,8 @@ final class SpacingControlTokens {
   _i1.Rem get compactHorizontalXlarge => const _i1.Rem(0.875);
 
   _i1.Rem get gap => const _i1.Rem(0.5);
+
+  _i1.Rem get compactGap => const _i1.Rem(0.375);
 }
 
 final class SpacingStatusTokens {
@@ -462,6 +464,10 @@ final class SpacingStatusTokens {
   _i1.Rem get horizontal => const _i1.Rem(0.625);
 
   _i1.Rem get vertical => const _i1.Rem(0.25);
+
+  _i1.Rem get compactHorizontal => const _i1.Rem(0.5);
+
+  _i1.Rem get compactVertical => const _i1.Rem(0.1875);
 }
 
 final class SpacingLoadingTokens {
@@ -481,6 +487,14 @@ final class SpacingFieldTokens {
 
   _i1.Rem get scrollPadding => const _i1.Rem(1.0);
 
+  _i1.Rem get compactLabelGap => const _i1.Rem(0.25);
+
+  _i1.Rem get compactSupportingGap => const _i1.Rem(0.1875);
+
+  _i1.Rem get compactContentGap => const _i1.Rem(0.375);
+
+  _i1.Rem get compactScrollPadding => const _i1.Rem(0.75);
+
   _i1.Rem get verticalXsmall => const _i1.Rem(0.25);
 
   _i1.Rem get verticalSmall => const _i1.Rem(0.375);
@@ -490,6 +504,16 @@ final class SpacingFieldTokens {
   _i1.Rem get verticalLarge => const _i1.Rem(0.625);
 
   _i1.Rem get verticalXlarge => const _i1.Rem(0.75);
+
+  _i1.Rem get compactVerticalXsmall => const _i1.Rem(0.125);
+
+  _i1.Rem get compactVerticalSmall => const _i1.Rem(0.25);
+
+  _i1.Rem get compactVerticalMedium => const _i1.Rem(0.375);
+
+  _i1.Rem get compactVerticalLarge => const _i1.Rem(0.5);
+
+  _i1.Rem get compactVerticalXlarge => const _i1.Rem(0.625);
 }
 
 final class SpacingSelectionTokens {
@@ -500,6 +524,12 @@ final class SpacingSelectionTokens {
   _i1.Rem get supportingGap => const _i1.Rem(0.25);
 
   _i1.Rem get groupGap => const _i1.Rem(0.5);
+
+  _i1.Rem get compactLabelGap => const _i1.Rem(0.375);
+
+  _i1.Rem get compactSupportingGap => const _i1.Rem(0.1875);
+
+  _i1.Rem get compactGroupGap => const _i1.Rem(0.375);
 
   _i1.Rem get markInset => const _i1.Rem(0.25);
 
@@ -520,6 +550,12 @@ final class SpacingOverlayTokens {
   _i1.Rem get menuItemVertical => const _i1.Rem(0.5);
 
   _i1.Rem get menuItemGap => const _i1.Rem(0.5);
+
+  _i1.Rem get compactMenuItemHorizontal => const _i1.Rem(0.625);
+
+  _i1.Rem get compactMenuItemVertical => const _i1.Rem(0.375);
+
+  _i1.Rem get compactMenuItemGap => const _i1.Rem(0.375);
 
   _i1.Rem get tooltipHorizontal => const _i1.Rem(0.5);
 
@@ -548,6 +584,14 @@ final class SpacingTableTokens {
   _i1.Rem get cellGap => const _i1.Rem(0.5);
 
   _i1.Rem get stateGap => const _i1.Rem(0.75);
+
+  _i1.Rem get compactHorizontal => const _i1.Rem(0.5);
+
+  _i1.Rem get compactVertical => const _i1.Rem(0.375);
+
+  _i1.Rem get compactCellGap => const _i1.Rem(0.375);
+
+  _i1.Rem get compactStateGap => const _i1.Rem(0.5);
 }
 
 final class SpacingLayoutTokens {
@@ -566,6 +610,8 @@ final class SpacingLayoutTokens {
   _i1.Rem get section => const _i1.Rem(1.0);
 
   _i1.Rem get toolbar => const _i1.Rem(0.5);
+
+  _i1.Rem get compactToolbar => const _i1.Rem(0.375);
 }
 
 final class SpacingTokens {
@@ -752,6 +798,20 @@ final class ComponentActionGapTokens {
   _i1.Rem get xlarge => spacing.control.gap;
 }
 
+final class ComponentActionCompactGapTokens {
+  const ComponentActionCompactGapTokens();
+
+  _i1.Rem get xsmall => spacing.control.compactGap;
+
+  _i1.Rem get small => spacing.control.compactGap;
+
+  _i1.Rem get medium => spacing.control.compactGap;
+
+  _i1.Rem get large => spacing.control.compactGap;
+
+  _i1.Rem get xlarge => spacing.control.compactGap;
+}
+
 final class ComponentActionIconTokens {
   const ComponentActionIconTokens();
 
@@ -835,6 +895,9 @@ final class ComponentActionTokens {
 
   final ComponentActionGapTokens gap = const ComponentActionGapTokens();
 
+  final ComponentActionCompactGapTokens compactGap =
+      const ComponentActionCompactGapTokens();
+
   final ComponentActionIconTokens icon = const ComponentActionIconTokens();
 
   final ComponentActionRadiusTokens radius =
@@ -873,6 +936,20 @@ final class ComponentFieldHorizontalPaddingTokens {
   _i1.Rem get xlarge => spacing.control.horizontalXlarge;
 }
 
+final class ComponentFieldCompactHorizontalPaddingTokens {
+  const ComponentFieldCompactHorizontalPaddingTokens();
+
+  _i1.Rem get xsmall => spacing.control.compactHorizontalXsmall;
+
+  _i1.Rem get small => spacing.control.compactHorizontalSmall;
+
+  _i1.Rem get medium => spacing.control.compactHorizontalMedium;
+
+  _i1.Rem get large => spacing.control.compactHorizontalLarge;
+
+  _i1.Rem get xlarge => spacing.control.compactHorizontalXlarge;
+}
+
 final class ComponentFieldVerticalPaddingTokens {
   const ComponentFieldVerticalPaddingTokens();
 
@@ -885,6 +962,20 @@ final class ComponentFieldVerticalPaddingTokens {
   _i1.Rem get large => component.action.verticalPadding.large;
 
   _i1.Rem get xlarge => component.action.verticalPadding.xlarge;
+}
+
+final class ComponentFieldCompactVerticalPaddingTokens {
+  const ComponentFieldCompactVerticalPaddingTokens();
+
+  _i1.Rem get xsmall => spacing.field.compactVerticalXsmall;
+
+  _i1.Rem get small => spacing.field.compactVerticalSmall;
+
+  _i1.Rem get medium => spacing.field.compactVerticalMedium;
+
+  _i1.Rem get large => spacing.field.compactVerticalLarge;
+
+  _i1.Rem get xlarge => spacing.field.compactVerticalXlarge;
 }
 
 final class ComponentFieldContentGapTokens {
@@ -901,6 +992,20 @@ final class ComponentFieldContentGapTokens {
   _i1.Rem get xlarge => spacing.field.contentGap;
 }
 
+final class ComponentFieldCompactContentGapTokens {
+  const ComponentFieldCompactContentGapTokens();
+
+  _i1.Rem get xsmall => spacing.field.compactContentGap;
+
+  _i1.Rem get small => spacing.field.compactContentGap;
+
+  _i1.Rem get medium => spacing.field.compactContentGap;
+
+  _i1.Rem get large => spacing.field.compactContentGap;
+
+  _i1.Rem get xlarge => spacing.field.compactContentGap;
+}
+
 final class ComponentFieldLabelGapTokens {
   const ComponentFieldLabelGapTokens();
 
@@ -913,6 +1018,20 @@ final class ComponentFieldLabelGapTokens {
   _i1.Rem get large => spacing.field.labelGap;
 
   _i1.Rem get xlarge => spacing.field.labelGap;
+}
+
+final class ComponentFieldCompactLabelGapTokens {
+  const ComponentFieldCompactLabelGapTokens();
+
+  _i1.Rem get xsmall => spacing.field.compactLabelGap;
+
+  _i1.Rem get small => spacing.field.compactLabelGap;
+
+  _i1.Rem get medium => spacing.field.compactLabelGap;
+
+  _i1.Rem get large => spacing.field.compactLabelGap;
+
+  _i1.Rem get xlarge => spacing.field.compactLabelGap;
 }
 
 final class ComponentFieldSupportingGapTokens {
@@ -929,6 +1048,20 @@ final class ComponentFieldSupportingGapTokens {
   _i1.Rem get xlarge => spacing.field.supportingGap;
 }
 
+final class ComponentFieldCompactSupportingGapTokens {
+  const ComponentFieldCompactSupportingGapTokens();
+
+  _i1.Rem get xsmall => spacing.field.compactSupportingGap;
+
+  _i1.Rem get small => spacing.field.compactSupportingGap;
+
+  _i1.Rem get medium => spacing.field.compactSupportingGap;
+
+  _i1.Rem get large => spacing.field.compactSupportingGap;
+
+  _i1.Rem get xlarge => spacing.field.compactSupportingGap;
+}
+
 final class ComponentFieldScrollPaddingTokens {
   const ComponentFieldScrollPaddingTokens();
 
@@ -941,6 +1074,20 @@ final class ComponentFieldScrollPaddingTokens {
   _i1.Rem get large => spacing.field.scrollPadding;
 
   _i1.Rem get xlarge => spacing.field.scrollPadding;
+}
+
+final class ComponentFieldCompactScrollPaddingTokens {
+  const ComponentFieldCompactScrollPaddingTokens();
+
+  _i1.Rem get xsmall => spacing.field.compactScrollPadding;
+
+  _i1.Rem get small => spacing.field.compactScrollPadding;
+
+  _i1.Rem get medium => spacing.field.compactScrollPadding;
+
+  _i1.Rem get large => spacing.field.compactScrollPadding;
+
+  _i1.Rem get xlarge => spacing.field.compactScrollPadding;
 }
 
 final class ComponentFieldIconTokens {
@@ -1093,20 +1240,38 @@ final class ComponentFieldTokens {
   final ComponentFieldHorizontalPaddingTokens horizontalPadding =
       const ComponentFieldHorizontalPaddingTokens();
 
+  final ComponentFieldCompactHorizontalPaddingTokens compactHorizontalPadding =
+      const ComponentFieldCompactHorizontalPaddingTokens();
+
   final ComponentFieldVerticalPaddingTokens verticalPadding =
       const ComponentFieldVerticalPaddingTokens();
+
+  final ComponentFieldCompactVerticalPaddingTokens compactVerticalPadding =
+      const ComponentFieldCompactVerticalPaddingTokens();
 
   final ComponentFieldContentGapTokens contentGap =
       const ComponentFieldContentGapTokens();
 
+  final ComponentFieldCompactContentGapTokens compactContentGap =
+      const ComponentFieldCompactContentGapTokens();
+
   final ComponentFieldLabelGapTokens labelGap =
       const ComponentFieldLabelGapTokens();
+
+  final ComponentFieldCompactLabelGapTokens compactLabelGap =
+      const ComponentFieldCompactLabelGapTokens();
 
   final ComponentFieldSupportingGapTokens supportingGap =
       const ComponentFieldSupportingGapTokens();
 
+  final ComponentFieldCompactSupportingGapTokens compactSupportingGap =
+      const ComponentFieldCompactSupportingGapTokens();
+
   final ComponentFieldScrollPaddingTokens scrollPadding =
       const ComponentFieldScrollPaddingTokens();
+
+  final ComponentFieldCompactScrollPaddingTokens compactScrollPadding =
+      const ComponentFieldCompactScrollPaddingTokens();
 
   final ComponentFieldIconTokens icon = const ComponentFieldIconTokens();
 
@@ -1140,6 +1305,20 @@ final class ComponentSelectionLabelGapTokens {
   _i1.Rem get xlarge => spacing.selection.labelGap;
 }
 
+final class ComponentSelectionCompactLabelGapTokens {
+  const ComponentSelectionCompactLabelGapTokens();
+
+  _i1.Rem get xsmall => spacing.selection.compactLabelGap;
+
+  _i1.Rem get small => spacing.selection.compactLabelGap;
+
+  _i1.Rem get medium => spacing.selection.compactLabelGap;
+
+  _i1.Rem get large => spacing.selection.compactLabelGap;
+
+  _i1.Rem get xlarge => spacing.selection.compactLabelGap;
+}
+
 final class ComponentSelectionSupportingGapTokens {
   const ComponentSelectionSupportingGapTokens();
 
@@ -1152,6 +1331,20 @@ final class ComponentSelectionSupportingGapTokens {
   _i1.Rem get large => spacing.selection.supportingGap;
 
   _i1.Rem get xlarge => spacing.selection.supportingGap;
+}
+
+final class ComponentSelectionCompactSupportingGapTokens {
+  const ComponentSelectionCompactSupportingGapTokens();
+
+  _i1.Rem get xsmall => spacing.selection.compactSupportingGap;
+
+  _i1.Rem get small => spacing.selection.compactSupportingGap;
+
+  _i1.Rem get medium => spacing.selection.compactSupportingGap;
+
+  _i1.Rem get large => spacing.selection.compactSupportingGap;
+
+  _i1.Rem get xlarge => spacing.selection.compactSupportingGap;
 }
 
 final class ComponentSelectionLabelFontSizeTokens {
@@ -1409,8 +1602,14 @@ final class ComponentSelectionTokens {
   final ComponentSelectionLabelGapTokens labelGap =
       const ComponentSelectionLabelGapTokens();
 
+  final ComponentSelectionCompactLabelGapTokens compactLabelGap =
+      const ComponentSelectionCompactLabelGapTokens();
+
   final ComponentSelectionSupportingGapTokens supportingGap =
       const ComponentSelectionSupportingGapTokens();
+
+  final ComponentSelectionCompactSupportingGapTokens compactSupportingGap =
+      const ComponentSelectionCompactSupportingGapTokens();
 
   final ComponentSelectionLabelFontTokens labelFont =
       const ComponentSelectionLabelFontTokens();
@@ -1435,6 +1634,10 @@ final class ComponentStatusTokens {
 
   _i1.Rem get verticalPadding => spacing.status.vertical;
 
+  _i1.Rem get compactHorizontalPadding => spacing.status.compactHorizontal;
+
+  _i1.Rem get compactVerticalPadding => spacing.status.compactVertical;
+
   _i1.Rem get radius => shape.circular;
 
   _i1.Rem get roundedRadius => shape.rounded;
@@ -1458,6 +1661,14 @@ final class ComponentMenuTokens {
   _i1.Rem get itemVerticalPadding => spacing.overlay.menuItemVertical;
 
   _i1.Rem get itemGap => spacing.overlay.menuItemGap;
+
+  _i1.Rem get compactItemHorizontalPadding =>
+      spacing.overlay.compactMenuItemHorizontal;
+
+  _i1.Rem get compactItemVerticalPadding =>
+      spacing.overlay.compactMenuItemVertical;
+
+  _i1.Rem get compactItemGap => spacing.overlay.compactMenuItemGap;
 
   _i1.Rem get itemRadius => shape.roundedSmall;
 
@@ -1550,6 +1761,14 @@ final class ComponentTableTokens {
   _i1.Rem get cellGap => spacing.table.cellGap;
 
   _i1.Rem get stateGap => spacing.table.stateGap;
+
+  _i1.Rem get compactHorizontalPadding => spacing.table.compactHorizontal;
+
+  _i1.Rem get compactVerticalPadding => spacing.table.compactVertical;
+
+  _i1.Rem get compactCellGap => spacing.table.compactCellGap;
+
+  _i1.Rem get compactStateGap => spacing.table.compactStateGap;
 
   _i1.Rem get surfaceRadius => shape.rounded;
 
