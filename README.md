@@ -12,14 +12,27 @@ Carpenter is pre-1.0. The public API is usable, but still evolving as production
 
 ```yaml
 dependencies:
-  carpenter: ^0.1.2
+  carpenter: ^0.1.8
 ```
 
-Then use the main barrel for components, units, navigation types, and bundled icons:
+The umbrella import remains supported and is the simplest option for application code that uses Carpenter across layers:
 
 ```dart
 import 'package:carpenter/carpenter.dart';
 ```
+
+For packages or features that want a smaller intentional dependency surface, Carpenter also exposes layered entrypoints:
+
+```dart
+import 'package:carpenter/foundation.dart';   // roles, theme, units, adaptive primitives
+import 'package:carpenter/components.dart';   // + basic controls and behaviours
+import 'package:carpenter/collections.dart';  // + collection contracts and views
+import 'package:carpenter/layout.dart';       // + shells, regions and page layout
+import 'package:carpenter/patterns.dart';     // + page infrastructure and business patterns
+import 'package:carpenter/application.dart';  // + runtime, commands, hotkeys and navigation
+```
+
+Each higher entrypoint includes the public layers below it, so prefer the lowest layer that owns the concepts a package actually needs. `application.dart` keeps the application-level `yx_navigation` integration; lower UI entrypoints do not expose it accidentally. The existing `carpenter.dart` barrel remains source-compatible.
 
 ## What is included
 
@@ -85,7 +98,7 @@ dart analyze lib
 flutter test
 ```
 
-The repository CI also builds the Widgetbook and example web applications and audits the `rem` migration invariants.
+The repository CI also builds the Widgetbook and example web applications and verifies formatting, analysis, and all non-golden package tests.
 
 ## License
 
