@@ -5,6 +5,21 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/harness.dart';
 
 void main() {
+  test('action columns use the semantic action-lane width policy', () {
+    final column = CarpenterTableColumn<_Row>.actions(
+      id: 'actions',
+      header: 'Actions',
+      actions: (_) => const [],
+    );
+
+    expect(
+      column.width.policy,
+      CarpenterTableColumnWidthPolicy.actionLane,
+    );
+    expect(column.width.flex, 0);
+    expect(column.resizable, isFalse);
+  });
+
   testWidgets('resizable columns work without a width callback', (
     tester,
   ) async {
