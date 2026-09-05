@@ -104,6 +104,8 @@ final class CarpenterActionDescriptor {
     this.semanticLabel,
     this.colorRole = ActionColorRole.neutral,
     this.shortcut,
+    this.visible = true,
+    this.disabledReason,
   });
 
   final String id;
@@ -112,6 +114,16 @@ final class CarpenterActionDescriptor {
   final String? semanticLabel;
   final ActionColorRole colorRole;
   final ShortcutActivator? shortcut;
+
+  /// Logical visibility independent of how a surface presents this action.
+  final bool visible;
+
+  /// Optional application reason for an unavailable action.
+  ///
+  /// Surfaces may expose this through accessibility or explanatory UI without
+  /// treating it as presentation configuration on the descriptor itself.
+  final String? disabledReason;
+
   final VoidCallback? onInvoke;
 
   bool get isEnabled => onInvoke != null;

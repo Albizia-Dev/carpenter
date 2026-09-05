@@ -19,7 +19,9 @@ final class CarpenterIconButton extends StatelessWidget {
     this.executionPhase = ActionExecutionPhase.idle,
     this.focusNode,
     this.autofocus = false,
-  }) : assert(
+  }) : _visible = true,
+       _semanticHint = null,
+       assert(
          onPressed == null || onInvoke == null,
          'Use either onPressed or the compatibility onInvoke callback, not both.',
        );
@@ -38,7 +40,9 @@ final class CarpenterIconButton extends StatelessWidget {
        semanticLabel = action.effectiveSemanticLabel,
        onPressed = action.onInvoke,
        onInvoke = null,
-       colorRole = action.colorRole;
+       colorRole = action.colorRole,
+       _visible = action.visible,
+       _semanticHint = action.disabledReason;
 
   final CarpenterIconSource icon;
   final String semanticLabel;
@@ -53,13 +57,17 @@ final class CarpenterIconButton extends StatelessWidget {
   final ActionExecutionPhase executionPhase;
   final FocusNode? focusNode;
   final bool autofocus;
+  final bool _visible;
+  final String? _semanticHint;
 
   VoidCallback? get _effectiveOnPressed => onPressed ?? onInvoke;
 
   @override
   Widget build(BuildContext context) {
+    if (!_visible) return const SizedBox.shrink();
     return ActionControl(
       semanticLabel: semanticLabel,
+      semanticHint: _semanticHint,
       onInvoke: _effectiveOnPressed,
       colorRole: colorRole,
       prominence: prominence,

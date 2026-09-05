@@ -20,12 +20,22 @@ void main() {
         id: 'delete',
         label: 'Delete',
         onInvoke: null,
+        disabledReason: 'Not allowed',
+      );
+      const hidden = CarpenterActionDescriptor(
+        id: 'internal',
+        label: 'Internal',
+        onInvoke: null,
+        visible: false,
       );
 
       expect(enabled.isEnabled, isTrue);
+      expect(enabled.visible, isTrue);
       expect(enabled.effectiveSemanticLabel, 'Save document');
       expect(disabled.isEnabled, isFalse);
+      expect(disabled.disabledReason, 'Not allowed');
       expect(disabled.effectiveSemanticLabel, 'Delete');
+      expect(hidden.visible, isFalse);
     },
   );
 }

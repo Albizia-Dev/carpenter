@@ -22,15 +22,17 @@ final class CarpenterMenu extends StatelessWidget {
   Widget build(BuildContext context) => MenuPanel(
     entries: [
       for (final item in items)
-        MenuPanelEntry(
-          id: item.effectiveId,
-          label: item.action.label,
-          semanticLabel: item.action.effectiveSemanticLabel,
-          icon: item.action.icon,
-          enabled: item.action.isEnabled,
-          selected: item.selected,
-          onActivate: item.action.onInvoke,
-        ),
+        if (item.action.visible)
+          MenuPanelEntry(
+            id: item.effectiveId,
+            label: item.action.label,
+            semanticLabel: item.action.effectiveSemanticLabel,
+            semanticHint: item.action.disabledReason,
+            icon: item.action.icon,
+            enabled: item.action.isEnabled,
+            selected: item.selected,
+            onActivate: item.action.onInvoke,
+          ),
     ],
     onDismissRequested: onDismissRequested,
     autofocus: autofocus,

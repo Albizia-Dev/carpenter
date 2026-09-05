@@ -128,19 +128,21 @@ final class CarpenterActionStrip extends StatelessWidget {
     final overflowWidth = context.units(theme.sizes.actionHeight(overflowSize));
     final entries = [
       for (final item in items)
-        ActionOverflowEntry(
-          value: item,
-          group: switch (item.group) {
-            CarpenterActionStripGroup.primary => ActionOverflowGroup.primary,
-            CarpenterActionStripGroup.secondary =>
-              ActionOverflowGroup.secondary,
-            CarpenterActionStripGroup.overflow => ActionOverflowGroup.overflow,
-          },
-          expandedWidth: _itemWidth(context, item),
-          iconWidth: item.action.icon == null
-              ? null
-              : context.units(theme.sizes.actionHeight(item.size)),
-        ),
+        if (item.action.visible)
+          ActionOverflowEntry(
+            value: item,
+            group: switch (item.group) {
+              CarpenterActionStripGroup.primary => ActionOverflowGroup.primary,
+              CarpenterActionStripGroup.secondary =>
+                ActionOverflowGroup.secondary,
+              CarpenterActionStripGroup.overflow =>
+                ActionOverflowGroup.overflow,
+            },
+            expandedWidth: _itemWidth(context, item),
+            iconWidth: item.action.icon == null
+                ? null
+                : context.units(theme.sizes.actionHeight(item.size)),
+          ),
     ];
     final resolution = const ActionOverflowResolver<CarpenterActionStripItem>()
         .resolve(

@@ -23,7 +23,9 @@ final class CarpenterButton extends StatelessWidget {
     this.focusNode,
     this.autofocus = false,
     this.semanticLabel,
-  }) : assert(
+  }) : _visible = true,
+       _semanticHint = null,
+       assert(
          onPressed == null || onInvoke == null,
          'Use either onPressed or the compatibility onInvoke callback, not both.',
        );
@@ -43,6 +45,8 @@ final class CarpenterButton extends StatelessWidget {
     this.autofocus = false,
     this.semanticLabel,
   }) : prominence = ActionProminence.filled,
+       _visible = true,
+       _semanticHint = null,
        assert(
          onPressed == null || onInvoke == null,
          'Use either onPressed or the compatibility onInvoke callback, not both.',
@@ -63,6 +67,8 @@ final class CarpenterButton extends StatelessWidget {
     this.autofocus = false,
     this.semanticLabel,
   }) : prominence = ActionProminence.outlined,
+       _visible = true,
+       _semanticHint = null,
        assert(
          onPressed == null || onInvoke == null,
          'Use either onPressed or the compatibility onInvoke callback, not both.',
@@ -83,6 +89,8 @@ final class CarpenterButton extends StatelessWidget {
     this.autofocus = false,
     this.semanticLabel,
   }) : prominence = ActionProminence.ghost,
+       _visible = true,
+       _semanticHint = null,
        assert(
          onPressed == null || onInvoke == null,
          'Use either onPressed or the compatibility onInvoke callback, not both.',
@@ -103,7 +111,9 @@ final class CarpenterButton extends StatelessWidget {
        onInvoke = null,
        icon = action.icon,
        semanticLabel = action.semanticLabel,
-       colorRole = action.colorRole;
+       colorRole = action.colorRole,
+       _visible = action.visible,
+       _semanticHint = action.disabledReason;
 
   final String label;
   final VoidCallback? onPressed;
@@ -120,13 +130,17 @@ final class CarpenterButton extends StatelessWidget {
   final FocusNode? focusNode;
   final bool autofocus;
   final String? semanticLabel;
+  final bool _visible;
+  final String? _semanticHint;
 
   VoidCallback? get _effectiveOnPressed => onPressed ?? onInvoke;
 
   @override
   Widget build(BuildContext context) {
+    if (!_visible) return const SizedBox.shrink();
     return ActionControl(
       semanticLabel: semanticLabel ?? label,
+      semanticHint: _semanticHint,
       onInvoke: _effectiveOnPressed,
       colorRole: colorRole,
       prominence: prominence,

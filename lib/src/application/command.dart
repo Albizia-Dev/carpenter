@@ -106,8 +106,9 @@ extension CarpenterCommandActionProjection<I> on CarpenterCommand<I> {
     ShortcutActivator? shortcut,
   }) {
     final current = state.value;
+    final visible = current.visibility == CarpenterCommandVisibility.visible;
     final available =
-        current.visibility == CarpenterCommandVisibility.visible &&
+        visible &&
         current.enabled &&
         current.execution != CarpenterCommandExecution.executing;
     return CarpenterActionDescriptor(
@@ -117,6 +118,8 @@ extension CarpenterCommandActionProjection<I> on CarpenterCommand<I> {
       icon: icon,
       colorRole: colorRole ?? _commandColorRole(presentation),
       shortcut: shortcut ?? (shortcuts.isEmpty ? null : shortcuts.first),
+      visible: visible,
+      disabledReason: available ? null : current.disabledReason,
       onInvoke: available
           ? () {
               unawaited(execute(input));
