@@ -12,9 +12,6 @@ concurrency:
   group: build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: write
-
 jobs:
   web:
     name: Verify package and build web examples
@@ -23,8 +20,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -34,124 +29,6 @@ jobs:
 
       - name: Install package dependencies
         run: flutter pub get
-
-      - name: Apply column API migration
-        shell: bash
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-
-          tree = Path('lib/src/components/collections/tree/tree_table.dart')
-          text = tree.read_text()
-
-          old_ctor = """@immutable
-          final class CarpenterTreeTableColumn<T> {
-            const CarpenterTreeTableColumn({
-              required this.id,
-              required this.header,
-              required this.cellBuilder,
-              @Deprecated(
-                'Use width: CarpenterTableColumnWidth.flexible(flex: ...) instead.',
-              )
-              this.flex = 1,
-              this.width,
-              this.alignment = CarpenterTableColumnAlignment.start,
-              this.verticalAlignment = CarpenterTableColumnVerticalAlignment.center,
-              this.resizable = true,
-              this.semanticLabel,
-            }) : assert(flex > 0);
-          """
-          new_ctor = """@immutable
-          final class CarpenterTreeTableColumn<T> {
-            @Deprecated(
-              'Use CarpenterTreeTableColumn.custom(...) with an explicit width contract.',
-            )
-            const CarpenterTreeTableColumn({
-              required this.id,
-              required this.header,
-              required this.cellBuilder,
-              @Deprecated(
-                'Use width: CarpenterTableColumnWidth.flexible(flex: ...) instead.',
-              )
-              this.flex = 1,
-              this.width,
-              this.alignment = CarpenterTableColumnAlignment.start,
-              this.verticalAlignment = CarpenterTableColumnVerticalAlignment.center,
-              this.resizable = true,
-              this.semanticLabel,
-            }) : assert(flex > 0);
-
-            const CarpenterTreeTableColumn.custom({
-              required this.id,
-              required this.header,
-              required this.cellBuilder,
-              this.width = const CarpenterTableColumnWidth.flexible(),
-              this.alignment = CarpenterTableColumnAlignment.start,
-              this.verticalAlignment = CarpenterTableColumnVerticalAlignment.center,
-              this.resizable = true,
-              this.semanticLabel,
-            }) : flex = 1;
-          """
-          if old_ctor in text:
-              text = text.replace(old_ctor, new_ctor, 1)
-          text = text.replace(") => CarpenterTreeTableColumn<T>(\n", ") => CarpenterTreeTableColumn<T>.custom(\n")
-          tree.write_text(text)
-
-          table = Path('lib/src/components/collections/table/table_column.dart')
-          text = table.read_text()
-          text = text.replace("    isActionColumn: true,\n", "")
-          table.write_text(text)
-
-          test = Path('test/collections/tree_table_layout_test.dart')
-          text = test.read_text()
-          marker = "void main() {\n"
-          addition = """void main() {
-            test('tree custom columns use the same explicit width contract as tables', () {
-              final column = CarpenterTreeTableColumn<String>.custom(
-                id: 'value',
-                header: 'Value',
-                cellBuilder: (_, node) => Text(node.label),
-              );
-
-              expect(column.width, isNotNull);
-              expect(column.effectiveWidth.policy, CarpenterTableColumnWidthPolicy.flexible);
-              expect(column.effectiveWidth.flex, 1);
-            });
-
-            test('legacy tree flex still resolves through the compatibility path', () {
-              const column = CarpenterTreeTableColumn<String>(
-                id: 'legacy',
-                header: 'Legacy',
-                flex: 3,
-                cellBuilder: _legacyTreeCell,
-              );
-
-              expect(column.width, isNull);
-              expect(column.effectiveWidth.policy, CarpenterTableColumnWidthPolicy.flexible);
-              expect(column.effectiveWidth.flex, 3);
-            });
-          """
-          if "tree custom columns use the same explicit width contract as tables" not in text:
-              text = text.replace(marker, addition, 1)
-              text += "\nWidget _legacyTreeCell(BuildContext context, CarpenterTreeNode<String> node) =>\n    Text(node.label);\n"
-          test.write_text(text)
-          PY
-
-          dart format lib/src/components/collections/tree/tree_table.dart \
-            lib/src/components/collections/table/table_column.dart \
-            test/collections/tree_table_layout_test.dart
-
-      - name: Commit column API migration
-        shell: bash
-        run: |
-          if git diff --quiet -- lib/src/components/collections/tree/tree_table.dart lib/src/components/collections/table/table_column.dart test/collections/tree_table_layout_test.dart; then
-            exit 0
-          fi
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add lib/src/components/collections/tree/tree_table.dart lib/src/components/collections/table/table_column.dart test/collections/tree_table_layout_test.dart
-          git commit -m "refactor: unify tree table column API"
-          git push origin HEAD:${{ github.head_ref }}
 
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib test
