@@ -27,17 +27,17 @@ void main() {
   });
 
   test('command projection reflects current availability', () {
-    final command = CarpenterCommandController<void>(
+    final command = CarpenterCommandController<int>(
       id: 'archive',
       title: 'Archive',
       presentation: CarpenterCommandPresentation.danger,
     );
     addTearDown(command.dispose);
 
-    expect(command.toAction(null).colorRole, ActionColorRole.danger);
-    expect(command.toAction(null).isEnabled, isTrue);
+    expect(command.toAction(1).colorRole, ActionColorRole.danger);
+    expect(command.toAction(1).isEnabled, isTrue);
 
     command.setAvailability(enabled: false, disabledReason: 'Not allowed');
-    expect(command.toAction(null).isEnabled, isFalse);
+    expect(command.toAction(1).isEnabled, isFalse);
   });
 }
