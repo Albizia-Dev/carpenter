@@ -91,6 +91,48 @@ abstract interface class CarpenterCommand<I> {
   Future<CarpenterCommandResult> execute(I input);
 }
 
+/// Projects an executable application command into Carpenter's shared action
+/// language. The returned descriptor is a snapshot of the command state; build
+/// it inside a listener when the presentation must react to availability or
+/// execution changes.
+extension CarpenterCommandActionProjection<I> on CarpenterCommand<I> {
+  CarpenterActionDescriptor toAction(
+    I input, {
+    String? label,
+    String? semanticLabel,
+    CarpenterIconSource? icon,
+    ActionColorRole? colorRole,
+    ShortcutActivator? shortcut,
+  }) {
+    final current = state.value;
+    final available =
+        current.visibility == CarpenterCommandVisibility.visible &&
+        current.enabled &&
+        current.execution != CarpenterCommandExecution.executing;
+    return CarpenterActionDescriptor(
+      id: id,
+      label: label ?? title,
+      semanticLabel: semanticLabel,
+      icon: icon,
+      colorRole: colorRole ?? _commandColorRole(presentation),
+      shortcut: shortcut ?? (shortcuts.isEmpty ? null : shortcuts.first),
+      onInvoke: available
+          ? () {
+              unawaited(execute(input));
+            }
+          : null,
+    );
+  }
+}
+
+ActionColorRole _commandColorRole(CarpenterCommandPresentation presentation) =>
+    switch (presentation) {
+      CarpenterCommandPresentation.danger => ActionColorRole.danger,
+      CarpenterCommandPresentation.primary => ActionColorRole.primary,
+      CarpenterCommandPresentation.secondary ||
+      CarpenterCommandPresentation.automatic => ActionColorRole.neutral,
+    };
+
 final class CarpenterCommandController<I>
     extends ValueNotifier<CarpenterCommandState>
     implements CarpenterCommand<I> {
@@ -244,8 +286,9 @@ final class CarpenterCommandShortcutScope extends StatelessWidget {
     for (final binding in bindings) {
       final state = binding.command.state.value;
       if (!state.enabled ||
-          state.visibility == CarpenterCommandVisibility.hidden)
+          state.visibility == CarpenterCommandVisibility.hidden) {
         continue;
+      }
       for (final activator in binding.shortcuts ?? binding.command.shortcuts) {
         shortcuts[activator] = _CarpenterCommandIntent(() async {
           await binding.command.execute(binding.input);
@@ -277,30 +320,23 @@ final class CarpenterCommandButton<I> extends StatelessWidget {
       ValueListenableBuilder<CarpenterCommandState>(
         valueListenable: command.state,
         builder: (context, state, _) {
-          if (state.visibility == CarpenterCommandVisibility.hidden)
+          if (state.visibility == CarpenterCommandVisibility.hidden) {
             return const SizedBox.shrink();
+          }
           final presentation = command.presentation;
-          return CarpenterButton(
-            label: state.execution == CarpenterCommandExecution.executing
-                ? '${command.title}…'
-                : command.title,
-            onInvoke:
-                state.enabled &&
-                    state.execution != CarpenterCommandExecution.executing
-                ? () => command.execute(input)
-                : null,
-            colorRole: presentation == CarpenterCommandPresentation.danger
-                ? ActionColorRole.danger
-                : ActionColorRole.primary,
+          return CarpenterButton.fromAction(
+            command.toAction(
+              input,
+              label: state.execution == CarpenterCommandExecution.executing
+                  ? '${command.title}…'
+                  : command.title,
+            ),
             prominence: presentation == CarpenterCommandPresentation.primary
                 ? ActionProminence.high
-                : presentation == CarpenterCommandPresentation.danger
-                ? ActionProminence.outlined
                 : ActionProminence.outlined,
             executionPhase: switch (state.execution) {
               CarpenterCommandExecution.idle => ActionExecutionPhase.idle,
-              CarpenterCommandExecution.executing =>
-                ActionExecutionPhase.running,
+              CarpenterCommandExecution.executing => ActionExecutionPhase.running,
               CarpenterCommandExecution.failed => ActionExecutionPhase.failed,
             },
           );
