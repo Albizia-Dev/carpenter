@@ -84,6 +84,7 @@ final class CarpenterTreeView<T> extends StatefulWidget {
     this.rowBuilder,
     this.iconBuilder,
     this.tableRows = false,
+    this.tableRowContentPadding = true,
     this.actions,
     this.dragActivation = CarpenterDragActivation.immediate,
     this.autoExpandOnHover = true,
@@ -108,6 +109,7 @@ final class CarpenterTreeView<T> extends StatefulWidget {
   final CarpenterTreeRowBuilder<T>? rowBuilder;
   final CarpenterTreeIconBuilder<T>? iconBuilder;
   final bool tableRows;
+  final bool tableRowContentPadding;
   final CarpenterTreeActionsBuilder<T>? actions;
   final CarpenterDragActivation dragActivation;
   final bool autoExpandOnHover;
@@ -417,6 +419,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
       );
       final row = widget.tableRows
           ? CarpenterListTile.tableRow(
+              contentPadding: widget.tableRowContentPadding,
               selected: state.selected,
               semanticLabel: node.effectiveSemanticLabel,
               onInvoke: () => _select(node),
