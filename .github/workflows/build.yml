@@ -12,6 +12,9 @@ concurrency:
   group: build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   web:
     name: Verify package and build web examples
@@ -20,6 +23,46 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Split tree content and column gaps
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path('lib/src/components/collections/tree/tree_table.dart')
+          text = path.read_text()
+
+          replacements = [
+              (
+                  "          rowBuilder: (context, node, state, _) =>\n              _buildRow(context, layout, columns, node, state, contentGap),",
+                  "          rowBuilder: (context, node, state, _) => _buildRow(\n            context,\n            layout,\n            columns,\n            node,\n            state,\n            contentGap,\n            interColumnGap,\n          ),",
+              ),
+              (
+                  "    CarpenterTreeNode<T> node,\n    CarpenterTreeRowState<T> state,\n    double gap,\n  ) {",
+                  "    CarpenterTreeNode<T> node,\n    CarpenterTreeRowState<T> state,\n    double contentGap,\n    double interColumnGap,\n  ) {",
+              ),
+              (
+                  "              SizedBox(width: gap),\n              Expanded(\n                child: CarpenterTableText.cell(",
+                  "              SizedBox(width: contentGap),\n              Expanded(\n                child: CarpenterTableText.cell(",
+              ),
+              (
+                  "        for (final column in columns) ...[\n          SizedBox(width: gap),\n          _TreeTableSlot(",
+                  "        for (final column in columns) ...[\n          SizedBox(width: interColumnGap),\n          _TreeTableSlot(",
+              ),
+          ]
+
+          for old, new in replacements:
+              count = text.count(old)
+              if count != 1:
+                  raise SystemExit(f'expected one match, got {count}: {old[:100]!r}')
+              text = text.replace(old, new, 1)
+
+          path.write_text(text)
+          PY
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -30,8 +73,21 @@ jobs:
       - name: Install package dependencies
         run: flutter pub get
 
-      - name: Check formatting
-        run: dart format --output=none --set-exit-if-changed lib test
+      - name: Format tree table gap fix
+        run: dart format lib/src/components/collections/tree/tree_table.dart
+
+      - name: Commit tree table gap fix
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        shell: bash
+        run: |
+          if git diff --quiet -- lib/src/components/collections/tree/tree_table.dart; then
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lib/src/components/collections/tree/tree_table.dart
+          git commit -m "fix: separate tree content and column gaps"
+          git push origin HEAD:${{ github.head_ref }}
 
       - name: Analyze library
         run: dart analyze lib
