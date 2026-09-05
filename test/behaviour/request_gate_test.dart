@@ -33,23 +33,26 @@ void main() {
     },
   );
 
-  test('explicit cancellation invalidates but does not dispose active work', () {
-    final gate = CarpenterRequestGate<_Cancellation>(
-      createCancellation: _Cancellation.new,
-    );
-    addTearDown(gate.dispose);
-    final lease = gate.begin();
+  test(
+    'explicit cancellation invalidates but does not dispose active work',
+    () {
+      final gate = CarpenterRequestGate<_Cancellation>(
+        createCancellation: _Cancellation.new,
+      );
+      addTearDown(gate.dispose);
+      final lease = gate.begin();
 
-    gate.cancel();
+      gate.cancel();
 
-    expect(lease.cancellation.isCancelled, isTrue);
-    expect(lease.cancellation.disposed, isFalse);
-    expect(gate.isCurrent(lease), isFalse);
-    expect(gate.active, isNull);
+      expect(lease.cancellation.isCancelled, isTrue);
+      expect(lease.cancellation.disposed, isFalse);
+      expect(gate.isCurrent(lease), isFalse);
+      expect(gate.active, isNull);
 
-    gate.finish(lease);
-    expect(lease.cancellation.disposed, isTrue);
-  });
+      gate.finish(lease);
+      expect(lease.cancellation.disposed, isTrue);
+    },
+  );
 }
 
 final class _Cancellation extends CarpenterCancellationSignal {
