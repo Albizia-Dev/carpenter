@@ -12,9 +12,6 @@ concurrency:
   group: build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: write
-
 jobs:
   web:
     name: Verify package and build web examples
@@ -23,40 +20,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Finish table metric cleanup
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        shell: bash
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-
-          path = Path('lib/src/components/collections/table/table.dart')
-          text = path.read_text()
-
-          replacements = [
-              (
-                  "  Widget build(BuildContext context) {\n    final theme = CarpenterTheme.of(context);\n    final metrics = CarpenterTableMetrics.resolve(context);\n    return Center(\n      child: Padding(\n        padding: EdgeInsets.all(metrics.horizontalPadding),",
-                  "  Widget build(BuildContext context) {\n    final metrics = CarpenterTableMetrics.resolve(context);\n    return Center(\n      child: Padding(\n        padding: EdgeInsets.all(metrics.horizontalPadding),",
-              ),
-              (
-                  "                    color: theme.overlay.border,\n                    width: context.units(theme.shapes.tableBorderWidth),",
-                  "                    color: theme.overlay.border,\n                    width: metrics.borderWidth,",
-              ),
-          ]
-
-          for old, new in replacements:
-              if old in text:
-                  if text.count(old) != 1:
-                      raise SystemExit(f'expected one old match, got {text.count(old)}')
-                  text = text.replace(old, new, 1)
-              elif new not in text:
-                  raise SystemExit(f'neither old nor new form found: {old[:80]!r}')
-
-          path.write_text(text)
-          PY
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -67,21 +30,8 @@ jobs:
       - name: Install package dependencies
         run: flutter pub get
 
-      - name: Format table cleanup
-        run: dart format lib/src/components/collections/table/table.dart
-
-      - name: Commit table metric cleanup
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        shell: bash
-        run: |
-          if git diff --quiet -- lib/src/components/collections/table/table.dart; then
-            exit 0
-          fi
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git add lib/src/components/collections/table/table.dart
-          git commit -m "refactor: finish table metric cleanup"
-          git push origin HEAD:${{ github.head_ref }}
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed lib test
 
       - name: Analyze library
         run: dart analyze lib
