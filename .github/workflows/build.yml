@@ -1,27 +1,25 @@
 name: Build
 
 on:
+  push:
+    branches:
+      - develop
   pull_request:
     branches:
       - develop
-
-permissions:
-  contents: write
 
 concurrency:
   group: build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  format-request-lifecycle:
-    name: Format request lifecycle once
+  web:
+    name: Verify package and build web examples
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout PR branch
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -29,20 +27,35 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Format lifecycle controller
-        run: dart format lib/src/components/collections/contracts/collection_lifecycle_controller.dart
+      - name: Install package dependencies
+        run: flutter pub get
 
-      - name: Guard scope
+      - name: Check formatting
+        run: >-
+          dart format --output=none --set-exit-if-changed
+          lib test widgetbook/lib example/lib
+
+      - name: Analyze library
+        run: dart analyze lib
+
+      - name: Test package without goldens
         shell: bash
         run: |
-          changed="$(git diff --name-only)"
-          test "$changed" = "lib/src/components/collections/contracts/collection_lifecycle_controller.dart"
+          mapfile -t tests < <(find test -name '*_test.dart' -not -path 'test/goldens/*' -print | sort)
+          flutter test "${tests[@]}"
 
-      - name: Commit formatting
-        shell: bash
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add lib/src/components/collections/contracts/collection_lifecycle_controller.dart
-          git commit -m "style: format collection request lifecycle"
-          git push
+      - name: Install Widgetbook dependencies
+        working-directory: widgetbook
+        run: flutter pub get
+
+      - name: Build Widgetbook
+        working-directory: widgetbook
+        run: flutter build web --release --base-href /carpenter/
+
+      - name: Install example dependencies
+        working-directory: example
+        run: flutter pub get
+
+      - name: Build example
+        working-directory: example
+        run: flutter build web --release
