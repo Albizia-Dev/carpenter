@@ -125,8 +125,13 @@ final class CarpenterInvalidationRegistry {
     required Iterable<String> scopes,
     required CarpenterInvalidationHandler handler,
   }) {
-    final normalized = Set<String>.unmodifiable(scopes.where((scope) => scope.isNotEmpty));
-    assert(normalized.isNotEmpty, 'At least one invalidation scope is required.');
+    final normalized = Set<String>.unmodifiable(
+      scopes.where((scope) => scope.isNotEmpty),
+    );
+    assert(
+      normalized.isNotEmpty,
+      'At least one invalidation scope is required.',
+    );
     _targets[target] = _CarpenterInvalidationTarget(
       scopes: normalized,
       handler: handler,
@@ -159,8 +164,9 @@ final class CarpenterInvalidationRegistry {
   }
 
   void handle(CarpenterCommandExecutionEvent event) {
-    if (event case CarpenterCommandSucceeded(:final refreshScopes)
-        when refreshScopes.isNotEmpty) {
+    if (event case CarpenterCommandSucceeded(
+      :final refreshScopes,
+    ) when refreshScopes.isNotEmpty) {
       unawaited(invalidate(refreshScopes));
     }
   }
