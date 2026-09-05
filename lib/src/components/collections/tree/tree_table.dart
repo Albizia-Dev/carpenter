@@ -8,6 +8,7 @@ import '../../../internal/layout/grid_layout.dart';
 import '../../basic/button/icon_button.dart';
 import '../../basic/gravity_icons.g.dart';
 import '../../basic/icon.dart';
+import '../../basic/status_indicator.dart';
 import '../../behaviour/drag_and_drop/draggable.dart';
 import '../contracts/selection_mode.dart';
 import '../table/table_actions.dart';
@@ -28,6 +29,9 @@ final class CarpenterTreeTableColumn<T> {
     required this.id,
     required this.header,
     required this.cellBuilder,
+    @Deprecated(
+      'Use width: CarpenterTableColumnWidth.flexible(flex: ...) instead.',
+    )
     this.flex = 1,
     this.width,
     this.alignment = CarpenterTableColumnAlignment.start,
@@ -35,6 +39,93 @@ final class CarpenterTreeTableColumn<T> {
     this.resizable = true,
     this.semanticLabel,
   }) : assert(flex > 0);
+
+  factory CarpenterTreeTableColumn.text({
+    required String id,
+    required String header,
+    required String Function(CarpenterTreeNode<T> node) value,
+    CarpenterTableColumnAlignment alignment =
+        CarpenterTableColumnAlignment.start,
+    CarpenterTableColumnVerticalAlignment verticalAlignment =
+        CarpenterTableColumnVerticalAlignment.center,
+    CarpenterTableColumnWidth width =
+        const CarpenterTableColumnWidth.flexible(),
+    bool resizable = true,
+    String? semanticLabel,
+  }) => CarpenterTreeTableColumn<T>(
+    id: id,
+    header: header,
+    alignment: alignment,
+    verticalAlignment: verticalAlignment,
+    width: width,
+    resizable: resizable,
+    semanticLabel: semanticLabel,
+    cellBuilder: (context, node) => CarpenterTableText.cell(
+      value(node),
+      maxLines: 2,
+      overflow: TextOverflow.ellipsis,
+    ),
+  );
+
+  factory CarpenterTreeTableColumn.number({
+    required String id,
+    required String header,
+    required num? Function(CarpenterTreeNode<T> node) value,
+    String Function(num value)? formatter,
+    CarpenterTableColumnAlignment alignment = CarpenterTableColumnAlignment.end,
+    CarpenterTableColumnVerticalAlignment verticalAlignment =
+        CarpenterTableColumnVerticalAlignment.center,
+    CarpenterTableColumnWidth width =
+        const CarpenterTableColumnWidth.flexible(),
+    bool resizable = true,
+    String? semanticLabel,
+  }) => CarpenterTreeTableColumn<T>(
+    id: id,
+    header: header,
+    alignment: alignment,
+    verticalAlignment: verticalAlignment,
+    width: width,
+    resizable: resizable,
+    semanticLabel: semanticLabel,
+    cellBuilder: (context, node) {
+      final number = value(node);
+      return CarpenterTableText.cell(
+        number == null ? '' : formatter?.call(number) ?? '$number',
+        textAlign: switch (alignment) {
+          CarpenterTableColumnAlignment.start => TextAlign.start,
+          CarpenterTableColumnAlignment.center => TextAlign.center,
+          CarpenterTableColumnAlignment.end => TextAlign.end,
+        },
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
+      );
+    },
+  );
+
+  factory CarpenterTreeTableColumn.status({
+    required String id,
+    required String header,
+    required String Function(CarpenterTreeNode<T> node) label,
+    required FeedbackColorRole Function(CarpenterTreeNode<T> node) role,
+    CarpenterTableColumnAlignment alignment =
+        CarpenterTableColumnAlignment.start,
+    CarpenterTableColumnVerticalAlignment verticalAlignment =
+        CarpenterTableColumnVerticalAlignment.center,
+    CarpenterTableColumnWidth width =
+        const CarpenterTableColumnWidth.flexible(),
+    bool resizable = true,
+    String? semanticLabel,
+  }) => CarpenterTreeTableColumn<T>(
+    id: id,
+    header: header,
+    alignment: alignment,
+    verticalAlignment: verticalAlignment,
+    width: width,
+    resizable: resizable,
+    semanticLabel: semanticLabel,
+    cellBuilder: (context, node) =>
+        CarpenterStatusIndicator(label: label(node), role: role(node)),
+  );
 
   /// Creates a compact action column using the same action-lane semantics as a
   /// regular [CarpenterTable].
@@ -98,6 +189,9 @@ final class CarpenterTreeTable<T> extends StatefulWidget {
     this.controller,
     this.treeColumnId = 'tree',
     this.treeHeader = 'Name',
+    @Deprecated(
+      'Use treeWidth: CarpenterTableColumnWidth.flexible(flex: ...) instead.',
+    )
     this.treeFlex = 2,
     this.treeWidth,
     this.treeAlignment = CarpenterTableColumnAlignment.start,
