@@ -1,30 +1,25 @@
 name: Build
 
 on:
+  push:
+    branches:
+      - develop
   pull_request:
     branches:
       - develop
-
-permissions:
-  contents: write
 
 concurrency:
   group: build-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  migrate:
-    name: Apply field feedback migration
+  web:
+    name: Verify package and build web examples
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref }}
-
-      - name: Apply guarded wrapper migration
-        run: python3 .github/scripts/apply_field_feedback_wrappers.py
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -32,64 +27,35 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Install dependencies
+      - name: Install package dependencies
         run: flutter pub get
 
-      - name: Format changed files
+      - name: Check formatting
         run: >-
-          dart format
-          lib/src/components/basic/input/field_shell.dart
-          lib/src/internal/rendering/text_editing_field.dart
-          lib/src/internal/rendering/selectable_field.dart
-          lib/src/components/basic/input/input.dart
-          lib/src/components/basic/input/text_area.dart
-          lib/src/components/basic/select/select.dart
-          lib/src/components/basic/input/masked_input.dart
-          lib/src/components/basic/input/number_input.dart
-          lib/src/components/basic/input/date_input.dart
-          lib/src/components/basic/input/date_range_input.dart
-          lib/src/components/basic/input/time_input.dart
-          lib/src/components/basic/input/file_input.dart
-          test/basic/field_feedback_test.dart
-          widgetbook/lib/use_cases/basic/input.dart
+          dart format --output=none --set-exit-if-changed
+          lib test widgetbook/lib example/lib
 
-      - name: Discard dependency-tool side effects
-        run: git checkout -- analysis_options.yaml example/pubspec.lock
+      - name: Analyze library
+        run: dart analyze lib
 
-      - name: Guard migration scope
+      - name: Test package without goldens
         shell: bash
         run: |
-          allowed='^(lib/src/components/basic/input/field_shell.dart|lib/src/internal/rendering/text_editing_field.dart|lib/src/internal/rendering/selectable_field.dart|lib/src/components/basic/input/input.dart|lib/src/components/basic/input/text_area.dart|lib/src/components/basic/select/select.dart|lib/src/components/basic/input/masked_input.dart|lib/src/components/basic/input/number_input.dart|lib/src/components/basic/input/date_input.dart|lib/src/components/basic/input/date_range_input.dart|lib/src/components/basic/input/time_input.dart|lib/src/components/basic/input/file_input.dart|test/basic/field_feedback_test.dart|widgetbook/lib/use_cases/basic/input.dart)$'
-          unexpected=$(git status --short | awk '{print $2}' | grep -Ev "$allowed" || true)
-          if [ -n "$unexpected" ]; then
-            echo "Unexpected modified paths:"
-            echo "$unexpected"
-            exit 1
-          fi
-          git diff --check
+          mapfile -t tests < <(find test -name '*_test.dart' -not -path 'test/goldens/*' -print | sort)
+          flutter test "${tests[@]}"
 
-      - name: Commit migration and formatting
-        shell: bash
-        run: |
-          if git diff --quiet; then
-            echo 'No changes to commit'
-            exit 1
-          fi
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add lib/src/components/basic/input/field_shell.dart \
-                  lib/src/internal/rendering/text_editing_field.dart \
-                  lib/src/internal/rendering/selectable_field.dart \
-                  lib/src/components/basic/input/input.dart \
-                  lib/src/components/basic/input/text_area.dart \
-                  lib/src/components/basic/select/select.dart \
-                  lib/src/components/basic/input/masked_input.dart \
-                  lib/src/components/basic/input/number_input.dart \
-                  lib/src/components/basic/input/date_input.dart \
-                  lib/src/components/basic/input/date_range_input.dart \
-                  lib/src/components/basic/input/time_input.dart \
-                  lib/src/components/basic/input/file_input.dart \
-                  test/basic/field_feedback_test.dart \
-                  widgetbook/lib/use_cases/basic/input.dart
-          git commit -m 'refactor: add semantic field feedback'
-          git push origin HEAD:${{ github.head_ref }}
+      - name: Install Widgetbook dependencies
+        working-directory: widgetbook
+        run: flutter pub get
+
+      - name: Build Widgetbook
+        working-directory: widgetbook
+        run: flutter build web --release --base-href /carpenter/
+
+      - name: Install example dependencies
+        working-directory: example
+        run: flutter pub get
+
+      - name: Build example
+        working-directory: example
+        run: flutter build web --release
