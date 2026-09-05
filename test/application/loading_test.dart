@@ -96,16 +96,19 @@ void main() {
     expect(await result, 7);
   });
 
-  test('compatibility loading cubit keeps stream and close affordances', () async {
-    final cubit = LoadingCubit();
-    final next = cubit.stream.first;
+  test(
+    'compatibility loading cubit keeps stream and close affordances',
+    () async {
+      final cubit = LoadingCubit();
+      final next = cubit.stream.first;
 
-    cubit.start('legacy');
+      cubit.start('legacy');
 
-    expect((await next).isActive('legacy'), isTrue);
-    await cubit.close();
-    expect(cubit.isClosed, isTrue);
-  });
+      expect((await next).isActive('legacy'), isTrue);
+      await cubit.close();
+      expect(cubit.isClosed, isTrue);
+    },
+  );
 
   testWidgets('nearest loading boundary intercepts descendant operations', (
     tester,
