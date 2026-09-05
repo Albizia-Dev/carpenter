@@ -81,7 +81,9 @@ final class _TextEditingFieldState extends State<TextEditingField>
   @override
   void initState() {
     super.initState();
-    _selectionGestureBuilder = TextSelectionGestureDetectorBuilder(delegate: this);
+    _selectionGestureBuilder = TextSelectionGestureDetectorBuilder(
+      delegate: this,
+    );
     _attachFocusNode();
     widget.controller.addListener(_handleControllerChanged);
   }
@@ -175,7 +177,9 @@ final class _TextEditingFieldState extends State<TextEditingField>
       alignment: AlignmentDirectional.centerStart,
       children: [
         if (widget.controller.text.isEmpty && widget.placeholder != null)
-          IgnorePointer(child: Text(widget.placeholder!, style: placeholderStyle)),
+          IgnorePointer(
+            child: Text(widget.placeholder!, style: placeholderStyle),
+          ),
         Semantics(
           container: true,
           textField: true,
@@ -188,7 +192,10 @@ final class _TextEditingFieldState extends State<TextEditingField>
           hint: widget.errorText ?? widget.description ?? widget.placeholder,
           child: ExcludeFocus(
             excluding: _disabled,
-            child: IgnorePointer(ignoring: _disabled, child: interactiveEditable),
+            child: IgnorePointer(
+              ignoring: _disabled,
+              child: interactiveEditable,
+            ),
           ),
         ),
       ],

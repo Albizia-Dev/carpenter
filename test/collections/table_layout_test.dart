@@ -5,6 +5,18 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/harness.dart';
 
 void main() {
+  test('action columns use the semantic action-lane width policy', () {
+    final column = CarpenterTableColumn<_Row>.actions(
+      id: 'actions',
+      header: 'Actions',
+      actions: (_) => const [],
+    );
+
+    expect(column.width.policy, CarpenterTableColumnWidthPolicy.actionLane);
+    expect(column.width.flex, 0);
+    expect(column.resizable, isFalse);
+  });
+
   testWidgets('resizable columns work without a width callback', (
     tester,
   ) async {
@@ -105,14 +117,7 @@ void main() {
     );
 
     expect(find.text('Archive'), findsNothing);
-    final overflowButton = find.byWidgetPredicate(
-      (widget) =>
-          widget is CarpenterIconButton && widget.semanticLabel == 'More actions',
-    );
-    expect(overflowButton, findsOneWidget);
-    final button = tester.widget<CarpenterIconButton>(overflowButton);
-    expect(button.onInvoke, isNotNull);
-    button.onInvoke!.call();
+    await tester.tap(find.bySemanticsLabel('More actions'));
     await tester.pumpAndSettle();
     expect(find.text('Archive'), findsOneWidget);
   });

@@ -24,7 +24,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Amount', findRichText: true), findsOneWidget);
+    expect(find.text('Amount *', findRichText: true), findsOneWidget);
     expect(find.text('Invalid amount'), findsOneWidget);
     expect(find.text('Supporting text'), findsNothing);
     expect(find.text('100'), findsOneWidget);

@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
@@ -19,14 +17,10 @@ import 'tree_event.dart';
 import 'tree_state.dart';
 import 'tree_view.dart';
 
-typedef CarpenterTreeTableCellBuilder<T> = Widget Function(
-  BuildContext context,
-  CarpenterTreeNode<T> node,
-);
-typedef CarpenterTreeTableColumnWidthChanged = void Function(
-  String columnId,
-  LengthUnit width,
-);
+typedef CarpenterTreeTableCellBuilder<T> =
+    Widget Function(BuildContext context, CarpenterTreeNode<T> node);
+typedef CarpenterTreeTableColumnWidthChanged =
+    void Function(String columnId, LengthUnit width);
 
 @immutable
 final class CarpenterTreeTableColumn<T> {
@@ -325,8 +319,9 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     double gap,
   ) {
     final theme = CarpenterTheme.of(context);
-    final height = MediaQuery.textScalerOf(context)
-        .scale(context.units(theme.sizes.tableHeaderHeight));
+    final height = MediaQuery.textScalerOf(
+      context,
+    ).scale(context.units(theme.sizes.tableHeaderHeight));
     return Container(
       color: theme.surface.subtle,
       height: height,
