@@ -8,6 +8,7 @@ void main() {
       final gate = CarpenterRequestGate<_Cancellation>(
         createCancellation: _Cancellation.new,
       );
+      addTearDown(gate.dispose);
 
       final first = gate.begin();
       var cancellationObserved = false;
@@ -16,31 +17,47 @@ void main() {
       final second = gate.begin();
 
       expect(first.cancellation.isCancelled, isTrue);
+      expect(first.cancellation.disposed, isFalse);
       expect(cancellationObserved, isTrue);
       expect(gate.isCurrent(first), isFalse);
       expect(gate.isCurrent(second), isTrue);
       expect(second.generation, greaterThan(first.generation));
 
       gate.finish(first);
+      expect(first.cancellation.disposed, isTrue);
       expect(gate.isCurrent(second), isTrue);
 
       gate.finish(second);
+      expect(second.cancellation.disposed, isTrue);
       expect(gate.active, isNull);
     },
   );
 
-  test('explicit cancellation invalidates the active lease', () {
+  test('explicit cancellation invalidates but does not dispose active work', () {
     final gate = CarpenterRequestGate<_Cancellation>(
       createCancellation: _Cancellation.new,
     );
+    addTearDown(gate.dispose);
     final lease = gate.begin();
 
     gate.cancel();
 
     expect(lease.cancellation.isCancelled, isTrue);
+    expect(lease.cancellation.disposed, isFalse);
     expect(gate.isCurrent(lease), isFalse);
     expect(gate.active, isNull);
+
+    gate.finish(lease);
+    expect(lease.cancellation.disposed, isTrue);
   });
 }
 
-final class _Cancellation extends CarpenterCancellationSignal {}
+final class _Cancellation extends CarpenterCancellationSignal {
+  bool disposed = false;
+
+  @override
+  void dispose() {
+    disposed = true;
+    super.dispose();
+  }
+}
