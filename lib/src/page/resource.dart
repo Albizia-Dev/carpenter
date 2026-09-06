@@ -21,6 +21,18 @@ final class CarpenterResourceLoadRequest {
   bool get refresh => reason == CarpenterResourceLoadReason.refresh;
 }
 
+final class CarpenterResourceFailure {
+  const CarpenterResourceFailure({
+    required this.error,
+    required this.stackTrace,
+    this.message,
+  });
+
+  final Object error;
+  final StackTrace stackTrace;
+  final String? message;
+}
+
 typedef CarpenterResourceLoader<T> =
     Future<T> Function(CarpenterResourceLoadRequest request);
 
@@ -58,11 +70,14 @@ class CarpenterResourceController<T> extends ValueNotifier<CarpenterPageState>
         createCancellation: CarpenterResourceCancellation.new,
       );
   T? _data;
+  CarpenterResourceFailure? _refreshFailure;
   late final CarpenterCommandController<void> refreshCommand;
   late final CarpenterCommandController<void> retryCommand;
 
   T? get data => _data;
   bool get hasData => _data != null;
+  CarpenterResourceFailure? get refreshFailure => _refreshFailure;
+  bool get hasRefreshFailure => _refreshFailure != null;
 
   /// Replaces the currently loaded resource without starting a new request.
   ///
@@ -97,6 +112,7 @@ class CarpenterResourceController<T> extends ValueNotifier<CarpenterPageState>
 
   Future<void> _run(CarpenterResourceLoadReason reason) async {
     final lease = _requests.begin();
+    _refreshFailure = null;
     value = _data == null
         ? const CarpenterPageInitialLoading()
         : const CarpenterPageRefreshing();
@@ -109,14 +125,25 @@ class CarpenterResourceController<T> extends ValueNotifier<CarpenterPageState>
       );
       if (!_requests.isCurrent(lease)) return;
       _data = loaded;
+      _refreshFailure = null;
       value = const CarpenterPageReady();
-    } catch (error) {
+    } catch (error, stackTrace) {
       if (!_requests.isCurrent(lease)) return;
-      value = CarpenterPageFailure(
+      final failure = CarpenterResourceFailure(
         error: error,
+        stackTrace: stackTrace,
         message: errorMessage?.call(error),
-        retryCommand: retryCommand,
       );
+      if (_data != null) {
+        _refreshFailure = failure;
+        value = const CarpenterPageReady();
+      } else {
+        value = CarpenterPageFailure(
+          error: error,
+          message: failure.message,
+          retryCommand: retryCommand,
+        );
+      }
     } finally {
       _requests.finish(lease);
     }
