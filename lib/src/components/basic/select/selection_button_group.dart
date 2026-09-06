@@ -5,8 +5,11 @@ import '../../../foundation/icon_data.dart';
 import '../../../foundation/roles.dart';
 import '../button/toggle_button.dart';
 
+/// Descriptor for one choice in a controlled [CarpenterSelectionButtonGroup].
 @immutable
 final class CarpenterSelectionButtonOption<T> {
+  /// Creates a choice with an application-owned [value], visible label, and
+  /// optional icon.
   const CarpenterSelectionButtonOption({
     required this.value,
     required this.label,
@@ -15,15 +18,30 @@ final class CarpenterSelectionButtonOption<T> {
     this.semanticLabel,
   });
 
+  /// Value delivered when this option is selected; keep option values
+  /// distinct.
   final T value;
+
+  /// Visible text naming the control or choice; keep it meaningful without
+  /// relying on an icon.
   final String label;
+
+  /// Optional icon shown on this option's toggle button.
   final CarpenterIconSource? icon;
+
+  /// Whether this option can be selected. The whole group is also disabled
+  /// when its callback is null.
   final bool enabled;
+
+  /// Accessible name supplied to assistive technology. When omitted, the
+  /// visible label is used.
   final String? semanticLabel;
 }
 
 /// Controlled single-choice group for switching one local content scope.
 final class CarpenterSelectionButtonGroup<T> extends StatefulWidget {
+  /// Creates a connected single-choice button group. Asserts that [options]
+  /// is not empty; the caller owns the selected value.
   const CarpenterSelectionButtonGroup({
     super.key,
     required this.options,
@@ -34,11 +52,28 @@ final class CarpenterSelectionButtonGroup<T> extends StatefulWidget {
     this.semanticLabel = 'View selection',
   }) : assert(options.length > 0);
 
+  /// Choices in presentation and keyboard order. Keep values stable and
+  /// distinct across rebuilds.
   final List<CarpenterSelectionButtonOption<T>> options;
+
+  /// Current selected option value; the group compares option values using
+  /// equality.
   final T value;
+
+  /// Receives the value of an activated enabled option. Update [value] to
+  /// commit the choice; null disables the group.
   final ValueChanged<T>? onChanged;
+
+  /// Semantic control size, resolving coordinated height, spacing, icon, and
+  /// typography metrics.
   final ControlSize size;
+
+  /// Semantic action or selection color resolved from the current Carpenter
+  /// theme.
   final ActionColorRole colorRole;
+
+  /// Accessible name for the whole choice group; defaults to "View
+  /// selection".
   final String semanticLabel;
 
   @override

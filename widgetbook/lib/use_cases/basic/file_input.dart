@@ -5,7 +5,7 @@ import 'package:widgetbook/widgetbook.dart';
 final fileInputComponent = WidgetbookComponent(
   name: 'File input',
   useCases: [
-    WidgetbookUseCase(name: 'Input + linked drop zone', builder: _linked),
+    WidgetbookUseCase(name: 'Playground', builder: _linked),
     WidgetbookUseCase(name: 'Attachments', builder: _attachments),
   ],
 );

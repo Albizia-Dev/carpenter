@@ -7,7 +7,14 @@ import '../../foundation/theme.dart';
 import '../../internal/rendering/radio_group_scope.dart';
 import '../../internal/rendering/selection_control.dart';
 
+/// One mutually exclusive choice inside a matching [CarpenterRadioGroup].
+///
+/// The group owns selection, enabled state, and arrow-key navigation.
+/// Mounting a radio outside a matching Carpenter group throws a FlutterError.
+/// Values must be unique within the group.
 final class CarpenterRadio<T> extends StatefulWidget {
+  /// Creates a group-owned choice identified by [value]; its selection
+  /// callback belongs to the enclosing [CarpenterRadioGroup].
   const CarpenterRadio({
     super.key,
     required this.value,
@@ -20,13 +27,35 @@ final class CarpenterRadio<T> extends StatefulWidget {
     this.autofocus = false,
   });
 
+  /// Stable value identifying this choice within the enclosing group.
   final T value;
+
+  /// Visible text naming the control or choice; keep it meaningful without
+  /// relying on an icon.
   final String label;
+
+  /// Optional supporting text explaining the choice without replacing its
+  /// accessible name.
   final String? description;
+
+  /// Accessible name supplied to assistive technology. When omitted, the
+  /// visible label is used.
   final String? semanticLabel;
+
+  /// Semantic control size, resolving coordinated height, spacing, icon, and
+  /// typography metrics.
   final ControlSize size;
+
+  /// Semantic action or selection color resolved from the current Carpenter
+  /// theme.
   final SelectionColorRole colorRole;
+
+  /// Optional caller-owned focus node. Dispose a supplied node in its owner,
+  /// not in the widget.
   final FocusNode? focusNode;
+
+  /// Whether the control requests focus when first attached. Defaults to
+  /// false.
   final bool autofocus;
 
   @override

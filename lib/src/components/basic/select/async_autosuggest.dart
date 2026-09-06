@@ -5,9 +5,19 @@ import 'package:flutter/widgets.dart';
 import '../../../foundation/roles.dart';
 import 'autosuggest.dart';
 
+/// Cooperative cancellation signal for one suggestion request. Cancelling
+/// notifies listeners once but does not abort HTTP or other transport work
+/// automatically.
 final class CarpenterSearchCancellation extends ChangeNotifier {
   bool _cancelled = false;
+
+  /// Whether cancellation has been requested. Once true, it remains true for
+  /// the lifetime of this signal.
   bool get isCancelled => _cancelled;
+
+  /// Marks the request cancelled and notifies listeners on the first call
+  /// only. Loaders should check isCancelled after asynchronous work or
+  /// connect this signal to their transport cancellation mechanism.
   void cancel() {
     if (!_cancelled) {
       _cancelled = true;
@@ -16,6 +26,10 @@ final class CarpenterSearchCancellation extends ChangeNotifier {
   }
 }
 
+/// Loads options for a trimmed query and a per-request cancellation signal.
+/// Return the complete suggestion list for that query. The autosuggest owns
+/// the signal and ignores cancelled or superseded completions; the loader
+/// owns any transport resources.
 typedef CarpenterSuggestionLoader<T> =
     Future<List<CarpenterOption<T>>> Function(
       String query,
@@ -24,6 +38,9 @@ typedef CarpenterSuggestionLoader<T> =
 
 /// Async lifecycle wrapper for CarpenterAutosuggest with debounce and stale-result protection.
 final class CarpenterAsyncAutosuggest<T> extends StatefulWidget {
+  /// Creates a suggestion field with an owned text controller, debounce
+  /// timer, and per-request cancellation. The parent handles selected
+  /// options; this wrapper does not expose an external text controller.
   const CarpenterAsyncAutosuggest({
     super.key,
     required this.load,
@@ -35,14 +52,39 @@ final class CarpenterAsyncAutosuggest<T> extends StatefulWidget {
     this.availability = FieldAvailability.enabled,
   });
 
+  /// Asynchronous source called after the debounce delay with a trimmed query
+  /// meeting minimumQueryLength. Thrown errors select the failed options
+  /// state rather than escaping through the widget callback.
   final CarpenterSuggestionLoader<T> load;
+
+  /// Receives the selected option before the suggestion popup is closed.
+  /// Store or process the option value in application state.
   final ValueChanged<CarpenterOption<T>> onSelected;
+
+  /// Optional visible field label forwarded to the underlying autosuggest.
   final String? label;
+
+  /// Hint shown by the underlying autosuggest when its owned text controller
+  /// is empty.
   final String? placeholder;
+
+  /// Minimum trimmed character count before a request is scheduled. Shorter
+  /// input cancels the current signal, clears suggestions, and closes the
+  /// popup. Defaults to one.
   final int minimumQueryLength;
+
+  /// Delay after the latest query edit before starting its request; defaults
+  /// to 300 milliseconds. Editing restarts the timer. An already running
+  /// request is superseded when the next load starts.
   final Duration debounce;
+
+  /// Editing availability forwarded to the underlying autosuggest. Defaults
+  /// to enabled.
   final FieldAvailability availability;
 
+  /// Creates the text, timer, popup, and request-generation state. Disposal
+  /// cancels timers and the current request signal and disposes the owned
+  /// controller.
   @override
   State<CarpenterAsyncAutosuggest<T>> createState() =>
       _CarpenterAsyncAutosuggestState<T>();

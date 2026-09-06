@@ -27,27 +27,39 @@ void main() {
     await tester.pumpWidget(_harness(buildPaymentListSample()));
     await tester.pump(const Milliseconds(500).toDuration());
 
-    expect(find.text('Реквизиты'), findsOneWidget);
-    if (find.text('Распределить').evaluate().isEmpty) {
-      await tester.tap(find.text('Ещё').last);
+    await tester.pumpAndSettle();
+    final semantics = tester.ensureSemantics();
+    try {
+      expect(find.text('Реквизиты'), findsOneWidget);
+
+      // The action can be labelled, icon-only, or inside the overflow menu.
+      // Its accessible name is stable across those layout presentations.
+      final allocate = find.bySemanticsLabel('Распределить');
+      if (allocate.evaluate().isEmpty) {
+        final overflow = find.bySemanticsLabel('Ещё');
+        expect(overflow, findsOneWidget);
+        await tester.tap(overflow);
+        await tester.pumpAndSettle();
+      }
+      expect(allocate, findsOneWidget);
+      await tester.tap(allocate);
       await tester.pumpAndSettle();
+      expect(find.textContaining('Открыто распределение'), findsOneWidget);
+
+      await tester.tap(find.text('ООО «Окиби Технологии»').last);
+      await tester.pump();
+      expect(find.textContaining('Открыто юридическое лицо'), findsOneWidget);
+
+      await tester.tap(find.text('Распределение'));
+      await tester.pump();
+      expect(find.text('Договор № 18/24'), findsOneWidget);
+
+      await tester.tap(find.text('История'));
+      await tester.pump();
+      expect(find.text('Платёж получен из банковской выписки'), findsOneWidget);
+    } finally {
+      semantics.dispose();
     }
-    final allocate = find.text('Распределить').last;
-    await tester.tap(allocate);
-    await tester.pump();
-    expect(find.textContaining('Открыто распределение'), findsOneWidget);
-
-    await tester.tap(find.text('ООО «Окиби Технологии»').last);
-    await tester.pump();
-    expect(find.textContaining('Открыто юридическое лицо'), findsOneWidget);
-
-    await tester.tap(find.text('Распределение'));
-    await tester.pump();
-    expect(find.text('Договор № 18/24'), findsOneWidget);
-
-    await tester.tap(find.text('История'));
-    await tester.pump();
-    expect(find.text('Платёж получен из банковской выписки'), findsOneWidget);
   });
 
   testWidgets('sample remains valid in compact pushed presentation', (

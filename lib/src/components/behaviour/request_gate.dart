@@ -8,8 +8,12 @@ import 'package:flutter/foundation.dart';
 class CarpenterCancellationSignal extends ChangeNotifier {
   bool _isCancelled = false;
 
+  /// Whether cancellation has been requested. Cancellation is permanent for
+  /// this signal.
   bool get isCancelled => _isCancelled;
 
+  /// Marks the signal cancelled and notifies listeners once. Repeated calls
+  /// are no-ops; this does not itself abort a transport.
   void cancel() {
     if (_isCancelled) return;
     _isCancelled = true;
@@ -29,7 +33,11 @@ final class CarpenterRequestLease<C extends CarpenterCancellationSignal> {
     required this.cancellation,
   });
 
+  /// Monotonically increasing admission number within the owning gate.
   final int generation;
+
+  /// Gate-owned signal for this request. Observe it, but let the gate manage
+  /// its disposal.
   final C cancellation;
 }
 
@@ -42,6 +50,8 @@ final class CarpenterRequestLease<C extends CarpenterCancellationSignal> {
 /// asynchronous setup. The gate deliberately knows nothing about loading, page,
 /// collection, or transport semantics; those remain with the owning feature.
 final class CarpenterRequestGate<C extends CarpenterCancellationSignal> {
+  /// Creates a request gate. [createCancellation] must return a fresh signal
+  /// for each admitted request.
   CarpenterRequestGate({required C Function() createCancellation})
     : _createCancellation = createCancellation;
 
@@ -50,8 +60,13 @@ final class CarpenterRequestGate<C extends CarpenterCancellationSignal> {
   CarpenterRequestLease<C>? _active;
   int _generation = 0;
 
+  /// Current admitted lease, or null after cancellation, completion, or
+  /// disposal.
   CarpenterRequestLease<C>? get active => _active;
 
+  /// Cancels the previous active lease and admits a new generation with a
+  /// fresh cancellation signal. The old signal remains alive until that old
+  /// request calls [finish].
   CarpenterRequestLease<C> begin() {
     _cancelActive();
     final lease = CarpenterRequestLease<C>._(
@@ -63,16 +78,27 @@ final class CarpenterRequestGate<C extends CarpenterCancellationSignal> {
     return lease;
   }
 
+  /// Whether [lease] is the identical active lease and its signal has not
+  /// been cancelled. Check before applying any asynchronous result or
+  /// failure.
   bool isCurrent(CarpenterRequestLease<C> lease) =>
       identical(_active, lease) && !lease.cancellation.isCancelled;
 
+  /// Releases a completed lease and disposes its signal once. Clears [active]
+  /// only when finishing the current lease, so an old completion cannot clear
+  /// a newer request.
   void finish(CarpenterRequestLease<C> lease) {
     if (identical(_active, lease)) _active = null;
     if (_live.remove(lease)) lease.cancellation.dispose();
   }
 
+  /// Cancels the active lease and clears [active]. Its signal remains alive
+  /// until [finish] or [dispose].
   void cancel() => _cancelActive();
 
+  /// Cancels and disposes every still-live request signal, including
+  /// superseded requests. The gate must no longer be used after its owner is
+  /// disposed.
   void dispose() {
     _active = null;
     for (final lease in _live) {

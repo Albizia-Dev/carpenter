@@ -10,3 +10,4 @@ build/
 *.iml
 *.log
 okibi/
+tool/documentation/

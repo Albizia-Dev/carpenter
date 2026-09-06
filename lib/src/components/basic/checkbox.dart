@@ -5,7 +5,15 @@ import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
 import '../../internal/rendering/selection_control.dart';
 
+/// Controlled selection control with unchecked, checked, and mixed
+/// presentation.
+///
+/// A mixed value represents partial selection. Activation changes mixed or
+/// unchecked to checked, and checked to unchecked; it does not cycle through
+/// all three states.
 final class CarpenterCheckbox extends StatelessWidget {
+  /// Creates a checkbox with externally owned [value]. Omit [onChanged] to
+  /// disable interaction.
   const CarpenterCheckbox({
     super.key,
     required this.value,
@@ -19,14 +27,40 @@ final class CarpenterCheckbox extends StatelessWidget {
     this.autofocus = false,
   });
 
+  /// Current tri-state selection. Mixed is supplied by the owner, not reached
+  /// by ordinary toggling.
   final CheckboxValue value;
+
+  /// Receives the next selection value on activation. Rebuild with that value
+  /// to commit it; null disables the control.
   final ValueChanged<CheckboxValue>? onChanged;
+
+  /// Visible text naming the control or choice; keep it meaningful without
+  /// relying on an icon.
   final String label;
+
+  /// Optional supporting text explaining the choice without replacing its
+  /// accessible name.
   final String? description;
+
+  /// Accessible name supplied to assistive technology. When omitted, the
+  /// visible label is used.
   final String? semanticLabel;
+
+  /// Semantic control size, resolving coordinated height, spacing, icon, and
+  /// typography metrics.
   final ControlSize size;
+
+  /// Semantic action or selection color resolved from the current Carpenter
+  /// theme.
   final SelectionColorRole colorRole;
+
+  /// Optional caller-owned focus node. Dispose a supplied node in its owner,
+  /// not in the widget.
   final FocusNode? focusNode;
+
+  /// Whether the control requests focus when first attached. Defaults to
+  /// false.
   final bool autofocus;
 
   CheckboxValue get _nextValue => switch (value) {

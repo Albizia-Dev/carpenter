@@ -1,0 +1,61 @@
+name: Documentation
+on:
+  push:
+    branches: [develop]
+  pull_request:
+    branches: [develop]
+permissions:
+  contents: read
+concurrency:
+  group: documentation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  audit:
+    name: Verify public API and catalog documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Resolve isolated audit dependencies
+        working-directory: tool/documentation
+        run: dart pub get --enforce-lockfile
+      - name: Check audit formatting and static analysis
+        working-directory: tool/documentation
+        run: |
+          dart format --output=none --set-exit-if-changed bin lib test
+          dart analyze
+      - name: Test export resolution and regression gates
+        working-directory: tool/documentation
+        run: dart test
+      - name: Check named documentation debt
+        working-directory: tool/documentation
+        run: dart run bin/audit.dart ../.. --check
+      - name: Publish coverage summary
+        if: always()
+        shell: bash
+        run: |
+          if [ -f build/documentation/coverage.md ]; then
+            cat build/documentation/coverage.md >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: documentation-coverage
+          path: build/documentation/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Resolve library dependencies
+        run: flutter pub get
+      - name: Generate DartDoc
+        run: dart doc --output build/api
+      - uses: actions/upload-artifact@v4
+        with:
+          name: api-documentation
+          path: build/api/
+          if-no-files-found: error
+          retention-days: 14

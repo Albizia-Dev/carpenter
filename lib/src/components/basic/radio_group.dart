@@ -5,7 +5,15 @@ import '../../foundation/theme.dart';
 import '../../internal/rendering/radio_group_scope.dart';
 import 'radio.dart';
 
+/// Controlled group of mutually exclusive radio choices with shared selection
+/// and keyboard navigation.
+///
+/// Children must have unique values. Supply [onChanged] and rebuild with the
+/// chosen [value]; null disables the entire group. Horizontal groups wrap
+/// rather than requiring a fixed-width row.
 final class CarpenterRadioGroup<T> extends StatefulWidget {
+  /// Creates a radio group whose [children] all use the same value type.
+  /// [value] may be null to represent no selection.
   const CarpenterRadioGroup({
     super.key,
     required this.value,
@@ -14,9 +22,19 @@ final class CarpenterRadioGroup<T> extends StatefulWidget {
     this.orientation = Axis.vertical,
   });
 
+  /// Currently selected child value, or null when no choice is selected.
   final T? value;
+
+  /// Receives a chosen value from pointer or keyboard interaction. Null
+  /// disables all choices; the group does not store the new selection.
   final ValueChanged<T>? onChanged;
+
+  /// Radio choices in display and keyboard traversal order. Their values must
+  /// be unique.
   final List<CarpenterRadio<T>> children;
+
+  /// Vertical stacked presentation or horizontal wrapping presentation;
+  /// defaults to vertical.
   final Axis orientation;
 
   @override

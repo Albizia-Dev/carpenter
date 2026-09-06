@@ -1,6 +1,5 @@
 import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
-import 'package:widgetbook/widgetbook.dart';
 
 enum LayoutViewportPreset {
   off,
@@ -45,17 +44,16 @@ Widget layoutViewportPreview(
   required Widget child,
   LengthUnit offHeight = const Rem(45),
 }) {
-  final preset = context.knobs.object.dropdown(
-    label: 'Environment · Viewport',
-    options: LayoutViewportPreset.values,
-    initialOption: LayoutViewportPreset.off,
-    labelBuilder: (value) => value.label,
-  );
-  return layoutViewportFrame(
-    context,
-    preset: preset,
-    offHeight: offHeight,
-    child: child,
+  // Device simulation belongs to the global Viewport addon. The local helper
+  // provides a finite fallback for direct widget tests and unbounded parents.
+  return LayoutBuilder(
+    builder: (context, constraints) => SizedBox(
+      width: constraints.hasBoundedWidth ? constraints.maxWidth : null,
+      height: constraints.hasBoundedHeight
+          ? constraints.maxHeight
+          : context.units(offHeight),
+      child: child,
+    ),
   );
 }
 

@@ -100,5 +100,23 @@ String semanticValueLabel(Object value) => switch (value) {
   TextOverflow.visible => 'Visible',
   Axis.horizontal => 'Horizontal',
   Axis.vertical => 'Vertical',
+  Enum() => humanizeIdentifier(value.name),
   _ => value.toString(),
 };
+
+/// Formats unlisted enum values without exposing Dart type names to users.
+String humanizeIdentifier(String value) {
+  if (value.isEmpty) return value;
+  final words = value
+      .replaceAllMapped(
+        RegExp(r'([A-Z]+)([A-Z][a-z])'),
+        (match) => '${match[1]} ${match[2]}',
+      )
+      .replaceAllMapped(
+        RegExp(r'([a-z0-9])([A-Z])'),
+        (match) => '${match[1]} ${match[2]}',
+      )
+      .replaceAll('_', ' ')
+      .toLowerCase();
+  return '${words[0].toUpperCase()}${words.substring(1)}';
+}
