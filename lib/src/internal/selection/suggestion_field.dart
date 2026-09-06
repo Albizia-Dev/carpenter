@@ -73,6 +73,7 @@ final class SuggestionField<T> extends StatefulWidget {
 final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
   final MenuNavigation<Object> _navigation = MenuNavigation();
   FocusNode? _ownedFocusNode;
+  bool _suppressFocusOpenUntilBlur = false;
 
   FocusNode get _focusNode => widget.focusNode ?? _ownedFocusNode!;
   bool get _enabled =>
@@ -98,6 +99,9 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
       _detachFocusNode(oldWidget.focusNode);
       _attachFocusNode();
     }
+    if (!oldWidget.open && widget.open) {
+      _suppressFocusOpenUntilBlur = false;
+    }
     final selectedChanged =
         oldWidget.selectedOptionId != widget.selectedOptionId;
     _syncOptions();
@@ -116,9 +120,12 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
   }
 
   void _handleFocusChanged() {
-    if (_focusNode.hasFocus && _enabled && !widget.open) {
-      widget.onOpenChanged(true);
+    if (!_focusNode.hasFocus) {
+      _suppressFocusOpenUntilBlur = false;
+      return;
     }
+    if (_suppressFocusOpenUntilBlur || !_enabled || widget.open) return;
+    widget.onOpenChanged(true);
   }
 
   void _syncOptions() {
@@ -162,7 +169,10 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
 
   void _move(int delta) {
     if (!_enabled || _composing) return;
-    if (!widget.open) widget.onOpenChanged(true);
+    if (!widget.open) {
+      _suppressFocusOpenUntilBlur = false;
+      widget.onOpenChanged(true);
+    }
     setState(() => _navigation.move(delta));
   }
 
@@ -178,16 +188,23 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
         widget.controller.value = value;
       }
     }
+    _suppressFocusOpenUntilBlur = true;
     widget.onSelected?.call(option);
     widget.onOpenChanged(false);
   }
 
   void _queryChanged(String query) {
+    _suppressFocusOpenUntilBlur = false;
     if (_navigation.highlightedKey != null) {
       setState(() => _navigation.highlightedKey = null);
     }
     widget.onQueryChanged?.call(query);
     if (_enabled && !widget.open) widget.onOpenChanged(true);
+  }
+
+  void _openFromPointer() {
+    _suppressFocusOpenUntilBlur = false;
+    widget.onOpenChanged(true);
   }
 
   KeyEventResult _handleKey(FocusNode node, KeyEvent event) {
@@ -241,7 +258,7 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
       child: Listener(
         behavior: HitTestBehavior.translucent,
         onPointerDown: _enabled && !widget.open
-            ? (_) => widget.onOpenChanged(true)
+            ? (_) => _openFromPointer()
             : null,
         child: CarpenterInput(
           controller: widget.controller,

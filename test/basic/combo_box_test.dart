@@ -1,4 +1,5 @@
 import 'package:carpenter/carpenter.dart';
+import 'package:carpenter/src/internal/selection/menu_panel.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -124,6 +125,53 @@ void main() {
       expect(open, isFalse);
     },
   );
+
+  testWidgets('selection stays closed when focus returns to the field', (
+    tester,
+  ) async {
+    final controller = TextEditingController();
+    final focusNode = FocusNode();
+    addTearDown(controller.dispose);
+    addTearDown(focusNode.dispose);
+    final visibility = <bool>[];
+    int? selected;
+
+    await tester.pumpWidget(
+      carpenterOverlayHarness(
+        CarpenterComboBox<int>(
+          controller: controller,
+          focusNode: focusNode,
+          value: null,
+          onChanged: (value) => selected = value,
+          onQueryChanged: (_) {},
+          onOpenChanged: visibility.add,
+          options: firstOptions,
+        ),
+      ),
+    );
+
+    await tester.tap(find.byType(EditableText));
+    await tester.pumpAndSettle();
+    expect(focusNode.hasFocus, isTrue);
+    expect(find.byType(MenuPanel), findsOneWidget);
+
+    focusNode.unfocus();
+    await tester.pump();
+    expect(focusNode.hasFocus, isFalse);
+
+    await tester.tap(find.text('Bravo').last);
+    await tester.pumpAndSettle();
+
+    expect(selected, 2);
+    expect(controller.text, 'Bravo');
+    expect(visibility.last, isFalse);
+    expect(find.byType(MenuPanel), findsNothing);
+    expect(focusNode.hasFocus, isTrue);
+
+    await tester.enterText(find.byType(EditableText), 'Br');
+    await tester.pumpAndSettle();
+    expect(find.byType(MenuPanel), findsOneWidget);
+  });
 
   testWidgets('IME composing is not intercepted by suggestion activation', (
     tester,
