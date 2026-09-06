@@ -11,14 +11,18 @@ void main() {
   ) async {
     await tester.pumpWidget(
       _harness(
-        Builder(builder: foundationColorsComponent.useCases.first.builder),
+        Builder(
+          builder: foundationColorsComponent.useCases
+              .singleWhere((useCase) => useCase.name == 'Semantic tokens')
+              .builder,
+        ),
       ),
     );
 
-    expect(find.text('Layout surfaces'), findsOneWidget);
-    expect(find.text('Content'), findsOneWidget);
-    expect(find.text('Feedback pairs'), findsOneWidget);
-    expect(find.text('Focus and borders'), findsOneWidget);
+    expect(find.text('surface.* / overlay.*'), findsOneWidget);
+    expect(find.text('content.*'), findsOneWidget);
+    expect(find.text('feedback.*'), findsOneWidget);
+    expect(find.text('focus / disabled'), findsOneWidget);
     expect(find.textContaining('#FF'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
@@ -27,7 +31,13 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      _harness(Builder(builder: buttonComponent.useCases[1].builder)),
+      _harness(
+        Builder(
+          builder: buttonComponent.useCases
+              .singleWhere((useCase) => useCase.name == 'Size comparison')
+              .builder,
+        ),
+      ),
     );
     expect(
       find.byType(CarpenterButton),
@@ -36,7 +46,13 @@ void main() {
     expect(tester.takeException(), isNull);
 
     await tester.pumpWidget(
-      _harness(Builder(builder: inputComponent.useCases[1].builder)),
+      _harness(
+        Builder(
+          builder: inputComponent.useCases
+              .singleWhere((useCase) => useCase.name == 'Size comparison')
+              .builder,
+        ),
+      ),
     );
     expect(find.byType(EditableText), findsNWidgets(FieldSize.values.length));
     expect(tester.takeException(), isNull);

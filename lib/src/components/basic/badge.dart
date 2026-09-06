@@ -6,6 +6,7 @@ import '../../foundation/theme.dart';
 
 /// Compact supplementary label or count. Use status indicators for business status.
 final class CarpenterBadge extends StatelessWidget {
+  /// Creates a supplementary label using a semantic feedback color.
   const CarpenterBadge({
     super.key,
     required this.label,
@@ -13,6 +14,8 @@ final class CarpenterBadge extends StatelessWidget {
     this.semanticLabel,
   });
 
+  /// Formats a nonnegative [count], replacing values above positive [max]
+  /// with "max+". Defaults to a danger-colored count badge.
   CarpenterBadge.count(
     int count, {
     super.key,
@@ -23,8 +26,14 @@ final class CarpenterBadge extends StatelessWidget {
        assert(max > 0),
        label = count > max ? '$max+' : '$count';
 
+  /// Compact supplementary text or count. Use a status indicator for business
+  /// status instead.
   final String label;
+
+  /// Feedback color role used for the badge background and foreground.
   final FeedbackColorRole role;
+
+  /// Accessible badge meaning; defaults to the formatted label.
   final String? semanticLabel;
 
   @override

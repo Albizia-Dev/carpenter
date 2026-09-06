@@ -49,7 +49,10 @@ final kanbanComponent = WidgetbookComponent(
 final planningBoardComponent = WidgetbookComponent(
   name: 'Planning board',
   useCases: [
-    WidgetbookUseCase(name: 'Lanes', builder: (_) => const _PlanningPreview()),
+    WidgetbookUseCase(
+      name: 'Playground',
+      builder: (_) => const _PlanningPreview(),
+    ),
   ],
 );
 

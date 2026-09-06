@@ -1,0 +1,4 @@
+# This tool is a standalone Dart package, not part of the Flutter package.
+analyzer:
+  errors:
+    unused_import: error

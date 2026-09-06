@@ -11,23 +11,39 @@ import '../../../internal/rendering/focus_ring.dart';
 /// danger feedback and always takes precedence when both are provided.
 @immutable
 final class CarpenterFieldFeedback {
+  /// Associates a supporting message with a semantic feedback role. No
+  /// validation or interaction occurs when feedback is constructed.
   const CarpenterFieldFeedback({required this.message, required this.role});
 
+  /// Creates informational supporting feedback without marking the field as
+  /// invalid.
   const CarpenterFieldFeedback.info(String message)
     : this(message: message, role: FeedbackColorRole.info);
 
+  /// Creates successful supporting feedback without marking the field as
+  /// invalid.
   const CarpenterFieldFeedback.success(String message)
     : this(message: message, role: FeedbackColorRole.success);
 
+  /// Creates warning feedback without marking the field as invalid.
   const CarpenterFieldFeedback.warning(String message)
     : this(message: message, role: FeedbackColorRole.warning);
 
+  /// Creates danger feedback, which makes isError true and selects the field
+  /// error styling.
   const CarpenterFieldFeedback.danger(String message)
     : this(message: message, role: FeedbackColorRole.danger);
 
+  /// Supporting text displayed by the field shell instead of its ordinary
+  /// description.
   final String message;
+
+  /// Semantic feedback palette used for the supporting text and border. Only
+  /// danger is treated as an error.
   final FeedbackColorRole role;
 
+  /// Whether role is danger. Informational, success, and warning feedback do
+  /// not mark the field as invalid.
   bool get isError => role == FeedbackColorRole.danger;
 }
 
@@ -38,6 +54,10 @@ final class CarpenterFieldFeedback {
 /// trailing slots, supporting text, semantic feedback, focus ring, minimum
 /// target size, and field-role theming.
 final class CarpenterFieldShell extends StatelessWidget {
+  /// Frames a caller-owned editing control. Supply the actual interaction
+  /// states and enforce availability in the child; the shell styles the field
+  /// but does not implement editing, focus ownership, validation, or event
+  /// blocking.
   const CarpenterFieldShell({
     super.key,
     required this.availability,
@@ -55,23 +75,65 @@ final class CarpenterFieldShell extends StatelessWidget {
     this.trailing,
   });
 
+  /// Availability used to resolve field colors and feedback styling. The
+  /// child remains responsible for disabling or restricting editing.
   final FieldAvailability availability;
+
+  /// Field role controlling height, typography, padding, and slot spacing
+  /// through the active theme.
   final FieldSize size;
+
+  /// Directional start and end shapes resolved to field radii for size and
+  /// the surrounding text direction.
   final CarpenterShape shape;
+
+  /// Current interaction states supplied by the control. In particular,
+  /// focused drives the focus ring; the shell does not detect focus itself.
   final Set<WidgetState> states;
+
+  /// Editing content placed in the expanding center slot. Its controller,
+  /// focus node, and editing callbacks remain owned by the caller.
   final Widget child;
+
+  /// Whether the control uses the themed fixed field height. When false, the
+  /// field may grow beyond its themed minimum height for multiline content.
   final bool fixedHeight;
+
+  /// Optional text above the control. A required marker is only drawn when a
+  /// label is present.
   final String? label;
+
+  /// Supporting text below the control when neither errorText nor feedback
+  /// supplies a message.
   final String? description;
+
+  /// Semantic supporting feedback. It replaces description and is overridden
+  /// by any non-null errorText, including an empty string.
   final CarpenterFieldFeedback? feedback;
+
+  /// Compatibility shorthand for danger feedback. Non-null values take
+  /// precedence over feedback; this property displays an error but does not
+  /// run validation.
   final String? errorText;
+
+  /// Whether to append a required marker to label. This is presentational and
+  /// does not make the child value mandatory.
   final bool required;
+
+  /// Optional content before the expanding child, separated with the themed
+  /// field-content gap.
   final Widget? leading;
+
+  /// Optional content after the expanding child, separated with the themed
+  /// field-content gap.
   final Widget? trailing;
 
   CarpenterFieldFeedback? get _effectiveFeedback =>
       errorText != null ? CarpenterFieldFeedback.danger(errorText!) : feedback;
 
+  /// Resolves field geometry and feedback from CarpenterTheme, then composes
+  /// the label, control slots, supporting text, and externally driven focus
+  /// ring.
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);

@@ -6,7 +6,7 @@ final treeTableContractsComponent = WidgetbookComponent(
   name: 'Tree table contracts',
   useCases: [
     WidgetbookUseCase(
-      name: 'Project structure',
+      name: 'Playground',
       builder: (_) => const _ProjectStructurePreview(),
     ),
     WidgetbookUseCase(name: 'Alignment contract', builder: _alignmentContract),

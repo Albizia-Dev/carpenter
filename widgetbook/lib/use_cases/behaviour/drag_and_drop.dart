@@ -7,9 +7,7 @@ import '../../helpers/preview.dart';
 
 final dragAndDropComponent = WidgetbookComponent(
   name: 'Drag & Drop',
-  useCases: [
-    WidgetbookUseCase(name: 'Kernel playground', builder: _dragAndDrop),
-  ],
+  useCases: [WidgetbookUseCase(name: 'Playground', builder: _dragAndDrop)],
 );
 
 Widget _dragAndDrop(BuildContext context) {

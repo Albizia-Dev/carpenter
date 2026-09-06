@@ -8,6 +8,9 @@ import '../../../foundation/theme.dart';
 import '../../basic/text.dart';
 import 'table_column.dart';
 
+/// Builds one footer cell from all rows currently supplied to the editable
+/// table. Calculate totals from items rather than maintaining a second
+/// independent list.
 typedef CarpenterTableFooterCellBuilder<T> =
     Widget Function(BuildContext context, List<T> items);
 
@@ -19,6 +22,10 @@ typedef CarpenterTableFooterCellBuilder<T> =
 /// and row actions. Header actions cover add/import operations and [footerCells]
 /// provides aligned totals or other per-column summaries.
 final class CarpenterEditableTable<T> extends StatelessWidget {
+  /// Presents caller-owned local rows and editable cell builders. It does not
+  /// own draft values, persist changes, sort, or page data. Keep editor
+  /// controllers outside cell builders and dispose them when rows are
+  /// removed.
   const CarpenterEditableTable({
     super.key,
     required this.items,
@@ -33,17 +40,51 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
     this.semanticLabel = 'Editable table',
   });
 
+  /// Rows displayed in list order and passed together to footer builders.
+  /// Mutate application state and rebuild to reflect edits, insertion, or
+  /// removal.
   final List<T> items;
+
+  /// Ordered column descriptors supplying headers, cell builders, horizontal
+  /// alignment, and width policy. Use stable unique IDs to address footer
+  /// cells.
   final List<CarpenterTableColumn<T>> columns;
+
+  /// Actions placed above the header in an end-aligned wrapping row. The
+  /// table does not implement add, import, or save operations itself.
   final List<Widget> headerActions;
+
+  /// Footer builders keyed by column ID. Each receives the full items list.
+  /// Columns without a matching builder get an empty footer cell; an empty
+  /// map omits the entire footer.
   final Map<String, CarpenterTableFooterCellBuilder<T>> footerCells;
+
+  /// Optional notification for a row tap. Selection is not stored; rebuild
+  /// with an updated selected predicate to change highlighting.
   final ValueChanged<T>? onRowSelected;
+
+  /// Optional notification for a row double tap. This is separate from row
+  /// selection and does not automatically open an editor.
   final ValueChanged<T>? onRowActivated;
+
+  /// Caller-owned predicate deciding whether each row is highlighted. Null
+  /// means no rows are highlighted.
   final bool Function(T item)? selected;
+
+  /// Minimum table content width, defaulting to 48 rem. A narrower viewport
+  /// gets horizontal scrolling rather than compressed columns.
   final LengthUnit minimumWidth;
+
+  /// Text displayed instead of body rows when items is empty. Headers, header
+  /// actions, and configured footer cells remain available.
   final String emptyMessage;
+
+  /// Accessible name for the table container, defaulting to Editable table.
   final String semanticLabel;
 
+  /// Composes headers, editable rows, and aligned footer cells using
+  /// CarpenterTheme. Width constraints determine whether a horizontal scroll
+  /// view is needed; vertical scrolling belongs to the parent.
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);

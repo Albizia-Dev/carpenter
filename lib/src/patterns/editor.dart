@@ -215,7 +215,13 @@ final class CarpenterFieldGroup extends StatelessWidget {
   );
 }
 
+/// Presentational form row combining a label, optional help text, a
+/// caller-owned editor, and an optional error notice. It does not bind or
+/// validate the editor automatically.
 final class CarpenterFormField extends StatelessWidget {
+  /// Wraps an editor with form-level labeling and error presentation. The
+  /// caller runs validation and passes the resulting error; required only
+  /// adds a marker.
   const CarpenterFormField({
     super.key,
     required this.label,
@@ -224,11 +230,29 @@ final class CarpenterFormField extends StatelessWidget {
     this.error,
     this.description,
   });
+
+  /// Visible label above the editor. A required marker is appended when
+  /// required is true.
   final String label;
+
+  /// Caller-owned editing widget. Bind its value and callbacks explicitly;
+  /// the wrapper creates no field controller.
   final Widget child;
+
+  /// Whether the label includes a required marker. Does not install a
+  /// validator or reject empty values.
   final bool required;
+
+  /// Optional error message rendered as a danger notice below the editor.
+  /// Null removes the notice.
   final String? error;
+
+  /// Optional supporting text between the label and editor. Unlike the basic
+  /// field shell, this form wrapper can show description and error together.
   final String? description;
+
+  /// Composes the label, help text, editor, and danger notice in vertical
+  /// order with theme spacing.
   @override
   Widget build(BuildContext context) {
     final gap = context.units(CarpenterTheme.of(context).spacing.small);
@@ -257,9 +281,19 @@ final class CarpenterFormField extends StatelessWidget {
   }
 }
 
+/// Form-level summary of externally computed field errors. An empty map
+/// produces no visible content.
 final class CarpenterValidationSummary extends StatelessWidget {
+  /// Displays the supplied field errors without running validators or
+  /// modifying field state.
   const CarpenterValidationSummary({super.key, required this.errors});
+
+  /// Messages keyed by stable field IDs. Values are joined in map iteration
+  /// order; field IDs are not displayed as labels.
   final Map<CarpenterFieldId, String> errors;
+
+  /// Returns an empty box when there are no errors, otherwise a danger
+  /// attention block containing all messages separated by newlines.
   @override
   Widget build(BuildContext context) => errors.isEmpty
       ? const SizedBox.shrink()

@@ -17,7 +17,7 @@ enum _LoadingPresentation {
 final loadingBoundaryComponent = WidgetbookComponent(
   name: 'Loading Boundary',
   useCases: [
-    WidgetbookUseCase(name: 'Presentation playground', builder: _presentation),
+    WidgetbookUseCase(name: 'Playground', builder: _presentation),
     WidgetbookUseCase(name: 'Concurrent operations', builder: _aggregation),
     WidgetbookUseCase(name: 'Nested boundaries', builder: _nested),
     WidgetbookUseCase(name: 'No scope fallback', builder: _noScope),

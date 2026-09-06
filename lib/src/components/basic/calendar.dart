@@ -8,6 +8,10 @@ import 'text.dart';
 
 /// Controlled month calendar used by date inputs and page-level scheduling UI.
 final class CarpenterCalendar extends StatefulWidget {
+  /// Creates a controlled date picker. The displayed month starts at
+  /// initialMonth, selected, or the current date in that order. Rebuild with
+  /// the date received by onChanged to update the selection. Date bounds are
+  /// inclusive and compare calendar dates, not times.
   const CarpenterCalendar({
     super.key,
     this.selected,
@@ -17,12 +21,33 @@ final class CarpenterCalendar extends StatefulWidget {
     this.initialMonth,
   });
 
+  /// Date highlighted as selected, or null for no selection. Time-of-day is
+  /// ignored. Changing it after mounting does not navigate the displayed
+  /// month.
   final DateTime? selected;
+
+  /// Receives an enabled day selected by the user. The parent must store the
+  /// returned date and rebuild; this callback does not update selected
+  /// automatically.
   final ValueChanged<DateTime> onChanged;
+
+  /// Inclusive earliest selectable date; null leaves the lower bound
+  /// unrestricted. Months wholly before this date cannot be reached with the
+  /// previous-month button.
   final DateTime? firstDate;
+
+  /// Inclusive latest selectable date; null leaves the upper bound
+  /// unrestricted. Months wholly after this date cannot be reached with the
+  /// next-month button.
   final DateTime? lastDate;
+
+  /// Month to display on first mount. Day and time components are discarded.
+  /// Subsequent changes do not reset navigation; use a new widget key when an
+  /// explicit reset is required.
   final DateTime? initialMonth;
 
+  /// Creates the month-navigation state. Selection remains caller-owned while
+  /// the visible month is retained for this widget identity.
   @override
   State<CarpenterCalendar> createState() => _CarpenterCalendarState();
 }

@@ -355,16 +355,28 @@ final class CarpenterAttachment<T> {
   final String? semanticLabel;
 }
 
+/// Determinate upload progress presentation. The caller owns transfer state
+/// and updates value; this widget does not start or monitor an upload.
 final class CarpenterUploadProgress extends StatelessWidget {
+  /// Displays a transfer fraction through CarpenterProgress, with an
+  /// upload-specific accessible label.
   const CarpenterUploadProgress({
     super.key,
     required this.value,
     this.semanticLabel = 'Upload progress',
   });
 
+  /// Completed fraction of the transfer. Supply a finite value between zero
+  /// and one; this wrapper forwards it to CarpenterProgress without its own
+  /// conversion.
   final double value;
+
+  /// Accessible name of the transfer, defaulting to Upload progress.
+  /// Distinguish concurrent uploads with different labels.
   final String semanticLabel;
 
+  /// Forwards the fraction and accessible label to CarpenterProgress; it does
+  /// not add independent loading or error state.
   @override
   Widget build(BuildContext context) =>
       CarpenterProgress(value: value, semanticLabel: semanticLabel);

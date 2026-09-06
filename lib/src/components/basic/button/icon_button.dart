@@ -5,7 +5,15 @@ import '../../../foundation/roles.dart';
 import '../../../internal/rendering/action_control.dart';
 import '../../../internal/rendering/icon_renderer.dart';
 
+/// Icon-only semantic action that requires an explicit accessible name.
+///
+/// Use it when the icon is recognizable in context and text would be
+/// redundant. The caller owns execution state; callback aliases follow the
+/// same mutually exclusive contract as [CarpenterButton].
 final class CarpenterIconButton extends StatelessWidget {
+  /// Creates an icon action with a required [semanticLabel]. Null callbacks
+  /// disable it; supplying both [onPressed] and [onInvoke] is an assertion
+  /// error.
   const CarpenterIconButton({
     super.key,
     required this.icon,
@@ -26,6 +34,8 @@ final class CarpenterIconButton extends StatelessWidget {
          'Use either onPressed or the compatibility onInvoke callback, not both.',
        );
 
+  /// Projects an icon-bearing [action], preserving its visibility and
+  /// disabled reason. Asserts that the descriptor supplies an icon.
   CarpenterIconButton.fromAction(
     CarpenterActionDescriptor action, {
     super.key,
@@ -44,18 +54,46 @@ final class CarpenterIconButton extends StatelessWidget {
        _visible = action.visible,
        _semanticHint = action.disabledReason;
 
+  /// Required Carpenter icon source; it is rendered at the themed action-icon
+  /// size.
   final CarpenterIconSource icon;
+
+  /// Required accessible action name. Describe the action rather than the
+  /// icon shape.
   final String semanticLabel;
+
+  /// Callback invoked by an enabled activation. Null disables the action
+  /// unless the compatibility callback is supplied.
   final VoidCallback? onPressed;
 
   /// Compatibility alias for older Carpenter call sites.
   final VoidCallback? onInvoke;
+
+  /// Semantic action or selection color resolved from the current Carpenter
+  /// theme.
   final ActionColorRole colorRole;
+
+  /// Visual emphasis independently of the action's semantic color role.
   final ActionProminence prominence;
+
+  /// Semantic control size, resolving coordinated height, spacing, icon, and
+  /// typography metrics.
   final ControlSize size;
+
+  /// Leading and trailing corner roles. Logical start/end follow text
+  /// direction.
   final CarpenterShape shape;
+
+  /// Caller-owned operation phase shown by the action renderer; no work is
+  /// started automatically.
   final ActionExecutionPhase executionPhase;
+
+  /// Optional caller-owned focus node. Dispose a supplied node in its owner,
+  /// not in the widget.
   final FocusNode? focusNode;
+
+  /// Whether the control requests focus when first attached. Defaults to
+  /// false.
   final bool autofocus;
   final bool _visible;
   final String? _semanticHint;

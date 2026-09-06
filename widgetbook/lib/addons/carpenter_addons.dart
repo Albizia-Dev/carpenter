@@ -40,37 +40,50 @@ const _carpenterViewports = <ViewportData>[
   ),
 ];
 
+final List<WidgetbookTheme<CarpenterThemeData>> carpenterThemes = [
+  WidgetbookTheme(name: 'Light', data: CarpenterThemeData.light()),
+  WidgetbookTheme(
+    name: 'Light · compact',
+    data: CarpenterThemeData.light(density: CarpenterDensity.compact),
+  ),
+  WidgetbookTheme(name: 'Dark', data: CarpenterThemeData.dark()),
+  WidgetbookTheme(
+    name: 'Dark · compact',
+    data: CarpenterThemeData.dark(density: CarpenterDensity.compact),
+  ),
+  WidgetbookTheme(
+    name: 'High contrast',
+    data: CarpenterThemeData.light(contrast: ContrastMode.high),
+  ),
+  WidgetbookTheme(
+    name: 'High contrast · compact',
+    data: CarpenterThemeData.light(
+      contrast: ContrastMode.high,
+      density: CarpenterDensity.compact,
+    ),
+  ),
+  WidgetbookTheme(
+    name: 'High contrast dark',
+    data: CarpenterThemeData.dark(contrast: ContrastMode.high),
+  ),
+  WidgetbookTheme(
+    name: 'High contrast dark · compact',
+    data: CarpenterThemeData.dark(
+      contrast: ContrastMode.high,
+      density: CarpenterDensity.compact,
+    ),
+  ),
+];
+
 final List<WidgetbookAddon> carpenterAddons = [
+  ViewportAddon(_carpenterViewports),
   ThemeAddon<CarpenterThemeData>(
-    themes: [
-      WidgetbookTheme(name: 'Light', data: CarpenterThemeData.light()),
-      WidgetbookTheme(
-        name: 'Light · compact',
-        data: CarpenterThemeData.light(density: CarpenterDensity.compact),
-      ),
-      WidgetbookTheme(name: 'Dark', data: CarpenterThemeData.dark()),
-      WidgetbookTheme(
-        name: 'Dark · compact',
-        data: CarpenterThemeData.dark(density: CarpenterDensity.compact),
-      ),
-      WidgetbookTheme(
-        name: 'High contrast',
-        data: CarpenterThemeData.light(contrast: ContrastMode.high),
-      ),
-      WidgetbookTheme(
-        name: 'High contrast · compact',
-        data: CarpenterThemeData.light(
-          contrast: ContrastMode.high,
-          density: CarpenterDensity.compact,
-        ),
-      ),
-    ],
+    themes: carpenterThemes,
     themeBuilder: (context, theme, child) => CarpenterTheme(
       data: theme,
       child: ColoredBox(color: theme.surface.base, child: child),
     ),
   ),
-  ViewportAddon(_carpenterViewports),
   ZoomAddon(),
   // Widgetbook 3.25 exposes animation timing as experimental.
   // ignore: experimental_member_use
