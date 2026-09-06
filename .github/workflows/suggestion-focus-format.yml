@@ -1,0 +1,37 @@
+name: Suggestion focus format
+
+on:
+  push:
+    branches:
+      - fix/suggestion-selection-focus-cycle
+
+permissions:
+  contents: write
+
+jobs:
+  format:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: fix/suggestion-selection-focus-cycle
+          persist-credentials: true
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Resolve package dependencies
+        run: flutter pub get
+      - name: Format suggestion lifecycle fix
+        run: dart format lib/src/internal/selection/suggestion_field.dart
+      - name: Commit formatter output
+        run: |
+          if git diff --quiet -- lib/src/internal/selection/suggestion_field.dart; then
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lib/src/internal/selection/suggestion_field.dart
+          git commit -m "style: format suggestion focus fix"
+          git push
