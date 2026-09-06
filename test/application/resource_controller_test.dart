@@ -148,8 +148,34 @@ void main() {
       'Cannot load resource',
     );
   });
+
+  test('data change hook observes request and local data changes', () async {
+    var next = 1;
+    final controller = _ObservedResourceController(() async => next);
+    addTearDown(controller.dispose);
+
+    await controller.initialize();
+    controller.replaceData(2);
+    controller.updateData((current) => current + 1);
+    next = 4;
+    await controller.refresh();
+
+    expect(controller.changes, ['null->1', '1->2', '2->3', '3->4']);
+  });
 }
 
 final class _TestResourceController extends CarpenterResourceController<int> {
   _TestResourceController() : super(load: (_) async => 11);
+}
+
+final class _ObservedResourceController extends CarpenterResourceController<int> {
+  _ObservedResourceController(Future<int> Function() load)
+    : super(load: (_) => load());
+
+  final List<String> changes = [];
+
+  @override
+  void didChangeData(int? previous, int next) {
+    changes.add('$previous->$next');
+  }
 }
