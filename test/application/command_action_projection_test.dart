@@ -27,6 +27,25 @@ void main() {
     expect(received, 42);
   });
 
+  test('command action consumes failure after executor reports it', () async {
+    final events = <CarpenterCommandExecutionEvent>[];
+    final command = CarpenterCommandController<void>(
+      id: 'refresh',
+      title: 'Refresh',
+      execute: (_) => throw StateError('offline'),
+    );
+    addTearDown(command.dispose);
+    final executor = CarpenterCommandExecutor(listeners: [events.add]);
+
+    command.toAction(null, executor: executor).onInvoke!.call();
+    await pumpEventQueue();
+
+    expect(command.state.value.execution, CarpenterCommandExecution.failed);
+    expect(command.state.value.error, isA<StateError>());
+    expect(events.whereType<CarpenterCommandFailed>(), hasLength(1));
+    expect(events.whereType<CarpenterCommandSucceeded>(), isEmpty);
+  });
+
   test('command projection reflects current availability and visibility', () {
     final command = CarpenterCommandController<int>(
       id: 'archive',
