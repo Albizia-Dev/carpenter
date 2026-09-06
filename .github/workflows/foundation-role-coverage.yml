@@ -1,0 +1,55 @@
+name: Verify foundation role documentation
+
+on:
+  push:
+    branches:
+      - docs/foundation-role-coverage
+
+permissions:
+  contents: write
+
+concurrency:
+  group: foundation-role-coverage
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Resolve dependencies
+        run: |
+          flutter pub get
+          (cd widgetbook && flutter pub get)
+          (cd tool/documentation && dart pub get --enforce-lockfile)
+      - name: Format semantic roles
+        run: dart format lib/src/foundation/roles.dart
+      - name: Regenerate documentation debt ledger
+        run: (cd tool/documentation && dart run bin/audit.dart ../.. --write-baseline)
+      - name: Verify documentation tooling
+        run: |
+          (cd tool/documentation && dart test)
+          (cd tool/documentation && dart run bin/audit.dart ../.. --check)
+      - name: Analyze library and Widgetbook
+        run: |
+          dart analyze lib
+          (cd widgetbook && dart analyze lib test)
+      - name: Test semantic role contracts
+        run: |
+          flutter test \
+            test/foundation/action_descriptor_test.dart \
+            test/foundation/theme_test.dart
+          (cd widgetbook && flutter test test/widgetbook_smoke_test.dart)
+      - name: Commit verified result and remove workbench
+        run: |
+          rm .github/workflows/foundation-role-coverage.yml
+          git diff --check
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git diff --cached --quiet || git commit -m 'docs: record semantic role coverage'
+          git push origin HEAD:docs/foundation-role-coverage
