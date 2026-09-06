@@ -24,8 +24,8 @@ final class CarpenterResourceLoadRequest {
 typedef CarpenterResourceLoader<T> =
     Future<T> Function(CarpenterResourceLoadRequest request);
 
-final class CarpenterResourceController<T>
-    extends ValueNotifier<CarpenterPageState>
+/// Extensible resource lifecycle base for application-specific controllers.
+class CarpenterResourceController<T> extends ValueNotifier<CarpenterPageState>
     implements CarpenterPageController {
   CarpenterResourceController({
     required CarpenterResourceLoader<T> load,

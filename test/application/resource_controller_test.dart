@@ -69,4 +69,21 @@ void main() {
       expect(controller.value, isA<CarpenterPageReady>());
     },
   );
+
+  test(
+    'resource controller supports application-specific subclasses',
+    () async {
+      final controller = _TestResourceController();
+      addTearDown(controller.dispose);
+
+      await controller.initialize();
+
+      expect(controller.data, 11);
+      expect(controller.value, isA<CarpenterPageReady>());
+    },
+  );
+}
+
+final class _TestResourceController extends CarpenterResourceController<int> {
+  _TestResourceController() : super(load: (_) async => 11);
 }
