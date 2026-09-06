@@ -66,6 +66,17 @@ void main() {
       await undo!();
       expect(undone, isTrue);
 
+      final undoOnly = CarpenterCommandController<void>(
+        id: 'payment.archive',
+        title: 'Archive payment',
+        execute: (_) => CarpenterCommandResult(undo: () => undone = false),
+      );
+      addTearDown(undoOnly.dispose);
+      await executor.execute(undoOnly, null);
+      expect(feedback.value?.kind, CarpenterCommandFeedbackKind.success);
+      expect(feedback.value?.message, isNull);
+      expect(feedback.value?.undo, isNotNull);
+
       final noMessage = CarpenterCommandController<void>(
         id: 'refresh',
         title: 'Refresh',
