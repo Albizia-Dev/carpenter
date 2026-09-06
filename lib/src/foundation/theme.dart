@@ -93,6 +93,38 @@ final class CarpenterThemeData {
 
   /// Shared overlay/menu/dialog/toast surface colors.
   final CarpenterOverlayTheme overlay;
+
+  /// Returns a theme with selected semantic contracts replaced.
+  ///
+  /// Brightness, contrast, and density remain owned by the light/dark
+  /// factories so token-derived geometry cannot become internally inconsistent.
+  CarpenterThemeData copyWith({
+    CarpenterContentTheme? content,
+    CarpenterActionTheme? actions,
+    CarpenterFieldTheme? fields,
+    CarpenterSelectionTheme? selection,
+    CarpenterFeedbackTheme? feedback,
+    CarpenterFocusTheme? focus,
+    CarpenterSurfaceTheme? surface,
+    CarpenterOverlayTheme? overlay,
+  }) => CarpenterThemeData._(
+    brightness: brightness,
+    contrast: contrast,
+    density: density,
+    typography: typography,
+    content: content ?? this.content,
+    actions: actions ?? this.actions,
+    fields: fields ?? this.fields,
+    selection: selection ?? this.selection,
+    feedback: feedback ?? this.feedback,
+    sizes: sizes,
+    spacing: spacing,
+    shapes: shapes,
+    motion: motion,
+    focus: focus ?? this.focus,
+    surface: surface ?? this.surface,
+    overlay: overlay ?? this.overlay,
+  );
 }
 
 /// Inherited boundary that exposes [CarpenterThemeData] to descendant Carpenter components.
@@ -448,6 +480,22 @@ final class CarpenterContentTheme {
   final Color disabled;
 
   /// Resolves a semantic content color [role] to its raw foreground color.
+  /// Returns a content palette with only the supplied semantic foregrounds replaced.
+  CarpenterContentTheme copyWith({
+    Color? primary,
+    Color? secondary,
+    Color? muted,
+    Color? inverse,
+    Color? disabled,
+  }) => CarpenterContentTheme(
+    primary: primary ?? this.primary,
+    secondary: secondary ?? this.secondary,
+    muted: muted ?? this.muted,
+    inverse: inverse ?? this.inverse,
+    disabled: disabled ?? this.disabled,
+  );
+
+  /// Resolves the semantic foreground color assigned to [role].
   Color resolve(ContentColorRole role) => switch (role) {
     ContentColorRole.primary => primary,
     ContentColorRole.secondary => secondary,
@@ -485,6 +533,22 @@ final class CarpenterActionPalette {
   final Color strongState;
 
   /// Resolves the action-family color for [states], preferring pressed, then hovered, then normal.
+  /// Returns this action-family palette with only the supplied interaction colors replaced.
+  CarpenterActionPalette copyWith({
+    Color? normal,
+    Color? hovered,
+    Color? pressed,
+    Color? state,
+    Color? strongState,
+  }) => CarpenterActionPalette(
+    normal: normal ?? this.normal,
+    hovered: hovered ?? this.hovered,
+    pressed: pressed ?? this.pressed,
+    state: state ?? this.state,
+    strongState: strongState ?? this.strongState,
+  );
+
+  /// Resolves this action palette for the supplied interaction [states].
   Color resolve(Set<WidgetState> states) {
     if (states.contains(WidgetState.pressed)) return pressed;
     if (states.contains(WidgetState.hovered)) return hovered;
@@ -572,6 +636,34 @@ final class CarpenterActionTheme {
   final Color disabledForeground;
 
   /// Resolves action colors from semantic [role], visual [prominence], and interaction [states], including disabled treatment.
+  /// Returns an action theme with only the supplied semantic palettes or shared colors replaced.
+  CarpenterActionTheme copyWith({
+    CarpenterActionPalette? neutral,
+    CarpenterActionPalette? primary,
+    CarpenterActionPalette? utility,
+    CarpenterActionPalette? danger,
+    CarpenterActionPalette? warning,
+    CarpenterActionPalette? success,
+    CarpenterActionPalette? info,
+    Color? transparent,
+    Color? inverse,
+    Color? disabledBackground,
+    Color? disabledForeground,
+  }) => CarpenterActionTheme(
+    neutral: neutral ?? this.neutral,
+    primary: primary ?? this.primary,
+    utility: utility ?? this.utility,
+    danger: danger ?? this.danger,
+    warning: warning ?? this.warning,
+    success: success ?? this.success,
+    info: info ?? this.info,
+    transparent: transparent ?? this.transparent,
+    inverse: inverse ?? this.inverse,
+    disabledBackground: disabledBackground ?? this.disabledBackground,
+    disabledForeground: disabledForeground ?? this.disabledForeground,
+  );
+
+  /// Resolves action colors from semantic role, prominence, and interaction state.
   CarpenterActionStyle resolve(
     ActionColorRole role,
     ActionProminence prominence,
@@ -780,6 +872,42 @@ final class CarpenterFieldTheme {
   final Color disabledForeground;
 
   /// Resolves field colors from [availability], hover/focus [states], and validation error state.
+  /// Returns a field theme with only the supplied semantic state colors replaced.
+  CarpenterFieldTheme copyWith({
+    Color? background,
+    Color? backgroundHovered,
+    Color? backgroundDisabled,
+    Color? foreground,
+    Color? placeholder,
+    Color? border,
+    Color? borderHovered,
+    Color? borderFocused,
+    Color? borderError,
+    Color? label,
+    Color? supporting,
+    Color? error,
+    Color? icon,
+    Color? selection,
+    Color? disabledForeground,
+  }) => CarpenterFieldTheme(
+    background: background ?? this.background,
+    backgroundHovered: backgroundHovered ?? this.backgroundHovered,
+    backgroundDisabled: backgroundDisabled ?? this.backgroundDisabled,
+    foreground: foreground ?? this.foreground,
+    placeholder: placeholder ?? this.placeholder,
+    border: border ?? this.border,
+    borderHovered: borderHovered ?? this.borderHovered,
+    borderFocused: borderFocused ?? this.borderFocused,
+    borderError: borderError ?? this.borderError,
+    label: label ?? this.label,
+    supporting: supporting ?? this.supporting,
+    error: error ?? this.error,
+    icon: icon ?? this.icon,
+    selection: selection ?? this.selection,
+    disabledForeground: disabledForeground ?? this.disabledForeground,
+  );
+
+  /// Resolves field colors for availability, interaction state, and errors.
   CarpenterFieldStyle resolve({
     required FieldAvailability availability,
     required Set<WidgetState> states,
@@ -860,6 +988,17 @@ final class CarpenterSelectionPalette {
 
   /// Mark/check/indicator color on selected controls.
   final Color mark;
+
+  /// Returns this selection palette with only the supplied selected-state colors replaced.
+  CarpenterSelectionPalette copyWith({
+    Color? selected,
+    Color? selectedHovered,
+    Color? mark,
+  }) => CarpenterSelectionPalette(
+    selected: selected ?? this.selected,
+    selectedHovered: selectedHovered ?? this.selectedHovered,
+    mark: mark ?? this.mark,
+  );
 }
 
 /// Resolves selection controls from semantic color role, selected state, and [WidgetState] values.
@@ -916,6 +1055,40 @@ final class CarpenterSelectionTheme {
   final Color disabledMark;
 
   /// Resolves selection colors from semantic [role], whether the control is [selected], and interaction [states].
+  /// Returns the palette currently assigned to the semantic selection [role].
+  CarpenterSelectionPalette palette(SelectionColorRole role) =>
+      _palettes[role]!;
+
+  /// Returns a selection theme with supplied role palettes merged over the current palette map.
+  CarpenterSelectionTheme copyWith({
+    Map<SelectionColorRole, CarpenterSelectionPalette>? palettes,
+    Color? foreground,
+    Color? supporting,
+    Color? disabledForeground,
+    Color? background,
+    Color? backgroundHovered,
+    Color? border,
+    Color? borderHovered,
+    Color? disabledBackground,
+    Color? disabledBorder,
+    Color? disabledSelected,
+    Color? disabledMark,
+  }) => CarpenterSelectionTheme(
+    {..._palettes, ...?palettes},
+    foreground: foreground ?? this.foreground,
+    supporting: supporting ?? this.supporting,
+    disabledForeground: disabledForeground ?? this.disabledForeground,
+    background: background ?? this.background,
+    backgroundHovered: backgroundHovered ?? this.backgroundHovered,
+    border: border ?? this.border,
+    borderHovered: borderHovered ?? this.borderHovered,
+    disabledBackground: disabledBackground ?? this.disabledBackground,
+    disabledBorder: disabledBorder ?? this.disabledBorder,
+    disabledSelected: disabledSelected ?? this.disabledSelected,
+    disabledMark: disabledMark ?? this.disabledMark,
+  );
+
+  /// Resolves selection colors for semantic role, selected state, and interaction state.
   CarpenterSelectionStyle resolve({
     required SelectionColorRole role,
     required bool selected,
@@ -966,6 +1139,13 @@ final class CarpenterFeedbackStyle {
 
   /// Semantic feedback foreground color.
   final Color foreground;
+
+  /// Returns this feedback style with supplied surface or foreground colors replaced.
+  CarpenterFeedbackStyle copyWith({Color? background, Color? foreground}) =>
+      CarpenterFeedbackStyle(
+        background: background ?? this.background,
+        foreground: foreground ?? this.foreground,
+      );
 }
 
 /// Maps [FeedbackColorRole] values to resolved passive feedback styles.
@@ -977,6 +1157,12 @@ final class CarpenterFeedbackTheme {
   final Map<FeedbackColorRole, CarpenterFeedbackStyle> _styles;
 
   /// Returns the configured passive feedback style for [role].
+  /// Returns a feedback theme with supplied role styles merged over the current style map.
+  CarpenterFeedbackTheme copyWith({
+    Map<FeedbackColorRole, CarpenterFeedbackStyle>? styles,
+  }) => CarpenterFeedbackTheme({..._styles, ...?styles});
+
+  /// Resolves the feedback style assigned to semantic [role].
   CarpenterFeedbackStyle resolve(FeedbackColorRole role) => _styles[role]!;
 }
 
@@ -1609,6 +1795,11 @@ final class CarpenterFocusTheme {
   const CarpenterFocusTheme({required this.color});
 
   final Color color;
+
+  /// Returns the focus theme with an optional replacement semantic focus-ring color.
+  CarpenterFocusTheme copyWith({Color? color}) =>
+      CarpenterFocusTheme(color: color ?? this.color);
+
   LengthUnit get width => tokens.focus.width;
   LengthUnit get gap => tokens.focus.gap;
 }
@@ -1619,6 +1810,13 @@ final class CarpenterSurfaceTheme {
 
   final Color base;
   final Color subtle;
+
+  /// Returns the surface theme with optional replacement base or subtle surfaces.
+  CarpenterSurfaceTheme copyWith({Color? base, Color? subtle}) =>
+      CarpenterSurfaceTheme(
+        base: base ?? this.base,
+        subtle: subtle ?? this.subtle,
+      );
 }
 
 @immutable
@@ -1644,6 +1842,29 @@ final class CarpenterOverlayTheme {
   final Color scrim;
   final Color tooltipBackground;
   final Color tooltipForeground;
+
+  /// Returns the overlay theme with only the supplied semantic overlay colors replaced.
+  CarpenterOverlayTheme copyWith({
+    Color? background,
+    Color? foreground,
+    Color? supporting,
+    Color? border,
+    Color? hovered,
+    Color? selected,
+    Color? scrim,
+    Color? tooltipBackground,
+    Color? tooltipForeground,
+  }) => CarpenterOverlayTheme(
+    background: background ?? this.background,
+    foreground: foreground ?? this.foreground,
+    supporting: supporting ?? this.supporting,
+    border: border ?? this.border,
+    hovered: hovered ?? this.hovered,
+    selected: selected ?? this.selected,
+    scrim: scrim ?? this.scrim,
+    tooltipBackground: tooltipBackground ?? this.tooltipBackground,
+    tooltipForeground: tooltipForeground ?? this.tooltipForeground,
+  );
 }
 
 CarpenterThemeData _fromTokens({
