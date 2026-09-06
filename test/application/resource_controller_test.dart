@@ -35,24 +35,21 @@ void main() {
     expect(controller.value, isA<CarpenterPageReady>());
   });
 
-  test(
-    'resource data replacement preserves state and notifies once',
-    () async {
-      final controller = CarpenterResourceController<int>(load: (_) async => 1);
-      addTearDown(controller.dispose);
-      await controller.initialize();
+  test('resource data replacement preserves state and notifies once', () async {
+    final controller = CarpenterResourceController<int>(load: (_) async => 1);
+    addTearDown(controller.dispose);
+    await controller.initialize();
 
-      var notifications = 0;
-      controller.addListener(() => notifications += 1);
+    var notifications = 0;
+    controller.addListener(() => notifications += 1);
 
-      controller.replaceData(2);
+    controller.replaceData(2);
 
-      expect(controller.data, 2);
-      expect(controller.hasData, isTrue);
-      expect(controller.value, isA<CarpenterPageReady>());
-      expect(notifications, 1);
-    },
-  );
+    expect(controller.data, 2);
+    expect(controller.hasData, isTrue);
+    expect(controller.value, isA<CarpenterPageReady>());
+    expect(notifications, 1);
+  });
 
   test(
     'resource data update uses latest value and requires loaded data',
