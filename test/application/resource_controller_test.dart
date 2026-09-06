@@ -108,6 +108,36 @@ void main() {
     },
   );
 
+  test(
+    'refresh command reports failure while preserving loaded resource',
+    () async {
+      var invocation = 0;
+      final controller = CarpenterResourceController<int>(
+        load: (_) async {
+          invocation += 1;
+          if (invocation == 1) return 8;
+          throw StateError('offline');
+        },
+      );
+      addTearDown(controller.dispose);
+
+      await controller.initialize();
+
+      await expectLater(
+        controller.refreshCommand.execute(null),
+        throwsA(isA<StateError>()),
+      );
+
+      expect(controller.data, 8);
+      expect(controller.value, isA<CarpenterPageReady>());
+      expect(controller.hasRefreshFailure, isTrue);
+      expect(
+        controller.refreshCommand.value.execution,
+        CarpenterCommandExecution.failed,
+      );
+    },
+  );
+
   test('successful refresh clears an earlier refresh failure', () async {
     var invocation = 0;
     final controller = CarpenterResourceController<int>(
@@ -146,6 +176,28 @@ void main() {
     expect(
       (controller.value as CarpenterPageFailure).message,
       'Cannot load resource',
+    );
+  });
+
+  test('retry command reports blocking initial-load failure', () async {
+    final controller = CarpenterResourceController<int>(
+      load: (_) async => throw StateError('offline'),
+      errorMessage: (_) => 'Cannot load resource',
+    );
+    addTearDown(controller.dispose);
+
+    await controller.initialize();
+
+    await expectLater(
+      controller.retryCommand.execute(null),
+      throwsA(isA<StateError>()),
+    );
+
+    expect(controller.data, isNull);
+    expect(controller.value, isA<CarpenterPageFailure>());
+    expect(
+      controller.retryCommand.value.execution,
+      CarpenterCommandExecution.failed,
     );
   });
 

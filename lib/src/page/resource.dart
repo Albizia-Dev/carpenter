@@ -50,7 +50,7 @@ class CarpenterResourceController<T> extends ValueNotifier<CarpenterPageState>
       title: 'Refresh',
       presentation: CarpenterCommandPresentation.secondary,
       execute: (_) async {
-        await refresh();
+        await _run(CarpenterResourceLoadReason.refresh, propagateFailure: true);
         return const CarpenterCommandResult();
       },
     );
@@ -58,7 +58,7 @@ class CarpenterResourceController<T> extends ValueNotifier<CarpenterPageState>
       id: 'resource.retry',
       title: 'Retry',
       execute: (_) async {
-        await refresh();
+        await _run(CarpenterResourceLoadReason.refresh, propagateFailure: true);
         return const CarpenterCommandResult();
       },
     );
@@ -124,7 +124,10 @@ class CarpenterResourceController<T> extends ValueNotifier<CarpenterPageState>
     if (notify) notifyListeners();
   }
 
-  Future<void> _run(CarpenterResourceLoadReason reason) async {
+  Future<void> _run(
+    CarpenterResourceLoadReason reason, {
+    bool propagateFailure = false,
+  }) async {
     final lease = _requests.begin();
     _refreshFailure = null;
     value = _data == null
@@ -157,6 +160,9 @@ class CarpenterResourceController<T> extends ValueNotifier<CarpenterPageState>
           message: failure.message,
           retryCommand: retryCommand,
         );
+      }
+      if (propagateFailure) {
+        Error.throwWithStackTrace(error, stackTrace);
       }
     } finally {
       _requests.finish(lease);
