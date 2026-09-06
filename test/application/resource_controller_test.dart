@@ -83,27 +83,30 @@ void main() {
     },
   );
 
-  test('refresh failure preserves loaded resource and exposes failure', () async {
-    var invocation = 0;
-    final controller = CarpenterResourceController<int>(
-      load: (_) async {
-        invocation += 1;
-        if (invocation == 1) return 5;
-        throw StateError('offline');
-      },
-      errorMessage: (_) => 'Retry later',
-    );
-    addTearDown(controller.dispose);
+  test(
+    'refresh failure preserves loaded resource and exposes failure',
+    () async {
+      var invocation = 0;
+      final controller = CarpenterResourceController<int>(
+        load: (_) async {
+          invocation += 1;
+          if (invocation == 1) return 5;
+          throw StateError('offline');
+        },
+        errorMessage: (_) => 'Retry later',
+      );
+      addTearDown(controller.dispose);
 
-    await controller.initialize();
-    await controller.refresh();
+      await controller.initialize();
+      await controller.refresh();
 
-    expect(controller.data, 5);
-    expect(controller.value, isA<CarpenterPageReady>());
-    expect(controller.hasRefreshFailure, isTrue);
-    expect(controller.refreshFailure?.error, isA<StateError>());
-    expect(controller.refreshFailure?.message, 'Retry later');
-  });
+      expect(controller.data, 5);
+      expect(controller.value, isA<CarpenterPageReady>());
+      expect(controller.hasRefreshFailure, isTrue);
+      expect(controller.refreshFailure?.error, isA<StateError>());
+      expect(controller.refreshFailure?.message, 'Retry later');
+    },
+  );
 
   test('successful refresh clears an earlier refresh failure', () async {
     var invocation = 0;
