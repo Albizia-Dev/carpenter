@@ -257,7 +257,9 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
       onKeyEvent: _handleKey,
       child: Listener(
         behavior: HitTestBehavior.translucent,
-        onPointerDown: _enabled && !widget.open ? (_) => _openFromPointer() : null,
+        onPointerDown: _enabled && !widget.open
+            ? (_) => _openFromPointer()
+            : null,
         child: CarpenterInput(
           controller: widget.controller,
           label: widget.label,
