@@ -4,9 +4,11 @@ import 'package:flutter/widgets.dart';
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
 import '../basic/button/button.dart';
+import '../basic/button/icon_button.dart';
+import '../basic/icons.dart';
 import '../basic/text.dart';
 
-/// Adaptive page navigation with first/last controls and a compact page window.
+/// Adaptive page navigation with previous/next controls and a compact page window.
 final class CarpenterPaginationBar extends StatelessWidget {
   const CarpenterPaginationBar({
     super.key,
@@ -62,18 +64,18 @@ final class CarpenterPaginationBar extends StatelessWidget {
   }
 
   Widget _navigationButton({
-    required String label,
+    required bool previous,
     required String semanticLabel,
     required int target,
     required bool enabled,
-  }) => CarpenterButton.text(
-    label: label,
+    CarpenterShape shape = CarpenterShape.rounded,
+  }) => CarpenterIconButton(
+    icon: previous ? CarpenterIcons.chevronLeft : CarpenterIcons.chevronRight,
     semanticLabel: semanticLabel,
     size: ControlSize.small,
-    shape: const CarpenterShape(
-      start: ShapeRole.none,
-      end: ShapeRole.none,
-    ),
+    colorRole: ActionColorRole.utility,
+    prominence: ActionProminence.ghost,
+    shape: shape,
     onPressed: enabled ? () => onPageChanged(target) : null,
   );
 
@@ -83,13 +85,13 @@ final class CarpenterPaginationBar extends StatelessWidget {
     final gap = context.units(theme.spacing.small);
     final label = CarpenterText.body('Page $page of $totalPages');
     final previous = _navigationButton(
-      label: '‹',
+      previous: true,
       semanticLabel: 'Previous page',
       target: page - 1,
       enabled: page > 1,
     );
     final next = _navigationButton(
-      label: '›',
+      previous: false,
       semanticLabel: 'Next page',
       target: page + 1,
       enabled: page < totalPages,
@@ -109,12 +111,18 @@ final class CarpenterPaginationBar extends StatelessWidget {
           );
         }
 
+        const joinedShape = CarpenterShape(
+          start: ShapeRole.none,
+          end: ShapeRole.none,
+        );
         final navigation = ClipRRect(
           borderRadius: BorderRadius.circular(
-            context.units(theme.shapes.radiusForAction(
-              ShapeRole.rounded,
-              ControlSize.small,
-            )),
+            context.units(
+              theme.shapes.radiusForAction(
+                ShapeRole.rounded,
+                ControlSize.small,
+              ),
+            ),
           ),
           child: DecoratedBox(
             decoration: BoxDecoration(
@@ -127,16 +135,18 @@ final class CarpenterPaginationBar extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _navigationButton(
-                  label: '«',
-                  semanticLabel: 'First page',
-                  target: 1,
+                  previous: true,
+                  semanticLabel: 'Previous page',
+                  target: page - 1,
                   enabled: page > 1,
+                  shape: joinedShape,
                 ),
-                previous,
                 for (final item in _pageWindow)
                   if (item == null)
                     SizedBox(
-                      width: context.units(theme.sizes.actionHeight(ControlSize.small)),
+                      width: context.units(
+                        theme.sizes.actionHeight(ControlSize.small),
+                      ),
                       child: const Center(child: CarpenterText.body('…')),
                     )
                   else
@@ -150,18 +160,17 @@ final class CarpenterPaginationBar extends StatelessWidget {
                       prominence: item == page
                           ? ActionProminence.low
                           : ActionProminence.ghost,
-                      shape: const CarpenterShape(
-                        start: ShapeRole.none,
-                        end: ShapeRole.none,
-                      ),
-                      onPressed: () => onPageChanged(item),
+                      shape: joinedShape,
+                      onPressed: item == page
+                          ? null
+                          : () => onPageChanged(item),
                     ),
-                next,
                 _navigationButton(
-                  label: '»',
-                  semanticLabel: 'Last page',
-                  target: totalPages,
+                  previous: false,
+                  semanticLabel: 'Next page',
+                  target: page + 1,
                   enabled: page < totalPages,
+                  shape: joinedShape,
                 ),
               ],
             ),
