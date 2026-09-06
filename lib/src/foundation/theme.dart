@@ -99,32 +99,32 @@ final class CarpenterThemeData {
   /// Brightness, contrast, and density remain owned by the light/dark
   /// factories so token-derived geometry cannot become internally inconsistent.
   CarpenterThemeData copyWith({
-  CarpenterContentTheme? content,
-  CarpenterActionTheme? actions,
-  CarpenterFieldTheme? fields,
-  CarpenterSelectionTheme? selection,
-  CarpenterFeedbackTheme? feedback,
-  CarpenterFocusTheme? focus,
-  CarpenterSurfaceTheme? surface,
-  CarpenterOverlayTheme? overlay,
-}) => CarpenterThemeData._(
-  brightness: brightness,
-  contrast: contrast,
-  density: density,
-  typography: typography,
-  content: content ?? this.content,
-  actions: actions ?? this.actions,
-  fields: fields ?? this.fields,
-  selection: selection ?? this.selection,
-  feedback: feedback ?? this.feedback,
-  sizes: sizes,
-  spacing: spacing,
-  shapes: shapes,
-  motion: motion,
-  focus: focus ?? this.focus,
-  surface: surface ?? this.surface,
-  overlay: overlay ?? this.overlay,
-);
+    CarpenterContentTheme? content,
+    CarpenterActionTheme? actions,
+    CarpenterFieldTheme? fields,
+    CarpenterSelectionTheme? selection,
+    CarpenterFeedbackTheme? feedback,
+    CarpenterFocusTheme? focus,
+    CarpenterSurfaceTheme? surface,
+    CarpenterOverlayTheme? overlay,
+  }) => CarpenterThemeData._(
+    brightness: brightness,
+    contrast: contrast,
+    density: density,
+    typography: typography,
+    content: content ?? this.content,
+    actions: actions ?? this.actions,
+    fields: fields ?? this.fields,
+    selection: selection ?? this.selection,
+    feedback: feedback ?? this.feedback,
+    sizes: sizes,
+    spacing: spacing,
+    shapes: shapes,
+    motion: motion,
+    focus: focus ?? this.focus,
+    surface: surface ?? this.surface,
+    overlay: overlay ?? this.overlay,
+  );
 }
 
 /// Inherited boundary that exposes [CarpenterThemeData] to descendant Carpenter components.
@@ -1207,9 +1207,8 @@ final class CarpenterSizeTheme {
   };
 
   double actionExtent(BuildContext context, ControlSize value) =>
-      MediaQuery.textScalerOf(
-        context,
-      ).scale(context.units(actionHeight(value)));
+      MediaQuery.textScalerOf(context)
+          .scale(context.units(actionHeight(value)));
 
   IconSize iconForControl(ControlSize value) => switch (value) {
     ControlSize.xsmall => IconSize.xsmall,
