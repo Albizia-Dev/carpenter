@@ -10,6 +10,7 @@ export 'gravity_icons.dart';
 export 'src/application/app.dart';
 export 'src/application/command.dart';
 export 'src/application/command_input_button.dart';
+export 'src/application/command_policy.dart';
 export 'src/application/frame_shell.dart';
 export 'src/application/host.dart';
 export 'src/application/hotkey.dart';
