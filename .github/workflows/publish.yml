@@ -63,8 +63,5 @@ jobs:
       - name: Restore repository-managed analysis config
         run: git checkout -- analysis_options.yaml
 
-      - name: Publish dry run
-        run: dart pub publish --dry-run
-
       - name: Publish to pub.dev
         run: dart pub publish --force
