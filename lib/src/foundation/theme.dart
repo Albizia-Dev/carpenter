@@ -495,6 +495,7 @@ final class CarpenterContentTheme {
     disabled: disabled ?? this.disabled,
   );
 
+  /// Resolves the semantic foreground color assigned to [role].
   Color resolve(ContentColorRole role) => switch (role) {
     ContentColorRole.primary => primary,
     ContentColorRole.secondary => secondary,
@@ -547,6 +548,7 @@ final class CarpenterActionPalette {
     strongState: strongState ?? this.strongState,
   );
 
+  /// Resolves this action palette for the supplied interaction [states].
   Color resolve(Set<WidgetState> states) {
     if (states.contains(WidgetState.pressed)) return pressed;
     if (states.contains(WidgetState.hovered)) return hovered;
@@ -661,6 +663,7 @@ final class CarpenterActionTheme {
     disabledForeground: disabledForeground ?? this.disabledForeground,
   );
 
+  /// Resolves action colors from semantic role, prominence, and interaction state.
   CarpenterActionStyle resolve(
     ActionColorRole role,
     ActionProminence prominence,
@@ -904,6 +907,7 @@ final class CarpenterFieldTheme {
     disabledForeground: disabledForeground ?? this.disabledForeground,
   );
 
+  /// Resolves field colors for availability, interaction state, and errors.
   CarpenterFieldStyle resolve({
     required FieldAvailability availability,
     required Set<WidgetState> states,
@@ -1084,6 +1088,7 @@ final class CarpenterSelectionTheme {
     disabledMark: disabledMark ?? this.disabledMark,
   );
 
+  /// Resolves selection colors for semantic role, selected state, and interaction state.
   CarpenterSelectionStyle resolve({
     required SelectionColorRole role,
     required bool selected,
@@ -1157,6 +1162,7 @@ final class CarpenterFeedbackTheme {
     Map<FeedbackColorRole, CarpenterFeedbackStyle>? styles,
   }) => CarpenterFeedbackTheme({..._styles, ...?styles});
 
+  /// Resolves the feedback style assigned to semantic [role].
   CarpenterFeedbackStyle resolve(FeedbackColorRole role) => _styles[role]!;
 }
 
