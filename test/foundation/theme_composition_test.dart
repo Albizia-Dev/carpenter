@@ -2,6 +2,7 @@ import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+// Regression coverage for application-level semantic theme composition.
 void main() {
   test(
     'semantic theme composition preserves mode and replaces selected roles',
