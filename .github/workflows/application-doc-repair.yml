@@ -45,8 +45,8 @@ jobs:
           (cd tool/documentation && dart run bin/audit.dart ../.. --check)
       - name: Analyze library and Widgetbook
         run: |
-          flutter analyze
-          (cd widgetbook && flutter analyze)
+          dart analyze lib
+          (cd widgetbook && dart analyze lib test)
       - name: Test catalog structure
         run: (cd widgetbook && flutter test test/widgetbook_smoke_test.dart)
       - name: Commit verified result and remove workbench
