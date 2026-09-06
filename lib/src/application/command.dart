@@ -274,6 +274,30 @@ extension CarpenterCommandExecutionBuildContext on BuildContext {
   }
 }
 
+/// Runs a command from a presentation-only surface.
+///
+/// Command state and [CarpenterCommandExecutor] listeners own failure
+/// presentation. A button or shortcut therefore consumes the already-recorded
+/// asynchronous error instead of also leaking it as an uncaught Future error.
+/// Programmatic callers should use [CarpenterCommand.execute] or
+/// [CarpenterCommandExecutionBuildContext.executeCommand] when they need the
+/// failure to propagate.
+Future<void> _executeCommandForSurface<I>(
+  CarpenterCommand<I> command,
+  I input,
+  CarpenterCommandExecutor? executor,
+) async {
+  try {
+    if (executor == null) {
+      await command.execute(input);
+    } else {
+      await executor.execute(command, input);
+    }
+  } catch (_) {
+    // Failure is already represented by command state and execution policy.
+  }
+}
+
 /// Projects an executable application command into Carpenter's shared action
 /// language. The returned descriptor is a snapshot of the command state; build
 /// it inside a listener when the presentation must react to availability or
@@ -305,11 +329,7 @@ extension CarpenterCommandActionProjection<I> on CarpenterCommand<I> {
       disabledReason: available ? null : current.disabledReason,
       onInvoke: available
           ? () {
-              unawaited(
-                executor == null
-                    ? execute(input)
-                    : executor.execute(this, input),
-              );
+              unawaited(_executeCommandForSurface(this, input, executor));
             }
           : null,
     );
@@ -483,13 +503,13 @@ final class CarpenterCommandShortcutScope extends StatelessWidget {
         continue;
       }
       for (final activator in binding.shortcuts ?? binding.command.shortcuts) {
-        shortcuts[activator] = _CarpenterCommandIntent(() async {
-          if (executor == null) {
-            await binding.command.execute(binding.input);
-          } else {
-            await executor.execute(binding.command, binding.input);
-          }
-        });
+        shortcuts[activator] = _CarpenterCommandIntent(
+          () => _executeCommandForSurface(
+            binding.command,
+            binding.input,
+            executor,
+          ),
+        );
       }
     }
     return Actions(
