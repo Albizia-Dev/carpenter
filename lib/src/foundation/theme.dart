@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'roles.dart';
 import 'tokens/carpenter.mordant.g.dart' as tokens;
 
+/// Immutable semantic theme assembled from generated Carpenter tokens for one brightness, contrast, and density combination.
 @immutable
 final class CarpenterThemeData {
   const CarpenterThemeData._({
@@ -25,6 +26,7 @@ final class CarpenterThemeData {
     required this.overlay,
   });
 
+  /// Builds the light token theme for the requested [contrast] and [density].
   factory CarpenterThemeData.light({
     ContrastMode contrast = ContrastMode.standard,
     CarpenterDensity density = CarpenterDensity.normal,
@@ -34,6 +36,7 @@ final class CarpenterThemeData {
     density: density,
   );
 
+  /// Builds the dark token theme for the requested [contrast] and [density].
   factory CarpenterThemeData.dark({
     ContrastMode contrast = ContrastMode.standard,
     CarpenterDensity density = CarpenterDensity.normal,
@@ -43,43 +46,82 @@ final class CarpenterThemeData {
     density: density,
   );
 
+  /// Effective light/dark brightness used to select generated token values.
   final Brightness brightness;
+
+  /// Requested semantic contrast mode used while selecting token values.
   final ContrastMode contrast;
+
+  /// Global density used by semantic size and spacing resolvers.
   final CarpenterDensity density;
+
+  /// Typography resolver for general text and component-specific text roles.
   final CarpenterTypographyTheme typography;
+
+  /// Semantic foreground colors for ordinary content.
   final CarpenterContentTheme content;
+
+  /// Semantic action palette and interaction-state resolver.
   final CarpenterActionTheme actions;
+
+  /// Semantic field palette and interaction/validation-state resolver.
   final CarpenterFieldTheme fields;
+
+  /// Semantic selection palette and selected/disabled-state resolver.
   final CarpenterSelectionTheme selection;
+
+  /// Passive feedback/status role palette.
   final CarpenterFeedbackTheme feedback;
+
+  /// Semantic component and layout size resolver.
   final CarpenterSizeTheme sizes;
+
+  /// Density-aware component and layout spacing resolver.
   final CarpenterSpacingTheme spacing;
+
+  /// Semantic radii, border widths, and shape-related metrics.
   final CarpenterShapeTheme shapes;
+
+  /// Semantic durations, curves, and loading-motion metrics.
   final CarpenterMotionTheme motion;
+
+  /// Focus-ring color and geometry.
   final CarpenterFocusTheme focus;
+
+  /// Base and subtle application surface colors.
   final CarpenterSurfaceTheme surface;
+
+  /// Shared overlay/menu/dialog/toast surface colors.
   final CarpenterOverlayTheme overlay;
 }
 
+/// Inherited boundary that exposes [CarpenterThemeData] to descendant Carpenter components.
 final class CarpenterTheme extends InheritedWidget {
+  /// Creates a theme boundary exposing [data] to [child].
   const CarpenterTheme({super.key, required this.data, required super.child});
 
+  /// Theme data exposed to descendants of this inherited boundary.
   final CarpenterThemeData data;
 
+  /// Returns the nearest Carpenter theme and establishes an inherited dependency; asserts in debug mode when no theme exists.
   static CarpenterThemeData of(BuildContext context) {
     final result = context.dependOnInheritedWidgetOfExactType<CarpenterTheme>();
     assert(result != null, 'No CarpenterTheme found above this context.');
     return result!.data;
   }
 
+  /// Notifies dependents when the [CarpenterThemeData] instance changes.
   @override
   bool updateShouldNotify(CarpenterTheme oldWidget) => data != oldWidget.data;
 }
 
+/// Resolves semantic Carpenter typography roles and component text treatments into Flutter [TextStyle] values using the active unit scale.
 @immutable
 final class CarpenterTypographyTheme {
+  /// Creates the stateless typography resolver backed by Carpenter tokens.
   const CarpenterTypographyTheme();
 
+  /// Resolves general semantic typography [role] and [emphasis] into a unit-aware text style.
   TextStyle resolve(
     BuildContext context,
     TypographyRole role,
@@ -88,6 +130,7 @@ final class CarpenterTypographyTheme {
     return _resolveUnits(context, _fontSize(role), _lineHeight(role), emphasis);
   }
 
+  /// Resolves action-label typography for a semantic control [size] and [emphasis].
   TextStyle action(
     BuildContext context,
     ControlSize size,
@@ -99,6 +142,7 @@ final class CarpenterTypographyTheme {
     emphasis,
   );
 
+  /// Resolves editable field-value typography for [size] and [emphasis].
   TextStyle fieldInput(
     BuildContext context,
     FieldSize size,
@@ -110,6 +154,7 @@ final class CarpenterTypographyTheme {
     emphasis,
   );
 
+  /// Resolves field-label typography for [size] and [emphasis].
   TextStyle fieldLabel(
     BuildContext context,
     FieldSize size,
@@ -121,6 +166,7 @@ final class CarpenterTypographyTheme {
     emphasis,
   );
 
+  /// Resolves field supporting/help typography for [size] and [emphasis].
   TextStyle fieldSupporting(
     BuildContext context,
     FieldSize size,
@@ -132,6 +178,7 @@ final class CarpenterTypographyTheme {
     emphasis,
   );
 
+  /// Resolves selection-control primary-label typography for [size] and [emphasis].
   TextStyle selectionLabel(
     BuildContext context,
     ControlSize size,
@@ -143,6 +190,7 @@ final class CarpenterTypographyTheme {
     emphasis,
   );
 
+  /// Resolves selection-control supporting-label typography for [size] and [emphasis].
   TextStyle selectionSupporting(
     BuildContext context,
     ControlSize size,
@@ -154,6 +202,7 @@ final class CarpenterTypographyTheme {
     emphasis,
   );
 
+  /// Resolves status-indicator typography using the status component tokens.
   TextStyle status(BuildContext context, TypographyEmphasis emphasis) =>
       _resolveUnits(
         context,
@@ -162,6 +211,7 @@ final class CarpenterTypographyTheme {
         emphasis,
       );
 
+  /// Resolves menu-item typography using the menu component tokens.
   TextStyle menuItem(BuildContext context, TypographyEmphasis emphasis) =>
       _resolveUnits(
         context,
@@ -170,6 +220,7 @@ final class CarpenterTypographyTheme {
         emphasis,
       );
 
+  /// Resolves tooltip typography using overlay tooltip tokens.
   TextStyle tooltip(BuildContext context, TypographyEmphasis emphasis) =>
       _resolveUnits(
         context,
@@ -178,6 +229,7 @@ final class CarpenterTypographyTheme {
         emphasis,
       );
 
+  /// Resolves dialog-title typography using overlay dialog tokens.
   TextStyle dialogTitle(BuildContext context, TypographyEmphasis emphasis) =>
       _resolveUnits(
         context,
@@ -186,6 +238,7 @@ final class CarpenterTypographyTheme {
         emphasis,
       );
 
+  /// Resolves toast-title typography using overlay toast tokens.
   TextStyle toastTitle(BuildContext context, TypographyEmphasis emphasis) =>
       _resolveUnits(
         context,
@@ -194,6 +247,7 @@ final class CarpenterTypographyTheme {
         emphasis,
       );
 
+  /// Resolves toast-message typography using overlay toast tokens.
   TextStyle toastMessage(BuildContext context, TypographyEmphasis emphasis) =>
       _resolveUnits(
         context,
@@ -202,6 +256,7 @@ final class CarpenterTypographyTheme {
         emphasis,
       );
 
+  /// Resolves table-header typography using table component tokens.
   TextStyle tableHeader(BuildContext context, TypographyEmphasis emphasis) =>
       _resolveUnits(
         context,
@@ -210,6 +265,7 @@ final class CarpenterTypographyTheme {
         emphasis,
       );
 
+  /// Resolves table-cell typography using table component tokens.
   TextStyle tableCell(BuildContext context, TypographyEmphasis emphasis) =>
       _resolveUnits(
         context,
@@ -364,8 +420,10 @@ final class CarpenterTypographyTheme {
   };
 }
 
+/// Semantic foreground palette for non-interactive content.
 @immutable
 final class CarpenterContentTheme {
+  /// Creates a semantic content foreground palette.
   const CarpenterContentTheme({
     required this.primary,
     required this.secondary,
@@ -374,12 +432,22 @@ final class CarpenterContentTheme {
     required this.disabled,
   });
 
+  /// Primary readable foreground for normal content.
   final Color primary;
+
+  /// Secondary foreground for supporting content.
   final Color secondary;
+
+  /// De-emphasized foreground for tertiary metadata.
   final Color muted;
+
+  /// Foreground intended for inverse or strongly colored surfaces.
   final Color inverse;
+
+  /// Foreground used for unavailable content.
   final Color disabled;
 
+  /// Resolves a semantic content color [role] to its raw foreground color.
   Color resolve(ContentColorRole role) => switch (role) {
     ContentColorRole.primary => primary,
     ContentColorRole.secondary => secondary,
@@ -389,8 +457,10 @@ final class CarpenterContentTheme {
   };
 }
 
+/// State palette for one semantic action color family.
 @immutable
 final class CarpenterActionPalette {
+  /// Creates the interaction-state palette for one action color family.
   const CarpenterActionPalette({
     required this.normal,
     required this.hovered,
@@ -399,12 +469,22 @@ final class CarpenterActionPalette {
     required this.strongState,
   });
 
+  /// Default foreground/state color for the action family.
   final Color normal;
+
+  /// Color used when the action is hovered.
   final Color hovered;
+
+  /// Color used while the action is pressed.
   final Color pressed;
+
+  /// Low-intensity semantic state color used for tinted surfaces.
   final Color state;
+
+  /// Higher-intensity semantic state color used for emphasized surfaces.
   final Color strongState;
 
+  /// Resolves the action-family color for [states], preferring pressed, then hovered, then normal.
   Color resolve(Set<WidgetState> states) {
     if (states.contains(WidgetState.pressed)) return pressed;
     if (states.contains(WidgetState.hovered)) return hovered;
@@ -412,8 +492,10 @@ final class CarpenterActionPalette {
   }
 }
 
+/// Resolved colors for one action after semantic role, prominence, and widget state have been applied.
 @immutable
 final class CarpenterActionStyle {
+  /// Creates a fully resolved action color style.
   const CarpenterActionStyle({
     required this.background,
     required this.foreground,
@@ -422,15 +504,26 @@ final class CarpenterActionStyle {
     required this.loadingAccent,
   });
 
+  /// Resolved action background color.
   final Color background;
+
+  /// Resolved action text/general foreground color.
   final Color foreground;
+
+  /// Resolved action icon color.
   final Color icon;
+
+  /// Resolved action border color.
   final Color border;
+
+  /// Resolved accent used by action loading/progress presentation.
   final Color loadingAccent;
 }
 
+/// Resolves semantic action color roles, prominence, and interaction state without requiring components to choose raw colors.
 @immutable
 final class CarpenterActionTheme {
+  /// Creates the action theme from semantic palettes and shared disabled/inverse colors.
   const CarpenterActionTheme({
     required this.neutral,
     required this.primary,
@@ -445,18 +538,40 @@ final class CarpenterActionTheme {
     required this.disabledForeground,
   });
 
+  /// Palette for neutral actions.
   final CarpenterActionPalette neutral;
+
+  /// Palette for primary product actions.
   final CarpenterActionPalette primary;
+
+  /// Palette for utility/tooling actions.
   final CarpenterActionPalette utility;
+
+  /// Palette for destructive actions.
   final CarpenterActionPalette danger;
+
+  /// Palette for cautionary actions.
   final CarpenterActionPalette warning;
+
+  /// Palette for positive/success actions.
   final CarpenterActionPalette success;
+
+  /// Palette for informational actions.
   final CarpenterActionPalette info;
+
+  /// Transparent color used when prominence calls for no filled surface or border.
   final Color transparent;
+
+  /// Inverse foreground used on filled semantic action surfaces.
   final Color inverse;
+
+  /// Shared disabled action background used by filled/tinted prominence.
   final Color disabledBackground;
+
+  /// Shared disabled foreground used for action text, icons, borders, and loading accents.
   final Color disabledForeground;
 
+  /// Resolves action colors from semantic [role], visual [prominence], and interaction [states], including disabled treatment.
   CarpenterActionStyle resolve(
     ActionColorRole role,
     ActionProminence prominence,
@@ -553,8 +668,10 @@ final class CarpenterActionTheme {
   }
 }
 
+/// Resolved field colors after availability, focus, hover, and validation state have been applied.
 @immutable
 final class CarpenterFieldStyle {
+  /// Creates a fully resolved field color style.
   const CarpenterFieldStyle({
     required this.background,
     required this.foreground,
@@ -567,19 +684,38 @@ final class CarpenterFieldStyle {
     required this.selection,
   });
 
+  /// Resolved field background.
   final Color background;
+
+  /// Resolved editable/readable value foreground.
   final Color foreground;
+
+  /// Resolved placeholder foreground.
   final Color placeholder;
+
+  /// Resolved field border.
   final Color border;
+
+  /// Resolved field-label foreground.
   final Color label;
+
+  /// Resolved supporting/help text foreground.
   final Color supporting;
+
+  /// Resolved validation-error foreground.
   final Color error;
+
+  /// Resolved field icon foreground.
   final Color icon;
+
+  /// Resolved text-selection/accent color.
   final Color selection;
 }
 
+/// Semantic field palette and state resolver shared by Carpenter input controls.
 @immutable
 final class CarpenterFieldTheme {
+  /// Creates the shared field state palette used by input controls.
   const CarpenterFieldTheme({
     required this.background,
     required this.backgroundHovered,
@@ -598,22 +734,52 @@ final class CarpenterFieldTheme {
     required this.disabledForeground,
   });
 
+  /// Enabled field background.
   final Color background;
+
+  /// Enabled field background while hovered.
   final Color backgroundHovered;
+
+  /// Disabled field background.
   final Color backgroundDisabled;
+
+  /// Enabled field value foreground.
   final Color foreground;
+
+  /// Enabled field placeholder foreground.
   final Color placeholder;
+
+  /// Default enabled field border.
   final Color border;
+
+  /// Field border while hovered.
   final Color borderHovered;
+
+  /// Field border while focused.
   final Color borderFocused;
+
+  /// Field border when validation reports an error.
   final Color borderError;
+
+  /// Enabled field-label foreground.
   final Color label;
+
+  /// Enabled supporting/help text foreground.
   final Color supporting;
+
+  /// Enabled validation-error foreground.
   final Color error;
+
+  /// Enabled field icon foreground.
   final Color icon;
+
+  /// Text-selection/accent color.
   final Color selection;
+
+  /// Shared foreground used for disabled value, placeholder, border, labels, supporting text, errors, and icons.
   final Color disabledForeground;
 
+  /// Resolves field colors from [availability], hover/focus [states], and validation error state.
   CarpenterFieldStyle resolve({
     required FieldAvailability availability,
     required Set<WidgetState> states,
@@ -648,8 +814,10 @@ final class CarpenterFieldTheme {
   }
 }
 
+/// Resolved colors for a selectable control after role, selection, hover, and disabled state have been applied.
 @immutable
 final class CarpenterSelectionStyle {
+  /// Creates a fully resolved selection color style.
   const CarpenterSelectionStyle({
     required this.background,
     required this.border,
@@ -658,28 +826,46 @@ final class CarpenterSelectionStyle {
     required this.supporting,
   });
 
+  /// Resolved selectable-control background.
   final Color background;
+
+  /// Resolved selectable-control border.
   final Color border;
+
+  /// Resolved check/radio/switch mark color.
   final Color mark;
+
+  /// Resolved primary label foreground.
   final Color foreground;
+
+  /// Resolved supporting-label foreground.
   final Color supporting;
 }
 
+/// Selected-state palette for one [SelectionColorRole].
 @immutable
 final class CarpenterSelectionPalette {
+  /// Creates selected, selected-hovered, and mark colors for one selection role.
   const CarpenterSelectionPalette({
     required this.selected,
     required this.selectedHovered,
     required this.mark,
   });
 
+  /// Selected control color for the semantic role.
   final Color selected;
+
+  /// Selected control color while hovered.
   final Color selectedHovered;
+
+  /// Mark/check/indicator color on selected controls.
   final Color mark;
 }
 
+/// Resolves selection controls from semantic color role, selected state, and [WidgetState] values.
 @immutable
 final class CarpenterSelectionTheme {
+  /// Creates the selection theme from role palettes plus shared unselected and disabled colors.
   const CarpenterSelectionTheme(
     this._palettes, {
     required this.foreground,
@@ -695,19 +881,41 @@ final class CarpenterSelectionTheme {
     required this.disabledMark,
   });
 
+  /// Default enabled selection-label foreground.
   final Color foreground;
+
+  /// Default enabled supporting-label foreground.
   final Color supporting;
+
+  /// Foreground used for disabled labels and supporting text.
   final Color disabledForeground;
+
+  /// Unselected enabled background.
   final Color background;
+
+  /// Unselected background while hovered.
   final Color backgroundHovered;
+
+  /// Unselected enabled border.
   final Color border;
+
+  /// Unselected border while hovered.
   final Color borderHovered;
   final Map<SelectionColorRole, CarpenterSelectionPalette> _palettes;
+
+  /// Disabled unselected background.
   final Color disabledBackground;
+
+  /// Disabled border.
   final Color disabledBorder;
+
+  /// Disabled selected background/border.
   final Color disabledSelected;
+
+  /// Disabled selection mark color.
   final Color disabledMark;
 
+  /// Resolves selection colors from semantic [role], whether the control is [selected], and interaction [states].
   CarpenterSelectionStyle resolve({
     required SelectionColorRole role,
     required bool selected,
@@ -744,23 +952,31 @@ final class CarpenterSelectionTheme {
   }
 }
 
+/// Resolved passive feedback colors for one semantic feedback role.
 @immutable
 final class CarpenterFeedbackStyle {
+  /// Creates background and foreground colors for one feedback role.
   const CarpenterFeedbackStyle({
     required this.background,
     required this.foreground,
   });
 
+  /// Semantic feedback surface/background color.
   final Color background;
+
+  /// Semantic feedback foreground color.
   final Color foreground;
 }
 
+/// Maps [FeedbackColorRole] values to resolved passive feedback styles.
 @immutable
 final class CarpenterFeedbackTheme {
+  /// Creates a feedback theme from a complete role-to-style map.
   const CarpenterFeedbackTheme(this._styles);
 
   final Map<FeedbackColorRole, CarpenterFeedbackStyle> _styles;
 
+  /// Returns the configured passive feedback style for [role].
   CarpenterFeedbackStyle resolve(FeedbackColorRole role) => _styles[role]!;
 }
 
