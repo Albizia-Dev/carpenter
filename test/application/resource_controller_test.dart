@@ -35,35 +35,41 @@ void main() {
     expect(controller.value, isA<CarpenterPageReady>());
   });
 
-  test('resource data replacement preserves state and notifies once', () async {
-    final controller = CarpenterResourceController<int>(load: (_) async => 1);
-    addTearDown(controller.dispose);
-    await controller.initialize();
+  test(
+    'resource data replacement preserves state and notifies once',
+    () async {
+      final controller = CarpenterResourceController<int>(load: (_) async => 1);
+      addTearDown(controller.dispose);
+      await controller.initialize();
 
-    var notifications = 0;
-    controller.addListener(() => notifications += 1);
+      var notifications = 0;
+      controller.addListener(() => notifications += 1);
 
-    controller.replaceData(2);
+      controller.replaceData(2);
 
-    expect(controller.data, 2);
-    expect(controller.hasData, isTrue);
-    expect(controller.value, isA<CarpenterPageReady>());
-    expect(notifications, 1);
-  });
+      expect(controller.data, 2);
+      expect(controller.hasData, isTrue);
+      expect(controller.value, isA<CarpenterPageReady>());
+      expect(notifications, 1);
+    },
+  );
 
-  test('resource data update uses latest value and requires loaded data', () async {
-    final controller = CarpenterResourceController<int>(load: (_) async => 4);
-    addTearDown(controller.dispose);
+  test(
+    'resource data update uses latest value and requires loaded data',
+    () async {
+      final controller = CarpenterResourceController<int>(load: (_) async => 4);
+      addTearDown(controller.dispose);
 
-    expect(
-      () => controller.updateData((current) => current + 1),
-      throwsStateError,
-    );
+      expect(
+        () => controller.updateData((current) => current + 1),
+        throwsStateError,
+      );
 
-    await controller.initialize();
-    controller.updateData((current) => current + 3);
+      await controller.initialize();
+      controller.updateData((current) => current + 3);
 
-    expect(controller.data, 7);
-    expect(controller.value, isA<CarpenterPageReady>());
-  });
+      expect(controller.data, 7);
+      expect(controller.value, isA<CarpenterPageReady>());
+    },
+  );
 }
