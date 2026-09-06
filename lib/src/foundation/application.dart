@@ -100,87 +100,118 @@ final class Application extends StatelessWidget {
   /// Navigator key used by the non-router application mode. It is ignored by
   /// [Application.router].
   final GlobalKey<NavigatorState>? navigatorKey;
+
   /// Route factory forwarded to [WidgetsApp] in navigator mode when a named route is
   /// requested.
   final RouteFactory? onGenerateRoute;
+
   /// Factory used by navigator mode to expand [initialRoute] into the initial route
   /// stack.
   final InitialRouteListFactory? onGenerateInitialRoutes;
+
   /// Fallback route factory used by navigator mode when [onGenerateRoute] and [routes]
   /// cannot resolve a name.
   final RouteFactory? onUnknownRoute;
+
   /// Optional listener for framework [NavigationNotification] events emitted by
   /// either navigator or router application mode.
   final NotificationListenerCallback<NavigationNotification>?
   onNavigationNotification;
+
   /// Observers attached to the [Navigator] in non-router mode. Defaults to an empty
   /// list.
   final List<NavigatorObserver>? navigatorObservers;
+
   /// Initial named route for navigator mode. Router mode obtains its initial location
   /// from router configuration instead.
   final String? initialRoute;
+
   /// Factory used to turn a route builder into a [PageRoute] in navigator mode.
   /// Carpenter supplies a simple [PageRouteBuilder] when omitted.
   final PageRouteFactory? pageRouteBuilder;
+
   /// Default navigator-mode content when no named initial route replaces it.
   final Widget? home;
+
   /// Named route table forwarded to [WidgetsApp] in navigator mode. Defaults to an
   /// empty map.
   final Map<String, WidgetBuilder>? routes;
+
   /// Optional application-level transition builder invoked inside [CarpenterTheme]. Use
   /// it to wrap the routed child without replacing Carpenter theme or unit scopes.
   final TransitionBuilder? builder;
+
   /// Static application title forwarded to the underlying [WidgetsApp].
   final String? title;
+
   /// Locale-aware title generator forwarded to the underlying [WidgetsApp]; when
   /// present it takes precedence over a static title where Flutter applies it.
   final GenerateAppTitle? onGenerateTitle;
+
   /// Requested application locale. Flutter resolves it against [supportedLocales] and
   /// the configured resolution callbacks.
   final Locale? locale;
+
   /// Localization delegates forwarded to the underlying [WidgetsApp].
   final Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates;
+
   /// Optional locale-list resolver forwarded to [WidgetsApp].
   final LocaleListResolutionCallback? localeListResolutionCallback;
+
   /// Optional single-locale resolver forwarded to [WidgetsApp].
   final LocaleResolutionCallback? localeResolutionCallback;
+
   /// Locales supported by the application. Defaults to US English.
   final Iterable<Locale> supportedLocales;
+
   /// Whether Flutter draws its performance overlay above the application.
   final bool showPerformanceOverlay;
+
   /// Whether Flutter draws the semantics debugger overlay.
   final bool showSemanticsDebugger;
+
   /// Whether Flutter exposes the widget-inspector selection affordance in debug mode.
   final bool debugShowWidgetInspector;
+
   /// Whether Flutter shows the checked-mode debug banner.
   final bool debugShowCheckedModeBanner;
+
   /// Optional builder for Flutter inspector UI used to exit widget-selection mode.
   final ExitWidgetSelectionButtonBuilder? exitWidgetSelectionButtonBuilder;
+
   /// Optional builder for the control that repositions Flutter inspector exit UI.
   final MoveExitWidgetSelectionButtonBuilder?
   moveExitWidgetSelectionButtonBuilder;
+
   /// Optional builder for Flutter inspector tap-behavior UI.
   final TapBehaviorButtonBuilder? tapBehaviorButtonBuilder;
+
   /// Application-wide Flutter shortcut mapping forwarded to the underlying
   /// [WidgetsApp]. Carpenter command shortcuts can be layered below this root.
   final Map<ShortcutActivator, Intent>? shortcuts;
+
   /// Application-wide Flutter action mapping forwarded to the underlying [WidgetsApp].
   final Map<Type, Action<Intent>>? actions;
+
   /// Restoration scope identifier forwarded to the underlying [WidgetsApp].
   final String? restorationScopeId;
 
   /// Route-information provider used only by [Application.router].
   final RouteInformationProvider? routeInformationProvider;
+
   /// Route-information parser used only by [Application.router] when a complete
   /// [routerConfig] is not supplied.
   final RouteInformationParser<Object>? routeInformationParser;
+
   /// Router delegate used only by [Application.router] when a complete [routerConfig]
   /// is not supplied.
   final RouterDelegate<Object>? routerDelegate;
+
   /// Complete Flutter router configuration for [Application.router]. Do not combine it
   /// with separate provider/parser/delegate pieces unless Flutter explicitly supports
   /// that combination.
   final RouterConfig<Object>? routerConfig;
+
   /// Back-button dispatcher forwarded to [WidgetsApp.router].
   final BackButtonDispatcher? backButtonDispatcher;
   final bool _isRouter;

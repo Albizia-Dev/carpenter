@@ -26,16 +26,21 @@ final class CarpenterHost extends StatelessWidget {
 
   /// Content hosted or wrapped by this Carpenter application primitive.
   final Widget child;
+
   /// Optional host-content transformer invoked after runtime compilation and before
   /// shell wrapping.
   final CarpenterHostBuilder? builder;
+
   /// Application shells contributed directly or by a module.
   final List<CarpenterShell> shells;
+
   /// Feature modules whose shells, routes, and capability requirements participate in
   /// this application host.
   final List<CarpenterModule> modules;
+
   /// Target platform used for platform-sensitive Carpenter behavior.
   final TargetPlatform? platform;
+
   /// Optional locale propagated as part of the core Carpenter runtime or application
   /// root.
   final Locale? locale;

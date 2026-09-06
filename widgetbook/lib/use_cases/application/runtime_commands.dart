@@ -9,7 +9,10 @@ import '../../helpers/preview.dart';
 final applicationRuntimeComponent = WidgetbookComponent(
   name: 'Runtime & Commands',
   useCases: [
-    WidgetbookUseCase(name: 'Playground', builder: (_) => const _RuntimePreview()),
+    WidgetbookUseCase(
+      name: 'Playground',
+      builder: (_) => const _RuntimePreview(),
+    ),
     WidgetbookUseCase(name: 'Raw runtime scope', builder: _rawRuntimeScope),
   ],
 );
@@ -51,8 +54,11 @@ final class _RuntimePreviewState extends State<_RuntimePreview> {
       shortcuts: const [
         SingleActivator(LogicalKeyboardKey.keyR, control: true),
       ],
-      effects: const [CarpenterRefreshCommandEffect({'runtime'})],
-      execute: (_) => const CarpenterCommandResult(message: 'Runtime refreshed'),
+      effects: const [
+        CarpenterRefreshCommandEffect({'runtime'}),
+      ],
+      execute: (_) =>
+          const CarpenterCommandResult(message: 'Runtime refreshed'),
     );
     _executor = CarpenterCommandExecutor(
       listeners: [
@@ -90,7 +96,10 @@ final class _RuntimePreviewState extends State<_RuntimePreview> {
                       'Platform: ${context.runtime.core.platform.name}',
                     ),
                     SizedBox(height: context.units(.75.rem)),
-                    CarpenterCommandButton<void>(command: _command, input: null),
+                    CarpenterCommandButton<void>(
+                      command: _command,
+                      input: null,
+                    ),
                     SizedBox(height: context.units(.5.rem)),
                     CarpenterText.caption('Last lifecycle event: $_event'),
                   ],

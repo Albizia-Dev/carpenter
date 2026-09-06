@@ -7,6 +7,7 @@ final class CarpenterCoreRuntime {
 
   /// Target platform used for platform-sensitive Carpenter behavior.
   final TargetPlatform platform;
+
   /// Optional locale propagated as part of the core Carpenter runtime or application
   /// root.
   final Locale? locale;
@@ -33,8 +34,10 @@ final class CarpenterRuntime {
   /// Reads the capability registered under `T`, or returns `null` when the type is
   /// absent.
   T? maybeRead<T extends Object>() => _values[T] as T?;
+
   /// Reports whether a capability is registered for the exact supplied type key.
   bool contains(Type type) => _values.containsKey(type);
+
   /// Unmodifiable set of capability types currently registered in this runtime.
   Set<Type> get types => Set<Type>.unmodifiable(_values.keys);
 
@@ -42,6 +45,7 @@ final class CarpenterRuntime {
   /// replacing any previous value for that key.
   CarpenterRuntime extend<T extends Object>(T value) =>
       CarpenterRuntime({..._values, T: value});
+
   /// Returns a new runtime with `value` registered under the explicit `type` key,
   /// replacing any previous value for that key.
   CarpenterRuntime extendByType(Type type, Object value) =>
