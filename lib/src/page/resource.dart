@@ -57,9 +57,34 @@ final class CarpenterResourceController<T>
       CarpenterRequestGate<CarpenterResourceCancellation>(
         createCancellation: CarpenterResourceCancellation.new,
       );
-  T? data;
+  T? _data;
   late final CarpenterCommandController<void> refreshCommand;
   late final CarpenterCommandController<void> retryCommand;
+
+  T? get data => _data;
+  bool get hasData => _data != null;
+
+  /// Replaces the currently loaded resource without starting a new request.
+  ///
+  /// Use this for optimistic updates or for applying a mutation response to the
+  /// resource already on screen. The current page state is preserved and
+  /// listeners are notified exactly once.
+  void replaceData(T next) {
+    _data = next;
+    notifyListeners();
+  }
+
+  /// Replaces the currently loaded resource using its latest value.
+  ///
+  /// Throws when no resource has been loaded yet. This keeps local mutations
+  /// explicit instead of silently dropping an update during initial loading.
+  void updateData(T Function(T current) update) {
+    final current = _data;
+    if (current == null) {
+      throw StateError('Cannot update resource data before it has loaded.');
+    }
+    replaceData(update(current));
+  }
 
   @override
   List<CarpenterCommand<dynamic>> get pageCommands => [
@@ -72,7 +97,7 @@ final class CarpenterResourceController<T>
 
   Future<void> _run(CarpenterResourceLoadReason reason) async {
     final lease = _requests.begin();
-    value = data == null
+    value = _data == null
         ? const CarpenterPageInitialLoading()
         : const CarpenterPageRefreshing();
     try {
@@ -83,7 +108,7 @@ final class CarpenterResourceController<T>
         ),
       );
       if (!_requests.isCurrent(lease)) return;
-      data = loaded;
+      _data = loaded;
       value = const CarpenterPageReady();
     } catch (error) {
       if (!_requests.isCurrent(lease)) return;
