@@ -45,10 +45,10 @@ typedef CarpenterCommandFailureMessageMapper =
 /// state suitable for business screens.
 ///
 /// Starting any observed command clears previous feedback. Success publishes
-/// the command result message when one exists. Failure keeps the original error
-/// for diagnostics while exposing only the application-provided mapped message
-/// to presentation code; raw technical errors are never turned into UI copy by
-/// default.
+/// feedback when the result has a message or undo action. Failure keeps the
+/// original error for diagnostics while exposing only the application-provided
+/// mapped message to presentation code; raw technical errors are never turned
+/// into UI copy by default.
 final class CarpenterCommandFeedbackController
     extends ValueNotifier<CarpenterCommandFeedback?> {
   CarpenterCommandFeedbackController({this.failureMessage}) : super(null);
@@ -61,14 +61,15 @@ final class CarpenterCommandFeedbackController
         value = null;
       case CarpenterCommandSucceeded(:final result):
         final message = result.message;
-        value = message == null
+        final undo = result.undo;
+        value = message == null && undo == null
             ? null
             : CarpenterCommandFeedback(
                 commandId: event.commandId,
                 title: event.title,
                 kind: CarpenterCommandFeedbackKind.success,
                 message: message,
-                undo: result.undo,
+                undo: undo,
               );
       case CarpenterCommandFailed(:final error, :final stackTrace):
         value = CarpenterCommandFeedback(
