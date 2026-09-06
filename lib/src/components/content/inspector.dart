@@ -110,7 +110,9 @@ final class _InspectorValue extends StatelessWidget {
         children: [
           for (var index = 0; index < items.length; index++)
             Padding(
-              padding: EdgeInsets.only(bottom: index == items.length - 1 ? 0 : gap),
+              padding: EdgeInsets.only(
+                bottom: index == items.length - 1 ? 0 : gap,
+              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

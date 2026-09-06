@@ -164,7 +164,9 @@ final class _CarpenterTabsState<T> extends State<CarpenterTabs<T>> {
           decoration: BoxDecoration(
             border: Border(
               bottom: BorderSide(
-                color: selected ? activeStyle.foreground : const Color(0x00000000),
+                color: selected
+                    ? activeStyle.foreground
+                    : const Color(0x00000000),
                 width: indicatorWidth,
               ),
             ),

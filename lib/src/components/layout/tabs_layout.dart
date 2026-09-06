@@ -84,7 +84,8 @@ final class CarpenterTabsLayout<T> extends StatelessWidget {
           ActionProminence.normal,
           const <WidgetState>{},
         );
-        final indicatorWidth = context.units(theme.shapes.actionBorderWidth) * 2;
+        final indicatorWidth =
+            context.units(theme.shapes.actionBorderWidth) * 2;
         return Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
