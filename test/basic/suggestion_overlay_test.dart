@@ -1,8 +1,8 @@
 import 'package:carpenter/carpenter.dart';
+import 'package:carpenter/src/internal/selection/menu_panel.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../lib/src/internal/selection/menu_panel.dart';
 import '../helpers/harness.dart';
 
 void main() {
