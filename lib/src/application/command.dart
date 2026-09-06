@@ -50,11 +50,14 @@ final class CarpenterCommandState {
     String? disabledReason,
     CarpenterCommandExecution? execution,
     Object? error,
+    bool clearDisabledReason = false,
     bool clearError = false,
   }) => CarpenterCommandState(
     visibility: visibility ?? this.visibility,
     enabled: enabled ?? this.enabled,
-    disabledReason: disabledReason ?? this.disabledReason,
+    disabledReason: clearDisabledReason
+        ? null
+        : disabledReason ?? this.disabledReason,
     execution: execution ?? this.execution,
     error: clearError ? null : error ?? this.error,
   );
@@ -383,6 +386,7 @@ final class CarpenterCommandController<I>
       visibility: visibility,
       enabled: enabled,
       disabledReason: disabledReason,
+      clearDisabledReason: disabledReason == null,
     );
   }
 
