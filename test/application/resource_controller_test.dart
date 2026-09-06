@@ -79,6 +79,66 @@ void main() {
     expect(controller.data, 11);
     expect(controller.value, isA<CarpenterPageReady>());
   });
+
+  test('refresh failure preserves loaded resource and exposes failure', () async {
+    var invocation = 0;
+    final controller = CarpenterResourceController<int>(
+      load: (_) async {
+        invocation += 1;
+        if (invocation == 1) return 5;
+        throw StateError('offline');
+      },
+      errorMessage: (_) => 'Retry later',
+    );
+    addTearDown(controller.dispose);
+
+    await controller.initialize();
+    await controller.refresh();
+
+    expect(controller.data, 5);
+    expect(controller.value, isA<CarpenterPageReady>());
+    expect(controller.hasRefreshFailure, isTrue);
+    expect(controller.refreshFailure?.error, isA<StateError>());
+    expect(controller.refreshFailure?.message, 'Retry later');
+  });
+
+  test('successful refresh clears an earlier refresh failure', () async {
+    var invocation = 0;
+    final controller = CarpenterResourceController<int>(
+      load: (_) async {
+        invocation += 1;
+        if (invocation == 1) return 1;
+        if (invocation == 2) throw StateError('offline');
+        return 3;
+      },
+    );
+    addTearDown(controller.dispose);
+
+    await controller.initialize();
+    await controller.refresh();
+    expect(controller.hasRefreshFailure, isTrue);
+
+    await controller.refresh();
+
+    expect(controller.data, 3);
+    expect(controller.refreshFailure, isNull);
+    expect(controller.value, isA<CarpenterPageReady>());
+  });
+
+  test('initial resource failure remains blocking', () async {
+    final controller = CarpenterResourceController<int>(
+      load: (_) async => throw StateError('offline'),
+      errorMessage: (_) => 'Cannot load resource',
+    );
+    addTearDown(controller.dispose);
+
+    await controller.initialize();
+
+    expect(controller.data, isNull);
+    expect(controller.refreshFailure, isNull);
+    expect(controller.value, isA<CarpenterPageFailure>());
+    expect((controller.value as CarpenterPageFailure).message, 'Cannot load resource');
+  });
 }
 
 final class _TestResourceController extends CarpenterResourceController<int> {
