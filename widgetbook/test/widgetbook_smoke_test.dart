@@ -24,6 +24,7 @@ void main() {
         'Behaviour',
         'Collections',
         'Layout',
+        'Application',
         'Page Patterns',
         'Samples',
       ]);

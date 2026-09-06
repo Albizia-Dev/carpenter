@@ -5,11 +5,15 @@ import 'module/module.dart';
 import 'runtime/runtime.dart';
 import 'shell/shell.dart';
 
+/// Optionally transforms hosted content after the runtime is compiled and before shells
+/// wrap the result.
 typedef CarpenterHostBuilder =
     Widget Function(BuildContext context, Widget child);
 
 /// Hosts Carpenter application capabilities independently from app/routing setup.
 final class CarpenterHost extends StatelessWidget {
+  /// Creates a capability host for `child`; direct shells/modules default to empty and
+  /// platform/locale default to the active environment.
   const CarpenterHost({
     super.key,
     required this.child,
@@ -20,13 +24,29 @@ final class CarpenterHost extends StatelessWidget {
     this.locale,
   });
 
+  /// Content hosted or wrapped by this Carpenter application primitive.
   final Widget child;
+
+  /// Optional host-content transformer invoked after runtime compilation and before
+  /// shell wrapping.
   final CarpenterHostBuilder? builder;
+
+  /// Application shells contributed directly or by a module.
   final List<CarpenterShell> shells;
+
+  /// Feature modules whose shells, routes, and capability requirements participate in
+  /// this application host.
   final List<CarpenterModule> modules;
+
+  /// Target platform used for platform-sensitive Carpenter behavior.
   final TargetPlatform? platform;
+
+  /// Optional locale propagated as part of the core Carpenter runtime or application
+  /// root.
   final Locale? locale;
 
+  /// Compiles core runtime plus effective shells, validates module requirements,
+  /// exposes the runtime, then wraps content through shells in reverse order.
   @override
   Widget build(BuildContext context) {
     final targetPlatform = platform ?? defaultTargetPlatform;

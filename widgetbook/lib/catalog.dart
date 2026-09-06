@@ -1,5 +1,6 @@
 import 'package:widgetbook/widgetbook.dart';
 
+import 'use_cases/application/runtime_commands.dart';
 import 'use_cases/basic/autosuggest.dart';
 import 'use_cases/basic/additional_primitives.dart';
 import 'use_cases/basic/button.dart';
@@ -160,6 +161,10 @@ final List<WidgetbookNode> carpenterCatalog = [
       adaptiveRegionComponent,
       masterDetailComponent,
     ],
+  ),
+  WidgetbookFolder(
+    name: 'Application',
+    children: [applicationRuntimeComponent],
   ),
   WidgetbookFolder(
     name: 'Page Patterns',
