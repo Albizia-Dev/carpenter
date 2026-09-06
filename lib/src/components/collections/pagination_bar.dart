@@ -4,9 +4,11 @@ import 'package:flutter/widgets.dart';
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
 import '../basic/button/button.dart';
+import '../basic/button/icon_button.dart';
+import '../basic/icons.dart';
 import '../basic/text.dart';
 
-/// Adaptive page navigation with first/last controls and a compact page window.
+/// Adaptive page navigation with previous/next controls and a compact page window.
 final class CarpenterPaginationBar extends StatelessWidget {
   const CarpenterPaginationBar({
     super.key,
@@ -62,14 +64,18 @@ final class CarpenterPaginationBar extends StatelessWidget {
   }
 
   Widget _navigationButton({
-    required String label,
+    required bool previous,
     required String semanticLabel,
     required int target,
     required bool enabled,
-  }) => CarpenterButton.text(
-    label: label,
+    CarpenterShape shape = CarpenterShape.rounded,
+  }) => CarpenterIconButton(
+    icon: previous ? CarpenterIcons.chevronLeft : CarpenterIcons.chevronRight,
     semanticLabel: semanticLabel,
     size: ControlSize.small,
+    colorRole: ActionColorRole.utility,
+    prominence: ActionProminence.ghost,
+    shape: shape,
     onPressed: enabled ? () => onPageChanged(target) : null,
   );
 
@@ -79,13 +85,13 @@ final class CarpenterPaginationBar extends StatelessWidget {
     final gap = context.units(theme.spacing.small);
     final label = CarpenterText.body('Page $page of $totalPages');
     final previous = _navigationButton(
-      label: '‹',
+      previous: true,
       semanticLabel: 'Previous page',
       target: page - 1,
       enabled: page > 1,
     );
     final next = _navigationButton(
-      label: '›',
+      previous: false,
       semanticLabel: 'Next page',
       target: page + 1,
       enabled: page < totalPages,
@@ -105,45 +111,70 @@ final class CarpenterPaginationBar extends StatelessWidget {
           );
         }
 
-        final navigation = Wrap(
-          spacing: gap / 2,
-          crossAxisAlignment: WrapCrossAlignment.center,
-          children: [
-            _navigationButton(
-              label: '«',
-              semanticLabel: 'First page',
-              target: 1,
-              enabled: page > 1,
+        const joinedShape = CarpenterShape(
+          start: ShapeRole.none,
+          end: ShapeRole.none,
+        );
+        final navigation = ClipRRect(
+          borderRadius: BorderRadius.circular(
+            context.units(
+              theme.shapes.radiusForAction(
+                ShapeRole.rounded,
+                ControlSize.small,
+              ),
             ),
-            previous,
-            for (final item in _pageWindow)
-              if (item == null)
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.units(.25.rem),
-                  ),
-                  child: const CarpenterText.body('…'),
-                )
-              else
-                CarpenterButton(
-                  label: '$item',
-                  semanticLabel: item == page
-                      ? 'Current page $item'
-                      : 'Page $item',
-                  size: ControlSize.small,
-                  prominence: item == page
-                      ? ActionProminence.filled
-                      : ActionProminence.ghost,
-                  onPressed: () => onPageChanged(item),
+          ),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: theme.surface.subtle,
+                width: context.units(theme.shapes.actionBorderWidth),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _navigationButton(
+                  previous: true,
+                  semanticLabel: 'Previous page',
+                  target: page - 1,
+                  enabled: page > 1,
+                  shape: joinedShape,
                 ),
-            next,
-            _navigationButton(
-              label: '»',
-              semanticLabel: 'Last page',
-              target: totalPages,
-              enabled: page < totalPages,
+                for (final item in _pageWindow)
+                  if (item == null)
+                    SizedBox(
+                      width: context.units(
+                        theme.sizes.actionHeight(ControlSize.small),
+                      ),
+                      child: const Center(child: CarpenterText.body('…')),
+                    )
+                  else
+                    CarpenterButton(
+                      label: '$item',
+                      semanticLabel: item == page
+                          ? 'Current page $item'
+                          : 'Page $item',
+                      size: ControlSize.small,
+                      colorRole: ActionColorRole.utility,
+                      prominence: item == page
+                          ? ActionProminence.low
+                          : ActionProminence.ghost,
+                      shape: joinedShape,
+                      onPressed: item == page
+                          ? null
+                          : () => onPageChanged(item),
+                    ),
+                _navigationButton(
+                  previous: false,
+                  semanticLabel: 'Next page',
+                  target: page + 1,
+                  enabled: page < totalPages,
+                  shape: joinedShape,
+                ),
+              ],
             ),
-          ],
+          ),
         );
 
         return Row(

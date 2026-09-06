@@ -65,4 +65,30 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
     expect(value, 'p');
   });
+
+  testWidgets('selection button group keeps controls contiguous', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      carpenterHarness(
+        CarpenterSelectionButtonGroup<String>(
+          value: 'common',
+          onChanged: (_) {},
+          options: const [
+            CarpenterSelectionButtonOption(value: 'common', label: 'Common'),
+            CarpenterSelectionButtonOption(value: 'p', label: 'Stage P'),
+            CarpenterSelectionButtonOption(value: 'r', label: 'Stage R'),
+          ],
+        ),
+      ),
+    );
+
+    final controls = find.byType(CarpenterToggleButton);
+    expect(controls, findsNWidgets(3));
+    final first = tester.getRect(controls.at(0));
+    final second = tester.getRect(controls.at(1));
+    final third = tester.getRect(controls.at(2));
+    expect((first.right - second.left).abs(), lessThan(.01));
+    expect((second.right - third.left).abs(), lessThan(.01));
+  });
 }

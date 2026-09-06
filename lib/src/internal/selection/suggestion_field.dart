@@ -270,6 +270,7 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
       placement: widget.placement,
       takeFocus: false,
       allowAnchorInteraction: true,
+      matchAnchorWidth: true,
       anchor: anchor,
       overlayBuilder: (context) => _buildMenu(),
     );

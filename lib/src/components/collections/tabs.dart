@@ -118,17 +118,24 @@ final class _CarpenterTabsState<T> extends State<CarpenterTabs<T>> {
       container: true,
       explicitChildNodes: true,
       label: widget.semanticLabel,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (var index = 0; index < widget.tabs.length; index++) ...[
-              if (index > 0)
-                SizedBox(width: context.units(theme.spacing.small)),
-              _buildTab(index),
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: theme.surface.subtle,
+              width: context.units(theme.shapes.actionBorderWidth),
+            ),
+          ),
+        ),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var index = 0; index < widget.tabs.length; index++)
+                _buildTab(index),
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -139,6 +146,13 @@ final class _CarpenterTabsState<T> extends State<CarpenterTabs<T>> {
     final selected = tab.value == widget.value;
     final enabled = tab.enabled && widget.onChanged != null;
     final focusNode = _focusNodes.putIfAbsent(tab.value, FocusNode.new);
+    final theme = CarpenterTheme.of(context);
+    final activeStyle = theme.actions.resolve(
+      ActionColorRole.utility,
+      ActionProminence.normal,
+      const <WidgetState>{},
+    );
+    final indicatorWidth = context.units(theme.shapes.actionBorderWidth) * 2;
     return Semantics(
       container: true,
       selected: selected,
@@ -146,22 +160,38 @@ final class _CarpenterTabsState<T> extends State<CarpenterTabs<T>> {
       child: Focus(
         canRequestFocus: false,
         onKeyEvent: (_, event) => _handleKey(index, event),
-        child: CarpenterButton(
-          label: tab.label,
-          semanticLabel: tab.effectiveSemanticLabel,
-          icon: tab.icon,
-          size: widget.size,
-          focusNode: focusNode,
-          colorRole: ActionColorRole.utility,
-          prominence: selected
-              ? ActionProminence.normal
-              : ActionProminence.ghost,
-          onInvoke: enabled
-              ? () {
-                  focusNode.requestFocus();
-                  widget.onChanged!(tab.value);
-                }
-              : null,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(
+                color: selected
+                    ? activeStyle.foreground
+                    : const Color(0x00000000),
+                width: indicatorWidth,
+              ),
+            ),
+          ),
+          child: CarpenterButton(
+            label: tab.label,
+            semanticLabel: tab.effectiveSemanticLabel,
+            icon: tab.icon,
+            size: widget.size,
+            focusNode: focusNode,
+            colorRole: ActionColorRole.utility,
+            prominence: selected
+                ? ActionProminence.low
+                : ActionProminence.ghost,
+            shape: const CarpenterShape(
+              start: ShapeRole.none,
+              end: ShapeRole.none,
+            ),
+            onInvoke: enabled
+                ? () {
+                    focusNode.requestFocus();
+                    widget.onChanged!(tab.value);
+                  }
+                : null,
+          ),
         ),
       ),
     );

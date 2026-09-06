@@ -33,15 +33,17 @@ final class CarpenterTableText extends StatelessWidget {
     this.semanticsLabel,
   }) : role = CarpenterTableTypographyRole.header;
 
+  /// Creates single-line table cell text that truncates overflow with an
+  /// ellipsis unless the caller explicitly supplies other text constraints.
   const CarpenterTableText.cell(
     this.data, {
     super.key,
     this.emphasis = TypographyEmphasis.regular,
     this.colorRole = ContentColorRole.primary,
     this.textAlign,
-    this.maxLines,
-    this.overflow,
-    this.softWrap,
+    this.maxLines = 1,
+    this.overflow = TextOverflow.ellipsis,
+    this.softWrap = false,
     this.semanticsLabel,
   }) : role = CarpenterTableTypographyRole.cell;
 

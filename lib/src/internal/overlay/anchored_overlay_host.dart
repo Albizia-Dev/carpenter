@@ -21,6 +21,7 @@ final class AnchoredOverlayHost extends StatelessWidget {
     this.restoreFocus = true,
     this.modal = false,
     this.allowAnchorInteraction = false,
+    this.matchAnchorWidth = false,
   });
 
   final bool open;
@@ -35,6 +36,7 @@ final class AnchoredOverlayHost extends StatelessWidget {
   final bool restoreFocus;
   final bool modal;
   final bool allowAnchorInteraction;
+  final bool matchAnchorWidth;
 
   @override
   Widget build(BuildContext context) => OverlayLifecycleHost(
@@ -60,6 +62,7 @@ final class AnchoredOverlayHost extends StatelessWidget {
           textDirection: Directionality.of(context),
           gap: context.units(theme.spacing.overlayAnchorGap),
           viewportInset: context.units(theme.spacing.overlayViewportInset),
+          matchAnchorWidth: matchAnchorWidth,
         ),
         child: overlayBuilder(context),
       );
@@ -76,6 +79,7 @@ final class _AnchoredOverlayLayoutDelegate extends SingleChildLayoutDelegate {
     required this.textDirection,
     required this.gap,
     required this.viewportInset,
+    required this.matchAnchorWidth,
   });
 
   final Rect anchor;
@@ -84,19 +88,25 @@ final class _AnchoredOverlayLayoutDelegate extends SingleChildLayoutDelegate {
   final TextDirection textDirection;
   final double gap;
   final double viewportInset;
+  final bool matchAnchorWidth;
 
   @override
-  BoxConstraints getConstraintsForChild(BoxConstraints constraints) =>
-      BoxConstraints.loose(
-        Size(
-          (constraints.maxWidth - viewportInset * 2)
-              .clamp(0, constraints.maxWidth)
-              .toDouble(),
-          (constraints.maxHeight - viewportInset * 2)
-              .clamp(0, constraints.maxHeight)
-              .toDouble(),
-        ),
-      );
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) {
+    final maxWidth = (constraints.maxWidth - viewportInset * 2)
+        .clamp(0, constraints.maxWidth)
+        .toDouble();
+    final maxHeight = (constraints.maxHeight - viewportInset * 2)
+        .clamp(0, constraints.maxHeight)
+        .toDouble();
+    final minWidth = matchAnchorWidth
+        ? anchor.width.clamp(0, maxWidth).toDouble()
+        : 0.0;
+    return BoxConstraints(
+      minWidth: minWidth,
+      maxWidth: maxWidth,
+      maxHeight: maxHeight,
+    );
+  }
 
   @override
   Offset getPositionForChild(Size size, Size childSize) =>
@@ -118,5 +128,6 @@ final class _AnchoredOverlayLayoutDelegate extends SingleChildLayoutDelegate {
       fallbackPlacements != oldDelegate.fallbackPlacements ||
       textDirection != oldDelegate.textDirection ||
       gap != oldDelegate.gap ||
-      viewportInset != oldDelegate.viewportInset;
+      viewportInset != oldDelegate.viewportInset ||
+      matchAnchorWidth != oldDelegate.matchAnchorWidth;
 }

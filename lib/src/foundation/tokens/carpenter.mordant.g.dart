@@ -1009,57 +1009,57 @@ final class ComponentFieldCompactContentGapTokens {
 final class ComponentFieldLabelGapTokens {
   const ComponentFieldLabelGapTokens();
 
-  _i1.Rem get xsmall => spacing.field.labelGap;
+  _i1.Rem get xsmall => const _i1.Rem(0.25);
 
-  _i1.Rem get small => spacing.field.labelGap;
+  _i1.Rem get small => const _i1.Rem(0.3125);
 
-  _i1.Rem get medium => spacing.field.labelGap;
+  _i1.Rem get medium => const _i1.Rem(0.375);
 
-  _i1.Rem get large => spacing.field.labelGap;
+  _i1.Rem get large => const _i1.Rem(0.4375);
 
-  _i1.Rem get xlarge => spacing.field.labelGap;
+  _i1.Rem get xlarge => const _i1.Rem(0.5);
 }
 
 final class ComponentFieldCompactLabelGapTokens {
   const ComponentFieldCompactLabelGapTokens();
 
-  _i1.Rem get xsmall => spacing.field.compactLabelGap;
+  _i1.Rem get xsmall => const _i1.Rem(0.125);
 
-  _i1.Rem get small => spacing.field.compactLabelGap;
+  _i1.Rem get small => const _i1.Rem(0.1875);
 
-  _i1.Rem get medium => spacing.field.compactLabelGap;
+  _i1.Rem get medium => const _i1.Rem(0.25);
 
-  _i1.Rem get large => spacing.field.compactLabelGap;
+  _i1.Rem get large => const _i1.Rem(0.3125);
 
-  _i1.Rem get xlarge => spacing.field.compactLabelGap;
+  _i1.Rem get xlarge => const _i1.Rem(0.375);
 }
 
 final class ComponentFieldSupportingGapTokens {
   const ComponentFieldSupportingGapTokens();
 
-  _i1.Rem get xsmall => spacing.field.supportingGap;
+  _i1.Rem get xsmall => const _i1.Rem(0.125);
 
-  _i1.Rem get small => spacing.field.supportingGap;
+  _i1.Rem get small => const _i1.Rem(0.1875);
 
-  _i1.Rem get medium => spacing.field.supportingGap;
+  _i1.Rem get medium => const _i1.Rem(0.25);
 
-  _i1.Rem get large => spacing.field.supportingGap;
+  _i1.Rem get large => const _i1.Rem(0.3125);
 
-  _i1.Rem get xlarge => spacing.field.supportingGap;
+  _i1.Rem get xlarge => const _i1.Rem(0.375);
 }
 
 final class ComponentFieldCompactSupportingGapTokens {
   const ComponentFieldCompactSupportingGapTokens();
 
-  _i1.Rem get xsmall => spacing.field.compactSupportingGap;
+  _i1.Rem get xsmall => const _i1.Rem(0.0625);
 
-  _i1.Rem get small => spacing.field.compactSupportingGap;
+  _i1.Rem get small => const _i1.Rem(0.125);
 
-  _i1.Rem get medium => spacing.field.compactSupportingGap;
+  _i1.Rem get medium => const _i1.Rem(0.1875);
 
-  _i1.Rem get large => spacing.field.compactSupportingGap;
+  _i1.Rem get large => const _i1.Rem(0.25);
 
-  _i1.Rem get xlarge => spacing.field.compactSupportingGap;
+  _i1.Rem get xlarge => const _i1.Rem(0.3125);
 }
 
 final class ComponentFieldScrollPaddingTokens {
