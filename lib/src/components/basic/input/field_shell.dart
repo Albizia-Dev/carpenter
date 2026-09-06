@@ -172,7 +172,9 @@ final class CarpenterFieldShell extends StatelessWidget {
         .copyWith(color: feedbackForeground ?? style.supporting);
     final fieldHeight = theme.sizes.fieldExtent(context, size);
     final horizontal = context.units(theme.spacing.fieldHorizontal(size));
-    final vertical = context.units(theme.spacing.fieldVertical(size));
+    final vertical = fixedHeight
+        ? 0.0
+        : context.units(theme.spacing.fieldVertical(size));
     final contentGap = context.units(theme.spacing.fieldContentGapFor(size));
     final supportingText = effectiveFeedback?.message ?? description;
 
