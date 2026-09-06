@@ -45,6 +45,12 @@ void main() {
     expect(disabled.visible, isTrue);
     expect(disabled.disabledReason, 'Not allowed');
 
+    command.setAvailability(enabled: true);
+    expect(command.state.value.disabledReason, isNull);
+
+    command.setAvailability(enabled: false);
+    expect(command.toAction(1).disabledReason, isNull);
+
     command.setAvailability(
       visibility: CarpenterCommandVisibility.hidden,
       enabled: false,
