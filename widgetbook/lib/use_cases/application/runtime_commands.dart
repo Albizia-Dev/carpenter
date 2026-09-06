@@ -1,4 +1,5 @@
 import 'package:carpenter/carpenter.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -13,7 +14,7 @@ final applicationRuntimeComponent = WidgetbookComponent(
   ],
 );
 
-Widget _rawRuntimeScope(BuildContext context) {
+Widget _rawRuntimeScope(BuildContext _) {
   final runtime = CarpenterRuntime().extend(
     CarpenterCoreRuntime(platform: defaultTargetPlatform),
   );
