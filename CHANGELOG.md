@@ -1,3 +1,82 @@
+# 0.2.0
+
+Carpenter 0.2.0 is a migration release that consolidates the application,
+resource, command, collection, and semantic presentation contracts introduced
+since 0.1.8.
+
+## Migration notes
+
+- `CarpenterResourceController.data` is now read-only to consumers. Use
+  `replaceData` or `updateData` for local reconciliation and optimistic changes.
+- `CarpenterResourceController` is an application extension point again and
+  exposes `didChangeData(previous, next)` for derived state such as command
+  availability. The base controller owns the corresponding notification.
+- Resource refresh failures no longer erase already loaded data. Existing data
+  remains visible and `refreshFailure` exposes the failure separately; initial
+  load failures remain blocking.
+- Resource `refreshCommand` and `retryCommand` now fail their command lifecycle
+  when the underlying load fails, while direct `refresh()` remains a
+  state-driven, non-throwing controller API.
+- Command availability no longer retains stale `disabledReason` values across
+  later availability transitions.
+- Presentation-only command surfaces consume an already-recorded asynchronous
+  command failure instead of leaking a second uncaught Future error. Direct
+  command/executor calls still propagate failures to programmatic callers.
+
+## Application and behaviour
+
+- Added a semantic command execution lifecycle with started, succeeded, and
+  failed events, command effects, refresh scopes, blocking effects, and a shared
+  executor boundary.
+- Added application command policy helpers for centralized success/failure
+  feedback, undo handling, and semantic invalidation without coupling commands
+  to a particular state-management or cache implementation.
+- Added shared request-gate cancellation and stale-request protection used by
+  application resource and collection lifecycles.
+- Centralized loading behaviour below application pages so loading ownership and
+  presentation can be reused without duplicating page-specific machinery.
+- Unified command-to-action projection so buttons, shortcuts, toolbars, table
+  rows, and other action surfaces share the same command availability and
+  execution semantics.
+
+## Collections and actions
+
+- Added a shared grid layout resolver used by ordinary and tree tables for
+  consistent fixed/flexible sizing and capped-flex redistribution.
+- Unified toolbar, table, and tree-table adaptive actions behind the shared
+  action-strip and overflow behaviour.
+- Added semantic table action lanes with stable geometry and compact preferred
+  widths instead of ad-hoc action-column sizing.
+- Made tree-table actions ordinary columns through
+  `CarpenterTreeTableColumn.actions`, while retaining the legacy top-level
+  action shorthand as a compatibility path.
+- Expanded table and tree-table column contracts with semantic text, number,
+  status, alignment, vertical alignment, width, and resizing behaviour.
+- Unified table/tree cell geometry, metrics, typography, borders, selection,
+  hover treatment, and animated Gravity chevrons for tree disclosure.
+
+## Components and foundation
+
+- Promoted `CarpenterFieldShell` to the public shared field primitive and routed
+  text-editing and selectable fields through the same label, feedback, spacing,
+  and semantic structure.
+- Added richer field feedback and semantic surface coverage for validation,
+  accessibility, and state presentation.
+- Expanded semantic theme roles and generated Mordant component/metric tokens
+  used by controls, tables, typography, loading, and application surfaces.
+- Added conceptual public entrypoints for application, components, collections,
+  foundation, layout, and patterns while retaining the umbrella
+  `package:carpenter/carpenter.dart` entrypoint.
+
+## Quality
+
+- Strengthened pull-request verification to require repository formatting,
+  library analysis, all non-golden package tests, and successful Widgetbook and
+  example web builds.
+- Added public-entrypoint, command-policy, request-gate, resource lifecycle,
+  field-shell, grid-layout, table, tree-table, action, and theme regression
+  coverage.
+
 # 0.1.8
 
 - Added a controlled, keyboard-accessible joined selection-button group for
