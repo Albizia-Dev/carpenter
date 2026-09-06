@@ -963,7 +963,6 @@
     "lib/src/components/collections/table/table_state.dart::field:CarpenterTableMessages.refreshing": "b7e8a9423d19f087191cd43ccb47b37c2a1bc4b5b5e1cb9152cb4a41cb596ac2",
     "lib/src/components/collections/table/table_state.dart::field:CarpenterTableMessages.selectAllLoaded": "0bb7028c3199aa1535e5844cd447eb63866b7b73456a3d23a7c62d20352b20c3",
     "lib/src/components/collections/table/table_state.dart::field:CarpenterTableMessages.zero": "6336769b9d514c09eac341b7d5e50b5760122dc1facd630556b525aff1e21bdf",
-    "lib/src/components/collections/table/table_text.dart::constructor:CarpenterTableText.cell": "a1fc9f2d884dff7d16da7dbb739e5bd7608a3b88447cadb136e37114dbe01efd",
     "lib/src/components/collections/table/table_text.dart::constructor:CarpenterTableText.header": "3fc1b3f7f84b603a38273f126b894d86f74d6dc3be77276623988b67845fc85d",
     "lib/src/components/collections/table/table_text.dart::constructor:CarpenterTableText.new": "68daec7af7faaa55238fb94cc541c7e60094d86170d638c7755e157e3bdefcdd",
     "lib/src/components/collections/table/table_text.dart::enum:CarpenterTableTypographyRole": "90e4b684bd1b2bd998967094e7616e21dbf764380ae773b9aa7a176a887bb0e9",
