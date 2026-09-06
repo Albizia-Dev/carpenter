@@ -3,7 +3,6 @@ import 'package:flutter/widgets.dart';
 
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
-import '../basic/card.dart';
 import '../basic/text.dart';
 
 typedef CarpenterInspectorLabelBuilder = String Function(String key);
@@ -39,6 +38,7 @@ final class CarpenterInspector extends StatelessWidget {
     scalar: _scalar,
     fieldFilter: fieldFilter,
     emptyMessage: emptyMessage,
+    depth: 0,
   );
 }
 
@@ -49,15 +49,20 @@ final class _InspectorValue extends StatelessWidget {
     required this.scalar,
     required this.fieldFilter,
     required this.emptyMessage,
+    required this.depth,
   });
+
   final Object? value;
   final String Function(String key) label;
   final String Function(Object? value) scalar;
   final CarpenterInspectorFieldFilter? fieldFilter;
   final String emptyMessage;
+  final int depth;
 
   @override
   Widget build(BuildContext context) {
+    final theme = CarpenterTheme.of(context);
+    final gap = context.units(theme.spacing.small);
     if (value is Map) {
       final entries = (value as Map).entries
           .where((entry) {
@@ -66,43 +71,58 @@ final class _InspectorValue extends StatelessWidget {
                 (entry.value != null && '${entry.value}'.isNotEmpty);
           })
           .toList(growable: false);
-      if (entries.isEmpty) return CarpenterText.body(emptyMessage);
+      if (entries.isEmpty) {
+        return CarpenterText.body(
+          emptyMessage,
+          colorRole: ContentColorRole.muted,
+        );
+      }
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (final entry in entries)
+          for (var index = 0; index < entries.length; index++) ...[
+            if (index > 0)
+              SizedBox(
+                height: context.units(theme.shapes.actionBorderWidth),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(color: theme.surface.subtle),
+                ),
+              ),
             _InspectorField(
-              label: label('${entry.key}'),
-              value: entry.value is Map || entry.value is List
-                  ? CarpenterInspector(
-                      value: entry.value,
-                      labelBuilder: label,
-                      scalarBuilder: scalar,
-                      fieldFilter: fieldFilter,
-                      emptyMessage: emptyMessage,
-                    )
-                  : CarpenterText.body(scalar(entry.value)),
+              label: label('${entries[index].key}'),
+              value: _nested(entries[index].value),
+              depth: depth,
             ),
+          ],
         ],
       );
     }
     if (value is List) {
       final items = value as List;
-      if (items.isEmpty) return CarpenterText.body(emptyMessage);
+      if (items.isEmpty) {
+        return CarpenterText.body(
+          emptyMessage,
+          colorRole: ContentColorRole.muted,
+        );
+      }
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          for (final item in items)
+          for (var index = 0; index < items.length; index++)
             Padding(
-              padding: EdgeInsets.only(bottom: context.units(.5.rem)),
-              child: CarpenterCard(
-                child: CarpenterInspector(
-                  value: item,
-                  labelBuilder: label,
-                  scalarBuilder: scalar,
-                  fieldFilter: fieldFilter,
-                  emptyMessage: emptyMessage,
-                ),
+              padding: EdgeInsets.only(bottom: index == items.length - 1 ? 0 : gap),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    width: context.units(2.rem),
+                    child: CarpenterText.caption(
+                      '${index + 1}.',
+                      colorRole: ContentColorRole.muted,
+                    ),
+                  ),
+                  Expanded(child: _nested(items[index])),
+                ],
               ),
             ),
         ],
@@ -110,27 +130,52 @@ final class _InspectorValue extends StatelessWidget {
     }
     return CarpenterText.body(scalar(value));
   }
+
+  Widget _nested(Object? nestedValue) {
+    if (nestedValue is! Map && nestedValue is! List) {
+      return CarpenterText.body(scalar(nestedValue));
+    }
+    return _InspectorValue(
+      value: nestedValue,
+      label: label,
+      scalar: scalar,
+      fieldFilter: fieldFilter,
+      emptyMessage: emptyMessage,
+      depth: depth + 1,
+    );
+  }
 }
 
 final class _InspectorField extends StatelessWidget {
-  const _InspectorField({required this.label, required this.value});
+  const _InspectorField({
+    required this.label,
+    required this.value,
+    required this.depth,
+  });
+
   final String label;
   final Widget value;
+  final int depth;
 
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.small);
+    final vertical = context.units(theme.spacing.small) / 2;
     return Padding(
-      padding: EdgeInsets.only(bottom: gap),
+      padding: EdgeInsetsDirectional.only(
+        start: depth == 0 ? 0 : gap,
+        top: vertical,
+        bottom: vertical,
+      ),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final labelWidget = CarpenterText.label(
             label,
-            emphasis: TypographyEmphasis.strong,
+            emphasis: TypographyEmphasis.medium,
             colorRole: ContentColorRole.secondary,
           );
-          if (constraints.maxWidth < context.units(26.25.rem))
+          if (constraints.maxWidth < context.units(32.rem)) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -139,10 +184,11 @@ final class _InspectorField extends StatelessWidget {
                 value,
               ],
             );
+          }
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(width: context.units(13.125.rem), child: labelWidget),
+              SizedBox(width: context.units(10.rem), child: labelWidget),
               SizedBox(width: gap),
               Expanded(child: value),
             ],
