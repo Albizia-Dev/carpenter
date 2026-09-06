@@ -168,7 +168,8 @@ final class _TestResourceController extends CarpenterResourceController<int> {
   _TestResourceController() : super(load: (_) async => 11);
 }
 
-final class _ObservedResourceController extends CarpenterResourceController<int> {
+final class _ObservedResourceController
+    extends CarpenterResourceController<int> {
   _ObservedResourceController(Future<int> Function() load)
     : super(load: (_) => load());
 
