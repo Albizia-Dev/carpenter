@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show protected;
 import 'package:flutter/widgets.dart';
 
 import '../application/command.dart';
@@ -36,6 +37,7 @@ final class CarpenterResourceFailure {
 typedef CarpenterResourceLoader<T> =
     Future<T> Function(CarpenterResourceLoadRequest request);
 
+/// Extensible resource lifecycle base for application-specific controllers.
 class CarpenterResourceController<T>
     extends ValueNotifier<CarpenterPageState>
     implements CarpenterPageController {
@@ -84,10 +86,7 @@ class CarpenterResourceController<T>
   /// Use this for optimistic updates or for applying a mutation response to the
   /// resource already on screen. The current page state is preserved and
   /// listeners are notified exactly once.
-  void replaceData(T next) {
-    _data = next;
-    notifyListeners();
-  }
+  void replaceData(T next) => _setData(next, notify: true);
 
   /// Replaces the currently loaded resource using its latest value.
   ///
@@ -101,6 +100,15 @@ class CarpenterResourceController<T>
     replaceData(update(current));
   }
 
+  /// Called after resource data changes from load, refresh, replace, or update.
+  ///
+  /// Application controllers can override this to recompute derived state or
+  /// command availability in one place. The new [data] value is already
+  /// installed when this hook runs. Do not call [notifyListeners] here;
+  /// Carpenter completes the owning lifecycle notification after the hook.
+  @protected
+  void didChangeData(T? previous, T next) {}
+
   @override
   List<CarpenterCommand<dynamic>> get pageCommands => [
     refreshCommand,
@@ -109,6 +117,13 @@ class CarpenterResourceController<T>
   Future<void> initialize() => _run(CarpenterResourceLoadReason.initial);
   @override
   Future<void> refresh() => _run(CarpenterResourceLoadReason.refresh);
+
+  void _setData(T next, {required bool notify}) {
+    final previous = _data;
+    _data = next;
+    didChangeData(previous, next);
+    if (notify) notifyListeners();
+  }
 
   Future<void> _run(CarpenterResourceLoadReason reason) async {
     final lease = _requests.begin();
@@ -124,7 +139,7 @@ class CarpenterResourceController<T>
         ),
       );
       if (!_requests.isCurrent(lease)) return;
-      _data = loaded;
+      _setData(loaded, notify: false);
       _refreshFailure = null;
       value = const CarpenterPageReady();
     } catch (error, stackTrace) {
