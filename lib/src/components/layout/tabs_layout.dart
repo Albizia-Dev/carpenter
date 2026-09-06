@@ -79,30 +79,58 @@ final class CarpenterTabsLayout<T> extends StatelessWidget {
             ],
           );
         }
+        final activeStyle = theme.actions.resolve(
+          ActionColorRole.utility,
+          ActionProminence.normal,
+          const <WidgetState>{},
+        );
+        final indicatorWidth = context.units(theme.shapes.actionBorderWidth) * 2;
         return Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SizedBox(
               width: context.units(15.rem),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  for (final tab in visible)
-                    Padding(
-                      padding: EdgeInsets.only(
-                        bottom: gap / context.units(.125.rem),
-                      ),
-                      child: CarpenterButton(
-                        label: _label(tab),
-                        prominence: tab.value == selected.value
-                            ? ActionProminence.normal
-                            : ActionProminence.ghost,
-                        onInvoke: tab.enabled
-                            ? () => onChanged(tab.value)
-                            : null,
-                      ),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  border: BorderDirectional(
+                    end: BorderSide(
+                      color: theme.surface.subtle,
+                      width: context.units(theme.shapes.actionBorderWidth),
                     ),
-                ],
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (final tab in visible)
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          border: BorderDirectional(
+                            start: BorderSide(
+                              color: tab.value == selected.value
+                                  ? activeStyle.foreground
+                                  : theme.actions.transparent,
+                              width: indicatorWidth,
+                            ),
+                          ),
+                        ),
+                        child: CarpenterButton(
+                          label: _label(tab),
+                          colorRole: ActionColorRole.utility,
+                          prominence: tab.value == selected.value
+                              ? ActionProminence.low
+                              : ActionProminence.ghost,
+                          shape: const CarpenterShape(
+                            start: ShapeRole.none,
+                            end: ShapeRole.none,
+                          ),
+                          onInvoke: tab.enabled
+                              ? () => onChanged(tab.value)
+                              : null,
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
             SizedBox(width: gap),
