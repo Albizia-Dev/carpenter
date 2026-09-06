@@ -102,8 +102,10 @@ final class CarpenterActionStrip extends StatelessWidget {
               ],
               if (layout.overflow.isNotEmpty) ...[
                 if (layout.visible.isNotEmpty) _gap(context),
-                Flexible(
-                  fit: FlexFit.loose,
+                SizedBox.square(
+                  dimension: context.units(
+                    CarpenterTheme.of(context).sizes.actionHeight(overflowSize),
+                  ),
                   child: _ActionStripOverflowButton(
                     items: layout.overflow,
                     label: overflowLabel,
@@ -299,7 +301,6 @@ final class _ActionStripOverflowButtonState
       ),
     );
     overlay.insert(_entry!);
-    setState(() {});
   }
 
   void _close() {
@@ -307,7 +308,6 @@ final class _ActionStripOverflowButtonState
     if (entry == null) return;
     _entry = null;
     entry.remove();
-    if (mounted) setState(() {});
   }
 
   @override
