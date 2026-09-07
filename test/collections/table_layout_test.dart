@@ -17,27 +17,30 @@ void main() {
     expect(column.resizable, isFalse);
   });
 
-  test('action columns expose the same semantic actions for context surfaces', () {
-    const row = _Row(1, 'Alpha');
-    final column = CarpenterTableColumn<_Row>.actions(
-      id: 'actions',
-      header: 'Actions',
-      actions: (_) => const [
-        CarpenterActionDescriptor(id: 'open', label: 'Open', onInvoke: null),
-      ],
-      secondaryActions: (_) => const [
-        CarpenterActionDescriptor(
-          id: 'archive',
-          label: 'Archive',
-          onInvoke: null,
-        ),
-      ],
-    );
+  test(
+    'action columns expose the same semantic actions for context surfaces',
+    () {
+      const row = _Row(1, 'Alpha');
+      final column = CarpenterTableColumn<_Row>.actions(
+        id: 'actions',
+        header: 'Actions',
+        actions: (_) => const [
+          CarpenterActionDescriptor(id: 'open', label: 'Open', onInvoke: null),
+        ],
+        secondaryActions: (_) => const [
+          CarpenterActionDescriptor(
+            id: 'archive',
+            label: 'Archive',
+            onInvoke: null,
+          ),
+        ],
+      );
 
-    final actions = column.actionsBuilder!(row);
-    expect(actions.primary.map((action) => action.id), ['open']);
-    expect(actions.secondary.map((action) => action.id), ['archive']);
-  });
+      final actions = column.actionsBuilder!(row);
+      expect(actions.primary.map((action) => action.id), ['open']);
+      expect(actions.secondary.map((action) => action.id), ['archive']);
+    },
+  );
 
   testWidgets('resizable columns work without a width callback', (
     tester,
@@ -189,7 +192,10 @@ void main() {
 
     final action = find.bySemanticsLabel('More actions');
     final before = tester.getCenter(action).dx;
-    await tester.drag(find.byType(SingleChildScrollView), const Offset(-180, 0));
+    await tester.drag(
+      find.byType(SingleChildScrollView),
+      const Offset(-180, 0),
+    );
     await tester.pump();
 
     expect(tester.getCenter(action).dx, closeTo(before, 0.5));
