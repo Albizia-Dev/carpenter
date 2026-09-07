@@ -23,11 +23,7 @@ final class CarpenterTreeUpdated<T> extends CarpenterTreePatch<T> {
 /// Duplicate ids and missing parents are rejected as no-ops. [index] is
 /// clamped to the destination list bounds; omitting it appends.
 final class CarpenterTreeInserted<T> extends CarpenterTreePatch<T> {
-  const CarpenterTreeInserted({
-    required this.node,
-    this.parentId,
-    this.index,
-  });
+  const CarpenterTreeInserted({required this.node, this.parentId, this.index});
 
   final CarpenterTreeNode<T> node;
   final Object? parentId;
@@ -84,7 +80,8 @@ extension CarpenterTreePatchApplication<T> on List<CarpenterTreeNode<T>> {
         if (source == null) return this;
         final parentId = patch.parentId;
         if (parentId != null) {
-          if (parentId == source.id || carpenterTreeContains(source, parentId)) {
+          if (parentId == source.id ||
+              carpenterTreeContains(source, parentId)) {
             return this;
           }
           if (findCarpenterTreeNode(this, parentId) == null) return this;

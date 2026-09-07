@@ -3,7 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('move to a stale missing parent does not remove the source', () {
-    const child = CarpenterTreeNode(id: 'child', value: 'child', label: 'Child');
+    const child = CarpenterTreeNode(
+      id: 'child',
+      value: 'child',
+      label: 'Child',
+    );
     final roots = <CarpenterTreeNode<String>>[
       const CarpenterTreeNode(
         id: 'root',

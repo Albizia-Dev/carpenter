@@ -36,10 +36,7 @@ final class _ExplorerInteractionsExampleState
         ],
         remembered: _remembered == null
             ? null
-            : CarpenterExplorerDestination(
-                value: _remembered!,
-                label: _value,
-              ),
+            : CarpenterExplorerDestination(value: _remembered!, label: _value),
       ),
       const SizedBox(height: 16),
       CarpenterInlineTextEdit(

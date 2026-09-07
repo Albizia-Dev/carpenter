@@ -3,7 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('collections entrypoint exposes tree patches', () {
-    const child = CarpenterTreeNode(id: 'child', value: 'child', label: 'Child');
+    const child = CarpenterTreeNode(
+      id: 'child',
+      value: 'child',
+      label: 'Child',
+    );
     final roots = <CarpenterTreeNode<String>>[
       const CarpenterTreeNode(id: 'root', value: 'root', label: 'Root'),
     ];

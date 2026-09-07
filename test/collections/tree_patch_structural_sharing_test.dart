@@ -3,7 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('tree update retains untouched root object identity', () {
-    const child = CarpenterTreeNode(id: 'child', value: 'child', label: 'Child');
+    const child = CarpenterTreeNode(
+      id: 'child',
+      value: 'child',
+      label: 'Child',
+    );
     const untouched = CarpenterTreeNode(
       id: 'untouched',
       value: 'untouched',

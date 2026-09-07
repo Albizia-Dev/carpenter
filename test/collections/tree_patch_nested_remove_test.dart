@@ -3,7 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('nested removal keeps sibling identity', () {
-    const removed = CarpenterTreeNode(id: 'remove', value: 'r', label: 'Remove');
+    const removed = CarpenterTreeNode(
+      id: 'remove',
+      value: 'r',
+      label: 'Remove',
+    );
     const sibling = CarpenterTreeNode(id: 'keep', value: 'k', label: 'Keep');
     final roots = <CarpenterTreeNode<String>>[
       const CarpenterTreeNode(

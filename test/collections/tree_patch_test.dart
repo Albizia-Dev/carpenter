@@ -35,26 +35,29 @@ void main() {
     expect(next[1], same(untouched));
   });
 
-  test('insert supports roots and nested parents and rejects duplicate ids', () {
-    final root = node('root');
-    final roots = <CarpenterTreeNode<String>>[root];
-    final nested = node('nested');
+  test(
+    'insert supports roots and nested parents and rejects duplicate ids',
+    () {
+      final root = node('root');
+      final roots = <CarpenterTreeNode<String>>[root];
+      final nested = node('nested');
 
-    final withNested = roots.applyCarpenterTreePatch(
-      CarpenterTreeInserted(node: nested, parentId: 'root'),
-    );
-    expect(withNested.first.children.single, same(nested));
+      final withNested = roots.applyCarpenterTreePatch(
+        CarpenterTreeInserted(node: nested, parentId: 'root'),
+      );
+      expect(withNested.first.children.single, same(nested));
 
-    final appended = withNested.applyCarpenterTreePatch(
-      CarpenterTreeInserted(node: node('second'), index: 0),
-    );
-    expect(appended.first.id, 'second');
+      final appended = withNested.applyCarpenterTreePatch(
+        CarpenterTreeInserted(node: node('second'), index: 0),
+      );
+      expect(appended.first.id, 'second');
 
-    final duplicate = appended.applyCarpenterTreePatch(
-      CarpenterTreeInserted(node: node('nested')),
-    );
-    expect(duplicate, same(appended));
-  });
+      final duplicate = appended.applyCarpenterTreePatch(
+        CarpenterTreeInserted(node: node('nested')),
+      );
+      expect(duplicate, same(appended));
+    },
+  );
 
   test('remove drops one subtree and preserves unrelated branches', () {
     final child = node('child', children: [node('grandchild')]);
@@ -111,9 +114,7 @@ void main() {
       same(roots),
     );
     expect(
-      roots.applyCarpenterTreePatch(
-        CarpenterTreeUpdated(node('missing')),
-      ),
+      roots.applyCarpenterTreePatch(CarpenterTreeUpdated(node('missing'))),
       same(roots),
     );
   });

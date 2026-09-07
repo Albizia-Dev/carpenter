@@ -3,7 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('nested node can move to root at a requested index', () {
-    const child = CarpenterTreeNode(id: 'child', value: 'child', label: 'Child');
+    const child = CarpenterTreeNode(
+      id: 'child',
+      value: 'child',
+      label: 'Child',
+    );
     final roots = <CarpenterTreeNode<String>>[
       const CarpenterTreeNode(
         id: 'parent',

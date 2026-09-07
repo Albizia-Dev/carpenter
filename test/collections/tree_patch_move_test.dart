@@ -3,7 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('moving to root preserves the source node instance', () {
-    const child = CarpenterTreeNode(id: 'child', value: 'child', label: 'Child');
+    const child = CarpenterTreeNode(
+      id: 'child',
+      value: 'child',
+      label: 'Child',
+    );
     final roots = <CarpenterTreeNode<String>>[
       const CarpenterTreeNode(
         id: 'parent',

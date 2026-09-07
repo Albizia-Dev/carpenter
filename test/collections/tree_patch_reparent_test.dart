@@ -3,7 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('node can reparent between sibling branches', () {
-    const moved = CarpenterTreeNode(id: 'moved', value: 'moved', label: 'Moved');
+    const moved = CarpenterTreeNode(
+      id: 'moved',
+      value: 'moved',
+      label: 'Moved',
+    );
     final roots = <CarpenterTreeNode<String>>[
       const CarpenterTreeNode(
         id: 'a',
