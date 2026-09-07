@@ -22,8 +22,10 @@ import 'table_column.dart';
 import 'table_state.dart';
 import 'table_text.dart';
 
-typedef CarpenterTableColumnWidthChanged =
-    void Function(String columnId, LengthUnit width);
+typedef CarpenterTableColumnWidthChanged = void Function(
+  String columnId,
+  LengthUnit width,
+);
 
 final class CarpenterTable<T, K> extends StatefulWidget {
   const CarpenterTable({
@@ -808,10 +810,7 @@ final class _TableRowState<T, K> extends State<_TableRow<T, K>> {
       ),
       foregroundDecoration: _focused
           ? BoxDecoration(
-              border: Border.all(
-                color: theme.focus.color,
-                width: focusWidth,
-              ),
+              border: Border.all(color: theme.focus.color, width: focusWidth),
             )
           : null,
       child: Stack(

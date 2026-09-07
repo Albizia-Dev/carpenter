@@ -56,10 +56,7 @@ final class _CarpenterContextActionRegionState
     super.dispose();
   }
 
-  void _show(
-    Offset globalPosition,
-    CarpenterContextActionTrigger trigger,
-  ) {
+  void _show(Offset globalPosition, CarpenterContextActionTrigger trigger) {
     if (_visibleActions.isEmpty) return;
     _close();
 
