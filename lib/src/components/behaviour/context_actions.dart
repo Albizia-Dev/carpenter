@@ -8,7 +8,13 @@ import 'menu/menu.dart';
 import 'menu/menu_entry.dart';
 
 /// Input source that requested a contextual action surface.
-enum CarpenterContextActionTrigger { pointerSecondary, longPress }
+enum CarpenterContextActionTrigger {
+  /// A secondary pointer button requested contextual actions.
+  pointerSecondary,
+
+  /// A touch or pointer long-press requested contextual actions.
+  longPress,
+}
 
 /// Makes one semantic action set available through platform-appropriate
 /// alternative gestures.
@@ -16,6 +22,10 @@ enum CarpenterContextActionTrigger { pointerSecondary, longPress }
 /// A secondary pointer press and a touch long-press both open the same
 /// [CarpenterMenu]. Callers provide semantic [CarpenterActionDescriptor]s and
 /// do not need to branch on mouse versus touch input.
+///
+/// The region owns only the transient menu overlay. It does not own action
+/// availability, selection, or command execution state. Disposing the region
+/// dismisses any menu it opened.
 final class CarpenterContextActionRegion extends StatefulWidget {
   const CarpenterContextActionRegion({
     super.key,
@@ -25,9 +35,22 @@ final class CarpenterContextActionRegion extends StatefulWidget {
     this.onOpen,
   });
 
+  /// Semantic actions exposed by the contextual surface.
+  ///
+  /// Invisible descriptors are omitted and disabled descriptors retain their
+  /// normal disabled presentation and invocation semantics.
   final List<CarpenterActionDescriptor> actions;
+
+  /// Content that receives the secondary-press and long-press gestures.
   final Widget child;
+
+  /// Accessibility label announced for the opened contextual menu.
   final String semanticLabel;
+
+  /// Reports which input source opened the menu.
+  ///
+  /// This callback is informational. Invocation remains owned by the supplied
+  /// [actions], and dismissing the overlay does not invoke this callback again.
   final ValueChanged<CarpenterContextActionTrigger>? onOpen;
 
   @override
