@@ -5,17 +5,27 @@ import 'tree_state.dart';
 
 @immutable
 final class CarpenterTreeDropDetails<T> {
+  /// Creates immutable details for one tree drop operation.
   const CarpenterTreeDropDetails({
     required this.dragged,
     required this.target,
     required this.position,
     required this.operation,
+    this.draggedNodes = const [],
   });
 
   final CarpenterTreeNode<T> dragged;
   final CarpenterTreeNode<T> target;
   final CarpenterDropPosition position;
   final CarpenterDragOperation operation;
+
+  /// Full drag selection when the gesture started from a selected row.
+  /// Empty means the legacy single [dragged] node only.
+  final List<CarpenterTreeNode<T>> draggedNodes;
+
+  /// Nodes participating in the drop, falling back to [dragged] for legacy use.
+  List<CarpenterTreeNode<T>> get effectiveDraggedNodes =>
+      draggedNodes.isEmpty ? [dragged] : draggedNodes;
 }
 
 typedef CarpenterTreeExpansionChanged =

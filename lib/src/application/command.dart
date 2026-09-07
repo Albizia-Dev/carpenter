@@ -137,6 +137,7 @@ final class CarpenterCommandResult {
   const CarpenterCommandResult({
     this.message,
     this.undo,
+    this.redo,
     this.refreshScopes = const {},
     this.blockingEffect = false,
   });
@@ -146,6 +147,10 @@ final class CarpenterCommandResult {
 
   /// Optional undo operation that application policy may register or present.
   final FutureOr<void> Function()? undo;
+
+  /// Optional redo operation paired with [undo]. A null value makes the
+  /// successful command undo-only.
+  final FutureOr<void> Function()? redo;
 
   /// Additional semantic invalidation scopes requested by this concrete result.
   final Set<String> refreshScopes;

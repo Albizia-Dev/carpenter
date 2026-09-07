@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 
+import '../components/behaviour/undo/undo_controller.dart';
+import '../components/behaviour/undo/undoable_operation.dart';
 import '../foundation/roles.dart';
 import 'command.dart';
 
@@ -243,6 +245,33 @@ final class CarpenterInvalidationRegistry {
           context: ErrorDescription(
             'while invalidating Carpenter data scopes ${matchedScopes.join(', ')}',
           ),
+        ),
+      );
+    }
+  }
+}
+
+/// Registers reversible successful command results in a shared undo controller.
+///
+/// This is application policy rather than behaviour-layer state: commands remain
+/// unaware of the controller, while the controller itself remains domain-neutral.
+final class CarpenterCommandUndoPolicy {
+  /// Creates policy that writes reversible command results to [controller].
+  const CarpenterCommandUndoPolicy(this.controller);
+
+  /// History controller receiving successful reversible command results.
+  final CarpenterUndoController controller;
+
+  /// Registers undo and optional redo callbacks from a successful [event].
+  void handle(CarpenterCommandExecutionEvent event) {
+    if (event case CarpenterCommandSucceeded(:final result)) {
+      final undo = result.undo;
+      if (undo == null) return;
+      controller.register(
+        CarpenterUndoableOperation(
+          label: event.title,
+          undo: undo,
+          redo: result.redo,
         ),
       );
     }

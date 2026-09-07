@@ -474,4 +474,130 @@ void main() {
     expect(laneId, 'lane');
     expect(expanded, isFalse);
   });
+  testWidgets(
+    'tree selects all visible rows with the platform select-all shortcut',
+    (tester) async {
+      var selected = <Object>{};
+      const nodes = <CarpenterTreeNode<String>>[
+        CarpenterTreeNode<String>(id: 'a', value: 'a', label: 'Alpha'),
+        CarpenterTreeNode<String>(id: 'b', value: 'b', label: 'Bravo'),
+        CarpenterTreeNode<String>(id: 'c', value: 'c', label: 'Charlie'),
+      ];
+
+      await tester.pumpWidget(
+        carpenterHarness(
+          StatefulBuilder(
+            builder: (context, setState) => CarpenterTreeView<String>(
+              nodes: nodes,
+              selectionMode: CarpenterTreeSelectionMode.multiple,
+              multipleSelectionBehavior:
+                  CollectionMultiSelectionBehavior.desktop,
+              selectedIds: selected,
+              onSelectionChanged: (next) => setState(() => selected = next),
+            ),
+          ),
+        ),
+      );
+      await tester.pump();
+
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      await tester.pump();
+
+      expect(selected, {'a', 'b', 'c'});
+    },
+  );
+
+  testWidgets('tree drag carries selected roots as one batch', (tester) async {
+    CarpenterTreeDropDetails<String>? dropped;
+    const nodes = <CarpenterTreeNode<String>>[
+      CarpenterTreeNode<String>(id: 'a', value: 'a', label: 'Alpha'),
+      CarpenterTreeNode<String>(id: 'b', value: 'b', label: 'Bravo'),
+      CarpenterTreeNode<String>(id: 'c', value: 'c', label: 'Charlie'),
+    ];
+
+    await tester.pumpWidget(
+      carpenterOverlayHarness(
+        SizedBox(
+          width: 420,
+          child: CarpenterTreeView<String>(
+            nodes: nodes,
+            selectionMode: CarpenterTreeSelectionMode.multiple,
+            selectedIds: const {'a', 'b'},
+            onDrop: (details) => dropped = details,
+            dragOperations: const {
+              CarpenterDragOperation.move,
+              CarpenterDragOperation.copy,
+            },
+          ),
+        ),
+      ),
+    );
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('Alpha')),
+    );
+    await tester.pump();
+    await gesture.moveTo(tester.getCenter(find.text('Charlie')));
+    await tester.pump();
+    await gesture.up();
+    await tester.pump();
+
+    expect(
+      dropped?.effectiveDraggedNodes.map((node) => node.id),
+      orderedEquals(['a', 'b']),
+    );
+    expect(dropped?.target.id, 'c');
+  });
+
+  testWidgets('tree drag collapses nested selected nodes to selected roots', (
+    tester,
+  ) async {
+    CarpenterTreeDropDetails<String>? dropped;
+    const nodes = <CarpenterTreeNode<String>>[
+      CarpenterTreeNode<String>(
+        id: 'root',
+        value: 'root',
+        label: 'Root',
+        children: [
+          CarpenterTreeNode<String>(
+            id: 'child',
+            value: 'child',
+            label: 'Child',
+          ),
+        ],
+      ),
+      CarpenterTreeNode<String>(id: 'target', value: 'target', label: 'Target'),
+    ];
+
+    await tester.pumpWidget(
+      carpenterOverlayHarness(
+        SizedBox(
+          width: 420,
+          child: CarpenterTreeView<String>(
+            nodes: nodes,
+            expandedIds: const {'root'},
+            selectionMode: CarpenterTreeSelectionMode.multiple,
+            selectedIds: const {'root', 'child'},
+            onDrop: (details) => dropped = details,
+          ),
+        ),
+      ),
+    );
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('Root')),
+    );
+    await tester.pump();
+    await gesture.moveTo(tester.getCenter(find.text('Target')));
+    await tester.pump();
+    await gesture.up();
+    await tester.pump();
+
+    expect(
+      dropped?.effectiveDraggedNodes.map((node) => node.id),
+      orderedEquals(['root']),
+    );
+  });
 }
