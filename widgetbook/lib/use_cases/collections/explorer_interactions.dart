@@ -22,7 +22,7 @@ Widget _explorerInteractions(BuildContext context) =>
 final class ExplorerInteractionsExample extends StatefulWidget {
   const ExplorerInteractionsExample({super.key});
 
-  @Override
+  @override
   State<ExplorerInteractionsExample> createState() =>
       _ExplorerInteractionsExampleState();
 }
@@ -36,7 +36,7 @@ final class _ExplorerInteractionsExampleState
   String _draft = 'Specifications';
   String _value = 'Specifications';
 
-  @Override
+  @override
   Widget build(BuildContext context) => CarpenterUndoScope(
     child: CarpenterClipboardScope<String>(
       child: Column(
