@@ -1,0 +1,53 @@
+name: Branch verify
+
+on:
+  push:
+    branches:
+      - feat/context-actions-0.2.1
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/context-actions-0.2.1
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Install package dependencies
+        run: flutter pub get
+      - name: Analyze library
+        run: flutter analyze lib
+      - name: Run focused contextual table tests
+        run: flutter test test/behaviour/context_actions_test.dart test/collections/table_layout_test.dart test/collections/tree_table_layout_test.dart
+      - name: Run all non-golden package tests
+        shell: bash
+        run: |
+          mapfile -t tests < <(find test -name '*_test.dart' -not -path 'test/goldens/*' -print | sort)
+          flutter test "${tests[@]}"
+      - name: Install Widgetbook dependencies
+        working-directory: widgetbook
+        run: flutter pub get
+      - name: Analyze Widgetbook
+        working-directory: widgetbook
+        run: flutter analyze
+      - name: Run non-golden Widgetbook tests
+        working-directory: widgetbook
+        shell: bash
+        run: |
+          mapfile -t tests < <(find test -name '*_test.dart' -not -path 'test/goldens/*' -print | sort)
+          if ((${#tests[@]})); then flutter test "${tests[@]}"; fi
+      - name: Build Widgetbook
+        working-directory: widgetbook
+        run: flutter build web --release
+      - name: Install example dependencies
+        working-directory: example
+        run: flutter pub get
+      - name: Build example
+        working-directory: example
+        run: flutter build web --release
