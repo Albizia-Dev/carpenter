@@ -24,6 +24,20 @@ views:
   structural sharing, so unaffected branches retain identity and consumers do
   not need to refetch a whole tree after a local mutation.
 
-Application code should project one domain operation into commands, context
-actions, keyboard shortcuts and drag/drop rather than implementing each input
-surface separately.
+## Composition rule
+
+One application operation should be represented once and projected into every
+input surface that exposes it. A move, copy, link, rename, delete, or restore
+operation may therefore appear as a command shortcut, context action, toolbar
+button, row action, or drag/drop gesture without each surface acquiring its own
+persistence callback.
+
+Clipboard state, undo history, current/remembered locations, selection, and edit
+drafts are intentionally caller-owned. Applications may preserve them across
+navigation, serialize them, or discard them according to product policy without
+Carpenter hiding a second source of truth in widget state.
+
+Server-backed explorers should apply authoritative mutation results through
+`CarpenterTreePatch` where possible and reserve full snapshot refreshes for
+explicit refresh or reconciliation. This keeps unrelated branches stable while
+still leaving persistence and conflict handling to the application.
