@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
@@ -9,6 +11,7 @@ import '../../basic/button/icon_button.dart';
 import '../../basic/gravity_icons.g.dart';
 import '../../basic/icon.dart';
 import '../../basic/status_indicator.dart';
+import '../../behaviour/context_actions.dart';
 import '../../behaviour/drag_and_drop/draggable.dart';
 import '../contracts/selection_mode.dart';
 import '../table_metrics.dart';
@@ -24,6 +27,8 @@ typedef CarpenterTreeTableCellBuilder<T> =
     Widget Function(BuildContext context, CarpenterTreeNode<T> node);
 typedef CarpenterTreeTableColumnWidthChanged =
     void Function(String columnId, LengthUnit width);
+typedef CarpenterTreeTableActionsBuilder<T> =
+    CarpenterTableActions Function(CarpenterTreeNode<T> node);
 
 @immutable
 final class CarpenterTreeTableColumn<T> {
@@ -43,6 +48,7 @@ final class CarpenterTreeTableColumn<T> {
     this.verticalAlignment = CarpenterTableColumnVerticalAlignment.center,
     this.resizable = true,
     this.semanticLabel,
+    this.actionsBuilder,
   }) : assert(flex > 0);
 
   const CarpenterTreeTableColumn.custom({
@@ -54,6 +60,7 @@ final class CarpenterTreeTableColumn<T> {
     this.verticalAlignment = CarpenterTableColumnVerticalAlignment.center,
     this.resizable = true,
     this.semanticLabel,
+    this.actionsBuilder,
   }) : flex = 1;
 
   factory CarpenterTreeTableColumn.text({
@@ -143,8 +150,8 @@ final class CarpenterTreeTableColumn<T> {
         CarpenterStatusIndicator(label: label(node), role: role(node)),
   );
 
-  /// Creates a compact action column using the same action-lane semantics as a
-  /// regular [CarpenterTable].
+  /// Creates a pinned trailing action column using the same semantic actions
+  /// for inline, overflow and contextual invocation.
   factory CarpenterTreeTableColumn.actions({
     required String id,
     required String header,
@@ -166,6 +173,10 @@ final class CarpenterTreeTableColumn<T> {
     width: width,
     resizable: resizable,
     semanticLabel: semanticLabel,
+    actionsBuilder: (node) => CarpenterTableActions(
+      primary: actions(node),
+      secondary: secondaryActions?.call(node) ?? const [],
+    ),
     cellBuilder: (context, node) => CarpenterTableActionCell(
       primary: actions(node),
       secondary: secondaryActions?.call(node) ?? const [],
@@ -187,6 +198,9 @@ final class CarpenterTreeTableColumn<T> {
   final bool resizable;
   final String? semanticLabel;
 
+  /// Semantic actions represented by this column, when available.
+  final CarpenterTreeTableActionsBuilder<T>? actionsBuilder;
+
   CarpenterTableColumnWidth get effectiveWidth =>
       width ?? CarpenterTableColumnWidth.flexible(flex: flex);
 }
@@ -194,6 +208,10 @@ final class CarpenterTreeTableColumn<T> {
 /// Tabular projection of [CarpenterTreeView]. Expansion, selection, activation,
 /// filtering, reveal and DnD use exactly the same contracts as the regular
 /// tree.
+///
+/// Action-lane columns remain pinned to the trailing edge while ordinary data
+/// columns scroll underneath them. The same action descriptors open from the
+/// pinned lane, secondary pointer press and touch long-press.
 ///
 /// Cell geometry is shared by header and rows. Column widths can be supplied
 /// through [columnWidths], while direct pointer resizing works without a
@@ -263,13 +281,13 @@ final class CarpenterTreeTable<T> extends StatefulWidget {
   final CarpenterTreeDropAcceptance<T>? canDrop;
   final CarpenterTreeNodeCallback<T>? onRetryLoad;
 
-  /// Compatibility shorthand for a trailing action column.
+  /// Compatibility shorthand for a pinned trailing action column.
   ///
   /// New code should prefer [CarpenterTreeTableColumn.actions] in [columns].
   final CarpenterTreeActionsBuilder<T>? actions;
 
-  /// Compatibility shorthand for secondary actions in the trailing action
-  /// column. New code should prefer [CarpenterTreeTableColumn.actions].
+  /// Compatibility shorthand for secondary actions in the pinned trailing
+  /// action column. New code should prefer [CarpenterTreeTableColumn.actions].
   final CarpenterTreeActionsBuilder<T>? secondaryActions;
   final String actionsHeader;
   final String actionsOverflowLabel;
@@ -284,6 +302,7 @@ final class CarpenterTreeTable<T> extends StatefulWidget {
 
 final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
   final Map<String, LengthUnit> _localColumnWidths = {};
+  final ScrollController _horizontalScrollController = ScrollController();
 
   CarpenterTableColumnWidth get _effectiveTreeWidth =>
       widget.treeWidth ??
@@ -334,11 +353,21 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     }
   }
 
+  @override
+  void dispose() {
+    _horizontalScrollController.dispose();
+    super.dispose();
+  }
+
   void _resizeColumn(String id, double value, BuildContext context) {
     final width = Rem(value / context.units(1.rem));
     setState(() => _localColumnWidths[id] = width);
     widget.onColumnWidthChanged?.call(id, width);
   }
+
+  double get _horizontalOffset => _horizontalScrollController.hasClients
+      ? _horizontalScrollController.offset
+      : 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -346,53 +375,91 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     final metrics = CarpenterTableMetrics.resolve(context);
     final contentGap = metrics.cellGap;
     final columns = _effectiveColumns;
+    final dataColumns = columns
+        .where(
+          (column) =>
+              column.effectiveWidth.policy !=
+              CarpenterTableColumnWidthPolicy.actionLane,
+        )
+        .toList(growable: false);
+    final actionColumns = columns
+        .where(
+          (column) =>
+              column.effectiveWidth.policy ==
+              CarpenterTableColumnWidthPolicy.actionLane,
+        )
+        .toList(growable: false);
 
     return LayoutBuilder(
       builder: (context, constraints) {
         final layout = _resolveLayout(
           context,
           constraints.maxWidth,
-          columns: columns,
+          dataColumns: dataColumns,
+          actionColumns: actionColumns,
         );
-        final tree = CarpenterTreeView<T>(
-          nodes: widget.nodes,
-          controller: widget.controller,
-          expandedIds: widget.expandedIds,
-          selectedIds: widget.selectedIds,
-          selectionMode: widget.selectionMode,
-          multipleSelectionBehavior: widget.multipleSelectionBehavior,
-          scrollController: widget.scrollController,
-          onExpansionChanged: widget.onExpansionChanged,
-          onSelectionChanged: widget.onSelectionChanged,
-          onActivated: widget.onActivated,
-          filter: widget.filter,
-          onDrop: widget.onDrop,
-          canDrop: widget.canDrop,
-          onRetryLoad: widget.onRetryLoad,
-          actions: null,
-          iconBuilder: null,
-          tableRows: true,
-          tableRowContentPadding: false,
-          dragActivation: widget.dragActivation,
-          semanticLabel: '${widget.semanticLabel} rows',
-          rowBuilder: (context, node, state, _) =>
-              _buildRow(context, layout, columns, node, state, contentGap),
-        );
-        Widget content = Column(
-          mainAxisSize: widget.scrollController == null
-              ? MainAxisSize.min
-              : MainAxisSize.max,
-          children: [
-            _buildHeader(context, layout, columns),
-            if (widget.scrollController == null)
-              tree
-            else
-              Expanded(child: tree),
-          ],
-        );
-        content = SingleChildScrollView(
+        Widget content = SingleChildScrollView(
+          controller: _horizontalScrollController,
           scrollDirection: Axis.horizontal,
-          child: SizedBox(width: layout.totalWidth, child: content),
+          child: AnimatedBuilder(
+            animation: _horizontalScrollController,
+            builder: (context, _) {
+              final offset = _horizontalOffset;
+              final tree = CarpenterTreeView<T>(
+                nodes: widget.nodes,
+                controller: widget.controller,
+                expandedIds: widget.expandedIds,
+                selectedIds: widget.selectedIds,
+                selectionMode: widget.selectionMode,
+                multipleSelectionBehavior: widget.multipleSelectionBehavior,
+                scrollController: widget.scrollController,
+                onExpansionChanged: widget.onExpansionChanged,
+                onSelectionChanged: widget.onSelectionChanged,
+                onActivated: widget.onActivated,
+                filter: widget.filter,
+                onDrop: widget.onDrop,
+                canDrop: widget.canDrop,
+                onRetryLoad: widget.onRetryLoad,
+                actions: null,
+                iconBuilder: null,
+                tableRows: true,
+                tableRowContentPadding: false,
+                dragActivation: widget.dragActivation,
+                semanticLabel: '${widget.semanticLabel} rows',
+                rowBuilder: (context, node, state, _) => _buildRow(
+                  context,
+                  layout,
+                  dataColumns,
+                  actionColumns,
+                  node,
+                  state,
+                  contentGap,
+                  offset,
+                ),
+              );
+              return SizedBox(
+                width: layout.totalWidth,
+                child: Column(
+                  mainAxisSize: widget.scrollController == null
+                      ? MainAxisSize.min
+                      : MainAxisSize.max,
+                  children: [
+                    _buildHeader(
+                      context,
+                      layout,
+                      dataColumns,
+                      actionColumns,
+                      offset,
+                    ),
+                    if (widget.scrollController == null)
+                      tree
+                    else
+                      Expanded(child: tree),
+                  ],
+                ),
+              );
+            },
+          ),
         );
 
         if (widget.framed) {
@@ -426,12 +493,43 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
   _TreeTableLayout _resolveLayout(
     BuildContext context,
     double viewportWidth, {
-    required List<CarpenterTreeTableColumn<T>> columns,
+    required List<CarpenterTreeTableColumn<T>> dataColumns,
+    required List<CarpenterTreeTableColumn<T>> actionColumns,
   }) {
     final metrics = CarpenterTableMetrics.resolve(context);
+    final widths = <String, double>{};
+    final minimums = <String, double>{};
+    final maximums = <String, double>{};
+    var actionWidth = 0.0;
+
+    for (final column in actionColumns) {
+      final width = column.effectiveWidth;
+      final minimum = width.minimum == null
+          ? metrics.minimumColumnWidth
+          : context.units(width.minimum!);
+      final maximum = width.maximum == null
+          ? metrics.maximumColumnWidth
+          : context.units(width.maximum!);
+      final explicit =
+          _localColumnWidths[column.id] ??
+          widget.columnWidths[column.id] ??
+          width.preferred;
+      final preferred = explicit == null
+          ? CarpenterTableActionCell.preferredColumnWidth(context)
+          : context.units(explicit);
+      final resolved = preferred.clamp(minimum, maximum).toDouble();
+      widths[column.id] = resolved;
+      minimums[column.id] = minimum;
+      maximums[column.id] = maximum;
+      actionWidth += resolved;
+    }
+
+    final dataViewportWidth = viewportWidth.isFinite
+        ? math.max(0.0, viewportWidth - actionWidth)
+        : viewportWidth;
     final publicSpecs = <({String id, CarpenterTableColumnWidth width})>[
       (id: widget.treeColumnId, width: _effectiveTreeWidth),
-      for (final column in columns)
+      for (final column in dataColumns)
         (id: column.id, width: column.effectiveWidth),
     ];
     final resolvedColumns = <GridColumnSpec>[];
@@ -449,11 +547,7 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
           _localColumnWidths[spec.id] ??
           widget.columnWidths[spec.id] ??
           spec.width.preferred;
-      final preferred =
-          explicit == null &&
-              spec.width.policy == CarpenterTableColumnWidthPolicy.actionLane
-          ? CarpenterTableActionCell.preferredColumnWidth(context)
-          : explicit == null
+      final preferred = explicit == null
           ? metrics.defaultColumnWidth
           : context.units(explicit);
       resolvedColumns.add(
@@ -470,110 +564,216 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
     }
     final resolved = GridLayoutResolver.resolve(
       columns: resolvedColumns,
-      viewportWidth: viewportWidth,
+      viewportWidth: dataViewportWidth,
     );
+    widths.addAll(resolved.widths);
+    minimums.addAll(resolved.minimums);
+    maximums.addAll(resolved.maximums);
+    final naturalWidth = resolved.totalWidth + actionWidth;
+    final totalWidth = viewportWidth.isFinite
+        ? math.max(viewportWidth, naturalWidth)
+        : naturalWidth;
     return _TreeTableLayout(
-      widths: resolved.widths,
-      minimums: resolved.minimums,
-      maximums: resolved.maximums,
-      totalWidth: resolved.totalWidth,
+      widths: widths,
+      minimums: minimums,
+      maximums: maximums,
+      actionWidth: actionWidth,
+      viewportWidth: viewportWidth,
+      totalWidth: totalWidth,
     );
   }
 
   Widget _buildHeader(
     BuildContext context,
     _TreeTableLayout layout,
-    List<CarpenterTreeTableColumn<T>> columns,
+    List<CarpenterTreeTableColumn<T>> dataColumns,
+    List<CarpenterTreeTableColumn<T>> actionColumns,
+    double horizontalOffset,
   ) {
     final theme = CarpenterTheme.of(context);
     final metrics = CarpenterTableMetrics.resolve(context);
     final height = metrics.headerHeight;
-    return Container(
-      color: theme.surface.subtle,
+    return SizedBox(
       height: height,
-      child: Row(
+      child: Stack(
         children: [
-          _TreeHeaderCell(
-            id: widget.treeColumnId,
-            label: widget.treeHeader,
-            semanticLabel: widget.treeHeader,
-            width: layout.widths[widget.treeColumnId]!,
-            minimumWidth: layout.minimums[widget.treeColumnId]!,
-            maximumWidth: layout.maximums[widget.treeColumnId]!,
-            alignment: widget.treeAlignment,
-            verticalAlignment: widget.treeVerticalAlignment,
-            resizable: widget.treeResizable,
-            onWidthChanged: (value) =>
-                _resizeColumn(widget.treeColumnId, value, context),
+          Positioned.fill(
+            child: ColoredBox(
+              color: theme.surface.subtle,
+              child: Row(
+                children: [
+                  _TreeHeaderCell(
+                    id: widget.treeColumnId,
+                    label: widget.treeHeader,
+                    semanticLabel: widget.treeHeader,
+                    width: layout.widths[widget.treeColumnId]!,
+                    minimumWidth: layout.minimums[widget.treeColumnId]!,
+                    maximumWidth: layout.maximums[widget.treeColumnId]!,
+                    alignment: widget.treeAlignment,
+                    verticalAlignment: widget.treeVerticalAlignment,
+                    resizable: widget.treeResizable,
+                    onWidthChanged: (value) =>
+                        _resizeColumn(widget.treeColumnId, value, context),
+                  ),
+                  for (final column in dataColumns)
+                    _TreeHeaderCell(
+                      id: column.id,
+                      label: column.header,
+                      semanticLabel: column.semanticLabel ?? column.header,
+                      width: layout.widths[column.id]!,
+                      minimumWidth: layout.minimums[column.id]!,
+                      maximumWidth: layout.maximums[column.id]!,
+                      alignment: column.alignment,
+                      verticalAlignment: column.verticalAlignment,
+                      resizable: column.resizable,
+                      onWidthChanged: (value) =>
+                          _resizeColumn(column.id, value, context),
+                    ),
+                  SizedBox(width: layout.actionWidth),
+                ],
+              ),
+            ),
           ),
-          for (final column in columns)
-            _TreeHeaderCell(
-              id: column.id,
-              label: column.header,
-              semanticLabel: column.semanticLabel ?? column.header,
-              width: layout.widths[column.id]!,
-              minimumWidth: layout.minimums[column.id]!,
-              maximumWidth: layout.maximums[column.id]!,
-              alignment: column.alignment,
-              verticalAlignment: column.verticalAlignment,
-              resizable: column.resizable,
-              onWidthChanged: (value) =>
-                  _resizeColumn(column.id, value, context),
+          if (actionColumns.isNotEmpty)
+            PositionedDirectional(
+              top: 0,
+              bottom: 0,
+              end: layout.trailingCompensation(horizontalOffset),
+              width: layout.actionWidth,
+              child: ColoredBox(
+                color: theme.surface.subtle,
+                child: Row(
+                  children: [
+                    for (final column in actionColumns)
+                      _TreeHeaderCell(
+                        id: column.id,
+                        label: column.header,
+                        semanticLabel: column.semanticLabel ?? column.header,
+                        width: layout.widths[column.id]!,
+                        minimumWidth: layout.minimums[column.id]!,
+                        maximumWidth: layout.maximums[column.id]!,
+                        alignment: column.alignment,
+                        verticalAlignment: column.verticalAlignment,
+                        resizable: column.resizable,
+                        onWidthChanged: (value) =>
+                            _resizeColumn(column.id, value, context),
+                      ),
+                  ],
+                ),
+              ),
             ),
         ],
       ),
     );
   }
 
+  List<CarpenterActionDescriptor> _contextActions(
+    CarpenterTreeNode<T> node,
+    List<CarpenterTreeTableColumn<T>> actionColumns,
+  ) {
+    final primary = <CarpenterActionDescriptor>[];
+    final secondary = <CarpenterActionDescriptor>[];
+    for (final column in actionColumns) {
+      final actions = column.actionsBuilder?.call(node);
+      if (actions == null) continue;
+      primary.addAll(actions.primary);
+      secondary.addAll(actions.secondary);
+    }
+    return [...primary, ...secondary];
+  }
+
   Widget _buildRow(
     BuildContext context,
     _TreeTableLayout layout,
-    List<CarpenterTreeTableColumn<T>> columns,
+    List<CarpenterTreeTableColumn<T>> dataColumns,
+    List<CarpenterTreeTableColumn<T>> actionColumns,
     CarpenterTreeNode<T> node,
     CarpenterTreeRowState<T> state,
     double contentGap,
+    double horizontalOffset,
   ) {
-    return Row(
+    final theme = CarpenterTheme.of(context);
+    final background = state.selected
+        ? theme.overlay.selected
+        : state.hovering
+        ? theme.overlay.hovered
+        : theme.overlay.background;
+    Widget row = Stack(
       children: [
-        _TreeTableSlot(
-          width: layout.widths[widget.treeColumnId]!,
-          alignment: widget.treeAlignment,
-          verticalAlignment: widget.treeVerticalAlignment,
-          child: Row(
-            children: [
-              _TreeTablePrefix<T>(
-                node: node,
-                depth: state.depth,
-                expanded: state.expanded,
-                icon: widget.iconBuilder?.call(node),
-                onToggle: () => widget.onExpansionChanged?.call(
-                  node.id,
-                  !widget.expandedIds.contains(node.id),
-                ),
+        Row(
+          children: [
+            _TreeTableSlot(
+              width: layout.widths[widget.treeColumnId]!,
+              alignment: widget.treeAlignment,
+              verticalAlignment: widget.treeVerticalAlignment,
+              child: Row(
+                children: [
+                  _TreeTablePrefix<T>(
+                    node: node,
+                    depth: state.depth,
+                    expanded: state.expanded,
+                    icon: widget.iconBuilder?.call(node),
+                    onToggle: () => widget.onExpansionChanged?.call(
+                      node.id,
+                      !widget.expandedIds.contains(node.id),
+                    ),
+                  ),
+                  SizedBox(width: contentGap),
+                  Expanded(
+                    child: CarpenterTableText.cell(
+                      node.label,
+                      emphasis: state.selected || state.focused
+                          ? TypographyEmphasis.medium
+                          : TypographyEmphasis.regular,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(width: contentGap),
-              Expanded(
-                child: CarpenterTableText.cell(
-                  node.label,
-                  emphasis: state.selected || state.focused
-                      ? TypographyEmphasis.medium
-                      : TypographyEmphasis.regular,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
+            ),
+            for (final column in dataColumns)
+              _TreeTableSlot(
+                width: layout.widths[column.id]!,
+                alignment: column.alignment,
+                verticalAlignment: column.verticalAlignment,
+                child: column.cellBuilder(context, node),
               ),
-            ],
-          ),
+            SizedBox(width: layout.actionWidth),
+          ],
         ),
-        for (final column in columns)
-          _TreeTableSlot(
-            width: layout.widths[column.id]!,
-            alignment: column.alignment,
-            verticalAlignment: column.verticalAlignment,
-            child: column.cellBuilder(context, node),
+        if (actionColumns.isNotEmpty)
+          PositionedDirectional(
+            top: 0,
+            bottom: 0,
+            end: layout.trailingCompensation(horizontalOffset),
+            width: layout.actionWidth,
+            child: ColoredBox(
+              color: background,
+              child: Row(
+                children: [
+                  for (final column in actionColumns)
+                    _TreeTableSlot(
+                      width: layout.widths[column.id]!,
+                      alignment: column.alignment,
+                      verticalAlignment: column.verticalAlignment,
+                      child: column.cellBuilder(context, node),
+                    ),
+                ],
+              ),
+            ),
           ),
       ],
     );
+    final actions = _contextActions(node, actionColumns);
+    if (actions.isNotEmpty) {
+      row = CarpenterContextActionRegion(
+        actions: actions,
+        semanticLabel: 'Actions for ${node.effectiveSemanticLabel}',
+        child: row,
+      );
+    }
+    return row;
   }
 }
 
@@ -582,13 +782,23 @@ final class _TreeTableLayout {
     required this.widths,
     required this.minimums,
     required this.maximums,
+    required this.actionWidth,
+    required this.viewportWidth,
     required this.totalWidth,
   });
 
   final Map<String, double> widths;
   final Map<String, double> minimums;
   final Map<String, double> maximums;
+  final double actionWidth;
+  final double viewportWidth;
   final double totalWidth;
+
+  double trailingCompensation(double offset) {
+    if (!viewportWidth.isFinite) return 0;
+    final maximum = math.max(0.0, totalWidth - viewportWidth);
+    return (maximum - offset).clamp(0.0, maximum).toDouble();
+  }
 }
 
 final class _TreeHeaderCell extends StatelessWidget {
