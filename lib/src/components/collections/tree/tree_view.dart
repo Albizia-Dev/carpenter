@@ -23,21 +23,20 @@ import '../contracts/selection_mode.dart';
 import 'tree_event.dart';
 import 'tree_state.dart';
 
-typedef CarpenterTreeNodeBuilder<T> =
-    Widget Function(
-      BuildContext context,
-      CarpenterTreeNode<T> node,
-      CarpenterTreeRowState<T> state,
-    );
-typedef CarpenterTreeRowBuilder<T> =
-    Widget Function(
-      BuildContext context,
-      CarpenterTreeNode<T> node,
-      CarpenterTreeRowState<T> state,
-      Widget prefix,
-    );
-typedef CarpenterTreeIconBuilder<T> =
-    CarpenterIconSource? Function(CarpenterTreeNode<T> node);
+typedef CarpenterTreeNodeBuilder<T> = Widget Function(
+  BuildContext context,
+  CarpenterTreeNode<T> node,
+  CarpenterTreeRowState<T> state,
+);
+typedef CarpenterTreeRowBuilder<T> = Widget Function(
+  BuildContext context,
+  CarpenterTreeNode<T> node,
+  CarpenterTreeRowState<T> state,
+  Widget prefix,
+);
+typedef CarpenterTreeIconBuilder<T> = CarpenterIconSource? Function(
+  CarpenterTreeNode<T> node,
+);
 typedef CarpenterTreeActionsBuilder<T> =
     List<CarpenterActionDescriptor> Function(CarpenterTreeNode<T> node);
 typedef CarpenterTreeActivation<T> = void Function(CarpenterTreeNode<T> node);
@@ -72,6 +71,7 @@ final class CarpenterTreeController extends ChangeNotifier {
 
 /// Controlled hierarchical collection with keyboard navigation and DnD.
 final class CarpenterTreeView<T> extends StatefulWidget {
+  /// Creates a controlled hierarchical view of [nodes].
   const CarpenterTreeView({
     super.key,
     required this.nodes,
@@ -105,6 +105,8 @@ final class CarpenterTreeView<T> extends StatefulWidget {
   final CarpenterTreeController? controller;
   final Set<Object> expandedIds;
   final Set<Object> selectedIds;
+
+  /// Stable node ids that should use pending-cut presentation.
   final Set<Object> cutIds;
   final CarpenterTreeSelectionMode selectionMode;
   final CollectionMultiSelectionBehavior multipleSelectionBehavior;
@@ -123,6 +125,8 @@ final class CarpenterTreeView<T> extends StatefulWidget {
   final bool tableRowContentPadding;
   final CarpenterTreeActionsBuilder<T>? actions;
   final CarpenterDragActivation dragActivation;
+
+  /// Move/copy/link operations that nodes may initiate through drag and drop.
   final Set<CarpenterDragOperation> dragOperations;
   final bool autoExpandOnHover;
   final String semanticLabel;
@@ -780,9 +784,8 @@ final class _TreeBranchRevealState extends State<_TreeBranchReveal>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _controller.duration = CarpenterTheme.of(
-      context,
-    ).motion.transitionDuration(context);
+    _controller.duration = CarpenterTheme.of(context).motion
+        .transitionDuration(context);
   }
 
   @override
