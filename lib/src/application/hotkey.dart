@@ -7,6 +7,7 @@ import '../components/basic/status_indicator.dart';
 import '../components/basic/text.dart';
 import '../foundation/roles.dart';
 import 'command.dart';
+
 import 'package:carpenter_units/carpenter_units.dart';
 
 /// Selects and normalizes a command shortcut set for a concrete target platform.
@@ -196,8 +197,9 @@ final class _HotkeyIntent extends Intent {
 }
 
 /// Observes a command immediately before a hotkey scope invokes it.
-typedef CarpenterHotkeyCommandCallback =
-    void Function(CarpenterCommand<void> command);
+typedef CarpenterHotkeyCommandCallback = void Function(
+  CarpenterCommand<void> command,
+);
 
 /// Keyboard interaction scope that installs command shortcuts, optionally tracks
 /// pressed keys, and exposes hotkey state to descendants.

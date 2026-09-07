@@ -19,9 +19,8 @@ void main() {
       const refreshFailure = CollectionFailure(error: 'refresh');
 
       final initial = CollectionSnapshot<int>().withLoadFailure(initialFailure);
-      final refresh = CollectionSnapshot<int>(
-        items: [1],
-      ).withLoadFailure(refreshFailure);
+      final refresh = CollectionSnapshot<int>(items: [1])
+          .withLoadFailure(refreshFailure);
 
       expect(initial.initialFailure, same(initialFailure));
       expect(initial.refreshFailure, isNull);

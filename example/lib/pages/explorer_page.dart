@@ -171,8 +171,7 @@ final class _ExplorerPageState extends State<ExplorerPage> {
       children: [
         CarpenterPageHeader(
           title: 'Resource explorer',
-          subtitle:
-              'Keyboard-friendly hierarchical navigation with caller-owned expansion and selection.',
+          subtitle: 'Keyboard-friendly hierarchical navigation with caller-owned expansion and selection.',
           status: CarpenterPageStatus(
             label:
                 '${flattenCarpenterTree(_nodes, _expanded).length} visible nodes',
@@ -205,8 +204,7 @@ final class _ExplorerPageState extends State<ExplorerPage> {
         ),
         const CarpenterNotice(
           title: 'Try the keyboard',
-          message:
-              'Arrow keys move through the tree, Left/Right collapse and expand, and Enter or Space selects the focused row.',
+          message: 'Arrow keys move through the tree, Left/Right collapse and expand, and Enter or Space selects the focused row.',
           tone: CarpenterNoticeTone.info,
         ),
       ],

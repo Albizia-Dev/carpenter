@@ -197,8 +197,7 @@ Widget _notices(BuildContext context) => previewColumn([
       width: context.units(38.75.rem),
       child: CarpenterNotice(
         title: tone.name,
-        message:
-            'Semantic feedback keeps its meaning in light, dark and high-contrast themes.',
+        message: 'Semantic feedback keeps its meaning in light, dark and high-contrast themes.',
         tone: tone,
       ),
     ),
@@ -211,8 +210,7 @@ Widget _expander(BuildContext context) {
   );
   final content = context.knobs.string(
     label: 'Content · Body',
-    initialValue:
-        'Account 40702810900000000001\nBIC 044525225\nCorrespondent account 30101810400000000225',
+    initialValue: 'Account 40702810900000000001\nBIC 044525225\nCorrespondent account 30101810400000000225',
   );
   final expanded = context.knobs.boolean(
     label: 'State · Initially expanded',

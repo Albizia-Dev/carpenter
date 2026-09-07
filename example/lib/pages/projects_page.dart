@@ -122,8 +122,7 @@ final class _ProjectsPageState extends State<ProjectsPage> {
       children: [
         CarpenterPageHeader(
           title: 'Project portfolio',
-          subtitle:
-              'A collection page using Carpenter filters, table selection, sorting and pagination.',
+          subtitle: 'A collection page using Carpenter filters, table selection, sorting and pagination.',
           status: CarpenterPageStatus(
             label: '${filtered.length} visible',
             role: FeedbackColorRole.info,

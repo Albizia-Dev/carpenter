@@ -62,12 +62,11 @@ typedef CollectionLifecycleLoader<T, F> =
 /// The controller does not concatenate items automatically. Merge the new
 /// batch with [current], preserve stable keys, and supply updated pagination
 /// metadata. Observe the request cancellation signal where supported.
-typedef CollectionLoadMore<T, F> =
-    Future<CollectionSnapshot<T>> Function(
-      CollectionQuery<F> query,
-      CollectionSnapshot<T> current,
-      CollectionLoadRequest request,
-    );
+typedef CollectionLoadMore<T, F> = Future<CollectionSnapshot<T>> Function(
+  CollectionQuery<F> query,
+  CollectionSnapshot<T> current,
+  CollectionLoadRequest request,
+);
 
 /// Full collection lifecycle controller: debounce, cancellation,
 /// stale-response protection, refresh and progressive loading.

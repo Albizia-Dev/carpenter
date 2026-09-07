@@ -7,8 +7,10 @@ import 'shell/shell.dart';
 
 /// Optionally transforms hosted content after the runtime is compiled and before shells
 /// wrap the result.
-typedef CarpenterHostBuilder =
-    Widget Function(BuildContext context, Widget child);
+typedef CarpenterHostBuilder = Widget Function(
+  BuildContext context,
+  Widget child,
+);
 
 /// Hosts Carpenter application capabilities independently from app/routing setup.
 final class CarpenterHost extends StatelessWidget {

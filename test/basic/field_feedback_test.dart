@@ -22,9 +22,8 @@ void main() {
     );
 
     final context = tester.element(find.text('Value'));
-    final warning = CarpenterTheme.of(
-      context,
-    ).feedback.resolve(FeedbackColorRole.warning);
+    final warning = CarpenterTheme.of(context).feedback
+        .resolve(FeedbackColorRole.warning);
     final container = tester.widget<AnimatedContainer>(
       find.descendant(
         of: find.byType(CarpenterFieldShell),

@@ -23,10 +23,13 @@ import 'tree_event.dart';
 import 'tree_state.dart';
 import 'tree_view.dart';
 
+/// Builds the content displayed in one tree-table cell for [node].
 typedef CarpenterTreeTableCellBuilder<T> = Widget Function(
   BuildContext context,
   CarpenterTreeNode<T> node,
 );
+
+/// Reports the caller-visible width selected for a resized tree-table column.
 typedef CarpenterTreeTableColumnWidthChanged = void Function(
   String columnId,
   LengthUnit width,

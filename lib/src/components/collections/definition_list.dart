@@ -7,8 +7,10 @@ import '../../foundation/theme.dart';
 import '../basic/text.dart';
 
 typedef CarpenterDefinitionTerm<T> = String Function(T item);
-typedef CarpenterDefinitionValueBuilder<T> =
-    Widget Function(BuildContext context, T item);
+typedef CarpenterDefinitionValueBuilder<T> = Widget Function(
+  BuildContext context,
+  T item,
+);
 
 /// Responsive term/value presentation for structured object metadata.
 final class CarpenterDefinitionList<T> extends StatelessWidget {

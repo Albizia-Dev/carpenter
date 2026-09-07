@@ -39,10 +39,13 @@ final class CarpenterPlanningMoveDetails<L, C, T> {
   final CarpenterKanbanMoveDetails<C, T> move;
 }
 
-typedef CarpenterPlanningMoveCallback<L, C, T> =
-    void Function(CarpenterPlanningMoveDetails<L, C, T> details);
-typedef CarpenterPlanningLaneExpansionChanged =
-    void Function(Object laneId, bool expanded);
+typedef CarpenterPlanningMoveCallback<L, C, T> = void Function(
+  CarpenterPlanningMoveDetails<L, C, T> details,
+);
+typedef CarpenterPlanningLaneExpansionChanged = void Function(
+  Object laneId,
+  bool expanded,
+);
 
 /// Multi-lane planning surface built from compatible Kanban drag surfaces.
 /// Lane expansion and card collections remain controlled by the caller.

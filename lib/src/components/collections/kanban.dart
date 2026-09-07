@@ -76,18 +76,20 @@ final class CarpenterKanbanCardState<C> {
   final CarpenterDropPosition? dropPosition;
 }
 
-typedef CarpenterKanbanCardBuilder<C, T> =
-    Widget Function(
-      BuildContext context,
-      T card,
-      CarpenterKanbanCardState<C> state,
-    );
-typedef CarpenterKanbanMoveCallback<C, T> =
-    void Function(CarpenterKanbanMoveDetails<C, T> details);
-typedef CarpenterKanbanMoveAcceptance<C, T> =
-    bool Function(CarpenterKanbanMoveDetails<C, T> details);
-typedef CarpenterKanbanColumnCallback<C, T> =
-    void Function(CarpenterKanbanColumn<C, T> column);
+typedef CarpenterKanbanCardBuilder<C, T> = Widget Function(
+  BuildContext context,
+  T card,
+  CarpenterKanbanCardState<C> state,
+);
+typedef CarpenterKanbanMoveCallback<C, T> = void Function(
+  CarpenterKanbanMoveDetails<C, T> details,
+);
+typedef CarpenterKanbanMoveAcceptance<C, T> = bool Function(
+  CarpenterKanbanMoveDetails<C, T> details,
+);
+typedef CarpenterKanbanColumnCallback<C, T> = void Function(
+  CarpenterKanbanColumn<C, T> column,
+);
 
 @immutable
 final class _KanbanDragData<C, T> {

@@ -332,8 +332,9 @@ final class CarpenterBlockGroup extends StatelessWidget {
   }
 }
 
-typedef CarpenterControllerFactory<C extends ChangeNotifier> =
-    C Function(BuildContext context);
+typedef CarpenterControllerFactory<C extends ChangeNotifier> = C Function(
+  BuildContext context,
+);
 
 final class CarpenterControllerHost<C extends ChangeNotifier>
     extends StatefulWidget {

@@ -8,8 +8,10 @@ import '../regions/primary_region.dart';
 import '../regions/region_role.dart';
 import 'header_actions.dart';
 
-typedef CarpenterDetailBuilder<T> =
-    Widget Function(BuildContext context, T value);
+typedef CarpenterDetailBuilder<T> = Widget Function(
+  BuildContext context,
+  T value,
+);
 
 final class CarpenterMasterDetailPage<T> extends StatelessWidget {
   const CarpenterMasterDetailPage({

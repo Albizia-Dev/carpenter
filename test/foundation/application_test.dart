@@ -35,9 +35,8 @@ void main() {
       ),
     );
 
-    Navigator.of(
-      tester.element(find.byKey(const Key('home'))),
-    ).pushNamed('/details');
+    Navigator.of(tester.element(find.byKey(const Key('home'))))
+        .pushNamed('/details');
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('details')), findsOneWidget);

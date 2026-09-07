@@ -6,8 +6,9 @@ import 'command.dart';
 
 /// Asynchronously collects input for a command immediately before execution;
 /// returning `null` cancels that invocation.
-typedef CarpenterCommandInputBuilder<I> =
-    Future<I?> Function(BuildContext context);
+typedef CarpenterCommandInputBuilder<I> = Future<I?> Function(
+  BuildContext context,
+);
 
 /// Presents a command whose input is collected just before execution.
 final class CarpenterCommandInputButton<I> extends StatelessWidget {

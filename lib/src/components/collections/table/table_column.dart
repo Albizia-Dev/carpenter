@@ -52,6 +52,7 @@ final class CarpenterTableColumnWidth {
   bool get isFlexible => policy == CarpenterTableColumnWidthPolicy.flexible;
 }
 
+/// Builds the content displayed in one table cell for [item].
 typedef CarpenterTableCellBuilder<T> = Widget Function(
   BuildContext context,
   T item,

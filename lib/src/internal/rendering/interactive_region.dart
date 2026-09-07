@@ -1,12 +1,11 @@
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
-typedef InteractiveRegionBuilder =
-    Widget Function(
-      BuildContext context,
-      Set<WidgetState> states,
-      bool showFocusHighlight,
-    );
+typedef InteractiveRegionBuilder = Widget Function(
+  BuildContext context,
+  Set<WidgetState> states,
+  bool showFocusHighlight,
+);
 
 final class InteractiveRegion extends StatefulWidget {
   const InteractiveRegion({

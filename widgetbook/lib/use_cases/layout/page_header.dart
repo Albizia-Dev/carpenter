@@ -81,10 +81,8 @@ Widget _pageHeaderStress(BuildContext context) => layoutViewportPreview(
   child: Align(
     alignment: AlignmentDirectional.topStart,
     child: CarpenterPageHeader(
-      title:
-          'Very long structured document title that must remain usable in a narrow operational workspace',
-      subtitle:
-          'A deliberately verbose subtitle with contextual metadata, ownership information and a description long enough to exercise wrapping.',
+      title: 'Very long structured document title that must remain usable in a narrow operational workspace',
+      subtitle: 'A deliberately verbose subtitle with contextual metadata, ownership information and a description long enough to exercise wrapping.',
       status: const CarpenterPageStatus(
         label: 'Requires immediate attention',
         role: FeedbackColorRole.warning,

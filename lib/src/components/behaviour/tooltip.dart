@@ -41,9 +41,9 @@ final class _CarpenterTooltipState extends State<CarpenterTooltip> {
 
   void _schedule(bool visible, TooltipDelay delay) {
     _timer?.cancel();
-    final duration = CarpenterTheme.of(
-      context,
-    ).motion.tooltipDelay(delay).toDuration();
+    final duration = CarpenterTheme.of(context).motion
+        .tooltipDelay(delay)
+        .toDuration();
     if (duration == Duration.zero) {
       _setVisible(visible);
     } else {

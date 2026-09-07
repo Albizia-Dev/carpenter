@@ -148,8 +148,7 @@ final class _ProjectPageState extends State<ProjectPage> {
                       value: CarpenterText.body(
                         'Demonstrate record composition, responsive details, actions and loading propagation.',
                       ),
-                      description:
-                          'This is intentionally richer than a static component showcase.',
+                      description: 'This is intentionally richer than a static component showcase.',
                     ),
                   ],
                 ),

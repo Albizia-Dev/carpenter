@@ -21,9 +21,8 @@ void main() {
     );
 
     final context = tester.element(find.text('Review required'));
-    final feedback = CarpenterTheme.of(
-      context,
-    ).feedback.resolve(FeedbackColorRole.warning);
+    final feedback = CarpenterTheme.of(context).feedback
+        .resolve(FeedbackColorRole.warning);
     final decorated = tester.widget<DecoratedBox>(
       find.descendant(
         of: find.byType(CarpenterCard),

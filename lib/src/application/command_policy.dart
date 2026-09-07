@@ -62,8 +62,9 @@ final class CarpenterCommandFeedback {
 
 /// Maps a failed command event to optional user-facing copy without exposing raw
 /// technical errors by default.
-typedef CarpenterCommandFailureMessageMapper =
-    String? Function(CarpenterCommandFailed event);
+typedef CarpenterCommandFailureMessageMapper = String? Function(
+  CarpenterCommandFailed event,
+);
 
 /// Converts command execution events into one controlled piece of feedback
 /// state suitable for business screens.
@@ -120,18 +121,18 @@ final class CarpenterCommandFeedbackController
 
 /// Performs caller-owned refresh work for the subset of semantic invalidation scopes
 /// matched by a target.
-typedef CarpenterInvalidationHandler =
-    FutureOr<void> Function(Set<String> matchedScopes);
+typedef CarpenterInvalidationHandler = FutureOr<void> Function(
+  Set<String> matchedScopes,
+);
 
 /// Handles an invalidation target failure together with the matched semantic scopes and
 /// original stack trace.
-typedef CarpenterInvalidationErrorHandler =
-    void Function(
-      Object target,
-      Set<String> matchedScopes,
-      Object error,
-      StackTrace stackTrace,
-    );
+typedef CarpenterInvalidationErrorHandler = void Function(
+  Object target,
+  Set<String> matchedScopes,
+  Object error,
+  StackTrace stackTrace,
+);
 
 final class _CarpenterInvalidationTarget {
   const _CarpenterInvalidationTarget({
@@ -215,9 +216,8 @@ final class CarpenterInvalidationRegistry {
   /// Consumes successful command events and schedules invalidation when their effective
   /// refresh-scope set is nonempty.
   void handle(CarpenterCommandExecutionEvent event) {
-    if (event case CarpenterCommandSucceeded(
-      :final refreshScopes,
-    ) when refreshScopes.isNotEmpty) {
+    if (event case CarpenterCommandSucceeded(:final refreshScopes)
+        when refreshScopes.isNotEmpty) {
       unawaited(invalidate(refreshScopes));
     }
   }

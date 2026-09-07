@@ -18,8 +18,9 @@ abstract interface class CollectionAdapter<T, F> {
 
 /// Compatibility loader returning a complete snapshot for a query without
 /// request-reason or cancellation context.
-typedef CollectionLoader<T, F> =
-    Future<CollectionSnapshot<T>> Function(CollectionQuery<F> query);
+typedef CollectionLoader<T, F> = Future<CollectionSnapshot<T>> Function(
+  CollectionQuery<F> query,
+);
 
 /// Adapts a plain asynchronous loader to the legacy [CollectionAdapter]
 /// interface without adding transport behavior.

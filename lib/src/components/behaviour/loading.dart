@@ -171,8 +171,11 @@ final class LoadingScope extends InheritedWidget {
 }
 
 /// Builds UI around a locally-owned [LoadingNotifier].
-typedef LoadingBoundaryBuilder =
-    Widget Function(BuildContext context, LoadingState state, Widget child);
+typedef LoadingBoundaryBuilder = Widget Function(
+  BuildContext context,
+  LoadingState state,
+  Widget child,
+);
 
 /// Owns a loading scope and lets its parent choose the loading presentation.
 ///

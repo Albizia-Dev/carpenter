@@ -11,8 +11,10 @@ import 'table_column.dart';
 /// Builds one footer cell from all rows currently supplied to the editable
 /// table. Calculate totals from items rather than maintaining a second
 /// independent list.
-typedef CarpenterTableFooterCellBuilder<T> =
-    Widget Function(BuildContext context, List<T> items);
+typedef CarpenterTableFooterCellBuilder<T> = Widget Function(
+  BuildContext context,
+  List<T> items,
+);
 
 /// Local-data table for editable business grids.
 ///

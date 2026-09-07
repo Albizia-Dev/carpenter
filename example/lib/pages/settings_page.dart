@@ -131,8 +131,7 @@ final class _SettingsPageState extends State<SettingsPage> {
     children: [
       CarpenterPageHeader(
         title: 'Settings',
-        subtitle:
-            'A production-shaped controlled form using plain, masked, typed, selectable and file fields.',
+        subtitle: 'A production-shaped controlled form using plain, masked, typed, selectable and file fields.',
         status: CarpenterPageStatus(
           label: _dirty ? 'Unsaved changes' : 'Saved',
           role: _dirty ? FeedbackColorRole.warning : FeedbackColorRole.success,
@@ -149,8 +148,7 @@ final class _SettingsPageState extends State<SettingsPage> {
       if (_dirty)
         const CarpenterNotice(
           title: 'Unsaved changes',
-          message:
-              'Business values are controlled by this page. Picker and dropdown visibility are intentionally transient Carpenter state.',
+          message: 'Business values are controlled by this page. Picker and dropdown visibility are intentionally transient Carpenter state.',
           tone: CarpenterNoticeTone.warning,
         ),
       CarpenterPageSection(
@@ -186,8 +184,7 @@ final class _SettingsPageState extends State<SettingsPage> {
       CarpenterPageSection(
         id: const CarpenterPageSectionId('defaults'),
         title: 'Operational defaults',
-        description:
-            'Typed fields keep domain values controlled while Carpenter owns picker/dropdown visibility.',
+        description: 'Typed fields keep domain values controlled while Carpenter owns picker/dropdown visibility.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -282,8 +279,7 @@ final class _SettingsPageState extends State<SettingsPage> {
       CarpenterPageSection(
         id: const CarpenterPageSectionId('files'),
         title: 'Attachments',
-        description:
-            'The core field stays backend-neutral. A real application connects its platform file picker here.',
+        description: 'The core field stays backend-neutral. A real application connects its platform file picker here.',
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
