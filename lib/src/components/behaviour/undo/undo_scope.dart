@@ -4,11 +4,16 @@ import 'undo_controller.dart';
 
 /// Inherited undo/redo boundary with optional caller-owned history.
 final class CarpenterUndoScope extends StatefulWidget {
+  /// Creates an undo scope around [child].
   const CarpenterUndoScope({super.key, required this.child, this.controller});
 
+  /// Descendant subtree that can resolve the scoped history controller.
   final Widget child;
+
+  /// Optional caller-owned history controller.
   final CarpenterUndoController? controller;
 
+  /// Reads the nearest history controller and asserts that a scope exists.
   static CarpenterUndoController of(BuildContext context) {
     final binding = context
         .dependOnInheritedWidgetOfExactType<_CarpenterUndoInherited>();
@@ -16,10 +21,12 @@ final class CarpenterUndoScope extends StatefulWidget {
     return binding!.controller;
   }
 
+  /// Reads the nearest history controller, or null outside an undo scope.
   static CarpenterUndoController? maybeOf(BuildContext context) => context
       .dependOnInheritedWidgetOfExactType<_CarpenterUndoInherited>()
       ?.controller;
 
+  /// Creates state that owns an implicit controller when one is not supplied.
   @override
   State<CarpenterUndoScope> createState() => _CarpenterUndoScopeState();
 }
