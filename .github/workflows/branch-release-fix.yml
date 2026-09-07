@@ -1,0 +1,70 @@
+name: Branch release fix
+
+on:
+  push:
+    branches:
+      - feat/context-actions-0.2.1
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/context-actions-0.2.1
+      - name: Document affected public typedefs
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          table = Path('lib/src/components/collections/table/table_column.dart')
+          text = table.read_text()
+          text = text.replace(
+              'typedef CarpenterTableCellBuilder<T> = Widget Function(',
+              '''/// Builds the content displayed in one table cell for [item].\ntypedef CarpenterTableCellBuilder<T> = Widget Function(''',
+              1,
+          )
+          table.write_text(text)
+
+          tree = Path('lib/src/components/collections/tree/tree_table.dart')
+          text = tree.read_text()
+          text = text.replace(
+              'typedef CarpenterTreeTableCellBuilder<T> = Widget Function(',
+              '''/// Builds the content displayed in one tree-table cell for [node].\ntypedef CarpenterTreeTableCellBuilder<T> = Widget Function(''',
+              1,
+          )
+          text = text.replace(
+              'typedef CarpenterTreeTableColumnWidthChanged = void Function(',
+              '''/// Reports the caller-visible width selected for a resized tree-table column.\ntypedef CarpenterTreeTableColumnWidthChanged = void Function(''',
+              1,
+          )
+          tree.write_text(text)
+          PY
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Apply canonical repository formatting
+        run: |
+          dart format lib test widgetbook/lib widgetbook/test example/lib
+          dart format lib test widgetbook/lib widgetbook/test example/lib
+          dart format --output=none --set-exit-if-changed lib test widgetbook/lib widgetbook/test example/lib
+      - name: Ratchet documentation debt downward
+        working-directory: tool/documentation
+        run: |
+          dart pub get --enforce-lockfile
+          dart run bin/audit.dart ../.. --write-baseline
+          dart run bin/audit.dart ../.. --check
+      - name: Commit release cleanup
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add lib test widgetbook/lib widgetbook/test example/lib tool/documentation/coverage-baseline.json
+          if git diff --cached --quiet; then
+            exit 0
+          fi
+          git commit -m "docs: ratchet contextual action API coverage"
+          git push
