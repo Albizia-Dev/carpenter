@@ -48,8 +48,20 @@ Widget _breadcrumbs(BuildContext context) {
 
   return preview(
     SizedBox(
-      width: context.units(42.rem),
-      child: CarpenterBreadcrumbs(items: items, maxVisibleItems: maxVisible),
+      width: context.knobs.double.slider(
+        label: 'Layout \u00b7 Available width',
+        initialValue: 480,
+        min: 80,
+        max: 800,
+      ),
+      child: CarpenterBreadcrumbs(
+        items: items,
+        maxVisibleItems: maxVisible,
+        overflowLabel: context.knobs.string(
+          label: 'Accessibility \u00b7 Overflow label',
+          initialValue: 'More breadcrumb items',
+        ),
+      ),
     ),
   );
 }
@@ -70,7 +82,7 @@ Widget _breadcrumbsLong(BuildContext context) => previewColumn([
     ),
   ),
   const CarpenterText.caption(
-    'Narrow width forces wrapping; path overflow remains explicit.',
+    'One line: middle ancestors collapse first; long labels are ellipsized.',
   ),
 ]);
 
