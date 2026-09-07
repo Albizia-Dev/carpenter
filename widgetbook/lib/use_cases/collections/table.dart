@@ -186,8 +186,9 @@ final class _TablePreviewState extends State<_TablePreview> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         CarpenterText.caption(
-          '$_lastAction · Two primary actions stay inline; extra primary and '
-          'secondary actions stay behind the ellipsis.',
+          '$_lastAction · The trailing action lane stays pinned while data '
+          'scrolls underneath it. Right-click or long-press a row to open the '
+          'same primary and secondary actions contextually.',
           colorRole: ContentColorRole.secondary,
         ),
         SizedBox(height: context.units(.5.rem)),
