@@ -118,6 +118,7 @@ export 'src/components/collections/table/table_state.dart';
 export 'src/components/collections/table/table_text.dart';
 export 'src/components/collections/tabs.dart';
 export 'src/components/collections/tree/tree_event.dart';
+export 'src/components/collections/tree/tree_patch.dart';
 export 'src/components/collections/tree/tree_state.dart';
 export 'src/components/collections/tree/tree_table.dart';
 export 'src/components/collections/tree/tree_view.dart';
