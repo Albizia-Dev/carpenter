@@ -22,10 +22,8 @@ import 'table_column.dart';
 import 'table_state.dart';
 import 'table_text.dart';
 
-typedef CarpenterTableColumnWidthChanged = void Function(
-  String columnId,
-  LengthUnit width,
-);
+typedef CarpenterTableColumnWidthChanged =
+    void Function(String columnId, LengthUnit width);
 
 final class CarpenterTable<T, K> extends StatefulWidget {
   const CarpenterTable({
