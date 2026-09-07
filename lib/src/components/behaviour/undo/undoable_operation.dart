@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 /// One reversible operation registered in a [CarpenterUndoController].
 @immutable
 final class CarpenterUndoableOperation {
+  /// Creates one completed operation with required [undo] and optional [redo].
   const CarpenterUndoableOperation({
     required this.label,
     required this.undo,
