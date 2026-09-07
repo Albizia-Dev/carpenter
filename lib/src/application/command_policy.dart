@@ -256,10 +256,13 @@ final class CarpenterInvalidationRegistry {
 /// This is application policy rather than behaviour-layer state: commands remain
 /// unaware of the controller, while the controller itself remains domain-neutral.
 final class CarpenterCommandUndoPolicy {
+  /// Creates policy that writes reversible command results to [controller].
   const CarpenterCommandUndoPolicy(this.controller);
 
+  /// History controller receiving successful reversible command results.
   final CarpenterUndoController controller;
 
+  /// Registers undo and optional redo callbacks from a successful [event].
   void handle(CarpenterCommandExecutionEvent event) {
     if (event case CarpenterCommandSucceeded(:final result)) {
       final undo = result.undo;
