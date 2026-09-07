@@ -36,6 +36,8 @@ typedef CarpenterTreeRowBuilder<T> =
       CarpenterTreeRowState<T> state,
       Widget prefix,
     );
+
+/// Builds the optional icon displayed for a tree node.
 typedef CarpenterTreeIconBuilder<T> =
     CarpenterIconSource? Function(CarpenterTreeNode<T> node);
 typedef CarpenterTreeActionsBuilder<T> =

@@ -32,6 +32,7 @@ import 'use_cases/behaviour/toast.dart';
 import 'use_cases/behaviour/tooltip.dart';
 import 'use_cases/collections/advanced_collections.dart';
 import 'use_cases/collections/editable_table.dart';
+import 'use_cases/collections/explorer_interactions.dart';
 import 'use_cases/collections/collection_kernel.dart';
 import 'use_cases/collections/content_primitives.dart';
 import 'use_cases/collections/data_list.dart';
@@ -129,6 +130,7 @@ final List<WidgetbookNode> carpenterCatalog = [
       collectionLifecycleComponent,
       filterBarComponent,
       breadcrumbsComponent,
+      explorerInteractionsComponent,
       dataListComponent,
       reorderableCollectionComponent,
       treeViewComponent,
