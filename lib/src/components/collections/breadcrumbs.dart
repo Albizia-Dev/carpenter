@@ -34,6 +34,7 @@ final class CarpenterBreadcrumb {
 /// The preferred width is intrinsic-safe, including inside a page header. The
 /// component never wraps or requires a caller-owned horizontal scroll view.
 final class CarpenterBreadcrumbs extends StatefulWidget {
+  /// Creates a single-line breadcrumb path from ordered [items].
   const CarpenterBreadcrumbs({
     super.key,
     required this.items,
@@ -59,7 +60,6 @@ final class _CarpenterBreadcrumbsState extends State<CarpenterBreadcrumbs> {
   @override
   void didUpdateWidget(CarpenterBreadcrumbs oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // An open menu belongs to the old location, not to a subsequent path.
     if (oldWidget.items != widget.items) _overflowOpen = false;
   }
 
@@ -93,7 +93,6 @@ final class _CarpenterBreadcrumbsState extends State<CarpenterBreadcrumbs> {
       return width;
     }
 
-    // Reserve the larger interaction style so hover does not move the path.
     final widths = [
       for (final item in widget.items)
         math.max(measure(item.label, regular), measure(item.label, medium)),
@@ -118,8 +117,6 @@ final class _CarpenterBreadcrumbsState extends State<CarpenterBreadcrumbs> {
       label: widget.semanticLabel,
       explicitChildNodes: true,
       child: SizedBox(
-        // A tight preferred width also answers IntrinsicWidth without asking
-        // LayoutBuilder for intrinsic dimensions.
         width: requiredWidth(initial),
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -128,7 +125,6 @@ final class _CarpenterBreadcrumbsState extends State<CarpenterBreadcrumbs> {
             while (visible.length > 2 && requiredWidth(visible) > available) {
               visible.removeAt(1);
             }
-            // At extremely narrow widths prefer current + ancestor menu.
             if (visible.length > 1 &&
                 available < overflowWidth + 2 * (separatorWidth + gap * 2)) {
               visible.removeAt(0);
@@ -165,7 +161,6 @@ final class _CarpenterBreadcrumbsState extends State<CarpenterBreadcrumbs> {
             } else if (visible.length == 1) {
               labelWidths[visible.single] = budget;
             } else {
-              // Give the current destination priority over a long root name.
               final current = visible.last;
               final reserve = math.min(widths[current], budget * 2 / 3);
               final first = math.min(widths[visible.first], budget - reserve);
