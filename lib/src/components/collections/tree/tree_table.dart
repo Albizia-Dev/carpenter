@@ -23,15 +23,26 @@ import 'tree_event.dart';
 import 'tree_state.dart';
 import 'tree_view.dart';
 
-typedef CarpenterTreeTableCellBuilder<T> =
-    Widget Function(BuildContext context, CarpenterTreeNode<T> node);
-typedef CarpenterTreeTableColumnWidthChanged =
-    void Function(String columnId, LengthUnit width);
-typedef CarpenterTreeTableActionsBuilder<T> =
-    CarpenterTableActions Function(CarpenterTreeNode<T> node);
+typedef CarpenterTreeTableCellBuilder<T> = Widget Function(
+  BuildContext context,
+  CarpenterTreeNode<T> node,
+);
+typedef CarpenterTreeTableColumnWidthChanged = void Function(
+  String columnId,
+  LengthUnit width,
+);
+
+/// Builds the primary and secondary semantic actions represented by a tree-table column.
+typedef CarpenterTreeTableActionsBuilder<T> = CarpenterTableActions Function(
+  CarpenterTreeNode<T> node,
+);
 
 @immutable
 final class CarpenterTreeTableColumn<T> {
+  /// Creates a tree-table column through the legacy flex-based width shorthand.
+  ///
+  /// Prefer [CarpenterTreeTableColumn.custom]. [actionsBuilder] is optional
+  /// semantic metadata used by action-lane contextual presentation.
   @Deprecated(
     'Use CarpenterTreeTableColumn.custom(...) with an explicit width contract.',
   )
@@ -51,6 +62,10 @@ final class CarpenterTreeTableColumn<T> {
     this.actionsBuilder,
   }) : assert(flex > 0);
 
+  /// Creates a tree-table column with an explicit width and caller-owned cell.
+  ///
+  /// [actionsBuilder] is optional semantic metadata for actions represented by
+  /// this column and is reused by contextual action presentation.
   const CarpenterTreeTableColumn.custom({
     required this.id,
     required this.header,

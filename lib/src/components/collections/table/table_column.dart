@@ -52,11 +52,18 @@ final class CarpenterTableColumnWidth {
   bool get isFlexible => policy == CarpenterTableColumnWidthPolicy.flexible;
 }
 
-typedef CarpenterTableCellBuilder<T> =
-    Widget Function(BuildContext context, T item);
+typedef CarpenterTableCellBuilder<T> = Widget Function(
+  BuildContext context,
+  T item,
+);
 
 @immutable
 final class CarpenterTableColumn<T> {
+  /// Creates a table column with caller-owned cell content and layout policy.
+  ///
+  /// [actionsBuilder] is optional semantic metadata for actions represented by
+  /// this column. Action-lane columns use it to expose the same actions through
+  /// contextual surfaces; ordinary custom columns may leave it null.
   const CarpenterTableColumn.custom({
     required this.id,
     required this.header,
