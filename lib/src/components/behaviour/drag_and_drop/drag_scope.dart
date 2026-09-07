@@ -7,6 +7,7 @@ import 'drag_payload.dart';
 
 @immutable
 final class CarpenterDragSession {
+  /// Creates one immutable snapshot of an in-progress drag session.
   const CarpenterDragSession({
     required this.payload,
     required this.operation,
@@ -19,12 +20,16 @@ final class CarpenterDragSession {
 
   final CarpenterDragPayload<Object?> payload;
   final CarpenterDragOperation operation;
+
+  /// Source-preferred operation used when modifiers stop requesting another one.
   final CarpenterDragOperation preferredOperation;
+
   final Object? sourceId;
   final Object? targetId;
   final CarpenterDropPosition? dropPosition;
   final bool targetAccepts;
 
+  /// Copies this session while optionally changing operation or target state.
   CarpenterDragSession copyWith({
     CarpenterDragOperation? operation,
     Object? targetId,
@@ -48,6 +53,7 @@ final class CarpenterDragController extends ChangeNotifier {
   CarpenterDragSession? get session => _session;
   bool get isDragging => _session != null;
 
+  /// Starts a drag session after validating that [operation] is allowed.
   void begin<T>({
     required CarpenterDragPayload<T> payload,
     required CarpenterDragOperation operation,
@@ -70,6 +76,7 @@ final class CarpenterDragController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Changes the operation of the active session when the payload supports it.
   void setOperation(CarpenterDragOperation operation) {
     final current = _session;
     if (current == null || current.operation == operation) return;
@@ -129,6 +136,7 @@ typedef CarpenterDragSessionCallback =
 /// modifier keys while a drag is in progress, so a user can change move/copy/
 /// link intent without restarting the gesture.
 final class CarpenterDragScope extends StatefulWidget {
+  /// Creates a drag runtime boundary around [child].
   const CarpenterDragScope({
     super.key,
     required this.child,
@@ -142,8 +150,14 @@ final class CarpenterDragScope extends StatefulWidget {
   final Widget child;
   final CarpenterDragController? controller;
   final CarpenterDragSessionCallback? onSessionChanged;
+
+  /// Optional platform override, primarily for deterministic policy testing.
   final TargetPlatform? platform;
+
+  /// Policy that maps pressed modifier keys to move, copy, or link.
   final CarpenterDragOperationPolicy operationPolicy;
+
+  /// Whether hardware modifier changes may change the active drag operation.
   final bool trackOperationModifiers;
 
   static _CarpenterDragScopeInherited? _binding(BuildContext context) => context
@@ -158,6 +172,7 @@ final class CarpenterDragScope extends StatefulWidget {
   static CarpenterDragController? maybeOf(BuildContext context) =>
       _binding(context)?.controller;
 
+  /// Resolves the operation a new [payload] should use in the nearest scope.
   static CarpenterDragOperation resolveOperationOf<T>(
     BuildContext context,
     CarpenterDragPayload<T> payload, {
@@ -176,6 +191,7 @@ final class CarpenterDragScope extends StatefulWidget {
     );
   }
 
+  /// Creates the state that coordinates controller and hardware-key lifecycles.
   @override
   State<CarpenterDragScope> createState() => _CarpenterDragScopeState();
 }
@@ -208,8 +224,9 @@ final class _CarpenterDragScopeState extends State<CarpenterDragScope> {
   void _handleChange() => widget.onSessionChanged?.call(_controller.session);
 
   bool _handleKeyEvent(KeyEvent event) {
-    if (!widget.trackOperationModifiers || !_controller.isDragging)
+    if (!widget.trackOperationModifiers || !_controller.isDragging) {
       return false;
+    }
     _syncOperation();
     return false;
   }
