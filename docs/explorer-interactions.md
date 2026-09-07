@@ -1,5 +1,8 @@
 # Explorer interaction contracts
 
+These contracts form the public explorer interaction baseline introduced in
+Carpenter 0.3.0.
+
 Carpenter owns reusable explorer mechanics while applications own domain state,
 validation and persistence.
 
