@@ -1,3 +1,24 @@
+# 0.3.0
+
+- Reworked breadcrumbs into a strictly single-line, width-aware path that
+  collapses ancestors into an accessible overflow menu instead of wrapping.
+- Added typed application clipboard state and reusable copy, cut, and paste
+  commands with familiar Cmd/Ctrl shortcuts; cut remains presentation-only
+  until a successful paste.
+- Added reusable undo/redo stacks and command-result policy so one semantic
+  operation can drive keyboard shortcuts, actions, and reversible mutations.
+- Expanded drag-and-drop into Finder-like move/copy/link operation negotiation,
+  including desktop modifier policy and dragging selected tree roots as one
+  batch.
+- Added controlled inline editing with pencil-to-check commit presentation,
+  Enter commit, Escape cancel, caller-owned drafts, validation, and persistence.
+- Added a generic explorer location strip for primary destinations plus an
+  optional remembered destination, with bounded-width joined controls.
+- Added immutable tree presentation patches for update, insert, remove, and
+  reparent operations with structural sharing, allowing authoritative server
+  mutation results to update only affected tree ancestry without refetching an
+  entire tree.
+
 # 0.2.1
 
 - Added adaptive contextual actions so secondary pointer presses and touch
