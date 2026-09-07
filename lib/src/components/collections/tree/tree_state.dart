@@ -40,6 +40,7 @@ final class CarpenterTreeNode<T> {
 
 @immutable
 final class CarpenterTreeRowState<T> {
+  /// Creates the complete presentation state for one rendered tree row.
   const CarpenterTreeRowState({
     required this.node,
     required this.depth,
@@ -49,6 +50,7 @@ final class CarpenterTreeRowState<T> {
     required this.dragging,
     required this.hovering,
     required this.acceptsDrop,
+    this.cut = false,
     this.dropPosition,
   });
 
@@ -60,6 +62,10 @@ final class CarpenterTreeRowState<T> {
   final bool dragging;
   final bool hovering;
   final bool acceptsDrop;
+
+  /// Whether the row should use pending-cut presentation.
+  final bool cut;
+
   final CarpenterDropPosition? dropPosition;
 }
 

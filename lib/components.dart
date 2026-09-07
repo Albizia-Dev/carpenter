@@ -43,6 +43,7 @@ export 'src/components/basic/text.dart';
 
 // Behaviour and transient surfaces.
 export 'src/components/behaviour/context_actions.dart';
+export 'src/components/behaviour/clipboard.dart';
 export 'src/components/behaviour/control.dart';
 export 'src/components/behaviour/dialog.dart';
 export 'src/components/behaviour/drag_and_drop/drag_operation.dart';
@@ -51,6 +52,7 @@ export 'src/components/behaviour/drag_and_drop/drag_scope.dart';
 export 'src/components/behaviour/drag_and_drop/draggable.dart';
 export 'src/components/behaviour/drag_and_drop/drop_target.dart';
 export 'src/components/behaviour/expander.dart';
+export 'src/components/behaviour/inline_edit.dart';
 export 'src/components/behaviour/loading.dart';
 export 'src/components/behaviour/menu/dropdown.dart';
 export 'src/components/behaviour/menu/menu.dart';
@@ -62,6 +64,9 @@ export 'src/components/behaviour/toast/toast.dart';
 export 'src/components/behaviour/toast/toast_region.dart';
 export 'src/components/behaviour/toast/toaster_controller.dart';
 export 'src/components/behaviour/tooltip.dart';
+export 'src/components/behaviour/undo/undo_controller.dart';
+export 'src/components/behaviour/undo/undo_scope.dart';
+export 'src/components/behaviour/undo/undoable_operation.dart';
 
 // Content primitives.
 export 'src/components/content/inspector.dart';

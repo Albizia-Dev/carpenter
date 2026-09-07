@@ -36,11 +36,21 @@ typedef CarpenterTreeRowBuilder<T> =
       CarpenterTreeRowState<T> state,
       Widget prefix,
     );
+
+/// Builds the optional icon displayed for a tree node.
 typedef CarpenterTreeIconBuilder<T> =
     CarpenterIconSource? Function(CarpenterTreeNode<T> node);
 typedef CarpenterTreeActionsBuilder<T> =
     List<CarpenterActionDescriptor> Function(CarpenterTreeNode<T> node);
 typedef CarpenterTreeActivation<T> = void Function(CarpenterTreeNode<T> node);
+
+@immutable
+final class _CarpenterTreeDragData<T> {
+  const _CarpenterTreeDragData({required this.primary, required this.nodes});
+
+  final CarpenterTreeNode<T> primary;
+  final List<CarpenterTreeNode<T>> nodes;
+}
 
 /// Imperative navigation surface for a controlled tree.
 ///
@@ -64,12 +74,14 @@ final class CarpenterTreeController extends ChangeNotifier {
 
 /// Controlled hierarchical collection with keyboard navigation and DnD.
 final class CarpenterTreeView<T> extends StatefulWidget {
+  /// Creates a controlled hierarchical view of [nodes].
   const CarpenterTreeView({
     super.key,
     required this.nodes,
     this.controller,
     this.expandedIds = const {},
     this.selectedIds = const {},
+    this.cutIds = const {},
     this.selectionMode = CarpenterTreeSelectionMode.single,
     this.multipleSelectionBehavior = CollectionMultiSelectionBehavior.toggle,
     this.scrollController,
@@ -87,6 +99,7 @@ final class CarpenterTreeView<T> extends StatefulWidget {
     this.tableRowContentPadding = true,
     this.actions,
     this.dragActivation = CarpenterDragActivation.immediate,
+    this.dragOperations = const {CarpenterDragOperation.move},
     this.autoExpandOnHover = true,
     this.semanticLabel = 'Tree',
   });
@@ -95,6 +108,9 @@ final class CarpenterTreeView<T> extends StatefulWidget {
   final CarpenterTreeController? controller;
   final Set<Object> expandedIds;
   final Set<Object> selectedIds;
+
+  /// Stable node ids that should use pending-cut presentation.
+  final Set<Object> cutIds;
   final CarpenterTreeSelectionMode selectionMode;
   final CollectionMultiSelectionBehavior multipleSelectionBehavior;
   final ScrollController? scrollController;
@@ -112,6 +128,9 @@ final class CarpenterTreeView<T> extends StatefulWidget {
   final bool tableRowContentPadding;
   final CarpenterTreeActionsBuilder<T>? actions;
   final CarpenterDragActivation dragActivation;
+
+  /// Move/copy/link operations that nodes may initiate through drag and drop.
+  final Set<CarpenterDragOperation> dragOperations;
   final bool autoExpandOnHover;
   final String semanticLabel;
 
@@ -277,6 +296,19 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
     final flat = _flat;
     if (flat.isEmpty) return KeyEventResult.ignored;
+
+    final keyboard = HardwareKeyboard.instance;
+    final selectAll =
+        event.logicalKey == LogicalKeyboardKey.keyA &&
+        (keyboard.isControlPressed || keyboard.isMetaPressed);
+    if (selectAll &&
+        widget.selectionMode == CarpenterTreeSelectionMode.multiple &&
+        widget.onSelectionChanged != null) {
+      final ids = Set<Object>.unmodifiable(flat.map((entry) => entry.node.id));
+      _selectionAnchorId = flat.first.node.id;
+      widget.onSelectionChanged!(ids);
+      return KeyEventResult.handled;
+    }
     var index = _focusedId == null
         ? 0
         : flat.indexWhere((entry) => entry.node.id == _focusedId);
@@ -319,16 +351,42 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
     return KeyEventResult.ignored;
   }
 
+  List<CarpenterTreeNode<T>> _draggedNodesFor(CarpenterTreeNode<T> node) {
+    if (widget.selectionMode != CarpenterTreeSelectionMode.multiple ||
+        !widget.selectedIds.contains(node.id)) {
+      return [node];
+    }
+    final selected = [
+      for (final entry in _flat)
+        if (widget.selectedIds.contains(entry.node.id)) entry.node,
+    ];
+    if (selected.isEmpty) return [node];
+    final roots = [
+      for (final candidate in selected)
+        if (!selected.any(
+          (other) =>
+              other.id != candidate.id &&
+              carpenterTreeContains(other, candidate.id),
+        ))
+          candidate,
+    ];
+    return List.unmodifiable(roots);
+  }
+
   bool _canDrop(
     CarpenterTreeNode<T> target,
-    CarpenterDropDetails<CarpenterTreeNode<T>> details,
+    CarpenterDropDetails<_CarpenterTreeDragData<T>> details,
   ) {
-    final dragged = details.payload.data;
-    if (dragged.id == target.id || carpenterTreeContains(dragged, target.id)) {
+    final data = details.payload.data;
+    if (data.nodes.any(
+      (dragged) =>
+          dragged.id == target.id || carpenterTreeContains(dragged, target.id),
+    )) {
       return false;
     }
     final treeDetails = CarpenterTreeDropDetails<T>(
-      dragged: dragged,
+      dragged: data.primary,
+      draggedNodes: data.nodes,
       target: target,
       position: details.position,
       operation: details.operation,
@@ -338,11 +396,13 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
 
   void _drop(
     CarpenterTreeNode<T> target,
-    CarpenterDropDetails<CarpenterTreeNode<T>> details,
+    CarpenterDropDetails<_CarpenterTreeDragData<T>> details,
   ) {
+    final data = details.payload.data;
     widget.onDrop?.call(
       CarpenterTreeDropDetails<T>(
-        dragged: details.payload.data,
+        dragged: data.primary,
+        draggedNodes: data.nodes,
         target: target,
         position: details.position,
         operation: details.operation,
@@ -352,7 +412,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
 
   void _syncAutoExpand(
     CarpenterTreeNode<T> node,
-    CarpenterDropTargetState<CarpenterTreeNode<T>> state,
+    CarpenterDropTargetState<_CarpenterTreeDragData<T>> state,
   ) {
     final shouldExpand =
         widget.autoExpandOnHover &&
@@ -384,7 +444,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
     final node = entry.node;
     final expanded = _visuallyExpanded(node);
     Widget buildContent(
-      CarpenterDropTargetState<CarpenterTreeNode<T>> dropState,
+      CarpenterDropTargetState<_CarpenterTreeDragData<T>> dropState,
     ) {
       _syncAutoExpand(node, dropState);
       final state = CarpenterTreeRowState<T>(
@@ -396,6 +456,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
         dragging: _draggingId == node.id,
         hovering: dropState.hovering,
         acceptsDrop: dropState.accepts,
+        cut: widget.cutIds.contains(node.id),
         dropPosition: dropState.position,
       );
       final theme = CarpenterTheme.of(context);
@@ -417,7 +478,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
         icon: widget.iconBuilder?.call(node),
         onToggle: () => _toggleExpansion(node),
       );
-      final row = widget.tableRows
+      Widget row = widget.tableRows
           ? CarpenterListTile.tableRow(
               contentPadding: widget.tableRowContentPadding,
               selected: state.selected,
@@ -447,15 +508,20 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
               title: title,
               trailing: _actions(context, actions),
             );
+      if (state.cut && widget.rowBuilder == null) {
+        row = Opacity(opacity: .55, child: row);
+      }
       if (widget.onDrop == null) return row;
-      return CarpenterDraggable<CarpenterTreeNode<T>>(
+      final draggedNodes = _draggedNodesFor(node);
+      return CarpenterDraggable<_CarpenterTreeDragData<T>>(
         sourceId: node.id,
         activation: widget.dragActivation,
-        payload: CarpenterDragPayload<CarpenterTreeNode<T>>(
+        payload: CarpenterDragPayload<_CarpenterTreeDragData<T>>(
           id: node.id,
-          data: node,
+          data: _CarpenterTreeDragData<T>(primary: node, nodes: draggedNodes),
+          allowedOperations: widget.dragOperations,
         ),
-        semanticLabel: 'Move ${node.effectiveSemanticLabel}',
+        semanticLabel: 'Drag ${node.effectiveSemanticLabel}',
         onDragStarted: () => setState(() => _draggingId = node.id),
         onDragCompleted: () {
           if (mounted) setState(() => _draggingId = null);
@@ -471,7 +537,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
       return KeyedSubtree(
         key: _rowKeys.putIfAbsent(node.id, GlobalKey.new),
         child: buildContent(
-          CarpenterDropTargetState<CarpenterTreeNode<T>>(
+          CarpenterDropTargetState<_CarpenterTreeDragData<T>>(
             hovering: false,
             accepts: false,
           ),
@@ -480,10 +546,10 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
     }
     return KeyedSubtree(
       key: _rowKeys.putIfAbsent(node.id, GlobalKey.new),
-      child: CarpenterDropTarget<CarpenterTreeNode<T>>(
+      child: CarpenterDropTarget<_CarpenterTreeDragData<T>>(
         targetId: node.id,
         axis: CarpenterDropAxis.vertical,
-        acceptedOperations: const {CarpenterDragOperation.move},
+        acceptedOperations: widget.dragOperations,
         canAccept: (details) => _canDrop(node, details),
         onDrop: (details) => _drop(node, details),
         builder: (context, state) => buildContent(state),
