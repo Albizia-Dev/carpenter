@@ -22,6 +22,7 @@ final class _InlineCancelIntent extends Intent {
 /// meaningful edit state and persistence. The idle pencil becomes a checkmark
 /// while editing; Enter commits and Escape cancels by default.
 final class CarpenterInlineEdit extends StatelessWidget {
+  /// Creates controlled inline-edit chrome around [value] and [editor].
   const CarpenterInlineEdit({
     super.key,
     required this.editing,
@@ -39,20 +40,46 @@ final class CarpenterInlineEdit extends StatelessWidget {
     this.actionSize = ControlSize.xsmall,
   });
 
+  /// Whether the caller currently exposes [editor] instead of [value].
   final bool editing;
+
+  /// Read-only presentation shown when [editing] is false.
   final Widget value;
+
+  /// Editing control shown when [editing] is true.
   final Widget editor;
+
+  /// Requests that the caller enter edit mode.
   final VoidCallback? onEditRequested;
+
+  /// Requests validation and persistence of the caller-owned draft.
   final VoidCallback? onCommitRequested;
+
+  /// Requests cancellation of the current caller-owned draft.
   final VoidCallback? onCancelRequested;
+
+  /// Whether a commit is currently executing.
   final bool committing;
+
+  /// Whether edit and commit actions are available.
   final bool enabled;
+
+  /// Whether Enter should request commit while editing.
   final bool commitOnEnter;
+
+  /// Optional validation or persistence error shown below the value/editor.
   final String? errorText;
+
+  /// Accessible label for the idle pencil action.
   final String editSemanticLabel;
+
+  /// Accessible label for the editing checkmark action.
   final String commitSemanticLabel;
+
+  /// Semantic size of the pencil/check action.
   final ControlSize actionSize;
 
+  /// Builds the controlled value/editor row and keyboard actions.
   @override
   Widget build(BuildContext context) {
     Widget content = Row(
@@ -129,6 +156,7 @@ final class CarpenterInlineEdit extends StatelessWidget {
 /// [draft] remains caller-owned. The widget owns only the ephemeral Flutter
 /// text/focus objects required to render that draft.
 final class CarpenterInlineTextEdit extends StatefulWidget {
+  /// Creates a controlled text-specific inline editor.
   const CarpenterInlineTextEdit({
     super.key,
     required this.value,
@@ -149,23 +177,55 @@ final class CarpenterInlineTextEdit extends StatefulWidget {
     this.placeholder,
   });
 
+  /// Persisted/read-only value displayed outside edit mode.
   final String value;
+
+  /// Caller-owned text draft displayed while editing.
   final String draft;
+
+  /// Whether the text field is currently shown.
   final bool editing;
+
+  /// Reports every draft change without taking ownership of the draft.
   final ValueChanged<String> onDraftChanged;
+
+  /// Requests that the caller enter edit mode.
   final VoidCallback? onEditRequested;
+
+  /// Requests validation and persistence of [draft].
   final VoidCallback? onCommitRequested;
+
+  /// Requests cancellation and caller-owned draft restoration.
   final VoidCallback? onCancelRequested;
+
+  /// Whether a commit is currently executing.
   final bool committing;
+
+  /// Whether editing and commit actions are available.
   final bool enabled;
+
+  /// Optional validation or persistence error for the field.
   final String? errorText;
+
+  /// Accessible label forwarded to the text input.
   final String? semanticLabel;
+
+  /// Accessible label for the idle pencil action.
   final String editSemanticLabel;
+
+  /// Accessible label for the editing checkmark action.
   final String commitSemanticLabel;
+
+  /// Semantic size of the pencil/check action.
   final ControlSize actionSize;
+
+  /// Semantic size of the inline text field.
   final FieldSize fieldSize;
+
+  /// Optional placeholder shown by the editing text field.
   final String? placeholder;
 
+  /// Creates ephemeral text-controller and focus state for the controlled draft.
   @override
   State<CarpenterInlineTextEdit> createState() =>
       _CarpenterInlineTextEditState();
