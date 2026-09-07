@@ -12,6 +12,7 @@ import '../../basic/gravity_icons.g.dart';
 import '../../basic/icon.dart';
 import '../../basic/status_indicator.dart';
 import '../../behaviour/context_actions.dart';
+import '../../behaviour/drag_and_drop/drag_operation.dart';
 import '../../behaviour/drag_and_drop/draggable.dart';
 import '../contracts/selection_mode.dart';
 import '../table_metrics.dart';
@@ -26,6 +27,14 @@ import 'tree_view.dart';
 /// Builds the content displayed in one tree-table cell for [node].
 typedef CarpenterTreeTableCellBuilder<T> =
     Widget Function(BuildContext context, CarpenterTreeNode<T> node);
+
+/// Builds the editable/display content of the leading tree column.
+typedef CarpenterTreeTableTreeCellBuilder<T> =
+    Widget Function(
+      BuildContext context,
+      CarpenterTreeNode<T> node,
+      CarpenterTreeRowState<T> state,
+    );
 
 /// Reports the caller-visible width selected for a resized tree-table column.
 typedef CarpenterTreeTableColumnWidthChanged =
@@ -244,11 +253,13 @@ final class CarpenterTreeTable<T> extends StatefulWidget {
     this.treeAlignment = CarpenterTableColumnAlignment.start,
     this.treeVerticalAlignment = CarpenterTableColumnVerticalAlignment.center,
     this.treeResizable = true,
+    this.treeCellBuilder,
     this.columns = const [],
     this.columnWidths = const {},
     this.onColumnWidthChanged,
     this.expandedIds = const {},
     this.selectedIds = const {},
+    this.cutIds = const {},
     this.selectionMode = CarpenterTreeSelectionMode.single,
     this.multipleSelectionBehavior = CollectionMultiSelectionBehavior.toggle,
     this.scrollController,
@@ -265,6 +276,7 @@ final class CarpenterTreeTable<T> extends StatefulWidget {
     this.actionsOverflowLabel = 'More actions',
     this.iconBuilder,
     this.dragActivation = CarpenterDragActivation.immediate,
+    this.dragOperations = const {CarpenterDragOperation.move},
     this.framed = true,
     this.semanticLabel = 'Tree table',
   }) : assert(treeFlex > 0);
@@ -278,11 +290,13 @@ final class CarpenterTreeTable<T> extends StatefulWidget {
   final CarpenterTableColumnAlignment treeAlignment;
   final CarpenterTableColumnVerticalAlignment treeVerticalAlignment;
   final bool treeResizable;
+  final CarpenterTreeTableTreeCellBuilder<T>? treeCellBuilder;
   final List<CarpenterTreeTableColumn<T>> columns;
   final Map<String, LengthUnit> columnWidths;
   final CarpenterTreeTableColumnWidthChanged? onColumnWidthChanged;
   final Set<Object> expandedIds;
   final Set<Object> selectedIds;
+  final Set<Object> cutIds;
   final CarpenterTreeSelectionMode selectionMode;
   final CollectionMultiSelectionBehavior multipleSelectionBehavior;
   final ScrollController? scrollController;
@@ -306,6 +320,7 @@ final class CarpenterTreeTable<T> extends StatefulWidget {
   final String actionsOverflowLabel;
   final CarpenterTreeIconBuilder<T>? iconBuilder;
   final CarpenterDragActivation dragActivation;
+  final Set<CarpenterDragOperation> dragOperations;
   final bool framed;
   final String semanticLabel;
 
@@ -423,6 +438,7 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
                 controller: widget.controller,
                 expandedIds: widget.expandedIds,
                 selectedIds: widget.selectedIds,
+                cutIds: widget.cutIds,
                 selectionMode: widget.selectionMode,
                 multipleSelectionBehavior: widget.multipleSelectionBehavior,
                 scrollController: widget.scrollController,
@@ -438,6 +454,7 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
                 tableRows: true,
                 tableRowContentPadding: false,
                 dragActivation: widget.dragActivation,
+                dragOperations: widget.dragOperations,
                 semanticLabel: '${widget.semanticLabel} rows',
                 rowBuilder: (context, node, state, _) => _buildRow(
                   context,
@@ -733,14 +750,16 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
                   ),
                   SizedBox(width: contentGap),
                   Expanded(
-                    child: CarpenterTableText.cell(
-                      node.label,
-                      emphasis: state.selected || state.focused
-                          ? TypographyEmphasis.medium
-                          : TypographyEmphasis.regular,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    child:
+                        widget.treeCellBuilder?.call(context, node, state) ??
+                        CarpenterTableText.cell(
+                          node.label,
+                          emphasis: state.selected || state.focused
+                              ? TypographyEmphasis.medium
+                              : TypographyEmphasis.regular,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
                   ),
                 ],
               ),
@@ -786,7 +805,7 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
         child: row,
       );
     }
-    return row;
+    return state.cut ? Opacity(opacity: .55, child: row) : row;
   }
 }
 

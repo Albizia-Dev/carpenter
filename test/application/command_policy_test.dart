@@ -183,4 +183,26 @@ void main() {
     expect(failures, ['broken']);
     expect(completed, ['healthy']);
   });
+  test('undo policy registers reversible command results with redo', () async {
+    final undoController = CarpenterUndoController();
+    addTearDown(undoController.dispose);
+    final undoPolicy = CarpenterCommandUndoPolicy(undoController);
+    var value = 1;
+    final command = CarpenterCommandController<void>(
+      id: 'value.change',
+      title: 'Change value',
+      execute: (_) =>
+          CarpenterCommandResult(undo: () => value = 0, redo: () => value = 1),
+    );
+    addTearDown(command.dispose);
+    final executor = CarpenterCommandExecutor(listeners: [undoPolicy.handle]);
+
+    await executor.execute(command, null);
+    expect(undoController.value.nextUndo?.label, 'Change value');
+
+    await undoController.undo();
+    expect(value, 0);
+    await undoController.redo();
+    expect(value, 1);
+  });
 }

@@ -49,6 +49,7 @@ final class CarpenterTreeRowState<T> {
     required this.dragging,
     required this.hovering,
     required this.acceptsDrop,
+    this.cut = false,
     this.dropPosition,
   });
 
@@ -60,6 +61,7 @@ final class CarpenterTreeRowState<T> {
   final bool dragging;
   final bool hovering;
   final bool acceptsDrop;
+  final bool cut;
   final CarpenterDropPosition? dropPosition;
 }
 

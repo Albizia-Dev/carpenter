@@ -1,12 +1,89 @@
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
+import '../components/basic/select/selection_button_group.dart';
 import '../components/layout/page_header.dart';
 import '../components/layout/regions/region_role.dart';
+import '../foundation/icon_data.dart';
+import '../foundation/roles.dart';
 import '../foundation/theme.dart';
 import '../page/descriptor.dart';
 import '../page/page.dart';
 import '../page/state.dart';
+
+/// One stable destination shown by [CarpenterExplorerLocationStrip].
+@immutable
+final class CarpenterExplorerDestination<L> {
+  const CarpenterExplorerDestination({
+    required this.location,
+    required this.label,
+    this.icon,
+    this.enabled = true,
+    this.semanticLabel,
+  });
+
+  final L location;
+  final String label;
+  final CarpenterIconSource? icon;
+  final bool enabled;
+  final String? semanticLabel;
+}
+
+/// Controlled explorer destination strip with an optional remembered location.
+///
+/// Primary destinations remain visible while navigation enters nested content.
+/// A caller-owned remembered destination is appended as one more peer and stays
+/// present when a primary destination is selected. Carpenter deliberately does
+/// not decide when remembered state changes; applications normally replace it
+/// only after explicit activation such as a directory double-click.
+final class CarpenterExplorerLocationStrip<L> extends StatelessWidget {
+  const CarpenterExplorerLocationStrip({
+    super.key,
+    required this.primaryDestinations,
+    required this.current,
+    required this.onChanged,
+    this.rememberedDestination,
+    this.size = ControlSize.medium,
+    this.semanticLabel = 'Explorer locations',
+  }) : assert(primaryDestinations.length > 0);
+
+  final List<CarpenterExplorerDestination<L>> primaryDestinations;
+  final CarpenterExplorerDestination<L>? rememberedDestination;
+  final L current;
+  final ValueChanged<L>? onChanged;
+  final ControlSize size;
+  final String semanticLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final remembered = rememberedDestination;
+    final destinations = <CarpenterExplorerDestination<L>>[
+      ...primaryDestinations,
+      if (remembered != null &&
+          !primaryDestinations.any(
+            (destination) => destination.location == remembered.location,
+          ))
+        remembered,
+    ];
+    return CarpenterSelectionButtonGroup<L>(
+      options: [
+        for (final destination in destinations)
+          CarpenterSelectionButtonOption<L>(
+            value: destination.location,
+            label: destination.label,
+            icon: destination.icon,
+            enabled: destination.enabled,
+            semanticLabel: destination.semanticLabel,
+          ),
+      ],
+      value: current,
+      onChanged: onChanged,
+      size: size,
+      semanticLabel: semanticLabel,
+      fillAvailableWidth: true,
+    );
+  }
+}
 
 /// Controlled navigation history for an explorer location.
 ///

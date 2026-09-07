@@ -1,4 +1,6 @@
 import 'package:carpenter/carpenter.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -120,5 +122,101 @@ void main() {
     expect(controller.session, isNull);
 
     controller.dispose();
+  });
+  test('drag operation policy maps familiar desktop modifiers', () {
+    const policy = CarpenterDragOperationPolicy.standard();
+    const allowed = {
+      CarpenterDragOperation.move,
+      CarpenterDragOperation.copy,
+      CarpenterDragOperation.link,
+    };
+
+    expect(
+      policy.resolve(
+        platform: TargetPlatform.windows,
+        pressedKeys: {LogicalKeyboardKey.controlLeft},
+        allowedOperations: allowed,
+      ),
+      CarpenterDragOperation.copy,
+    );
+    expect(
+      policy.resolve(
+        platform: TargetPlatform.windows,
+        pressedKeys: {LogicalKeyboardKey.altLeft},
+        allowedOperations: allowed,
+      ),
+      CarpenterDragOperation.link,
+    );
+    expect(
+      policy.resolve(
+        platform: TargetPlatform.macOS,
+        pressedKeys: {LogicalKeyboardKey.altLeft},
+        allowedOperations: allowed,
+      ),
+      CarpenterDragOperation.copy,
+    );
+    expect(
+      policy.resolve(
+        platform: TargetPlatform.macOS,
+        pressedKeys: {LogicalKeyboardKey.metaLeft, LogicalKeyboardKey.altLeft},
+        allowedOperations: allowed,
+      ),
+      CarpenterDragOperation.link,
+    );
+  });
+
+  testWidgets('active drag updates operation when desktop modifiers change', (
+    tester,
+  ) async {
+    final controller = CarpenterDragController();
+    addTearDown(controller.dispose);
+
+    await tester.pumpWidget(
+      carpenterOverlayHarness(
+        CarpenterDragScope(
+          controller: controller,
+          platform: TargetPlatform.windows,
+          child: CarpenterDraggable<String>(
+            payload: const CarpenterDragPayload<String>(
+              data: 'payload',
+              allowedOperations: {
+                CarpenterDragOperation.move,
+                CarpenterDragOperation.copy,
+                CarpenterDragOperation.link,
+              },
+            ),
+            child: const SizedBox(
+              width: 120,
+              height: 80,
+              child: Center(child: Text('Drag modifiers')),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.text('Drag modifiers')),
+    );
+    await tester.pump();
+    await gesture.moveBy(const Offset(20, 0));
+    await tester.pump();
+    expect(controller.session?.operation, CarpenterDragOperation.move);
+
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.pump();
+    expect(controller.session?.operation, CarpenterDragOperation.copy);
+
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+    await tester.pump();
+    expect(controller.session?.operation, CarpenterDragOperation.link);
+
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+    await tester.pump();
+    expect(controller.session?.operation, CarpenterDragOperation.move);
+
+    await gesture.up();
+    await tester.pump();
   });
 }

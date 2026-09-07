@@ -50,6 +50,7 @@ final class CarpenterSelectionButtonGroup<T> extends StatefulWidget {
     this.size = ControlSize.medium,
     this.colorRole = ActionColorRole.primary,
     this.semanticLabel = 'View selection',
+    this.fillAvailableWidth = false,
   }) : assert(options.length > 0);
 
   /// Choices in presentation and keyboard order. Keep values stable and
@@ -75,6 +76,13 @@ final class CarpenterSelectionButtonGroup<T> extends StatefulWidget {
   /// Accessible name for the whole choice group; defaults to "View
   /// selection".
   final String semanticLabel;
+
+  /// Whether the connected choices should divide a bounded available width.
+  ///
+  /// This is useful for compact scope switchers whose choices must remain
+  /// simultaneously reachable instead of overflowing off-screen. In an
+  /// unbounded horizontal context the group keeps its intrinsic width.
+  final bool fillAvailableWidth;
 
   @override
   State<CarpenterSelectionButtonGroup<T>> createState() =>
@@ -173,30 +181,37 @@ final class _CarpenterSelectionButtonGroupState<T>
     container: true,
     explicitChildNodes: true,
     label: widget.semanticLabel,
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var index = 0; index < widget.options.length; index++)
-          CarpenterToggleButton(
-            label: widget.options[index].label,
-            semanticLabel: widget.options[index].semanticLabel,
-            checked: widget.options[index].value == widget.value,
-            icon: widget.options[index].icon,
-            size: widget.size,
-            colorRole: widget.colorRole,
-            shape: CarpenterShape(
-              start: index == 0 ? ShapeRole.rounded : ShapeRole.none,
-              end: index == widget.options.length - 1
-                  ? ShapeRole.rounded
-                  : ShapeRole.none,
-            ),
-            focusNode: _focusNodes[index],
-            onChanged:
-                widget.onChanged == null || !widget.options[index].enabled
-                ? null
-                : (_) => widget.onChanged!(widget.options[index].value),
+    child: LayoutBuilder(
+      builder: (context, constraints) {
+        final distribute =
+            widget.fillAvailableWidth && constraints.hasBoundedWidth;
+        Widget option(int index) => CarpenterToggleButton(
+          label: widget.options[index].label,
+          semanticLabel: widget.options[index].semanticLabel,
+          checked: widget.options[index].value == widget.value,
+          icon: widget.options[index].icon,
+          size: widget.size,
+          colorRole: widget.colorRole,
+          shape: CarpenterShape(
+            start: index == 0 ? ShapeRole.rounded : ShapeRole.none,
+            end: index == widget.options.length - 1
+                ? ShapeRole.rounded
+                : ShapeRole.none,
           ),
-      ],
+          focusNode: _focusNodes[index],
+          onChanged: widget.onChanged == null || !widget.options[index].enabled
+              ? null
+              : (_) => widget.onChanged!(widget.options[index].value),
+        );
+
+        return Row(
+          mainAxisSize: distribute ? MainAxisSize.max : MainAxisSize.min,
+          children: [
+            for (var index = 0; index < widget.options.length; index++)
+              if (distribute) Expanded(child: option(index)) else option(index),
+          ],
+        );
+      },
     ),
   );
 }

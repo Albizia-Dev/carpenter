@@ -87,9 +87,15 @@ final class _CarpenterDraggableState<T> extends State<CarpenterDraggable<T>> {
     }
 
     void started() {
+      final effectiveOperation = CarpenterDragScope.resolveOperationOf(
+        context,
+        widget.payload,
+        preferred: widget.operation,
+      );
       controller?.begin(
         payload: widget.payload,
-        operation: widget.operation,
+        operation: effectiveOperation,
+        preferredOperation: widget.operation,
         sourceId: widget.sourceId,
       );
       widget.onDragStarted?.call();

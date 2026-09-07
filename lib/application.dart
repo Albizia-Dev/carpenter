@@ -20,4 +20,5 @@ export 'src/application/navigation/route_information_sync.dart';
 export 'src/application/navigation/router.dart';
 export 'src/application/navigation/router_shell.dart';
 export 'src/application/runtime/runtime.dart';
+export 'src/application/standard_commands.dart';
 export 'src/application/shell/shell.dart';

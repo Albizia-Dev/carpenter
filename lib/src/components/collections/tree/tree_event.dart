@@ -10,12 +10,20 @@ final class CarpenterTreeDropDetails<T> {
     required this.target,
     required this.position,
     required this.operation,
+    this.draggedNodes = const [],
   });
 
   final CarpenterTreeNode<T> dragged;
   final CarpenterTreeNode<T> target;
   final CarpenterDropPosition position;
   final CarpenterDragOperation operation;
+
+  /// Full drag selection when the gesture started from a selected row.
+  /// Empty means the legacy single [dragged] node only.
+  final List<CarpenterTreeNode<T>> draggedNodes;
+
+  List<CarpenterTreeNode<T>> get effectiveDraggedNodes =>
+      draggedNodes.isEmpty ? [dragged] : draggedNodes;
 }
 
 typedef CarpenterTreeExpansionChanged =
