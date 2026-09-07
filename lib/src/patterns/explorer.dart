@@ -14,6 +14,7 @@ import '../page/state.dart';
 /// One stable destination shown by [CarpenterExplorerLocationStrip].
 @immutable
 final class CarpenterExplorerDestination<L> {
+  /// Creates one caller-owned explorer destination.
   const CarpenterExplorerDestination({
     required this.location,
     required this.label,
@@ -22,10 +23,19 @@ final class CarpenterExplorerDestination<L> {
     this.semanticLabel,
   });
 
+  /// Stable location value emitted when this destination is selected.
   final L location;
+
+  /// Visible destination label.
   final String label;
+
+  /// Optional leading semantic icon.
   final CarpenterIconSource? icon;
+
+  /// Whether this destination may currently be selected.
   final bool enabled;
+
+  /// Optional accessible label overriding [label].
   final String? semanticLabel;
 }
 
@@ -37,6 +47,7 @@ final class CarpenterExplorerDestination<L> {
 /// not decide when remembered state changes; applications normally replace it
 /// only after explicit activation such as a directory double-click.
 final class CarpenterExplorerLocationStrip<L> extends StatelessWidget {
+  /// Creates a controlled strip of primary and optional remembered locations.
   const CarpenterExplorerLocationStrip({
     super.key,
     required this.primaryDestinations,
@@ -47,13 +58,25 @@ final class CarpenterExplorerLocationStrip<L> extends StatelessWidget {
     this.semanticLabel = 'Explorer locations',
   }) : assert(primaryDestinations.length > 0);
 
+  /// Stable root/scope destinations that always remain visible.
   final List<CarpenterExplorerDestination<L>> primaryDestinations;
+
+  /// Optional caller-owned nested destination appended after primary locations.
   final CarpenterExplorerDestination<L>? rememberedDestination;
+
+  /// Currently selected location value.
   final L current;
+
+  /// Reports requested location changes without mutating caller state.
   final ValueChanged<L>? onChanged;
+
+  /// Semantic size of the joined destination controls.
   final ControlSize size;
+
+  /// Accessible label for the location-selection group.
   final String semanticLabel;
 
+  /// Builds the joined location controls from caller-owned destinations.
   @override
   Widget build(BuildContext context) {
     final remembered = rememberedDestination;
