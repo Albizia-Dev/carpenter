@@ -15,8 +15,10 @@ enum CarpenterDropAxis { vertical, horizontal }
 /// source's preferred/default allowed operation.
 @immutable
 final class CarpenterDragOperationPolicy {
+  /// Creates Carpenter's standard platform-aware drag-operation policy.
   const CarpenterDragOperationPolicy.standard();
 
+  /// Resolves the active operation from platform modifiers and allowed values.
   CarpenterDragOperation resolve({
     required TargetPlatform platform,
     required Set<LogicalKeyboardKey> pressedKeys,
