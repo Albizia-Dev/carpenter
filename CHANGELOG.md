@@ -1,3 +1,16 @@
+# 0.2.1
+
+- Added adaptive contextual actions so secondary pointer presses and touch
+  long-presses invoke the same semantic `CarpenterActionDescriptor` set.
+- Made table and tree-table action lanes remain pinned to the trailing edge while
+  horizontally scrolling data columns move underneath them.
+- Reused `CarpenterTableColumn.actions` and `CarpenterTreeTableColumn.actions`
+  builders for inline, overflow, and contextual action presentation instead of
+  requiring duplicate application action definitions.
+- Kept the legacy `CarpenterTreeTable.actions` and `secondaryActions` shorthand
+  source-compatible while projecting those actions into the same pinned and
+  contextual behavior.
+
 # 0.2.0
 
 Carpenter 0.2.0 is a migration release that consolidates the application,
@@ -226,5 +239,5 @@ since 0.1.8.
 
 - Established the initial publishable Flutter package.
 - Added the development example application.
-- Added the Widgetbook development catalog.
+- Added Widgetbook development catalog.
 - Added package documentation and publication quality gates.
