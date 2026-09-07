@@ -1,0 +1,175 @@
+name: Finalize 0.2.1 branch
+
+on:
+  push:
+    branches:
+      - feat/context-actions-0.2.1
+
+permissions:
+  contents: write
+
+concurrency:
+  group: finalize-context-actions-0.2.1
+  cancel-in-progress: true
+
+jobs:
+  finalize:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/context-actions-0.2.1
+          fetch-depth: 0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Resolve package dependencies
+        run: flutter pub get
+      - name: Complete public API documentation
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          context_actions = Path('lib/src/components/behaviour/context_actions.dart')
+          text = context_actions.read_text()
+          text = text.replace(
+              'final class CarpenterContextActionRegion extends StatefulWidget {\n  const CarpenterContextActionRegion({',
+              'final class CarpenterContextActionRegion extends StatefulWidget {\n  /// Creates a region that exposes [actions] through secondary press and long-press gestures.\n  const CarpenterContextActionRegion({',
+              1,
+          )
+          text = text.replace(
+              '  @override\n  State<CarpenterContextActionRegion> createState() =>',
+              '  /// Creates the state that owns this region\'s transient contextual menu.\n  @override\n  State<CarpenterContextActionRegion> createState() =>',
+              1,
+          )
+          context_actions.write_text(text)
+
+          table = Path('lib/src/components/collections/table/table.dart')
+          text = table.read_text()
+          marker = 'typedef CarpenterTableColumnWidthChanged = void Function('
+          if '/// Reports the caller-visible width selected for a resized table column.\n' not in text:
+              text = text.replace(
+                  marker,
+                  '/// Reports the caller-visible width selected for a resized table column.\n' + marker,
+                  1,
+              )
+          table.write_text(text)
+          PY
+      - name: Add contextual actions Widgetbook use case
+        shell: bash
+        run: |
+          cat > widgetbook/lib/use_cases/behaviour/context_actions.dart <<'DART'
+          import 'package:carpenter/carpenter.dart';
+          import 'package:flutter/widgets.dart';
+          import 'package:widgetbook/widgetbook.dart';
+
+          import '../../helpers/preview.dart';
+
+          final contextActionsComponent = WidgetbookComponent(
+            name: 'Context Actions',
+            useCases: [
+              WidgetbookUseCase(name: 'Playground', builder: _contextActions),
+            ],
+          );
+
+          Widget _contextActions(BuildContext context) => preview(
+            CarpenterContextActionRegion(
+              semanticLabel: 'Demo row actions',
+              actions: [
+                CarpenterActionDescriptor(
+                  id: 'open',
+                  label: 'Open',
+                  onInvoke: () {},
+                ),
+                CarpenterActionDescriptor(
+                  id: 'archive',
+                  label: 'Archive',
+                  onInvoke: () {},
+                ),
+              ],
+              child: SizedBox(
+                width: context.units(30.rem),
+                child: CarpenterCard(
+                  child: Padding(
+                    padding: EdgeInsets.all(context.units(1.rem)),
+                    child: CarpenterText.body(
+                      'Right-click this surface, or long-press it on touch, to open the same semantic actions.',
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+          DART
+
+          python3 - <<'PY'
+          from pathlib import Path
+          catalog = Path('widgetbook/lib/catalog.dart')
+          text = catalog.read_text()
+          import_line = "import 'use_cases/behaviour/context_actions.dart';\n"
+          if import_line not in text:
+              text = text.replace(
+                  "import 'use_cases/behaviour/dialog.dart';\n",
+                  import_line + "import 'use_cases/behaviour/dialog.dart';\n",
+                  1,
+              )
+          if '      contextActionsComponent,\n' not in text:
+              text = text.replace(
+                  '      controlComponent,\n',
+                  '      controlComponent,\n      contextActionsComponent,\n',
+                  1,
+              )
+          catalog.write_text(text)
+          PY
+      - name: Apply canonical formatting to changed Dart files
+        run: |
+          dart format \
+            lib/src/components/behaviour/context_actions.dart \
+            lib/src/components/collections/table/table.dart \
+            lib/src/components/collections/table/table_column.dart \
+            lib/src/components/collections/tree/tree_table.dart \
+            widgetbook/lib/catalog.dart \
+            widgetbook/lib/use_cases/behaviour/context_actions.dart
+          dart format --output=none --set-exit-if-changed \
+            lib/src/components/behaviour/context_actions.dart \
+            lib/src/components/collections/table/table.dart \
+            lib/src/components/collections/table/table_column.dart \
+            lib/src/components/collections/tree/tree_table.dart \
+            widgetbook/lib/catalog.dart \
+            widgetbook/lib/use_cases/behaviour/context_actions.dart
+      - name: Verify documentation has no new debt
+        working-directory: tool/documentation
+        shell: bash
+        run: |
+          dart pub get --enforce-lockfile
+          set +e
+          dart run bin/audit.dart ../.. --check 2>&1 | tee /tmp/carpenter-audit.txt
+          set -e
+          if grep -q 'New or changed undocumented API:' /tmp/carpenter-audit.txt; then
+            cat /tmp/carpenter-audit.txt
+            exit 1
+          fi
+          if grep -q 'New unreferencedWidgets entry:' /tmp/carpenter-audit.txt; then
+            cat /tmp/carpenter-audit.txt
+            exit 1
+          fi
+          dart run bin/audit.dart ../.. --write-baseline
+          dart run bin/audit.dart ../.. --check
+      - name: Commit final branch normalization
+        shell: bash
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add \
+            lib/src/components/behaviour/context_actions.dart \
+            lib/src/components/collections/table/table.dart \
+            lib/src/components/collections/table/table_column.dart \
+            lib/src/components/collections/tree/tree_table.dart \
+            widgetbook/lib/catalog.dart \
+            widgetbook/lib/use_cases/behaviour/context_actions.dart \
+            tool/documentation/coverage-baseline.json
+          git commit -m 'chore: finalize 0.2.1 API and documentation'
+          git push
