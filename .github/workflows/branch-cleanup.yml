@@ -1,0 +1,87 @@
+name: Branch cleanup
+
+on:
+  push:
+    branches:
+      - feat/context-actions-0.2.1
+
+permissions:
+  contents: write
+
+concurrency:
+  group: branch-cleanup-context-actions-0.2.1
+  cancel-in-progress: true
+
+jobs:
+  cleanup:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/context-actions-0.2.1
+          fetch-depth: 0
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Restore unrelated formatting noise from develop
+        shell: bash
+        run: |
+          git fetch origin develop
+          git checkout origin/develop -- \
+            example \
+            lib/src/application \
+            lib/src/components/basic \
+            lib/src/components/behaviour/control.dart \
+            lib/src/components/behaviour/drag_and_drop \
+            lib/src/components/behaviour/loading.dart \
+            lib/src/components/behaviour/tooltip.dart \
+            lib/src/components/collections/contracts \
+            lib/src/components/collections/data_list.dart \
+            lib/src/components/collections/definition_list.dart \
+            lib/src/components/collections/kanban.dart \
+            lib/src/components/collections/planning_board.dart \
+            lib/src/components/collections/reorderable_collection.dart \
+            lib/src/components/collections/table/editable_table.dart \
+            lib/src/components/collections/table/table_actions.dart \
+            lib/src/components/collections/tree/tree_event.dart \
+            lib/src/components/collections/tree/tree_state.dart \
+            lib/src/components/collections/tree/tree_view.dart \
+            lib/src/components/content \
+            lib/src/components/layout \
+            lib/src/foundation/theme.dart \
+            lib/src/internal \
+            lib/src/page \
+            test/basic \
+            test/collections/collection_kernel_test.dart \
+            test/foundation \
+            tool/documentation/coverage-baseline.json \
+            widgetbook/lib/use_cases/behaviour \
+            widgetbook/lib/use_cases/collections/advanced_collections.dart \
+            widgetbook/lib/use_cases/foundation \
+            widgetbook/lib/use_cases/layout \
+            widgetbook/lib/use_cases/patterns
+      - name: Format only the 0.2.1 Dart changes
+        run: |
+          dart format \
+            lib/carpenter.dart \
+            lib/components.dart \
+            lib/src/components/behaviour/context_actions.dart \
+            lib/src/components/collections/table/table.dart \
+            lib/src/components/collections/table/table_column.dart \
+            lib/src/components/collections/tree/tree_table.dart \
+            test/behaviour/context_actions_test.dart \
+            test/collections/table_layout_test.dart \
+            test/collections/tree_table_layout_test.dart \
+            widgetbook/lib/use_cases/collections/table.dart \
+            widgetbook/lib/use_cases/collections/tree_table_contracts.dart
+      - name: Commit cleaned feature diff
+        shell: bash
+        run: |
+          git rm .github/workflows/branch-cleanup.yml
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add -A
+          git commit -m "chore: remove unrelated formatting noise"
+          git push
