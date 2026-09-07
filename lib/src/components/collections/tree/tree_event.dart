@@ -5,6 +5,7 @@ import 'tree_state.dart';
 
 @immutable
 final class CarpenterTreeDropDetails<T> {
+  /// Creates immutable details for one tree drop operation.
   const CarpenterTreeDropDetails({
     required this.dragged,
     required this.target,
@@ -22,6 +23,7 @@ final class CarpenterTreeDropDetails<T> {
   /// Empty means the legacy single [dragged] node only.
   final List<CarpenterTreeNode<T>> draggedNodes;
 
+  /// Nodes participating in the drop, falling back to [dragged] for legacy use.
   List<CarpenterTreeNode<T>> get effectiveDraggedNodes =>
       draggedNodes.isEmpty ? [dragged] : draggedNodes;
 }
