@@ -13,6 +13,7 @@ import 'command.dart';
 /// Carpenter supplies stable commands and familiar platform shortcuts. Call
 /// [refreshAvailability] after external selection state changes.
 final class CarpenterClipboardCommandSet<T> {
+  /// Creates clipboard commands bound to [clipboard] and caller-owned selection.
   CarpenterClipboardCommandSet({
     required this.clipboard,
     required this.selectedItems,
@@ -81,21 +82,37 @@ final class CarpenterClipboardCommandSet<T> {
     refreshAvailability();
   }
 
+  /// Typed clipboard that stores the current copy or cut payload.
   final CarpenterClipboardController<T> clipboard;
+
+  /// Reads the application's current selected items when copy or cut executes.
   final List<T> Function() selectedItems;
+
+  /// Performs application-owned paste semantics for the current payload.
   final FutureOr<CarpenterCommandResult> Function(
     CarpenterClipboardContent<T> content,
   )
   onPaste;
+
+  /// Optionally identifies the current source location written to the clipboard.
   final Object? Function()? sourceId;
+
+  /// Command group used by action and command-palette presentation.
   final String group;
 
+  /// Standard copy command, including Ctrl+C and Command+C shortcuts.
   late final CarpenterCommandController<void> copy;
+
+  /// Standard cut command, including Ctrl+X and Command+X shortcuts.
   late final CarpenterCommandController<void> cut;
+
+  /// Standard paste command, including Ctrl+V and Command+V shortcuts.
   late final CarpenterCommandController<void> paste;
 
+  /// Commands in conventional copy, cut, paste order.
   List<CarpenterCommand<void>> get commands => [copy, cut, paste];
 
+  /// Synchronizes command availability with selection and clipboard state.
   void refreshAvailability() {
     final hasSelection = selectedItems().isNotEmpty;
     copy.setAvailability(enabled: hasSelection);
@@ -103,6 +120,7 @@ final class CarpenterClipboardCommandSet<T> {
     paste.setAvailability(enabled: clipboard.hasContent);
   }
 
+  /// Detaches listeners and disposes the command controllers owned by this set.
   void dispose() {
     clipboard.removeListener(refreshAvailability);
     copy.dispose();
@@ -113,6 +131,7 @@ final class CarpenterClipboardCommandSet<T> {
 
 /// Standard undo/redo commands bound to one [CarpenterUndoController].
 final class CarpenterUndoCommandSet {
+  /// Creates undo and redo commands that reflect [controller] history state.
   CarpenterUndoCommandSet({required this.controller, this.group = 'Edit'}) {
     undo = CarpenterCommandController<void>(
       id: 'history.undo',
@@ -152,12 +171,19 @@ final class CarpenterUndoCommandSet {
     _syncAvailability();
   }
 
+  /// History controller that owns reversible application operations.
   final CarpenterUndoController controller;
+
+  /// Command group used by action and command-palette presentation.
   final String group;
 
+  /// Standard undo command with platform-native shortcuts.
   late final CarpenterCommandController<void> undo;
+
+  /// Standard redo command with platform-native shortcuts.
   late final CarpenterCommandController<void> redo;
 
+  /// Commands in undo, redo order.
   List<CarpenterCommand<void>> get commands => [undo, redo];
 
   void _syncAvailability() {
@@ -173,6 +199,7 @@ final class CarpenterUndoCommandSet {
     );
   }
 
+  /// Detaches the history listener and disposes both command controllers.
   void dispose() {
     controller.removeListener(_syncAvailability);
     undo.dispose();
