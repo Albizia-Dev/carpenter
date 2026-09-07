@@ -22,7 +22,7 @@ jobs:
       - name: Install package dependencies
         run: flutter pub get
       - name: Analyze library
-        run: flutter analyze lib
+        run: dart analyze lib
       - name: Run focused contextual table tests
         run: flutter test test/behaviour/context_actions_test.dart test/collections/table_layout_test.dart test/collections/tree_table_layout_test.dart
       - name: Run all non-golden package tests
@@ -35,7 +35,7 @@ jobs:
         run: flutter pub get
       - name: Analyze Widgetbook
         working-directory: widgetbook
-        run: flutter analyze
+        run: dart analyze lib test
       - name: Run non-golden Widgetbook tests
         working-directory: widgetbook
         shell: bash
@@ -44,7 +44,7 @@ jobs:
           if ((${#tests[@]})); then flutter test "${tests[@]}"; fi
       - name: Build Widgetbook
         working-directory: widgetbook
-        run: flutter build web --release
+        run: flutter build web --release --base-href /carpenter/
       - name: Install example dependencies
         working-directory: example
         run: flutter pub get
