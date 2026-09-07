@@ -10,6 +10,7 @@ import '../../../internal/layout/grid_layout.dart';
 import '../../basic/button/button.dart';
 import '../../basic/checkbox.dart';
 import '../../basic/status_indicator.dart';
+import '../../behaviour/context_actions.dart';
 import '../contracts/collection_load_phase.dart';
 import '../contracts/collection_query.dart';
 import '../contracts/collection_snapshot.dart';
@@ -21,6 +22,7 @@ import 'table_column.dart';
 import 'table_state.dart';
 import 'table_text.dart';
 
+/// Reports the caller-visible width selected for a resized table column.
 typedef CarpenterTableColumnWidthChanged =
     void Function(String columnId, LengthUnit width);
 
@@ -71,6 +73,23 @@ final class CarpenterTable<T, K> extends StatefulWidget {
 final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
   final Map<K, FocusNode> _rowFocusNodes = {};
   final Map<String, LengthUnit> _localColumnWidths = {};
+  final ScrollController _horizontalScrollController = ScrollController();
+
+  List<CarpenterTableColumn<T>> get _dataColumns => widget.columns
+      .where(
+        (column) =>
+            column.effectiveWidth.policy !=
+            CarpenterTableColumnWidthPolicy.actionLane,
+      )
+      .toList(growable: false);
+
+  List<CarpenterTableColumn<T>> get _actionColumns => widget.columns
+      .where(
+        (column) =>
+            column.effectiveWidth.policy ==
+            CarpenterTableColumnWidthPolicy.actionLane,
+      )
+      .toList(growable: false);
 
   @override
   void didUpdateWidget(CarpenterTable<T, K> oldWidget) {
@@ -97,6 +116,7 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
     for (final node in _rowFocusNodes.values) {
       node.dispose();
     }
+    _horizontalScrollController.dispose();
     super.dispose();
   }
 
@@ -131,6 +151,10 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
     widget.onColumnWidthChanged?.call(id, width);
   }
 
+  double get _horizontalOffset => _horizontalScrollController.hasClients
+      ? _horizontalScrollController.offset
+      : 0.0;
+
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
@@ -139,18 +163,18 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
     final radius = metrics.surfaceRadius;
     return LayoutBuilder(
       builder: (context, constraints) {
-        final layout = _resolveColumnLayout(context, constraints.maxWidth);
-        final tableWidth = layout.totalWidth;
+        final dataColumns = _dataColumns;
+        final actionColumns = _actionColumns;
+        final layout = _resolveColumnLayout(
+          context,
+          constraints.maxWidth,
+          dataColumns: dataColumns,
+          actionColumns: actionColumns,
+        );
         final headerHeight = widget.stickyHeader ? metrics.headerHeight : 0.0;
         final availableBodyHeight = constraints.maxHeight.isFinite
             ? math.max(0.0, constraints.maxHeight - headerHeight)
             : null;
-        final body = _buildBody(
-          context,
-          layout,
-          availableHeight: availableBodyHeight,
-        );
-        final header = _buildHeader(context, layout);
         return Semantics(
           container: true,
           explicitChildNodes: true,
@@ -167,15 +191,36 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(radius),
               child: SingleChildScrollView(
+                controller: _horizontalScrollController,
                 scrollDirection: Axis.horizontal,
-                child: SizedBox(
-                  width: tableWidth,
-                  child: widget.stickyHeader
-                      ? Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [header, body],
-                        )
-                      : body,
+                child: AnimatedBuilder(
+                  animation: _horizontalScrollController,
+                  builder: (context, _) {
+                    final body = _buildBody(
+                      context,
+                      layout,
+                      dataColumns: dataColumns,
+                      actionColumns: actionColumns,
+                      availableHeight: availableBodyHeight,
+                      horizontalOffset: _horizontalOffset,
+                    );
+                    final header = _buildHeader(
+                      context,
+                      layout,
+                      dataColumns: dataColumns,
+                      actionColumns: actionColumns,
+                      horizontalOffset: _horizontalOffset,
+                    );
+                    return SizedBox(
+                      width: layout.totalWidth,
+                      child: widget.stickyHeader
+                          ? Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [header, body],
+                            )
+                          : body,
+                    );
+                  },
                 ),
               ),
             ),
@@ -187,62 +232,106 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
 
   _TableColumnLayout _resolveColumnLayout(
     BuildContext context,
-    double viewportWidth,
-  ) {
+    double viewportWidth, {
+    required List<CarpenterTableColumn<T>> dataColumns,
+    required List<CarpenterTableColumn<T>> actionColumns,
+  }) {
     final metrics = CarpenterTableMetrics.resolve(context);
     final selectionWidth =
         widget.showSelectionColumn && widget.selection.isEnabled
         ? metrics.selectionColumnWidth
         : 0.0;
-    final columns = <GridColumnSpec>[];
-    for (final column in widget.columns) {
-      final minimum = column.width.minimum == null
+    final widths = <String, double>{};
+    final minimums = <String, double>{};
+    final maximums = <String, double>{};
+    var actionWidth = 0.0;
+
+    for (final column in actionColumns) {
+      final width = column.effectiveWidth;
+      final minimum = width.minimum == null
           ? metrics.minimumColumnWidth
-          : context.units(column.width.minimum!);
-      final maximum = column.width.maximum == null
+          : context.units(width.minimum!);
+      final maximum = width.maximum == null
           ? metrics.maximumColumnWidth
-          : context.units(column.width.maximum!);
+          : context.units(width.maximum!);
+      final explicitWidth =
+          _localColumnWidths[column.id] ??
+          widget.columnWidths[column.id] ??
+          width.preferred;
+      final preferred = explicitWidth == null
+          ? CarpenterTableActionCell.preferredColumnWidth(context)
+          : context.units(explicitWidth);
+      final resolved = preferred.clamp(minimum, maximum).toDouble();
+      widths[column.id] = resolved;
+      minimums[column.id] = minimum;
+      maximums[column.id] = maximum;
+      actionWidth += resolved;
+    }
+
+    final dataViewportWidth = viewportWidth.isFinite
+        ? math.max(0.0, viewportWidth - actionWidth)
+        : viewportWidth;
+    final specs = <GridColumnSpec>[];
+    for (final column in dataColumns) {
+      final width = column.effectiveWidth;
+      final minimum = width.minimum == null
+          ? metrics.minimumColumnWidth
+          : context.units(width.minimum!);
+      final maximum = width.maximum == null
+          ? metrics.maximumColumnWidth
+          : context.units(width.maximum!);
       final pinned =
           _localColumnWidths.containsKey(column.id) ||
           widget.columnWidths.containsKey(column.id);
       final explicitWidth =
           _localColumnWidths[column.id] ??
           widget.columnWidths[column.id] ??
-          column.width.preferred;
-      final actionLane =
-          column.width.policy == CarpenterTableColumnWidthPolicy.actionLane;
-      final preferred = explicitWidth == null && actionLane
-          ? CarpenterTableActionCell.preferredColumnWidth(context)
-          : explicitWidth == null
+          width.preferred;
+      final preferred = explicitWidth == null
           ? metrics.defaultColumnWidth
           : context.units(explicitWidth);
-      columns.add(
+      specs.add(
         GridColumnSpec(
           id: column.id,
           preferred: preferred,
           minimum: minimum,
           maximum: maximum,
-          flex: column.width.flex,
-          flexible: column.width.isFlexible,
+          flex: width.flex,
+          flexible: width.isFlexible,
           pinned: pinned,
         ),
       );
     }
     final resolved = GridLayoutResolver.resolve(
-      columns: columns,
-      viewportWidth: viewportWidth,
+      columns: specs,
+      viewportWidth: dataViewportWidth,
       fixedExtent: selectionWidth,
     );
+    widths.addAll(resolved.widths);
+    minimums.addAll(resolved.minimums);
+    maximums.addAll(resolved.maximums);
+    final naturalWidth = resolved.totalWidth + actionWidth;
+    final totalWidth = viewportWidth.isFinite
+        ? math.max(viewportWidth, naturalWidth)
+        : naturalWidth;
     return _TableColumnLayout(
-      widths: resolved.widths,
-      minimums: resolved.minimums,
-      maximums: resolved.maximums,
+      widths: widths,
+      minimums: minimums,
+      maximums: maximums,
       selectionWidth: selectionWidth,
-      totalWidth: resolved.totalWidth,
+      actionWidth: actionWidth,
+      viewportWidth: viewportWidth,
+      totalWidth: totalWidth,
     );
   }
 
-  Widget _buildHeader(BuildContext context, _TableColumnLayout layout) {
+  Widget _buildHeader(
+    BuildContext context,
+    _TableColumnLayout layout, {
+    required List<CarpenterTableColumn<T>> dataColumns,
+    required List<CarpenterTableColumn<T>> actionColumns,
+    required double horizontalOffset,
+  }) {
     final theme = CarpenterTheme.of(context);
     final metrics = CarpenterTableMetrics.resolve(context);
     final height = metrics.headerHeight;
@@ -253,38 +342,72 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
         : selectedCount == loadedKeys.length
         ? CheckboxValue.checked
         : CheckboxValue.mixed;
-    return Container(
+    return SizedBox(
       height: height,
-      color: theme.surface.subtle,
-      child: Row(
+      child: Stack(
         children: [
-          if (layout.selectionWidth > 0)
-            SizedBox(
-              width: layout.selectionWidth,
-              child: Center(
-                child: CarpenterCheckbox(
-                  value: checkboxValue,
-                  label: '',
-                  semanticLabel: checkboxValue == CheckboxValue.checked
-                      ? widget.messages.clearLoadedSelection
-                      : widget.messages.selectAllLoaded,
-                  size: ControlSize.small,
-                  onChanged: widget.onSelectionChanged == null
-                      ? null
-                      : (_) => _toggleLoadedSelection(),
-                ),
+          Positioned.fill(
+            child: ColoredBox(
+              color: theme.surface.subtle,
+              child: Row(
+                children: [
+                  if (layout.selectionWidth > 0)
+                    SizedBox(
+                      width: layout.selectionWidth,
+                      child: Center(
+                        child: CarpenterCheckbox(
+                          value: checkboxValue,
+                          label: '',
+                          semanticLabel: checkboxValue == CheckboxValue.checked
+                              ? widget.messages.clearLoadedSelection
+                              : widget.messages.selectAllLoaded,
+                          size: ControlSize.small,
+                          onChanged: widget.onSelectionChanged == null
+                              ? null
+                              : (_) => _toggleLoadedSelection(),
+                        ),
+                      ),
+                    ),
+                  for (final column in dataColumns)
+                    _HeaderCell<T>(
+                      column: column,
+                      width: layout.widths[column.id]!,
+                      minimumWidth: layout.minimums[column.id]!,
+                      maximumWidth: layout.maximums[column.id]!,
+                      sorting: widget.sorting,
+                      onSortingChanged: widget.onSortingChanged,
+                      multiSort: widget.multiSort,
+                      onWidthChanged: _resizeColumn,
+                    ),
+                  SizedBox(width: layout.actionWidth),
+                ],
               ),
             ),
-          for (final column in widget.columns)
-            _HeaderCell<T>(
-              column: column,
-              width: layout.widths[column.id]!,
-              minimumWidth: layout.minimums[column.id]!,
-              maximumWidth: layout.maximums[column.id]!,
-              sorting: widget.sorting,
-              onSortingChanged: widget.onSortingChanged,
-              multiSort: widget.multiSort,
-              onWidthChanged: _resizeColumn,
+          ),
+          if (actionColumns.isNotEmpty)
+            PositionedDirectional(
+              top: 0,
+              bottom: 0,
+              end: layout.trailingCompensation(horizontalOffset),
+              width: layout.actionWidth,
+              child: ColoredBox(
+                color: theme.surface.subtle,
+                child: Row(
+                  children: [
+                    for (final column in actionColumns)
+                      _HeaderCell<T>(
+                        column: column,
+                        width: layout.widths[column.id]!,
+                        minimumWidth: layout.minimums[column.id]!,
+                        maximumWidth: layout.maximums[column.id]!,
+                        sorting: widget.sorting,
+                        onSortingChanged: widget.onSortingChanged,
+                        multiSort: widget.multiSort,
+                        onWidthChanged: _resizeColumn,
+                      ),
+                  ],
+                ),
+              ),
             ),
         ],
       ),
@@ -294,7 +417,10 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
   Widget _buildBody(
     BuildContext context,
     _TableColumnLayout layout, {
+    required List<CarpenterTableColumn<T>> dataColumns,
+    required List<CarpenterTableColumn<T>> actionColumns,
     required double? availableHeight,
+    required double horizontalOffset,
   }) {
     final metrics = CarpenterTableMetrics.resolve(context);
     final rowHeight = metrics.rowHeight;
@@ -322,7 +448,15 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
         itemBuilder: (context, index) {
           var contentIndex = index;
           if (!widget.stickyHeader) {
-            if (contentIndex == 0) return _buildHeader(context, layout);
+            if (contentIndex == 0) {
+              return _buildHeader(
+                context,
+                layout,
+                dataColumns: dataColumns,
+                actionColumns: actionColumns,
+                horizontalOffset: horizontalOffset,
+              );
+            }
             contentIndex -= 1;
           }
           if (state != null) {
@@ -335,7 +469,15 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
             contentIndex -= 1;
           }
           if (contentIndex < widget.snapshot.items.length) {
-            return _buildRow(context, layout, contentIndex, rowHeight);
+            return _buildRow(
+              context,
+              layout,
+              contentIndex,
+              rowHeight,
+              dataColumns: dataColumns,
+              actionColumns: actionColumns,
+              horizontalOffset: horizontalOffset,
+            );
           }
           return SizedBox(height: rowHeight, child: footer);
         },
@@ -403,12 +545,30 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
     );
   }
 
+  List<CarpenterActionDescriptor> _contextActions(
+    T item,
+    List<CarpenterTableColumn<T>> actionColumns,
+  ) {
+    final primary = <CarpenterActionDescriptor>[];
+    final secondary = <CarpenterActionDescriptor>[];
+    for (final column in actionColumns) {
+      final actions = column.actionsBuilder?.call(item);
+      if (actions == null) continue;
+      primary.addAll(actions.primary);
+      secondary.addAll(actions.secondary);
+    }
+    return [...primary, ...secondary];
+  }
+
   Widget _buildRow(
     BuildContext context,
     _TableColumnLayout layout,
     int index,
-    double height,
-  ) {
+    double height, {
+    required List<CarpenterTableColumn<T>> dataColumns,
+    required List<CarpenterTableColumn<T>> actionColumns,
+    required double horizontalOffset,
+  }) {
     final item = widget.snapshot.items[index];
     final key = widget.rowKey(item);
     final node = _rowFocusNodes.putIfAbsent(key, FocusNode.new);
@@ -422,8 +582,12 @@ final class _CarpenterTableState<T, K> extends State<CarpenterTable<T, K>> {
           widget.selection.isEnabled && widget.onSelectionChanged != null,
       showSelection: layout.selectionWidth > 0,
       selectionWidth: layout.selectionWidth,
-      columns: widget.columns,
+      dataColumns: dataColumns,
+      actionColumns: actionColumns,
       widths: layout.widths,
+      actionWidth: layout.actionWidth,
+      trailingCompensation: layout.trailingCompensation(horizontalOffset),
+      contextActions: _contextActions(item, actionColumns),
       height: height,
       focusNode: node,
       onToggle: () => _toggleRow(key),
@@ -441,13 +605,24 @@ final class _TableColumnLayout {
     required this.minimums,
     required this.maximums,
     required this.selectionWidth,
+    required this.actionWidth,
+    required this.viewportWidth,
     required this.totalWidth,
   });
+
   final Map<String, double> widths;
   final Map<String, double> minimums;
   final Map<String, double> maximums;
   final double selectionWidth;
+  final double actionWidth;
+  final double viewportWidth;
   final double totalWidth;
+
+  double trailingCompensation(double offset) {
+    if (!viewportWidth.isFinite) return 0;
+    final maximum = math.max(0.0, totalWidth - viewportWidth);
+    return (maximum - offset).clamp(0.0, maximum).toDouble();
+  }
 }
 
 final class _HeaderCell<T> extends StatelessWidget {
@@ -545,8 +720,12 @@ final class _TableRow<T, K> extends StatefulWidget {
     required this.selectionEnabled,
     required this.showSelection,
     required this.selectionWidth,
-    required this.columns,
+    required this.dataColumns,
+    required this.actionColumns,
     required this.widths,
+    required this.actionWidth,
+    required this.trailingCompensation,
+    required this.contextActions,
     required this.height,
     required this.focusNode,
     required this.onToggle,
@@ -563,8 +742,12 @@ final class _TableRow<T, K> extends StatefulWidget {
   final bool selectionEnabled;
   final bool showSelection;
   final double selectionWidth;
-  final List<CarpenterTableColumn<T>> columns;
+  final List<CarpenterTableColumn<T>> dataColumns;
+  final List<CarpenterTableColumn<T>> actionColumns;
   final Map<String, double> widths;
+  final double actionWidth;
+  final double trailingCompensation;
+  final List<CarpenterActionDescriptor> contextActions;
   final double height;
   final FocusNode focusNode;
   final VoidCallback onToggle;
@@ -613,6 +796,87 @@ final class _TableRowState<T, K> extends State<_TableRow<T, K>> {
         ? theme.overlay.hovered
         : theme.overlay.background;
     final focusWidth = context.units(theme.focus.width);
+    Widget row = Container(
+      height: widget.height,
+      decoration: BoxDecoration(
+        color: background,
+        border: Border(
+          bottom: BorderSide(
+            color: theme.overlay.border,
+            width: metrics.borderWidth,
+          ),
+        ),
+      ),
+      foregroundDecoration: _focused
+          ? BoxDecoration(
+              border: Border.all(color: theme.focus.color, width: focusWidth),
+            )
+          : null,
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Row(
+              children: [
+                if (widget.showSelection)
+                  SizedBox(
+                    width: widget.selectionWidth,
+                    child: Center(
+                      child: CarpenterCheckbox(
+                        value: widget.selected
+                            ? CheckboxValue.checked
+                            : CheckboxValue.unchecked,
+                        label: '',
+                        semanticLabel: widget.semanticLabel,
+                        size: ControlSize.small,
+                        onChanged: widget.selectionEnabled
+                            ? (_) => widget.onToggle()
+                            : null,
+                      ),
+                    ),
+                  ),
+                for (final column in widget.dataColumns)
+                  CarpenterTableCellChrome(
+                    width: widget.widths[column.id]!,
+                    alignment: column.alignment,
+                    verticalAlignment: column.verticalAlignment,
+                    child: column.cellBuilder(context, widget.item),
+                  ),
+                SizedBox(width: widget.actionWidth),
+              ],
+            ),
+          ),
+          if (widget.actionColumns.isNotEmpty)
+            PositionedDirectional(
+              top: 0,
+              bottom: 0,
+              end: widget.trailingCompensation,
+              width: widget.actionWidth,
+              child: ColoredBox(
+                color: background,
+                child: Row(
+                  children: [
+                    for (final column in widget.actionColumns)
+                      CarpenterTableCellChrome(
+                        width: widget.widths[column.id]!,
+                        alignment: column.alignment,
+                        verticalAlignment: column.verticalAlignment,
+                        child: column.cellBuilder(context, widget.item),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+    if (widget.contextActions.isNotEmpty) {
+      row = CarpenterContextActionRegion(
+        actions: widget.contextActions,
+        semanticLabel: 'Actions for ${widget.semanticLabel}',
+        onOpen: (_) => widget.focusNode.requestFocus(),
+        child: row,
+      );
+    }
     return Semantics(
       container: true,
       selected: widget.selected,
@@ -636,54 +900,7 @@ final class _TableRowState<T, K> extends State<_TableRow<T, K>> {
                     widget.onToggle();
                   }
                 : null,
-            child: Container(
-              height: widget.height,
-              decoration: BoxDecoration(
-                color: background,
-                border: Border(
-                  bottom: BorderSide(
-                    color: theme.overlay.border,
-                    width: metrics.borderWidth,
-                  ),
-                ),
-              ),
-              foregroundDecoration: _focused
-                  ? BoxDecoration(
-                      border: Border.all(
-                        color: theme.focus.color,
-                        width: focusWidth,
-                      ),
-                    )
-                  : null,
-              child: Row(
-                children: [
-                  if (widget.showSelection)
-                    SizedBox(
-                      width: widget.selectionWidth,
-                      child: Center(
-                        child: CarpenterCheckbox(
-                          value: widget.selected
-                              ? CheckboxValue.checked
-                              : CheckboxValue.unchecked,
-                          label: '',
-                          semanticLabel: widget.semanticLabel,
-                          size: ControlSize.small,
-                          onChanged: widget.selectionEnabled
-                              ? (_) => widget.onToggle()
-                              : null,
-                        ),
-                      ),
-                    ),
-                  for (final column in widget.columns)
-                    CarpenterTableCellChrome(
-                      width: widget.widths[column.id]!,
-                      alignment: column.alignment,
-                      verticalAlignment: column.verticalAlignment,
-                      child: column.cellBuilder(context, widget.item),
-                    ),
-                ],
-              ),
-            ),
+            child: row,
           ),
         ),
       ),

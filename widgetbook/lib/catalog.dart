@@ -20,6 +20,7 @@ import 'use_cases/basic/status_indicator.dart';
 import 'use_cases/basic/switch.dart';
 import 'use_cases/basic/text.dart';
 import 'use_cases/basic/text_area.dart';
+import 'use_cases/behaviour/context_actions.dart';
 import 'use_cases/behaviour/dialog.dart';
 import 'use_cases/behaviour/drag_and_drop.dart';
 import 'use_cases/behaviour/dropdown.dart';
@@ -105,6 +106,7 @@ final List<WidgetbookNode> carpenterCatalog = [
     name: 'Behaviour',
     children: [
       controlComponent,
+      contextActionsComponent,
       dragAndDropComponent,
       loadingBoundaryComponent,
       popoverComponent,

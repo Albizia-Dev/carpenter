@@ -30,11 +30,12 @@ final class CarpenterTableColumnWidth {
        preferred = width,
        flex = 0;
 
-  /// Compact non-flexing lane for semantic row actions.
+  /// Compact trailing lane for semantic row actions.
   ///
-  /// When [preferred] is omitted, the table resolves the extent from its action
-  /// control size, gaps, and cell padding instead of coupling layout to a
-  /// concrete action-cell widget.
+  /// Action lanes remain pinned to the trailing edge while data columns scroll
+  /// underneath them. When [preferred] is omitted, the table resolves the
+  /// extent from its action control size, gaps, and cell padding instead of
+  /// coupling layout to a concrete action-cell widget.
   const CarpenterTableColumnWidth.actionLane({
     this.preferred,
     this.minimum,
@@ -51,11 +52,17 @@ final class CarpenterTableColumnWidth {
   bool get isFlexible => policy == CarpenterTableColumnWidthPolicy.flexible;
 }
 
+/// Builds the content displayed in one table cell for [item].
 typedef CarpenterTableCellBuilder<T> =
     Widget Function(BuildContext context, T item);
 
 @immutable
 final class CarpenterTableColumn<T> {
+  /// Creates a table column with caller-owned cell content and layout policy.
+  ///
+  /// [actionsBuilder] is optional semantic metadata for actions represented by
+  /// this column. Action-lane columns use it to expose the same actions through
+  /// contextual surfaces; ordinary custom columns may leave it null.
   const CarpenterTableColumn.custom({
     required this.id,
     required this.header,
@@ -66,6 +73,7 @@ final class CarpenterTableColumn<T> {
     this.sortable = false,
     this.resizable = true,
     this.semanticLabel,
+    this.actionsBuilder,
     @Deprecated(
       'Use width: CarpenterTableColumnWidth.actionLane(). '
       'isActionColumn is retained for source compatibility.',
@@ -170,7 +178,11 @@ final class CarpenterTableColumn<T> {
   ///
   /// [actions] are primary actions. Up to two icon-bearing actions stay inline;
   /// remaining primary actions and every [secondaryActions] entry live under
-  /// overflow. The default [width] is a semantic action lane and therefore does
+  /// overflow. The same descriptors are exposed through [actionsBuilder] so
+  /// the owning table can project them into its secondary-click/long-press
+  /// context menu without a second application-level action definition.
+  ///
+  /// The default [width] is a pinned trailing action lane and therefore does
   /// not participate in flexible data-column growth.
   factory CarpenterTableColumn.actions({
     required String id,
@@ -193,6 +205,10 @@ final class CarpenterTableColumn<T> {
     width: width,
     resizable: resizable,
     semanticLabel: semanticLabel,
+    actionsBuilder: (item) => CarpenterTableActions(
+      primary: actions(item),
+      secondary: secondaryActions?.call(item) ?? const [],
+    ),
     cellBuilder: (context, item) => CarpenterTableActionCell(
       primary: actions(item),
       secondary: secondaryActions?.call(item) ?? const [],
@@ -210,6 +226,14 @@ final class CarpenterTableColumn<T> {
   final CarpenterTableColumnWidth width;
   final bool sortable;
   final bool resizable;
+
+  /// Semantic actions represented by this column, when available.
+  ///
+  /// Tables use this projection for contextual invocation as well as the pinned
+  /// inline action lane. Custom action columns may provide their own builder to
+  /// opt into the same behavior.
+  final CarpenterTableActionsBuilder<T>? actionsBuilder;
+
   final bool _legacyIsActionColumn;
 
   @Deprecated(

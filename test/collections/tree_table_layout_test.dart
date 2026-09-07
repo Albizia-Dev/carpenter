@@ -53,6 +53,32 @@ void main() {
     expect(column.resizable, isFalse);
   });
 
+  test('tree action columns expose one semantic action definition', () {
+    const node = CarpenterTreeNode<String>(
+      id: 'root',
+      value: 'root',
+      label: 'Root',
+    );
+    final column = CarpenterTreeTableColumn<String>.actions(
+      id: 'actions',
+      header: 'Actions',
+      actions: (_) => const [
+        CarpenterActionDescriptor(id: 'open', label: 'Open', onInvoke: null),
+      ],
+      secondaryActions: (_) => const [
+        CarpenterActionDescriptor(
+          id: 'archive',
+          label: 'Archive',
+          onInvoke: null,
+        ),
+      ],
+    );
+
+    final actions = column.actionsBuilder!(node);
+    expect(actions.primary.map((action) => action.id), ['open']);
+    expect(actions.secondary.map((action) => action.id), ['archive']);
+  });
+
   testWidgets('tree table uses chevrons and resizes without a callback', (
     tester,
   ) async {
@@ -197,6 +223,60 @@ void main() {
     );
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets(
+    'tree-table action lane stays pinned while data columns scroll underneath',
+    (tester) async {
+      await tester.pumpWidget(
+        carpenterOverlayHarness(
+          SizedBox(
+            width: 320,
+            child: CarpenterTreeTable<String>(
+              nodes: const [
+                CarpenterTreeNode<String>(
+                  id: 'root',
+                  value: 'root',
+                  label: 'Root',
+                ),
+              ],
+              treeWidth: const CarpenterTableColumnWidth.fixed(width: Px(300)),
+              columns: [
+                CarpenterTreeTableColumn<String>.text(
+                  id: 'detail',
+                  header: 'Detail',
+                  value: (_) => 'Wide detail',
+                  width: const CarpenterTableColumnWidth.fixed(width: Px(300)),
+                ),
+                CarpenterTreeTableColumn<String>.actions(
+                  id: 'actions',
+                  header: 'Actions',
+                  actions: (_) => const [],
+                  secondaryActions: (_) => const [
+                    CarpenterActionDescriptor(
+                      id: 'archive',
+                      label: 'Archive',
+                      onInvoke: null,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+
+      final action = find.bySemanticsLabel('More actions');
+      final before = tester.getCenter(action).dx;
+      await tester.drag(
+        find.byType(SingleChildScrollView),
+        const Offset(-180, 0),
+      );
+      await tester.pump();
+
+      expect(tester.getCenter(action).dx, closeTo(before, 0.5));
+      expect(tester.takeException(), isNull);
+    },
+  );
 }
 
 Widget _legacyTreeCell(BuildContext context, CarpenterTreeNode<String> node) =>
