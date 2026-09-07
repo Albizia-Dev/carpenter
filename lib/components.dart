@@ -42,6 +42,7 @@ export 'src/components/basic/tag.dart';
 export 'src/components/basic/text.dart';
 
 // Behaviour and transient surfaces.
+export 'src/components/behaviour/context_actions.dart';
 export 'src/components/behaviour/control.dart';
 export 'src/components/behaviour/dialog.dart';
 export 'src/components/behaviour/drag_and_drop/drag_operation.dart';
