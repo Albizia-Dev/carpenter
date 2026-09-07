@@ -120,7 +120,8 @@ final class _PlanningPageState extends State<PlanningPage> {
     children: [
       CarpenterPageHeader(
         title: 'Delivery planning',
-        subtitle: 'Controlled Kanban and generic reorder surfaces using the same Carpenter drag-and-drop kernel.',
+        subtitle:
+            'Controlled Kanban and generic reorder surfaces using the same Carpenter drag-and-drop kernel.',
         status: CarpenterPageStatus(
           label:
               '${_items.values.fold<int>(0, (sum, list) => sum + list.length)} work items',
@@ -129,13 +130,15 @@ final class _PlanningPageState extends State<PlanningPage> {
       ),
       const CarpenterNotice(
         title: 'This is application state, not a canned component demo',
-        message: 'The widgets only emit move details. This page owns the lists and applies every reorder, so the example mirrors production usage.',
+        message:
+            'The widgets only emit move details. This page owns the lists and applies every reorder, so the example mirrors production usage.',
         tone: CarpenterNoticeTone.info,
       ),
       CarpenterPageSection(
         id: const CarpenterPageSectionId('triage'),
         title: 'Triage order',
-        description: 'A presentation-neutral reorderable collection for arbitrary application content.',
+        description:
+            'A presentation-neutral reorderable collection for arbitrary application content.',
         child: CarpenterReorderableCollection<String>(
           items: _triage,
           itemKey: (item) => item,
@@ -160,7 +163,8 @@ final class _PlanningPageState extends State<PlanningPage> {
       CarpenterPageSection(
         id: const CarpenterPageSectionId('kanban'),
         title: 'Delivery board',
-        description: 'Move cards within a column or across columns. Empty columns remain valid drop targets.',
+        description:
+            'Move cards within a column or across columns. Empty columns remain valid drop targets.',
         child: CarpenterKanban<String, _WorkItem>(
           columns: _columns,
           cardKey: (item) => item.id,

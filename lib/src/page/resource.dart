@@ -34,9 +34,8 @@ final class CarpenterResourceFailure {
   final String? message;
 }
 
-typedef CarpenterResourceLoader<T> = Future<T> Function(
-  CarpenterResourceLoadRequest request,
-);
+typedef CarpenterResourceLoader<T> =
+    Future<T> Function(CarpenterResourceLoadRequest request);
 
 /// Extensible resource lifecycle base for application-specific controllers.
 class CarpenterResourceController<T> extends ValueNotifier<CarpenterPageState>

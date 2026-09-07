@@ -301,9 +301,8 @@ final class CarpenterCommandFailed extends CarpenterCommandExecutionEvent {
 }
 
 /// Listener notified synchronously for command started, succeeded, and failed events.
-typedef CarpenterCommandExecutionListener = void Function(
-  CarpenterCommandExecutionEvent event,
-);
+typedef CarpenterCommandExecutionListener =
+    void Function(CarpenterCommandExecutionEvent event);
 
 /// Executes commands and emits one uniform lifecycle for application policy.
 ///
@@ -759,33 +758,32 @@ final class CarpenterCommandButton<I> extends StatelessWidget {
   /// Rebuilds from command state, hides the button for hidden commands, and maps
   /// execution state to Carpenter's standard action phase.
   @override
-  Widget build(BuildContext context) =>
-      ValueListenableBuilder<CarpenterCommandState>(
-        valueListenable: command.state,
-        builder: (context, state, _) {
-          if (state.visibility == CarpenterCommandVisibility.hidden) {
-            return const SizedBox.shrink();
-          }
-          final presentation = command.presentation;
-          return CarpenterButton.fromAction(
-            command.toAction(
-              input,
-              label: state.execution == CarpenterCommandExecution.executing
-                  ? '${command.title}…'
-                  : command.title,
-              executor: CarpenterCommandExecutionScope.maybeOf(context)
-                  ?.executor,
-            ),
-            prominence: presentation == CarpenterCommandPresentation.primary
-                ? ActionProminence.high
-                : ActionProminence.outlined,
-            executionPhase: switch (state.execution) {
-              CarpenterCommandExecution.idle => ActionExecutionPhase.idle,
-              CarpenterCommandExecution.executing =>
-                ActionExecutionPhase.running,
-              CarpenterCommandExecution.failed => ActionExecutionPhase.failed,
-            },
-          );
+  Widget build(
+    BuildContext context,
+  ) => ValueListenableBuilder<CarpenterCommandState>(
+    valueListenable: command.state,
+    builder: (context, state, _) {
+      if (state.visibility == CarpenterCommandVisibility.hidden) {
+        return const SizedBox.shrink();
+      }
+      final presentation = command.presentation;
+      return CarpenterButton.fromAction(
+        command.toAction(
+          input,
+          label: state.execution == CarpenterCommandExecution.executing
+              ? '${command.title}…'
+              : command.title,
+          executor: CarpenterCommandExecutionScope.maybeOf(context)?.executor,
+        ),
+        prominence: presentation == CarpenterCommandPresentation.primary
+            ? ActionProminence.high
+            : ActionProminence.outlined,
+        executionPhase: switch (state.execution) {
+          CarpenterCommandExecution.idle => ActionExecutionPhase.idle,
+          CarpenterCommandExecution.executing => ActionExecutionPhase.running,
+          CarpenterCommandExecution.failed => ActionExecutionPhase.failed,
         },
       );
+    },
+  );
 }

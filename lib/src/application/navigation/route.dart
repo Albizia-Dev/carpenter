@@ -5,23 +5,18 @@ import '../runtime/runtime.dart';
 
 /// Wraps a matched route subtree with route-local state or dependency scope while
 /// preserving the already rendered child.
-typedef CarpenterRouteScopeBuilder = Widget Function(
-  CarpenterRouteContext context,
-  Widget child,
-);
+typedef CarpenterRouteScopeBuilder =
+    Widget Function(CarpenterRouteContext context, Widget child);
 
 /// Wraps a matched route subtree with route-local visual or navigation shell
 /// chrome.
-typedef CarpenterRouteShellBuilder = Widget Function(
-  CarpenterRouteContext context,
-  Widget child,
-);
+typedef CarpenterRouteShellBuilder =
+    Widget Function(CarpenterRouteContext context, Widget child);
 
 /// Builds terminal route content from the matched route node and compiled
 /// Carpenter runtime.
-typedef CarpenterRoutePageBuilder = Widget Function(
-  CarpenterRouteContext context,
-);
+typedef CarpenterRoutePageBuilder =
+    Widget Function(CarpenterRouteContext context);
 
 /// Carpenter declaration layered over yx_navigation route identity.
 final class CarpenterRoute {

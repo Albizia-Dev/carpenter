@@ -84,9 +84,9 @@ final class _ReorderPreviewState extends State<_ReorderPreview> {
         opacity: state.dragging ? .45 : 1,
         child: CarpenterCard(
           borderColor: state.hovering && state.accepts
-              ? CarpenterTheme.of(context).feedback
-                    .resolve(FeedbackColorRole.info)
-                    .foreground
+              ? CarpenterTheme.of(
+                  context,
+                ).feedback.resolve(FeedbackColorRole.info).foreground
               : null,
           child: CarpenterText.label(item),
         ),
@@ -273,9 +273,9 @@ final class _KanbanPreviewState extends State<_KanbanPreview> {
         opacity: state.dragging ? .45 : 1,
         child: CarpenterCard(
           borderColor: state.hovering && state.acceptsDrop
-              ? CarpenterTheme.of(context).feedback
-                    .resolve(FeedbackColorRole.info)
-                    .foreground
+              ? CarpenterTheme.of(
+                  context,
+                ).feedback.resolve(FeedbackColorRole.info).foreground
               : null,
           child: CarpenterText.label(card),
         ),

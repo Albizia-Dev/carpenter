@@ -211,12 +211,11 @@ Widget _editor(BuildContext context) {
     _EditorScenario.dirty => const CarpenterEditorReady(dirty: true),
     _EditorScenario.validating => const CarpenterEditorValidating(),
     _EditorScenario.saving => const CarpenterEditorSaving(),
-    _EditorScenario.validationFailure => const CarpenterEditorValidationFailure(
-      {
+    _EditorScenario.validationFailure =>
+      const CarpenterEditorValidationFailure({
         CarpenterFieldId('name'): 'Name is required',
         CarpenterFieldId('inn'): 'INN must contain 10 digits',
-      },
-    ),
+      }),
     _EditorScenario.saveFailure => CarpenterEditorSaveFailure(
       StateError('Backend rejected the update'),
     ),

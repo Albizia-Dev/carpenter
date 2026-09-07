@@ -52,8 +52,9 @@ Widget _catalog(BuildContext context) {
         return DecoratedBox(
           decoration: BoxDecoration(
             border: Border.all(
-              color: CarpenterTheme.of(context).content
-                  .resolve(ContentColorRole.muted),
+              color: CarpenterTheme.of(
+                context,
+              ).content.resolve(ContentColorRole.muted),
             ),
             borderRadius: BorderRadius.circular(8),
           ),

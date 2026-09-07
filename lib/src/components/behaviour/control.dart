@@ -17,10 +17,8 @@ final class CarpenterControlState {
   final bool pressed;
 }
 
-typedef CarpenterControlBuilder = Widget Function(
-  BuildContext context,
-  CarpenterControlState state,
-);
+typedef CarpenterControlBuilder =
+    Widget Function(BuildContext context, CarpenterControlState state);
 
 /// Behaviour-only primitive for custom interactive Carpenter components.
 ///

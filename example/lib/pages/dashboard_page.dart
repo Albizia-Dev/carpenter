@@ -38,7 +38,8 @@ final class DashboardPage extends StatelessWidget {
     children: [
       CarpenterPageHeader(
         title: 'Overview',
-        subtitle: 'A connected application example: navigation, loading, commands, collections, drag-and-drop and adaptive layout.',
+        subtitle:
+            'A connected application example: navigation, loading, commands, collections, drag-and-drop and adaptive layout.',
         status: const CarpenterPageStatus(
           label: 'All systems nominal',
           role: FeedbackColorRole.success,
@@ -86,7 +87,8 @@ final class DashboardPage extends StatelessWidget {
       ),
       CarpenterNotice(
         title: 'The example is intentionally interconnected',
-        message: 'Use Ctrl+1 through Ctrl+5 (Cmd on macOS) to navigate. Global hotkeys and sidebar items execute the same CarpenterCommand instances.',
+        message:
+            'Use Ctrl+1 through Ctrl+5 (Cmd on macOS) to navigate. Global hotkeys and sidebar items execute the same CarpenterCommand instances.',
         tone: CarpenterNoticeTone.info,
         action: CarpenterActionDescriptor(
           id: 'dashboard.hotkeys',
@@ -145,7 +147,8 @@ final class DashboardPage extends StatelessWidget {
       CarpenterPageSection(
         id: const CarpenterPageSectionId('alerts'),
         title: 'Persistent notifications',
-        description: 'Toasts are transient; notification state is an ordinary caller-owned collection.',
+        description:
+            'Toasts are transient; notification state is an ordinary caller-owned collection.',
         child: CarpenterNotificationList(
           items: [
             CarpenterNotification(

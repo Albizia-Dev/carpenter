@@ -80,7 +80,8 @@ final class _OperationsPageState extends State<OperationsPage> {
       children: [
         CarpenterPageHeader(
           title: 'Operations lab',
-          subtitle: 'Loading aggregation, nested boundaries, global hotkeys, transient feedback and controlled overlays in one page.',
+          subtitle:
+              'Loading aggregation, nested boundaries, global hotkeys, transient feedback and controlled overlays in one page.',
           status: const CarpenterPageStatus(
             label: 'Interactive',
             role: FeedbackColorRole.info,
@@ -217,7 +218,8 @@ final class _OperationsPageState extends State<OperationsPage> {
         SizedBox(height: context.units(1.5.rem)),
         const CarpenterNotice(
           title: 'Nearest scope wins',
-          message: 'The local blocked region below has its own LoadingBoundary, so its work never reaches the progress indicator in the application header.',
+          message:
+              'The local blocked region below has its own LoadingBoundary, so its work never reaches the progress indicator in the application header.',
           tone: CarpenterNoticeTone.info,
         ),
       ],

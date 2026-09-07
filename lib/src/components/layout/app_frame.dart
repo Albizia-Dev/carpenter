@@ -19,10 +19,8 @@ final class CarpenterTopPanelContext {
   bool get isDesktop => framePlatform == CarpenterFramePlatform.desktop;
 }
 
-typedef CarpenterTopPanelBuilder = Widget Function(
-  BuildContext context,
-  CarpenterTopPanelContext panel,
-);
+typedef CarpenterTopPanelBuilder =
+    Widget Function(BuildContext context, CarpenterTopPanelContext panel);
 
 /// Lightweight cross-platform frame retained for apps that do not need ApplicationShell regions.
 final class CarpenterAppFrame extends StatelessWidget {
