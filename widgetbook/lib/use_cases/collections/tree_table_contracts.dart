@@ -180,9 +180,11 @@ final class _ProjectStructurePreviewState
             description:
                 'Drag the visible header dividers to resize columns. '
                 'Click selects, Ctrl/Cmd toggles, Shift selects a range. '
-                'Double-click or Enter activates. Two primary row actions stay '
-                'inline; extra primary and secondary actions stay behind the '
-                'ellipsis without changing row geometry.',
+                'Double-click or Enter activates. The trailing action lane '
+                'stays pinned while data scrolls underneath it; right-click '
+                'or long-press a row to open the same actions contextually. '
+                'Extra primary and secondary actions stay behind the ellipsis '
+                'without changing row geometry.',
             child: CarpenterTreeTable<String>(
               nodes: _projectNodes,
               controller: _treeController,
