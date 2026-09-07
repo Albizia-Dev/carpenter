@@ -6,6 +6,7 @@ import 'tree_state.dart';
 /// authoritative mutation results to their current roots and keep the result
 /// in their own state layer.
 sealed class CarpenterTreePatch<T> {
+  /// Creates the common base of immutable tree presentation patches.
   const CarpenterTreePatch();
 }
 
@@ -13,8 +14,10 @@ sealed class CarpenterTreePatch<T> {
 ///
 /// Applying an update for an absent id is a no-op.
 final class CarpenterTreeUpdated<T> extends CarpenterTreePatch<T> {
+  /// Creates a patch that replaces the loaded node matching [node.id].
   const CarpenterTreeUpdated(this.node);
 
+  /// Authoritative replacement node supplied by the caller.
   final CarpenterTreeNode<T> node;
 }
 
@@ -23,17 +26,25 @@ final class CarpenterTreeUpdated<T> extends CarpenterTreePatch<T> {
 /// Duplicate ids and missing parents are rejected as no-ops. [index] is
 /// clamped to the destination list bounds; omitting it appends.
 final class CarpenterTreeInserted<T> extends CarpenterTreePatch<T> {
+  /// Creates an insertion patch for [node].
   const CarpenterTreeInserted({required this.node, this.parentId, this.index});
 
+  /// Authoritative node to insert.
   final CarpenterTreeNode<T> node;
+
+  /// Stable destination parent id, or null to insert at the root.
   final Object? parentId;
+
+  /// Optional destination index, clamped to the destination bounds.
   final int? index;
 }
 
 /// Removes a loaded node and its loaded descendants from presentation data.
 final class CarpenterTreeRemoved<T> extends CarpenterTreePatch<T> {
+  /// Creates a removal patch for stable node [id].
   const CarpenterTreeRemoved(this.id);
 
+  /// Stable id of the loaded node to remove.
   final Object id;
 }
 
@@ -42,10 +53,16 @@ final class CarpenterTreeRemoved<T> extends CarpenterTreePatch<T> {
 /// The node object itself is preserved. Moving a node into itself or one of
 /// its descendants, or targeting a missing parent, is rejected as a no-op.
 final class CarpenterTreeMoved<T> extends CarpenterTreePatch<T> {
+  /// Creates a reparent/reorder patch for stable node [id].
   const CarpenterTreeMoved({required this.id, this.parentId, this.index});
 
+  /// Stable id of the loaded node to move.
   final Object id;
+
+  /// Stable destination parent id, or null to move to the root.
   final Object? parentId;
+
+  /// Optional destination index, clamped to the destination bounds.
   final int? index;
 }
 
