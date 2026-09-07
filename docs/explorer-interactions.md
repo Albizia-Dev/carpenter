@@ -41,3 +41,7 @@ Server-backed explorers should apply authoritative mutation results through
 `CarpenterTreePatch` where possible and reserve full snapshot refreshes for
 explicit refresh or reconciliation. This keeps unrelated branches stable while
 still leaving persistence and conflict handling to the application.
+
+The Widgetbook catalog includes a live Explorer interactions example covering
+location switching, the typed clipboard and undo scopes, and both inline-edit
+primitives so these contracts remain visible while applications adopt them.
