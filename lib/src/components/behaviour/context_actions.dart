@@ -27,6 +27,7 @@ enum CarpenterContextActionTrigger {
 /// availability, selection, or command execution state. Disposing the region
 /// dismisses any menu it opened.
 final class CarpenterContextActionRegion extends StatefulWidget {
+  /// Creates a region that exposes [actions] through secondary press and long-press gestures.
   const CarpenterContextActionRegion({
     super.key,
     required this.actions,
@@ -53,6 +54,7 @@ final class CarpenterContextActionRegion extends StatefulWidget {
   /// [actions], and dismissing the overlay does not invoke this callback again.
   final ValueChanged<CarpenterContextActionTrigger>? onOpen;
 
+  /// Creates the state that owns this region's transient contextual menu.
   @override
   State<CarpenterContextActionRegion> createState() =>
       _CarpenterContextActionRegionState();
