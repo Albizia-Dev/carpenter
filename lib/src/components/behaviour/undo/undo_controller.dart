@@ -4,10 +4,22 @@ import 'package:flutter/foundation.dart';
 
 import 'undoable_operation.dart';
 
-enum CarpenterUndoExecution { idle, undoing, redoing }
+/// Current execution phase of the undo/redo history.
+enum CarpenterUndoExecution {
+  /// No undo or redo callback is currently running.
+  idle,
 
+  /// The next undo callback is currently running.
+  undoing,
+
+  /// The next redo callback is currently running.
+  redoing,
+}
+
+/// Immutable snapshot of caller-owned undo/redo history.
 @immutable
 final class CarpenterUndoState {
+  /// Creates an undo state from explicit stacks and execution state.
   const CarpenterUndoState({
     this.undoStack = const [],
     this.redoStack = const [],
@@ -15,17 +27,31 @@ final class CarpenterUndoState {
     this.error,
   });
 
+  /// Completed operations currently available for undo, oldest first.
   final List<CarpenterUndoableOperation> undoStack;
+
+  /// Undone operations currently available for redo, oldest first.
   final List<CarpenterUndoableOperation> redoStack;
+
+  /// Current undo/redo execution phase.
   final CarpenterUndoExecution execution;
+
+  /// Most recent undo/redo error retained for caller presentation or recovery.
   final Object? error;
 
+  /// Whether one operation may currently be undone.
   bool get canUndo =>
       execution == CarpenterUndoExecution.idle && undoStack.isNotEmpty;
+
+  /// Whether one operation may currently be redone.
   bool get canRedo =>
       execution == CarpenterUndoExecution.idle && redoStack.isNotEmpty;
+
+  /// Most recent operation that would be undone next.
   CarpenterUndoableOperation? get nextUndo =>
       undoStack.isEmpty ? null : undoStack.last;
+
+  /// Most recent operation that would be redone next.
   CarpenterUndoableOperation? get nextRedo =>
       redoStack.isEmpty ? null : redoStack.last;
 }
@@ -36,15 +62,21 @@ final class CarpenterUndoState {
 /// leaves both stacks untouched so the caller can retry after recovering from a
 /// transient failure.
 final class CarpenterUndoController extends ValueNotifier<CarpenterUndoState> {
+  /// Creates empty history with the bounded [maximumDepth].
   CarpenterUndoController({this.maximumDepth = 100})
     : assert(maximumDepth > 0),
       super(const CarpenterUndoState());
 
+  /// Maximum number of completed operations retained for undo.
   final int maximumDepth;
 
+  /// Whether an undo can start now.
   bool get canUndo => value.canUndo;
+
+  /// Whether a redo can start now.
   bool get canRedo => value.canRedo;
 
+  /// Registers a completed reversible [operation] and clears redo history.
   void register(CarpenterUndoableOperation operation) {
     final next = [...value.undoStack, operation];
     if (next.length > maximumDepth) {
@@ -56,8 +88,12 @@ final class CarpenterUndoController extends ValueNotifier<CarpenterUndoState> {
     );
   }
 
+  /// Clears both history stacks and the last error.
   void clear() => value = const CarpenterUndoState();
 
+  /// Executes the next undo operation and returns whether one ran.
+  ///
+  /// A failed callback restores both stacks, stores the error, and rethrows it.
   Future<bool> undo() async {
     if (!value.canUndo) return false;
     final before = value;
@@ -87,6 +123,9 @@ final class CarpenterUndoController extends ValueNotifier<CarpenterUndoState> {
     }
   }
 
+  /// Executes the next redo operation and returns whether one ran.
+  ///
+  /// A failed callback restores both stacks, stores the error, and rethrows it.
   Future<bool> redo() async {
     if (!value.canRedo) return false;
     final before = value;
