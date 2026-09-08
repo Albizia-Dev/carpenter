@@ -55,36 +55,34 @@ final class CarpenterPageHeader extends StatelessWidget {
         constraints.maxWidth,
       );
       final actionWidget = actions ?? _descriptorActions();
-      final titleBlock = IntrinsicWidth(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (breadcrumbs != null) ...[
-              breadcrumbs!,
-              SizedBox(height: externalGap),
-            ],
-            CarpenterText.title(
-              title,
-              emphasis: TypographyEmphasis.strong,
-              maxLines: 2,
+      final titleBlock = Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (breadcrumbs != null) ...[
+            breadcrumbs!,
+            SizedBox(height: externalGap),
+          ],
+          CarpenterText.title(
+            title,
+            emphasis: TypographyEmphasis.strong,
+            maxLines: 2,+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
+          if (subtitle != null) ...[
+            SizedBox(height: internalGap),
+            CarpenterText.body(
+              subtitle!,
+              colorRole: ContentColorRole.secondary,
+              maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
-            if (subtitle != null) ...[
-              SizedBox(height: internalGap),
-              CarpenterText.body(
-                subtitle!,
-                colorRole: ContentColorRole.secondary,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-            if (status case final CarpenterPageStatus value) ...[
-              SizedBox(height: statusGap),
-              CarpenterStatusIndicator(label: value.label, role: value.role),
-            ],
           ],
-        ),
+          if (status case final CarpenterPageStatus value) ...[
+            SizedBox(height: statusGap),
+            CarpenterStatusIndicator(label: value.label, role: value.role),
+          ],
+        ],
       );
       final content = actionWidget == null
           ? titleBlock
