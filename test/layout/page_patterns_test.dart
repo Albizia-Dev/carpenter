@@ -4,6 +4,33 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  testWidgets('page content is laid out as the primary stack child', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _harness(
+        child: const CarpenterPage(
+          descriptor: CarpenterPageDescriptor(
+            id: CarpenterPageId('layout.primary-child'),
+            title: 'Layout',
+            kind: CarpenterPageKind.record,
+          ),
+          body: Text('Page content'),
+        ),
+      ),
+    );
+
+    expect(find.text('Page content'), findsOneWidget);
+    expect(find.text('Page content').hitTestable(), findsOneWidget);
+    expect(
+      find.ancestor(
+        of: find.text('Page content'),
+        matching: find.byType(Positioned),
+      ),
+      findsNothing,
+    );
+  });
+
   testWidgets('collection page distinguishes exclusive collection states', (
     tester,
   ) async {

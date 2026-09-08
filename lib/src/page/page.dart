@@ -138,14 +138,11 @@ final class CarpenterPage extends StatelessWidget {
       color: theme.surface.base,
       child: SafeArea(
         child: Stack(
+          fit: StackFit.expand,
           children: [
-            Positioned.fill(
-              child: Padding(
-                padding: EdgeInsets.all(
-                  context.units(theme.spacing.layoutPage),
-                ),
-                child: pageContent,
-              ),
+            Padding(
+              padding: EdgeInsets.all(context.units(theme.spacing.layoutPage)),
+              child: pageContent,
             ),
             if (overlay != null) Positioned.fill(child: overlay!),
           ],
