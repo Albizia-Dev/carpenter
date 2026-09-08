@@ -1,3 +1,8 @@
+# 0.3.1
+
+- Fixed `CarpenterPage` primary content layout so desktop pointer hit testing
+  cannot observe its page padding before that padding has a size.
+
 # 0.3.0
 
 - Reworked breadcrumbs into a strictly single-line, width-aware path that
