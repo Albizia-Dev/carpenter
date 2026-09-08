@@ -4,6 +4,29 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  testWidgets(
+    'page header does not request intrinsics from adaptive children',
+    (tester) async {
+      await tester.pumpWidget(
+        _harness(
+          child: CarpenterPageHeader(
+            title: 'Project',
+            breadcrumbs: LayoutBuilder(
+              builder: (context, constraints) => const Text('Projects'),
+            ),
+            actions: LayoutBuilder(
+              builder: (context, constraints) => const Text('Save'),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Projects'), findsOneWidget);
+      expect(find.text('Save'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   testWidgets('page content is laid out as the primary stack child', (
     tester,
   ) async {
