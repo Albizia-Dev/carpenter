@@ -66,7 +66,7 @@ final class CarpenterPageHeader extends StatelessWidget {
           CarpenterText.title(
             title,
             emphasis: TypographyEmphasis.strong,
-            maxLines: 2,+            maxLines: 2,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
           if (subtitle != null) ...[
