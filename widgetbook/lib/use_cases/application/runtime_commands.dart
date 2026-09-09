@@ -6,6 +6,49 @@ import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/preview.dart';
 
+final appHostComponent = WidgetbookComponent(
+  name: 'App host',
+  useCases: [
+    WidgetbookUseCase(
+      name: 'Playground',
+      builder: (context) {
+        final rem = context.knobs.double.slider(
+          label: 'Root font size',
+          initialValue: 16,
+          min: 12,
+          max: 24,
+        );
+        final title = context.knobs.string(
+          label: 'Title',
+          initialValue: 'Hosted application',
+        );
+        final frame = context.knobs.boolean(
+          label: 'Application frame',
+          initialValue: false,
+        );
+        final safeArea = context.knobs.boolean(
+          label: 'Safe area',
+          initialValue: true,
+        );
+        return SizedBox(
+          height: 360,
+          child: CarpenterApp(
+            theme: CarpenterTheme.of(context),
+            rem: Px(rem),
+            title: title,
+            locale: const Locale('en', 'US'),
+            supportedLocales: const [Locale('en', 'US')],
+            useFrame: frame,
+            useSafeArea: safeArea,
+            builder: (context, child) => child!,
+            child: Center(child: CarpenterText.body(title)),
+          ),
+        );
+      },
+    ),
+  ],
+);
+
 final applicationRuntimeComponent = WidgetbookComponent(
   name: 'Runtime & commands',
   useCases: [

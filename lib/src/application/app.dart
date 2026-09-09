@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 
 import '../components/layout/app_frame.dart';
 import '../foundation/application.dart';
@@ -22,6 +23,10 @@ final class CarpenterApp extends StatelessWidget {
     super.key,
     this.child,
     this.theme,
+    this.rem = const Px(16),
+    this.builder,
+    this.localizationsDelegates,
+    this.supportedLocales = const [Locale('en', 'US')],
     this.routerConfig,
     this.shells = const [],
     this.modules = const [],
@@ -53,6 +58,20 @@ final class CarpenterApp extends StatelessWidget {
   /// Carpenter theme passed to the underlying [Application]; defaults there to
   /// the light theme when omitted.
   final CarpenterThemeData? theme;
+
+  /// Root font-relative scale shared by every hosted shell and routed page.
+  /// Defaults to 16 logical pixels and updates when the app rebuilds.
+  final Px rem;
+
+  /// Wraps hosted content below localization, theme and units scopes. Preserve
+  /// the supplied child so routing, runtime shells and commands remain mounted.
+  final TransitionBuilder? builder;
+
+  /// Application and feature localization delegates forwarded to WidgetsApp.
+  final Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates;
+
+  /// Locales offered to Flutter's locale resolution. Defaults to US English.
+  final Iterable<Locale> supportedLocales;
 
   /// Optional external Flutter router configuration. When present,
   /// [CarpenterApp] uses [Application.router] and treats its routed child as
@@ -214,7 +233,7 @@ final class CarpenterApp extends StatelessWidget {
     if (executor != null) {
       host = CarpenterCommandExecutionScope(executor: executor, child: host);
     }
-    return host;
+    return builder?.call(context, host) ?? host;
   }
 
   /// Builds either router or navigator application mode, then hosts effective
@@ -226,6 +245,9 @@ final class CarpenterApp extends StatelessWidget {
     if (router != null) {
       return Application.router(
         theme: theme,
+        rem: rem,
+        localizationsDelegates: localizationsDelegates,
+        supportedLocales: supportedLocales,
         routerConfig: router,
         title: title,
         locale: locale,
@@ -235,6 +257,9 @@ final class CarpenterApp extends StatelessWidget {
     }
     return Application(
       theme: theme,
+      rem: rem,
+      localizationsDelegates: localizationsDelegates,
+      supportedLocales: supportedLocales,
       home: Builder(builder: (context) => _host(context, null)),
       title: title,
       locale: locale,

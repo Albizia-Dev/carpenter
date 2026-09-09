@@ -80,8 +80,8 @@ void main() {
     );
     // Inventory before reorganization: 99 components, 178 scenarios.
     // Contract demos now belong to Tree table; no scenario was removed.
-    expect(componentNames, hasLength(98));
-    expect(caseBuilders, hasLength(178));
+    expect(componentNames, hasLength(99));
+    expect(caseBuilders, hasLength(179));
   });
 
   test(

@@ -95,6 +95,7 @@ final class _CarpenterTabsState<T> extends State<CarpenterTabs<T>> {
   }
 
   KeyEventResult _handleKey(int index, KeyEvent event) {
+    if (widget.onChanged == null) return KeyEventResult.ignored;
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
     final direction = Directionality.of(context);
     if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
@@ -185,7 +186,12 @@ final class _CarpenterTabsState<T> extends State<CarpenterTabs<T>> {
               start: ShapeRole.none,
               end: ShapeRole.none,
             ),
-            onInvoke: enabled ? () => widget.onChanged!(tab.value) : null,
+            onInvoke: enabled
+                ? () {
+                    focusNode.requestFocus();
+                    widget.onChanged!(tab.value);
+                  }
+                : null,
           ),
         ),
       ),

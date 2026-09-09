@@ -270,6 +270,7 @@ final List<WidgetbookNode> carpenterCatalog = [
       WidgetbookFolder(
         name: 'Runtime and commands',
         children: [
+          appHostComponent,
           applicationRuntimeComponent,
           commandComponent,
           hotkeyComponent,

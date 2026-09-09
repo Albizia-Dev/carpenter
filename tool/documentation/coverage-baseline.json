@@ -2334,7 +2334,6 @@
   "unreferencedWidgets": [
     "Application",
     "CarpenterActionBar",
-    "CarpenterApp",
     "CarpenterAttentionBlock",
     "CarpenterBlockGroup",
     "CarpenterBlockList",

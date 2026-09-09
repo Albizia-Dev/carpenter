@@ -1,4 +1,7 @@
-# Unreleased
+# 0.4.2
+
+- CarpenterApp forwards localization delegates, supported locales, root rem and
+  an application builder; tab activation now retains keyboard navigation.
 
 - Ссылки по умолчанию не подчёркиваются; размеры checkbox/radio согласованы.
 - Дата, диапазон и время выбираются без диалогов: прямой цифровой ввод,
