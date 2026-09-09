@@ -12,7 +12,7 @@ Carpenter is pre-1.0. The public API is usable, but still evolving as production
 
 ```yaml
 dependencies:
-  carpenter: ^0.1.8
+  carpenter: ^0.4.0
 ```
 
 The umbrella import remains supported and is the simplest option for application code that uses Carpenter across layers:
@@ -33,6 +33,34 @@ import 'package:carpenter/application.dart';  // + runtime, commands, hotkeys an
 ```
 
 Each higher entrypoint includes the public layers below it, so prefer the lowest layer that owns the concepts a package actually needs. `application.dart` keeps the application-level `yx_navigation` integration; lower UI entrypoints do not expose it accidentally. The existing `carpenter.dart` barrel remains source-compatible.
+
+## Совместимость с carpenter_older
+
+Начиная с 0.4.0, прежняя реализация `carpenter_older` 0.0.1 входит в пакет
+`carpenter` и доступна через отдельный импорт:
+
+```dart
+import 'package:carpenter/carpenter_older.dart';
+```
+
+Для перехода замените `package:carpenter_older/carpenter.dart` этим импортом,
+обновите зависимость `carpenter` до `^0.4.0` и удалите отдельную зависимость
+`carpenter_older` из `pubspec.yaml`. Имена, сигнатуры, экспортируемая навигация
+и поведение старого API сохранены.
+
+Если одному файлу нужны оба API, используйте префиксы:
+
+```dart
+import 'package:carpenter/carpenter.dart' as carpenter;
+import 'package:carpenter/carpenter_older.dart' as older;
+```
+
+Старый API намеренно не экспортируется из `carpenter.dart` и современных
+послойных точек входа. Совпадающие имена обозначают разные типы; темы,
+контроллеры и контексты двух API пока сохраняют собственные контракты.
+Реализация находится в `lib/src/carpenter_older/` и остаётся частью пакета
+для дальнейшего постепенного объединения. Её удаление и объявление устаревшей
+не входят в этот переход.
 
 ## What is included
 

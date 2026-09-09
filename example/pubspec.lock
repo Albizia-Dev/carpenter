@@ -71,7 +71,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.3.3"
+    version: "0.4.0"
   carpenter_mordant:
     dependency: transitive
     description:
@@ -282,6 +282,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.18.0"
+  okcolor:
+    dependency: transitive
+    description:
+      name: okcolor
+      sha256: "4d5332b52720fd4e0cf451bd63786a64ae5e4f88ab77efba6166a8ca8f2f0db1"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   package_config:
     dependency: transitive
     description:

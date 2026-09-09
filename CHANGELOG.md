@@ -1,3 +1,15 @@
+# 0.4.0
+
+- Bundled the complete `carpenter_older` 0.0.1 implementation inside Carpenter,
+  available through the separate `package:carpenter/carpenter_older.dart` import.
+- Kept legacy types, behavior, and exports isolated from `carpenter.dart` and the
+  modern layered entrypoints; the standalone `carpenter_older` dependency is no
+  longer needed by migrated applications.
+- Retained the legacy API for incremental integration without deprecating or
+  removing it, and carried over its existing compatibility tests.
+- Included the nested task composition, cancellable inline editing, action glyph,
+  and project sample improvements developed since 0.3.4.
+
 # 0.3.4
 
 - Added semantic `CarpenterLinkRole` variants for inline, standalone,

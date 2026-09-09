@@ -87,6 +87,7 @@ Temporary Items
 pubspec.lock
 !example/pubspec.lock
 !widgetbook/pubspec.lock
+!tool/documentation/pubspec.lock
 doc/api/
 .env*
 *.dart.js
