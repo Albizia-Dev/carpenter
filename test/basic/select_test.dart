@@ -6,6 +6,51 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/harness.dart';
 
 void main() {
+  testWidgets(
+    'nullable option labels, selection and clearing remain controlled',
+    (tester) async {
+      int? value;
+      var changes = 0;
+      await tester.pumpWidget(
+        carpenterOverlayHarness(
+          StatefulBuilder(
+            builder: (context, setState) => CarpenterSelect<int?>(
+              value: value,
+              onChanged: (next) => setState(() {
+                value = next;
+                changes++;
+              }),
+              placeholder: 'Choose',
+              options: const [
+                CarpenterOption(id: 'all', value: null, label: 'All accounts'),
+                CarpenterOption(
+                  id: 'account',
+                  value: 1,
+                  label: 'Current account',
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+      expect(find.text('All accounts'), findsOneWidget);
+      expect(find.text('Choose'), findsNothing);
+      await tester.tap(find.text('All accounts'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Current account'));
+      await tester.pumpAndSettle();
+      expect(value, 1);
+      await tester.tap(find.text('Current account'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('All accounts'));
+      await tester.pumpAndSettle();
+      expect(value, isNull);
+      expect(changes, 2);
+      expect(find.text('All accounts'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
   const options = [
     CarpenterOption(id: 'a', value: 1, label: 'Alpha'),
     CarpenterOption(id: 'b', value: 2, label: 'Bravo'),

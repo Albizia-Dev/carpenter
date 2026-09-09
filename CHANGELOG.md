@@ -1,3 +1,8 @@
+# 0.4.3
+
+- Nullable Select options now display and select their explicit label, allowing
+  application filters to offer an accessible “All” choice.
+
 # 0.4.2
 
 - CarpenterApp forwards localization delegates, supported locales, root rem and

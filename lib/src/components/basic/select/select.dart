@@ -41,6 +41,9 @@ final class CarpenterSelect<T> extends StatefulWidget {
          'Controlled CarpenterSelect.open requires onOpenChanged.',
        );
 
+  /// Selected value. With nullable [T], an option whose value is null represents
+  /// an explicit choice (for example, “All”). Without such an option, null shows
+  /// [placeholder]. Use distinct stable option IDs, including for the null choice.
   final T? value;
   final ValueChanged<T>? onChanged;
 
@@ -81,9 +84,13 @@ final class _CarpenterSelectState<T> extends State<CarpenterSelect<T>> {
 
   CarpenterOption<T>? get _selectedOption {
     final selected = widget.value;
-    if (selected == null) return null;
+
     for (final option in widget.options) {
-      if (_same(option.value, selected)) return option;
+      if (selected == null
+          ? option.value == null
+          : _same(option.value, selected)) {
+        return option;
+      }
     }
     return null;
   }

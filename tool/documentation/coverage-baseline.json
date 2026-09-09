@@ -404,7 +404,6 @@
     "lib/src/components/basic/select/select.dart::field:CarpenterSelect.semanticLabel": "cc69273fae602e5f445a8407ba08955a4bc9cd428b4824bbbb10fb36ab8292c7",
     "lib/src/components/basic/select/select.dart::field:CarpenterSelect.shape": "0eb34c78b83ffdc1231dff03d1e74611d5a1b101cd5a1a177a71e810d0887fb8",
     "lib/src/components/basic/select/select.dart::field:CarpenterSelect.size": "3c36dee0881ceafe99d4b88efae30a1f7339d980a34e2a073c3a5dd65ba99e6e",
-    "lib/src/components/basic/select/select.dart::field:CarpenterSelect.value": "42fc023e7f78b07d8bf159da5ac5c21cbb965285f97099e1a3cd7f80c9539c84",
     "lib/src/components/basic/select/select.dart::method:CarpenterSelect.createState": "bba8a004c4b5ed74adf7048e26168c4503aacb567325b65260c64c80afef04eb",
     "lib/src/components/basic/select/select.dart::typedef:CarpenterValueEquality": "c8290c76e6ce9040a15e7d3cc655f50dd08ed162ff9d64ac77e7692751f9dbe7",
     "lib/src/components/basic/select/selection_button_group.dart::method:CarpenterSelectionButtonGroup.createState": "761cb3a47debe0d46d1bdfab6ea540fc22c540128dda645881ab7c5c38c53055",

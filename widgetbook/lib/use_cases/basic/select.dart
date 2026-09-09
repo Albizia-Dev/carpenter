@@ -60,6 +60,10 @@ Widget _playground(BuildContext context) {
     options: FieldSize.values,
     labelBuilder: semanticValueLabel,
   );
+  final allowAll = context.knobs.boolean(
+    label: 'Content · All option',
+    initialValue: false,
+  );
   final required = context.knobs.boolean(label: 'State · Required');
   final error = context.knobs.boolean(label: 'State · Error');
   final optionCount = context.knobs.int.slider(
@@ -77,6 +81,7 @@ Widget _playground(BuildContext context) {
       required: required,
       error: error,
       optionCount: optionCount,
+      allowAll: allowAll,
     ),
   );
 }
@@ -114,6 +119,7 @@ final class _SelectPreview extends StatefulWidget {
     required this.required,
     required this.error,
     required this.optionCount,
+    this.allowAll = false,
   });
   final String label;
   final String placeholder;
@@ -122,6 +128,7 @@ final class _SelectPreview extends StatefulWidget {
   final bool required;
   final bool error;
   final int optionCount;
+  final bool allowAll;
   @override
   State<_SelectPreview> createState() => _SelectPreviewState();
 }
@@ -130,7 +137,7 @@ final class _SelectPreviewState extends State<_SelectPreview> {
   int? _value;
   var _open = false;
   @override
-  Widget build(BuildContext context) => CarpenterSelect<int>(
+  Widget build(BuildContext context) => CarpenterSelect<int?>(
     value: _value,
     onChanged: (value) => setState(() => _value = value),
     open: _open,
@@ -142,6 +149,8 @@ final class _SelectPreviewState extends State<_SelectPreview> {
     required: widget.required,
     errorText: widget.error ? 'Выберите допустимое значение' : null,
     options: [
+      if (widget.allowAll)
+        const CarpenterOption(id: 'all', value: null, label: 'Все варианты'),
       for (var index = 1; index <= widget.optionCount; index++)
         CarpenterOption(
           id: index,
