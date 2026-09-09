@@ -35,17 +35,10 @@ jobs:
       - name: Install package dependencies
         run: flutter pub get
 
-      - name: Format formatter-debug workspace
-        run: dart format lib test widgetbook/lib widgetbook/test example/lib
-
-      - name: Upload formatter output
-        uses: actions/upload-artifact@v4
-        with:
-          name: formatter-output
-          path: |
-            lib/src/components/basic/link.dart
-            test/basic/link_test.dart
-            widgetbook/lib/use_cases/basic/card_link.dart
+      - name: Check formatting
+        run: >-
+          dart format --output=none --set-exit-if-changed
+          lib test widgetbook/lib widgetbook/test example/lib
 
       - name: Analyze library
         run: dart analyze lib
