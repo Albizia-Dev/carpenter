@@ -1,3 +1,10 @@
+# 0.3.3
+
+- Removed card chrome and row dividers from `CarpenterDefinitionList` so it can
+  compose cleanly inside page regions.
+- Added adaptive primary and secondary row actions backed by semantic
+  `CarpenterActionDescriptor` values.
+
 # 0.3.1
 
 - Fixed `CarpenterPage` primary content layout so desktop pointer hit testing

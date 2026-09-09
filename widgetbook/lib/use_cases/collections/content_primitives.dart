@@ -52,6 +52,10 @@ final class _TabsPreviewState extends State<_TabsPreview> {
 
 Widget _definitionPlayground(BuildContext context) {
   final longValues = context.knobs.boolean(label: 'Content · Long values');
+  final actions = context.knobs.boolean(
+    label: 'Content · Row actions',
+    initialValue: true,
+  );
   final values = longValues
       ? const [
           ('Legal entity', 'Northwind Logistics International Holdings'),
@@ -68,6 +72,16 @@ Widget _definitionPlayground(BuildContext context) {
       items: values,
       term: (item) => item.$1,
       valueBuilder: (context, item) => CarpenterText.body(item.$2),
+      actions: actions
+          ? (item) => [
+              CarpenterActionDescriptor(
+                id: 'definition.edit.${item.$1}',
+                label: 'Edit ${item.$1}',
+                icon: GravityIcons.pencil,
+                onInvoke: () {},
+              ),
+            ]
+          : null,
     ),
   );
 }

@@ -62,6 +62,69 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('definition list is chrome-free and invokes row actions', (
+    tester,
+  ) async {
+    var invocations = 0;
+    await tester.pumpWidget(
+      carpenterHarness(
+        CarpenterDefinitionList<(String, String)>(
+          items: const [('Account', '40702 0000')],
+          term: _term,
+          valueBuilder: _value,
+          actions: (item) => [
+            CarpenterActionDescriptor(
+              id: 'account.edit',
+              label: 'Edit account',
+              icon: GravityIcons.pencil,
+              onInvoke: () => invocations += 1,
+            ),
+          ],
+          secondaryActions: (item) => const [
+            CarpenterActionDescriptor(
+              id: 'account.copy',
+              label: 'Copy account',
+              onInvoke: null,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final listContext = tester.element(
+      find.byType(CarpenterDefinitionList<(String, String)>),
+    );
+    final theme = CarpenterTheme.of(listContext);
+    expect(
+      find.byWidgetPredicate((widget) {
+        if (widget is! DecoratedBox || widget.decoration is! BoxDecoration) {
+          return false;
+        }
+        final decoration = widget.decoration as BoxDecoration;
+        return decoration.color == theme.surface.subtle &&
+            decoration.border != null;
+      }),
+      findsNothing,
+    );
+    expect(
+      find.byWidgetPredicate((widget) {
+        if (widget is! DecoratedBox || widget.decoration is! BoxDecoration) {
+          return false;
+        }
+        final border = (widget.decoration as BoxDecoration).border;
+        return border is Border &&
+            border.top.style == BorderStyle.none &&
+            border.left.style == BorderStyle.none &&
+            border.right.style == BorderStyle.none &&
+            border.bottom.style != BorderStyle.none;
+      }),
+      findsNothing,
+    );
+    expect(find.bySemanticsLabel('More actions'), findsOneWidget);
+    await tester.tap(find.bySemanticsLabel('Edit account'));
+    expect(invocations, 1);
+  });
+
   testWidgets('link invokes through pointer and keyboard', (tester) async {
     var invocations = 0;
     await tester.pumpWidget(
