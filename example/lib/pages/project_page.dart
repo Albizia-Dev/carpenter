@@ -291,8 +291,8 @@ final class _ProjectPageState extends State<ProjectPage> {
   }
 
   Widget _relationRow({required String title, required String emptyText}) {
-    return SizedBox(
-      minHeight: 54,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 54),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
