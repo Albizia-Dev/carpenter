@@ -18,22 +18,35 @@ typedef CarpenterDialogActionsBuilder<T> =
 /// entering the Navigator overlay. This keeps locally hosted Carpenter
 /// subtrees working even when the application root belongs to another UI
 /// system during an incremental migration.
+///
+/// Supply either [title], [content] and [actionsBuilder], or [builder]. The
+/// builder runs inside the captured scopes and may create a stateful form that
+/// owns a [CarpenterDialog] with `open: true`. That form handles dismissal through
+/// `Navigator.pop`, including its `onOpenChanged` callback, and may return a typed
+/// result. Do not combine the builder with the static presentation arguments.
 Future<T?> showCarpenterDialog<T>({
   required BuildContext context,
-  required String title,
-  required Widget content,
-  required CarpenterDialogActionsBuilder<T> actionsBuilder,
+  String? title,
+  Widget? content,
+  CarpenterDialogActionsBuilder<T>? actionsBuilder,
+  WidgetBuilder? builder,
   DialogDismissPolicy dismissPolicy = DialogDismissPolicy.escapeOnly,
   String? semanticLabel,
   FocusNode? initialFocusNode,
 }) {
+  assert(
+    builder != null
+        ? title == null && content == null && actionsBuilder == null
+        : title != null && content != null && actionsBuilder != null,
+    'Provide either a dialog builder or title, content and actionsBuilder.',
+  );
   final theme = CarpenterTheme.of(context);
   final rem = Px(context.units(const Rem(1)));
 
   return showGeneralDialog<T>(
     context: context,
     barrierDismissible: false,
-    barrierLabel: semanticLabel ?? title,
+    barrierLabel: semanticLabel ?? title ?? 'Dialog',
     barrierColor: const Color(0x00000000),
     transitionDuration: Duration.zero,
     pageBuilder: (dialogContext, _, _) {
@@ -49,19 +62,21 @@ Future<T?> showCarpenterDialog<T>({
         rem: rem,
         child: CarpenterTheme(
           data: theme,
-          child: CarpenterDialog(
-            open: true,
-            onOpenChanged: (open) {
-              if (!open) close();
-            },
-            title: title,
-            content: content,
-            actions: actionsBuilder(close),
-            dismissPolicy: dismissPolicy,
-            initialFocusNode: initialFocusNode,
-            semanticLabel: semanticLabel,
-            child: const SizedBox.shrink(),
-          ),
+          child: builder != null
+              ? Builder(builder: builder)
+              : CarpenterDialog(
+                  open: true,
+                  onOpenChanged: (open) {
+                    if (!open) close();
+                  },
+                  title: title!,
+                  content: content!,
+                  actions: actionsBuilder!(close),
+                  dismissPolicy: dismissPolicy,
+                  initialFocusNode: initialFocusNode,
+                  semanticLabel: semanticLabel,
+                  child: const SizedBox.shrink(),
+                ),
         ),
       );
     },

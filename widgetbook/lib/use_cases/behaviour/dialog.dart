@@ -9,6 +9,7 @@ final dialogComponent = WidgetbookComponent(
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
     WidgetbookUseCase(name: 'Scenario · Nested overlay', builder: _nested),
+    WidgetbookUseCase(name: 'States · Hosted form', builder: _statefulForm),
   ],
 );
 
@@ -125,5 +126,60 @@ final class _NestedDialogPreviewState extends State<_NestedDialogPreview> {
         _popover = true;
       }),
     ),
+  );
+}
+
+Widget _statefulForm(BuildContext context) => Center(
+  child: CarpenterButton(
+    label: 'Открыть форму',
+    onPressed: () => showCarpenterDialog<String>(
+      context: context,
+      builder: (_) => const _DialogForm(),
+    ),
+  ),
+);
+
+class _DialogForm extends StatefulWidget {
+  const _DialogForm();
+  @override
+  State<_DialogForm> createState() => _DialogFormState();
+}
+
+class _DialogFormState extends State<_DialogForm> {
+  final _name = TextEditingController();
+  @override
+  void dispose() {
+    _name.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => CarpenterDialog(
+    open: true,
+    onOpenChanged: (open) {
+      if (!open) Navigator.of(context).pop();
+    },
+    child: const SizedBox.shrink(),
+    title: 'Название',
+    content: CarpenterInput(
+      controller: _name,
+      label: 'Название',
+      autofocus: true,
+      onChanged: (_) => setState(() {}),
+    ),
+    actions: [
+      CarpenterActionDescriptor(
+        id: 'cancel',
+        label: 'Отмена',
+        onInvoke: () => Navigator.of(context).pop(),
+      ),
+      CarpenterActionDescriptor(
+        id: 'save',
+        label: 'Сохранить',
+        onInvoke: _name.text.trim().isEmpty
+            ? null
+            : () => Navigator.of(context).pop(_name.text.trim()),
+      ),
+    ],
   );
 }

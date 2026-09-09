@@ -31,6 +31,8 @@ final class TextEditingField extends StatefulWidget {
     this.inputFormatters,
     this.focusNode,
     this.autofocus = false,
+    this.obscureText = false,
+    this.textCapitalization = TextCapitalization.none,
   });
 
   final TextEditingController controller;
@@ -55,6 +57,8 @@ final class TextEditingField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final FocusNode? focusNode;
   final bool autofocus;
+  final bool obscureText;
+  final TextCapitalization textCapitalization;
 
   CarpenterFieldFeedback? get effectiveFeedback =>
       errorText != null ? CarpenterFieldFeedback.danger(errorText!) : feedback;
@@ -163,6 +167,16 @@ final class _TextEditingFieldState extends State<TextEditingField>
       maxLines: widget.maxLines,
       minLines: widget.minLines,
       autofocus: widget.autofocus && !_disabled,
+      obscureText: widget.obscureText,
+      textCapitalization: widget.textCapitalization,
+      autocorrect: !widget.obscureText,
+      enableSuggestions: !widget.obscureText,
+      smartDashesType: widget.obscureText
+          ? SmartDashesType.disabled
+          : SmartDashesType.enabled,
+      smartQuotesType: widget.obscureText
+          ? SmartQuotesType.disabled
+          : SmartQuotesType.enabled,
       keyboardType: widget.keyboardType,
       textInputAction: widget.textInputAction,
       inputFormatters: widget.inputFormatters,
@@ -194,7 +208,8 @@ final class _TextEditingFieldState extends State<TextEditingField>
           multiline: widget.maxLines != 1,
           isRequired: widget.required ? true : null,
           label: widget.semanticLabel ?? widget.label,
-          value: widget.controller.text,
+          obscured: widget.obscureText,
+          value: widget.obscureText ? null : widget.controller.text,
           hint:
               effectiveFeedback?.message ??
               widget.description ??

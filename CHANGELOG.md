@@ -1,3 +1,11 @@
+# 0.4.4
+
+- Input now supports native capitalization and a non-editable unit suffix.
+- Added controlled password masking to Input, disabling suggestions and protecting
+  the semantic value when obscured.
+- Added a scoped dialog builder for stateful forms while preserving the existing
+  typed static dialog API, focus management and route results.
+
 # 0.4.3
 
 - Nullable Select options now display and select their explicit label, allowing

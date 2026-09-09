@@ -11,6 +11,10 @@ import '../button/icon_button.dart';
 import 'field_shell.dart';
 
 final class CarpenterInput extends StatelessWidget {
+  /// Edits the caller-owned [controller], preserving its lifetime and selection.
+  /// Defaults to enabled plain single-line input. Null callbacks do not disable
+  /// editing; use [availability]. Visibility, validation and submission belong
+  /// to the caller, while suffix text remains outside the editable value.
   const CarpenterInput({
     super.key,
     required this.controller,
@@ -33,6 +37,9 @@ final class CarpenterInput extends StatelessWidget {
     this.inputFormatters,
     this.focusNode,
     this.autofocus = false,
+    this.obscureText = false,
+    this.textCapitalization = TextCapitalization.none,
+    this.suffixText,
   });
 
   final TextEditingController controller;
@@ -55,6 +62,18 @@ final class CarpenterInput extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final FocusNode? focusNode;
   final bool autofocus;
+
+  /// Hides sensitive input using the platform editor's obscured-text behavior.
+  /// The caller owns visibility toggles. Obscured input disables correction,
+  /// suggestions and smart punctuation, and never exposes plaintext semantics.
+  final bool obscureText;
+
+  /// Requests native keyboard capitalization without modifying controller text.
+  final TextCapitalization textCapitalization;
+
+  /// Non-editable text after the value, such as a currency or measurement unit.
+  /// Included in field semantics and may coexist with [trailingAction].
+  final String? suffixText;
 
   CarpenterFieldFeedback? get _effectiveFeedback =>
       errorText != null ? CarpenterFieldFeedback.danger(errorText!) : feedback;
@@ -100,12 +119,31 @@ final class CarpenterInput extends StatelessWidget {
                 color: fieldStyle.icon,
               ),
             ),
-      trailing: trailingAction == null
+      trailing: suffixText == null && trailingAction == null
           ? null
-          : CarpenterIconButton.fromAction(
-              trailingAction!,
-              prominence: ActionProminence.ghost,
-              size: theme.sizes.controlForField(size),
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (suffixText != null)
+                  Text(
+                    suffixText!,
+                    style: theme.typography
+                        .fieldSupporting(
+                          context,
+                          size,
+                          TypographyEmphasis.regular,
+                        )
+                        .copyWith(color: fieldStyle.foreground),
+                  ),
+                if (suffixText != null && trailingAction != null)
+                  SizedBox(width: context.units(theme.spacing.fieldContentGap)),
+                if (trailingAction != null)
+                  CarpenterIconButton.fromAction(
+                    trailingAction!,
+                    prominence: ActionProminence.ghost,
+                    size: theme.sizes.controlForField(size),
+                  ),
+              ],
             ),
       onChanged: onChanged,
       onSubmitted: onSubmitted,
@@ -114,6 +152,8 @@ final class CarpenterInput extends StatelessWidget {
       inputFormatters: inputFormatters,
       focusNode: focusNode,
       autofocus: autofocus,
+      obscureText: obscureText,
+      textCapitalization: textCapitalization,
     );
   }
 }

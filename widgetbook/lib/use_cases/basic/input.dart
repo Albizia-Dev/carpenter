@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:carpenter/carpenter.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
@@ -92,6 +93,16 @@ Widget _playground(BuildContext context) {
     initialOption: ShapeRole.rounded,
     labelBuilder: semanticValueLabel,
   );
+  final suffix = context.knobs.stringOrNull(
+    label: 'Content · Unit suffix',
+    defaultToNull: true,
+  );
+  final capitalization = context.knobs.object.dropdown(
+    label: 'Behavior · Capitalization',
+    options: TextCapitalization.values,
+    labelBuilder: (value) => value.name,
+  );
+  final obscure = context.knobs.boolean(label: 'State · Hide sensitive text');
   final required = context.knobs.boolean(label: 'State · Required');
   final leading = context.knobs.boolean(
     label: 'Content · Leading icon',
@@ -115,6 +126,9 @@ Widget _playground(BuildContext context) {
       size: size,
       shape: CarpenterShape(start: startShape, end: endShape),
       required: required,
+      obscureText: obscure,
+      suffixText: suffix,
+      textCapitalization: capitalization,
       leadingIcon: leading ? Icons.edit : null,
       trailing: trailing,
       autofocus: autofocus,
@@ -149,6 +163,9 @@ final class _InputPreview extends StatefulWidget {
     this.size = FieldSize.medium,
     this.shape = CarpenterShape.rounded,
     this.required = false,
+    this.obscureText = false,
+    this.suffixText,
+    this.textCapitalization = TextCapitalization.none,
     this.leadingIcon,
     this.trailing = false,
     this.autofocus = false,
@@ -164,6 +181,9 @@ final class _InputPreview extends StatefulWidget {
   final FieldSize size;
   final CarpenterShape shape;
   final bool required;
+  final bool obscureText;
+  final String? suffixText;
+  final TextCapitalization textCapitalization;
   final IconData? leadingIcon;
   final bool trailing;
   final bool autofocus;
@@ -199,6 +219,9 @@ final class _InputPreviewState extends State<_InputPreview> {
     size: widget.size,
     shape: widget.shape,
     required: widget.required,
+    obscureText: widget.obscureText,
+    suffixText: widget.suffixText,
+    textCapitalization: widget.textCapitalization,
     leadingIcon: widget.leadingIcon,
     autofocus: widget.autofocus,
     trailingAction: widget.trailing
