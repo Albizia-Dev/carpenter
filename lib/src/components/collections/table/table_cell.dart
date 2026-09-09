@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../../foundation/theme.dart';
 import '../../../internal/rendering/interactive_region.dart';
+import '../../basic/status_indicator.dart';
 import '../table_metrics.dart';
 import 'table_column.dart';
 
@@ -38,7 +39,9 @@ final class CarpenterTableCellChrome extends StatelessWidget {
       content = Padding(
         padding: EdgeInsetsDirectional.symmetric(
           horizontal: metrics.horizontalPadding,
-          vertical: metrics.verticalPadding,
+          vertical: child is CarpenterStatusIndicator
+              ? 0
+              : metrics.verticalPadding,
         ),
         child: content,
       );
