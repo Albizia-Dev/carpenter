@@ -54,6 +54,7 @@ import 'use_cases/patterns/migrated_patterns.dart';
 import 'use_cases/patterns/page_patterns.dart';
 import 'use_cases/patterns/page_states.dart';
 import 'use_cases/samples/payment_list.dart';
+import 'use_cases/samples/project_page.dart';
 
 /// The single registry used by the app and catalog coverage tests.
 final List<WidgetbookNode> carpenterCatalog = [
@@ -186,5 +187,8 @@ final List<WidgetbookNode> carpenterCatalog = [
       workflowPatternComponent,
     ],
   ),
-  WidgetbookFolder(name: 'Samples', children: [paymentListSampleComponent]),
+  WidgetbookFolder(
+    name: 'Samples',
+    children: [paymentListSampleComponent, projectPageSampleComponent],
+  ),
 ];
