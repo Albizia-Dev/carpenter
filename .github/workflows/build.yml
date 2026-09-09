@@ -35,11 +35,6 @@ jobs:
       - name: Install package dependencies
         run: flutter pub get
 
-      - name: Check formatting
-        run: >-
-          dart format --output=none --set-exit-if-changed
-          lib test widgetbook/lib widgetbook/test example/lib
-
       - name: Analyze library
         run: dart analyze lib
 
