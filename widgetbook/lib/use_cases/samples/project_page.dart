@@ -68,35 +68,44 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
           onInvoke: () {},
         ),
       ],
-      primaryContent: CarpenterRecordTabs<_ProjectTab>(
-        value: _tab,
-        onChanged: (value) => setState(() => _tab = value),
-        tabs: [
-          CarpenterRecordTab<_ProjectTab>(
-            value: _ProjectTab.overview,
-            label: 'Обзор',
-            content: _overview(),
+      primaryContent: CarpenterPageBody(
+        semanticLabel: 'Разделы проекта',
+        children: [
+          CarpenterTabs<_ProjectTab>(
+            value: _tab,
+            onChanged: (value) => setState(() => _tab = value),
+            tabs: const [
+              CarpenterTab<_ProjectTab>(
+                value: _ProjectTab.overview,
+                label: 'Обзор',
+              ),
+              CarpenterTab<_ProjectTab>(
+                value: _ProjectTab.documents,
+                label: 'Документы',
+              ),
+              CarpenterTab<_ProjectTab>(
+                value: _ProjectTab.relations,
+                label: 'Связи',
+              ),
+              CarpenterTab<_ProjectTab>(
+                value: _ProjectTab.finance,
+                label: 'Финансы',
+              ),
+            ],
           ),
-          CarpenterRecordTab<_ProjectTab>(
-            value: _ProjectTab.documents,
-            label: 'Документы',
-            content: _documents(),
-          ),
-          CarpenterRecordTab<_ProjectTab>(
-            value: _ProjectTab.relations,
-            label: 'Связи',
-            content: _relations(),
-          ),
-          CarpenterRecordTab<_ProjectTab>(
-            value: _ProjectTab.finance,
-            label: 'Финансы',
-            content: _finance(),
-          ),
+          _tabContent(),
         ],
       ),
       semanticLabel: 'Демонстрационная страница проекта',
     );
   }
+
+  Widget _tabContent() => switch (_tab) {
+        _ProjectTab.overview => _overview(),
+        _ProjectTab.documents => _documents(),
+        _ProjectTab.relations => _relations(),
+        _ProjectTab.finance => _finance(),
+      };
 
   Widget _overview() {
     return CarpenterPageBody(
@@ -333,30 +342,36 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
     return CarpenterPageBody(
       semanticLabel: 'Связи проекта',
       children: [
-        CarpenterRelatedCollection(
+        CarpenterRecordSection(
+          id: const CarpenterPageSectionId('relations.contracts'),
           title: 'Договоры',
-          action: CarpenterButton.fromAction(
-            CarpenterActionDescriptor(
-              id: 'relations.contracts.add',
-              label: 'Связать',
-              onInvoke: () {},
+          actions: [
+            CarpenterButton.fromAction(
+              CarpenterActionDescriptor(
+                id: 'relations.contracts.add',
+                label: 'Связать',
+                onInvoke: () {},
+              ),
             ),
-          ),
+          ],
           child: const CarpenterNotice(
             title: 'Договоры пока не связаны',
             message: 'Связанные договоры появятся здесь.',
             tone: CarpenterNoticeTone.neutral,
           ),
         ),
-        CarpenterRelatedCollection(
+        CarpenterRecordSection(
+          id: const CarpenterPageSectionId('relations.tasks'),
           title: 'Задачи',
-          action: CarpenterButton.fromAction(
-            CarpenterActionDescriptor(
-              id: 'relations.tasks.add',
-              label: 'Связать',
-              onInvoke: () {},
+          actions: [
+            CarpenterButton.fromAction(
+              CarpenterActionDescriptor(
+                id: 'relations.tasks.add',
+                label: 'Связать',
+                onInvoke: () {},
+              ),
             ),
-          ),
+          ],
           child: const CarpenterNotice(
             title: 'Связанных задач пока нет',
             message: 'Задачи проекта появятся здесь.',
