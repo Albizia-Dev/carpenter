@@ -228,7 +228,15 @@ final class _KanbanPreviewState extends State<_KanbanPreview> {
       id: 'todo',
       value: 'todo',
       title: 'To do',
-      cards: ['Investigate', 'Write spec'],
+      cards: [
+        'Investigate',
+        'Write spec',
+        'Review requirements',
+        'Discuss accessibility',
+        'Prepare fixtures',
+        'Verify scrolling',
+        'Review release',
+      ],
     ),
     CarpenterKanbanColumn<String, String>(
       id: 'doing',

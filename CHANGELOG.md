@@ -1,3 +1,7 @@
+## 0.4.9
+
+- Kanban columns scroll independently below fixed headings in bounded layouts, preserving content-sized embedding and stable column scroll positions.
+
 ## 0.4.8
 
 - Separate pointer focus from keyboard focus highlighting in action controls; tabs keep one selected traversal stop and preserve arrow-key navigation.

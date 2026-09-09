@@ -106,6 +106,10 @@ final class _KanbanDragData<C, T> {
 
 /// Controlled multi-column board with cross-column and within-column DnD.
 ///
+/// In a bounded viewport each column scrolls vertically beneath its fixed
+/// heading. In an unbounded layout columns expand to their content height;
+/// the parent owns vertical scrolling. Horizontal scrolling belongs to the board.
+///
 /// Separate Kanban instances can participate in the same drag surface by
 /// sharing [dragGroupId]. This is how [CarpenterPlanningBoard] enables moves
 /// across lanes without making card state internal.
@@ -330,68 +334,89 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
       semanticLabel: column.semanticLabel ?? column.title,
       child: ConstrainedBox(
         constraints: BoxConstraints(minHeight: context.units(12.rem)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: CarpenterText.label(
-                    column.title,
-                    emphasis: TypographyEmphasis.strong,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final heading = <Widget>[
+              Row(
+                children: [
+                  Expanded(
+                    child: CarpenterText.label(
+                      column.title,
+                      emphasis: TypographyEmphasis.strong,
+                    ),
+                  ),
+                  CarpenterText.caption(
+                    '${column.cards.length}',
+                    colorRole: ContentColorRole.secondary,
+                  ),
+                ],
+              ),
+              SizedBox(height: gap),
+            ];
+            final cards = <Widget>[
+              if (column.cards.isEmpty &&
+                  column.loadState == CarpenterKanbanLoadState.ready)
+                Padding(
+                  padding: EdgeInsets.symmetric(vertical: context.units(2.rem)),
+                  child: CarpenterText.caption(
+                    widget.emptyLabel,
+                    colorRole: ContentColorRole.secondary,
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                CarpenterText.caption(
-                  '${column.cards.length}',
-                  colorRole: ContentColorRole.secondary,
-                ),
+              for (var index = 0; index < column.cards.length; index++) ...[
+                if (index > 0) SizedBox(height: gap),
+                _card(context, column, column.cards[index], index),
               ],
-            ),
-            SizedBox(height: gap),
-            if (column.cards.isEmpty &&
-                column.loadState == CarpenterKanbanLoadState.ready)
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: context.units(2.rem)),
-                child: CarpenterText.caption(
-                  widget.emptyLabel,
+              _tailDrop(context, column),
+              if (column.loadState == CarpenterKanbanLoadState.loading)
+                const CarpenterText.caption(
+                  'Loading…',
                   colorRole: ContentColorRole.secondary,
                   textAlign: TextAlign.center,
                 ),
-              ),
-            for (var index = 0; index < column.cards.length; index++) ...[
-              if (index > 0) SizedBox(height: gap),
-              _card(context, column, column.cards[index], index),
-            ],
-            _tailDrop(context, column),
-            if (column.loadState == CarpenterKanbanLoadState.loading)
-              const CarpenterText.caption(
-                'Loading…',
-                colorRole: ContentColorRole.secondary,
-                textAlign: TextAlign.center,
-              ),
-            if (column.loadState == CarpenterKanbanLoadState.failed)
-              GestureDetector(
-                onTap: widget.onRetry == null
-                    ? null
-                    : () => widget.onRetry!(column),
-                child: CarpenterText.caption(
-                  column.errorText ?? 'Failed to load. Retry',
-                  colorRole: ContentColorRole.secondary,
-                  textAlign: TextAlign.center,
+              if (column.loadState == CarpenterKanbanLoadState.failed)
+                GestureDetector(
+                  onTap: widget.onRetry == null
+                      ? null
+                      : () => widget.onRetry!(column),
+                  child: CarpenterText.caption(
+                    column.errorText ?? 'Failed to load. Retry',
+                    colorRole: ContentColorRole.secondary,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
-            if (column.hasMore &&
-                column.loadState == CarpenterKanbanLoadState.ready &&
-                widget.onLoadMore != null)
-              GestureDetector(
-                onTap: () => widget.onLoadMore!(column),
-                child: const CarpenterText.caption(
-                  'Load more',
-                  colorRole: ContentColorRole.secondary,
-                  textAlign: TextAlign.center,
+              if (column.hasMore &&
+                  column.loadState == CarpenterKanbanLoadState.ready &&
+                  widget.onLoadMore != null)
+                GestureDetector(
+                  onTap: () => widget.onLoadMore!(column),
+                  child: const CarpenterText.caption(
+                    'Load more',
+                    colorRole: ContentColorRole.secondary,
+                    textAlign: TextAlign.center,
+                  ),
                 ),
-              ),
-          ],
+            ];
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ...heading,
+                if (constraints.hasBoundedHeight)
+                  Expanded(
+                    child: ListView(
+                      key: PageStorageKey<Object>(column.id),
+                      primary: false,
+                      padding: EdgeInsets.zero,
+                      children: cards,
+                    ),
+                  )
+                else
+                  ...cards,
+              ],
+            );
+          },
         ),
       ),
     );
@@ -417,7 +442,11 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
             builder: (context, state) => buildColumn(state),
           );
 
-    return SizedBox(width: context.units(18.rem), child: child);
+    return SizedBox(
+      key: ValueKey(column.id),
+      width: context.units(18.rem),
+      child: child,
+    );
   }
 
   @override
