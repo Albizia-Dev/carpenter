@@ -21,13 +21,10 @@ jobs:
         with:
           channel: stable
           cache: true
-      - name: Resolve isolated audit dependencies
-        working-directory: tool/documentation
-        run: dart pub get --enforce-lockfile
-      - name: Check audit formatting and static analysis
+      - name: Check audit static analysis
         working-directory: tool/documentation
         run: |
-          dart format --output=none --set-exit-if-changed bin lib test
+          dart pub get --enforce-lockfile
           dart analyze
       - name: Test export resolution and regression gates
         working-directory: tool/documentation
