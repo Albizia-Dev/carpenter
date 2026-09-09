@@ -172,6 +172,7 @@ export 'src/page/surface.dart';
 // High-level migrated patterns.
 export 'src/patterns/editor.dart';
 export 'src/patterns/explorer.dart';
+export 'src/patterns/operation.dart';
 export 'src/patterns/record.dart';
 export 'src/patterns/workflow.dart';
 

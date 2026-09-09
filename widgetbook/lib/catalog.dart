@@ -51,6 +51,7 @@ import 'use_cases/layout/semantic_layout.dart';
 import 'use_cases/patterns/list_report.dart';
 import 'use_cases/patterns/validation.dart';
 import 'use_cases/patterns/migrated_patterns.dart';
+import 'use_cases/patterns/nested_composition.dart';
 import 'use_cases/patterns/page_patterns.dart';
 import 'use_cases/patterns/page_states.dart';
 import 'use_cases/samples/payment_list.dart';
@@ -185,6 +186,7 @@ final List<WidgetbookNode> carpenterCatalog = [
       masterDetailPageComponent,
       explorerPatternComponent,
       workflowPatternComponent,
+      nestedCompositionComponent,
     ],
   ),
   WidgetbookFolder(

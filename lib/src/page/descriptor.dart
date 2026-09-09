@@ -10,6 +10,10 @@ enum CarpenterPageKind {
   record,
   editor,
   workflow,
+
+  /// A bounded workspace for performing, matching, reconciling or comparing work.
+  operation,
+
   explorer,
   custom,
 }
