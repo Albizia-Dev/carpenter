@@ -11,10 +11,7 @@ enum _DocumentStage { common, design, working }
 final projectPageSampleComponent = WidgetbookComponent(
   name: 'Project Page',
   useCases: [
-    WidgetbookUseCase(
-      name: 'Fake project',
-      builder: _projectPage,
-    ),
+    WidgetbookUseCase(name: 'Playground', builder: _projectPage),
   ],
 );
 
@@ -34,16 +31,16 @@ final class _ProjectPageSample extends StatefulWidget {
 }
 
 final class _ProjectPageSampleState extends State<_ProjectPageSample> {
-  final _documentSearch = TextEditingController();
+  final _search = TextEditingController();
   final _documentWidths = <String, LengthUnit>{};
 
   _ProjectTab _tab = _ProjectTab.overview;
   _DocumentStage _stage = _DocumentStage.design;
-  Set<Object> _expandedDocumentIds = {'electrical', 'structures'};
+  Set<Object> _expanded = {'electrical', 'structures'};
 
   @override
   void dispose() {
-    _documentSearch.dispose();
+    _search.dispose();
     super.dispose();
   }
 
@@ -108,10 +105,10 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
         CarpenterRecordSection(
           id: const CarpenterPageSectionId('project.details'),
           title: 'О проекте',
-          child: CarpenterCard(
+          child: const CarpenterCard(
             child: CarpenterRecordDetails(
               labelWidth: 190,
-              details: const [
+              details: [
                 CarpenterRecordDetail(
                   label: 'Название',
                   value: CarpenterText.body('Демо-объект 25'),
@@ -139,10 +136,10 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
         CarpenterRecordSection(
           id: const CarpenterPageSectionId('project.team'),
           title: 'Команда',
-          child: CarpenterCard(
+          child: const CarpenterCard(
             child: CarpenterRecordDetails(
               labelWidth: 190,
-              details: const [
+              details: [
                 CarpenterRecordDetail(
                   label: 'Проектировщики',
                   value: CarpenterText.body('Не назначены'),
@@ -220,20 +217,20 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
             ],
           ),
           CarpenterFilterBar(
-            searchController: _documentSearch,
+            searchController: _search,
             searchLabel: 'Поиск в текущем разделе',
             searchPlaceholder: 'Название материала',
             onSearchChanged: (_) => setState(() {}),
-            activeFilterCount: _documentSearch.text.trim().isEmpty ? 0 : 1,
+            activeFilterCount: _search.text.trim().isEmpty ? 0 : 1,
             clearAction: CarpenterActionDescriptor(
               id: 'documents.clear-search',
               label: 'Очистить',
-              onInvoke: () => setState(_documentSearch.clear),
+              onInvoke: () => setState(_search.clear),
             ),
           ),
           CarpenterTreeTable<_DocumentItem>(
             semanticLabel: 'Материалы стадии П',
-            nodes: _visibleDocumentNodes,
+            nodes: _filteredDocuments,
             treeHeader: 'Наименование',
             treeWidth: const CarpenterTableColumnWidth.flexible(
               flex: 4,
@@ -310,16 +307,16 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
                 ],
               ),
             ],
-            expandedIds: _expandedDocumentIds,
+            expandedIds: _expanded,
             onExpansionChanged: (id, expanded) {
               setState(() {
-                final next = {..._expandedDocumentIds};
+                final next = {..._expanded};
                 if (expanded) {
                   next.add(id);
                 } else {
                   next.remove(id);
                 }
-                _expandedDocumentIds = next;
+                _expanded = next;
               });
             },
             selectionMode: CarpenterTreeSelectionMode.none,
@@ -423,7 +420,7 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
               ),
               CarpenterTableColumn<_PaymentStage>.number(
                 id: 'ppd',
-                header: 'Срок ППД',
+                header: 'Срок ПРД',
                 value: (row) => row.ppdTerm,
               ),
               CarpenterTableColumn<_PaymentStage>.status(
@@ -534,15 +531,9 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
     );
   }
 
-  List<CarpenterTreeNode<_DocumentItem>> get _visibleDocumentNodes {
-    final query = _documentSearch.text.trim().toLowerCase();
+  List<CarpenterTreeNode<_DocumentItem>> get _filteredDocuments {
+    final query = _search.text.trim().toLowerCase();
     if (query.isEmpty) return _documentNodes;
-
-    bool matches(CarpenterTreeNode<_DocumentItem> node) {
-      return node.label.toLowerCase().contains(query) ||
-          node.value.cipher.toLowerCase().contains(query) ||
-          node.value.designer.toLowerCase().contains(query);
-    }
 
     CarpenterTreeNode<_DocumentItem>? filterNode(
       CarpenterTreeNode<_DocumentItem> node,
@@ -551,7 +542,10 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
           .map(filterNode)
           .whereType<CarpenterTreeNode<_DocumentItem>>()
           .toList(growable: false);
-      if (!matches(node) && children.isEmpty) return null;
+      final matches = node.label.toLowerCase().contains(query) ||
+          node.value.cipher.toLowerCase().contains(query) ||
+          node.value.designer.toLowerCase().contains(query);
+      if (!matches && children.isEmpty) return null;
       return CarpenterTreeNode<_DocumentItem>(
         id: node.id,
         value: node.value,
@@ -567,15 +561,7 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
   }
 }
 
-String _money(num value) {
-  final integer = value.toInt().toString();
-  final groups = <String>[];
-  for (var end = integer.length; end > 0; end -= 3) {
-    final start = (end - 3).clamp(0, integer.length);
-    groups.insert(0, integer.substring(start, end));
-  }
-  return '${groups.join(' ')} ₽';
-}
+String _money(num value) => '${value.toInt()} ₽';
 
 CollectionSnapshot<T> _readySnapshot<T>(List<T> items) {
   return CollectionSnapshot<T>(
@@ -634,7 +620,6 @@ const _documentNodes = <CarpenterTreeNode<_DocumentItem>>[
         value: _DocumentItem(
           cipher: 'ЭОМ-02',
           designer: 'А. Иванов',
-          status: 'Черновик',
         ),
         label: 'Электронный макет.dwg',
       ),
@@ -653,11 +638,7 @@ const _documentNodes = <CarpenterTreeNode<_DocumentItem>>[
   ),
   CarpenterTreeNode<_DocumentItem>(
     id: 'test-section',
-    value: _DocumentItem(
-      number: 3,
-      cipher: 'ТСТ',
-      status: 'Черновик',
-    ),
+    value: _DocumentItem(number: 3, cipher: 'ТСТ'),
     label: 'Тестовый раздел',
   ),
   CarpenterTreeNode<_DocumentItem>(
