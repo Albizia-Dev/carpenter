@@ -33,10 +33,20 @@ final class _ProjectPageSample extends StatefulWidget {
 final class _ProjectPageSampleState extends State<_ProjectPageSample> {
   final _search = TextEditingController();
   final _documentWidths = <String, LengthUnit>{};
+  final _projectValues = <String, String>{
+    'name': 'Демо-объект 25',
+    'customer': 'ООО «Ромашка»',
+    'designCode': '22-12',
+    'workingCode': '',
+    'objectType': 'Линейный объект',
+  };
+  final _drafts = <String, String>{};
 
   _ProjectTab _tab = _ProjectTab.overview;
   _DocumentStage _stage = _DocumentStage.design;
   Set<Object> _expanded = {'electrical', 'structures'};
+  String? _editingField;
+  String? _editError;
 
   @override
   void dispose() {
@@ -46,9 +56,12 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
 
   @override
   Widget build(BuildContext context) {
+    final name = _projectValues['name']!;
+    final customer = _projectValues['customer']!;
+    final designCode = _projectValues['designCode']!;
     return CarpenterObjectPage(
-      title: '№104. Демо-объект 25',
-      subtitle: 'ООО «Ромашка» · стадия П 22-12',
+      title: '№104. $name',
+      subtitle: '$customer · стадия П $designCode',
       status: const CarpenterPageStatus(
         label: 'На согласовании',
         role: FeedbackColorRole.info,
@@ -57,14 +70,15 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
         CarpenterActionDescriptor(
           id: 'project.edit',
           label: 'Редактировать',
-          icon: CarpenterIcons.edit,
-          onInvoke: () {},
+          icon: GravityIcons.pencil,
+          onInvoke: () => _beginEdit('name', showOverview: true),
         ),
       ],
       secondaryActions: [
         CarpenterActionDescriptor(
           id: 'project.more',
           label: 'Ещё действия',
+          icon: GravityIcons.ellipsis,
           onInvoke: () {},
         ),
       ],
@@ -100,12 +114,77 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
     );
   }
 
+  void _beginEdit(String key, {bool showOverview = false}) {
+    setState(() {
+      if (showOverview) _tab = _ProjectTab.overview;
+      _editingField = key;
+      _drafts[key] = _projectValues[key] ?? '';
+      _editError = null;
+    });
+  }
+
+  void _changeDraft(String key, String value) {
+    setState(() {
+      _drafts[key] = value;
+      _editError = null;
+    });
+  }
+
+  void _commitEdit(String key, {bool allowEmpty = false}) {
+    final value = (_drafts[key] ?? '').trim();
+    if (!allowEmpty && value.isEmpty) {
+      setState(() => _editError = 'Значение не может быть пустым');
+      return;
+    }
+    setState(() {
+      _projectValues[key] = value;
+      _editingField = null;
+      _editError = null;
+    });
+  }
+
+  void _cancelEdit(String key) {
+    setState(() {
+      _drafts[key] = _projectValues[key] ?? '';
+      _editingField = null;
+      _editError = null;
+    });
+  }
+
+  CarpenterRecordDetail _editableTextDetail({
+    required String key,
+    required String label,
+    bool allowEmpty = false,
+    String? placeholder,
+  }) {
+    final value = _projectValues[key] ?? '';
+    final editing = _editingField == key;
+    return CarpenterRecordDetail(
+      label: label,
+      value: CarpenterInlineTextEdit(
+        value: value.isEmpty ? 'Не задано' : value,
+        draft: _drafts[key] ?? value,
+        editing: editing,
+        enabled: _editingField == null || editing,
+        semanticLabel: label,
+        placeholder: placeholder,
+        editSemanticLabel: 'Редактировать: $label',
+        commitSemanticLabel: 'Сохранить: $label',
+        errorText: editing ? _editError : null,
+        onDraftChanged: (next) => _changeDraft(key, next),
+        onEditRequested: () => _beginEdit(key),
+        onCommitRequested: () => _commitEdit(key, allowEmpty: allowEmpty),
+        onCancelRequested: () => _cancelEdit(key),
+      ),
+    );
+  }
+
   Widget _tabContent() => switch (_tab) {
-        _ProjectTab.overview => _overview(),
-        _ProjectTab.documents => _documents(),
-        _ProjectTab.relations => _relations(),
-        _ProjectTab.finance => _finance(),
-      };
+    _ProjectTab.overview => _overview(),
+    _ProjectTab.documents => _documents(),
+    _ProjectTab.relations => _relations(),
+    _ProjectTab.finance => _finance(),
+  };
 
   Widget _overview() {
     return CarpenterPageBody(
@@ -114,29 +193,37 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
         CarpenterRecordSection(
           id: const CarpenterPageSectionId('project.details'),
           title: 'О проекте',
-          child: const CarpenterCard(
+          description:
+              'Изменения применяются прямо в строке. Enter сохраняет, Escape отменяет.',
+          child: CarpenterCard(
             child: CarpenterRecordDetails(
               labelWidth: 190,
               details: [
-                CarpenterRecordDetail(
+                _editableTextDetail(
+                  key: 'name',
                   label: 'Название',
-                  value: CarpenterText.body('Демо-объект 25'),
+                  placeholder: 'Название проекта',
                 ),
-                CarpenterRecordDetail(
+                _editableTextDetail(
+                  key: 'customer',
                   label: 'Заказчик',
-                  value: CarpenterText.body('ООО «Ромашка»'),
+                  placeholder: 'Контрагент-заказчик',
                 ),
-                CarpenterRecordDetail(
+                _editableTextDetail(
+                  key: 'designCode',
                   label: 'Стадия П',
-                  value: CarpenterText.body('22-12'),
+                  placeholder: 'Номер документа',
                 ),
-                CarpenterRecordDetail(
+                _editableTextDetail(
+                  key: 'workingCode',
                   label: 'Стадия Р',
-                  value: CarpenterText.body('Не задана'),
+                  allowEmpty: true,
+                  placeholder: 'Номер документа',
                 ),
-                CarpenterRecordDetail(
+                _editableTextDetail(
+                  key: 'objectType',
                   label: 'Тип объекта',
-                  value: CarpenterText.body('Линейный объект'),
+                  placeholder: 'Тип объекта',
                 ),
               ],
             ),
@@ -193,6 +280,7 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
           CarpenterActionDescriptor(
             id: 'documents.add-section',
             label: 'Добавить раздел',
+            icon: GravityIcons.folderPlus,
             onInvoke: () {},
           ),
         ),
@@ -200,6 +288,7 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
           CarpenterActionDescriptor(
             id: 'documents.add-file',
             label: 'Добавить файл',
+            icon: GravityIcons.filePlus,
             onInvoke: () {},
           ),
         ),
@@ -234,6 +323,7 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
             clearAction: CarpenterActionDescriptor(
               id: 'documents.clear-search',
               label: 'Очистить',
+              icon: GravityIcons.xmark,
               onInvoke: () => setState(_search.clear),
             ),
           ),
@@ -296,13 +386,13 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
                   CarpenterActionDescriptor(
                     id: 'document.open.${node.id}',
                     label: 'Открыть',
-                    icon: CarpenterIcons.openFile,
+                    icon: GravityIcons.folderOpen,
                     onInvoke: () {},
                   ),
                   CarpenterActionDescriptor(
                     id: 'document.edit.${node.id}',
                     label: 'Редактировать',
-                    icon: CarpenterIcons.edit,
+                    icon: GravityIcons.pencil,
                     onInvoke: () {},
                   ),
                 ],
@@ -310,7 +400,7 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
                   CarpenterActionDescriptor(
                     id: 'document.archive.${node.id}',
                     label: 'Архивировать',
-                    icon: CarpenterIcons.archive,
+                    icon: GravityIcons.archive,
                     onInvoke: () {},
                   ),
                 ],
@@ -350,6 +440,7 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
               CarpenterActionDescriptor(
                 id: 'relations.contracts.add',
                 label: 'Связать',
+                icon: GravityIcons.plus,
                 onInvoke: () {},
               ),
             ),
@@ -368,6 +459,7 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
               CarpenterActionDescriptor(
                 id: 'relations.tasks.add',
                 label: 'Связать',
+                icon: GravityIcons.plus,
                 onInvoke: () {},
               ),
             ),
@@ -632,10 +724,7 @@ const _documentNodes = <CarpenterTreeNode<_DocumentItem>>[
       ),
       CarpenterTreeNode<_DocumentItem>(
         id: 'electrical-file-2',
-        value: _DocumentItem(
-          cipher: 'ЭОМ-02',
-          designer: 'А. Иванов',
-        ),
+        value: _DocumentItem(cipher: 'ЭОМ-02', designer: 'А. Иванов'),
         label: 'Электронный макет.dwg',
       ),
     ],
