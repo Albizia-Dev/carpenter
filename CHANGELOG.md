@@ -1,3 +1,15 @@
+# 0.3.4
+
+- Added semantic `CarpenterLinkRole` variants for inline, standalone,
+  subtle, and prominent link presentation.
+- Added independent `CarpenterLinkUnderline` policies with semantic
+  automatic defaults and explicit always, hover/focus, or none behavior.
+- Changed the default `CarpenterLink` treatment to neutral standalone
+  styling with hover/focus underline while preserving explicit action
+  color overrides.
+- Added Widgetbook role coverage and regression tests for link styling,
+  focus behavior, activation, and accessibility semantics.
+
 # 0.3.3
 
 - Removed card chrome and row dividers from `CarpenterDefinitionList` so it can

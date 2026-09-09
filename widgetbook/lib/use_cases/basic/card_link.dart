@@ -13,7 +13,10 @@ final cardComponent = WidgetbookComponent(
 
 final linkComponent = WidgetbookComponent(
   name: 'Link',
-  useCases: [WidgetbookUseCase(name: 'Playground', builder: _linkPlayground)],
+  useCases: [
+    WidgetbookUseCase(name: 'Playground', builder: _linkPlayground),
+    WidgetbookUseCase(name: 'Roles', builder: _linkRoles),
+  ],
 );
 
 Widget _cardPlayground(BuildContext context) {
@@ -147,7 +150,22 @@ Widget _linkPlayground(BuildContext context) {
     initialValue: true,
   );
   final role = context.knobs.object.segmented(
-    label: 'Appearance · Role',
+    label: 'Appearance · Link role',
+    options: CarpenterLinkRole.values,
+    initialOption: CarpenterLinkRole.standalone,
+    labelBuilder: semanticValueLabel,
+  );
+  final underline = context.knobs.object.segmented(
+    label: 'Appearance · Underline',
+    options: CarpenterLinkUnderline.values,
+    initialOption: CarpenterLinkUnderline.auto,
+    labelBuilder: semanticValueLabel,
+  );
+  final overrideColor = context.knobs.boolean(
+    label: 'Appearance · Override action color',
+  );
+  final colorRole = context.knobs.object.segmented(
+    label: 'Appearance · Action color',
     options: ActionColorRole.values,
     initialOption: ActionColorRole.utility,
     labelBuilder: semanticValueLabel,
@@ -157,9 +175,39 @@ Widget _linkPlayground(BuildContext context) {
     CarpenterLink(
       label: label,
       icon: withIcon ? Icons.open_in_new : null,
-      colorRole: role,
+      role: role,
+      underline: underline,
+      colorRole: overrideColor ? colorRole : null,
       autofocus: autofocus,
       onInvoke: enabled ? () {} : null,
     ),
   );
 }
+
+Widget _linkRoles(BuildContext context) => preview(
+  Column(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      CarpenterLink(
+        label: 'Inline link inside prose',
+        role: CarpenterLinkRole.inline,
+        onInvoke: () {},
+      ),
+      SizedBox(height: context.units(.75.rem)),
+      CarpenterLink(label: 'Standalone link', onInvoke: () {}),
+      SizedBox(height: context.units(.75.rem)),
+      CarpenterLink(
+        label: 'Subtle supporting link',
+        role: CarpenterLinkRole.subtle,
+        onInvoke: () {},
+      ),
+      SizedBox(height: context.units(.75.rem)),
+      CarpenterLink(
+        label: 'Prominent navigation link',
+        role: CarpenterLinkRole.prominent,
+        onInvoke: () {},
+      ),
+    ],
+  ),
+);
