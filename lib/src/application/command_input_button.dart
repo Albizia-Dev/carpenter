@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 
 import '../components/basic/button/button.dart';
@@ -53,15 +55,7 @@ final class CarpenterCommandInputButton<I> extends StatelessWidget {
           secondary ??
           command.presentation == CarpenterCommandPresentation.secondary;
 
-      Future<void> invoke() async {
-        final input = await inputBuilder(context);
-        if (input == null) return;
-        try {
-          await context.executeCommand(command, input);
-        } catch (_) {
-          // Command state and execution listeners are the canonical channels.
-        }
-      }
+      final action = command.toInputAction(context, inputBuilder: inputBuilder);
 
       return CarpenterButton(
         label: state.execution == CarpenterCommandExecution.executing
@@ -76,8 +70,58 @@ final class CarpenterCommandInputButton<I> extends StatelessWidget {
           CarpenterCommandExecution.executing => ActionExecutionPhase.running,
           CarpenterCommandExecution.failed => ActionExecutionPhase.failed,
         },
-        onInvoke: enabled ? invoke : null,
+        onInvoke: enabled ? action.onInvoke : null,
       );
     },
   );
+}
+
+/// Projects commands that collect input into shared header, menu, and dialog actions.
+extension CarpenterCommandInputActionProjection<I> on CarpenterCommand<I> {
+  /// Takes a snapshot of current command availability. Rebuild the descriptor
+  /// when [CarpenterCommand.state] changes. Input cancellation, an unmounted
+  /// [context], or changed availability prevents execution after collection.
+  /// Failures during execution remain in command state and executor listeners.
+  CarpenterActionDescriptor toInputAction(
+    BuildContext context, {
+    required CarpenterCommandInputBuilder<I> inputBuilder,
+    String? label,
+  }) {
+    final current = state.value;
+    final visible = current.visibility == CarpenterCommandVisibility.visible;
+    bool available() =>
+        state.value.enabled &&
+        state.value.visibility == CarpenterCommandVisibility.visible &&
+        state.value.execution != CarpenterCommandExecution.executing;
+    var collecting = false;
+    Future<void> invoke() async {
+      if (collecting || !context.mounted || !available()) return;
+      collecting = true;
+      try {
+        final input = await inputBuilder(context);
+        if (input == null || !context.mounted || !available()) return;
+        try {
+          await context.executeCommand(this, input);
+        } catch (_) {
+          // Command state and executor listeners already own execution failures.
+        }
+      } finally {
+        collecting = false;
+      }
+    }
+
+    return CarpenterActionDescriptor(
+      id: id,
+      label: label ?? title,
+      visible: visible,
+      colorRole: switch (presentation) {
+        CarpenterCommandPresentation.danger => ActionColorRole.danger,
+        CarpenterCommandPresentation.primary => ActionColorRole.primary,
+        _ => ActionColorRole.neutral,
+      },
+      shortcut: shortcuts.isEmpty ? null : shortcuts.first,
+      disabledReason: available() ? null : current.disabledReason,
+      onInvoke: available() ? () => unawaited(invoke()) : null,
+    );
+  }
 }

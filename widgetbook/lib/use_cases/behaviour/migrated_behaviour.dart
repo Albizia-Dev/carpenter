@@ -492,6 +492,20 @@ final class _CommandInputPreviewState extends State<_CommandInputPreview> {
               },
             ),
           ),
+          ValueListenableBuilder<CarpenterCommandState>(
+            valueListenable: _reject.state,
+            builder: (context, _, _) => CarpenterHeaderActions(
+              primary: [
+                _reject.toInputAction(
+                  context,
+                  inputBuilder: (_) async {
+                    final value = _reason.text.trim();
+                    return value.isEmpty ? null : value;
+                  },
+                ),
+              ],
+            ),
+          ),
           if (_lastInput != null) ...[
             SizedBox(height: context.units(.75.rem)),
             CarpenterText.caption('Last input: $_lastInput'),

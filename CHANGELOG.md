@@ -1,3 +1,7 @@
+## 0.4.6
+
+- Project commands with asynchronously collected input into shared header, menu, and dialog actions. Cancellation, unmounting, and changed availability prevent late execution; scoped command effects and error handling remain intact.
+
 # 0.4.5
 
 - Collection search can atomically update domain filters and reset pagination
