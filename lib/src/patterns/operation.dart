@@ -5,6 +5,7 @@ import '../application/command.dart';
 import '../components/layout/page_header.dart';
 import '../components/layout/patterns/header_actions.dart';
 import '../components/layout/regions/region_role.dart';
+import '../foundation/roles.dart';
 import '../foundation/theme.dart';
 import '../page/capability.dart';
 import '../page/controller.dart';
@@ -40,10 +41,7 @@ final class CarpenterOperationPage extends StatelessWidget {
     this.commands = const [],
     this.commandBindings = const [],
     this.capabilities = const [],
-  }) : assert(
-         descriptor.kind == CarpenterPageKind.operation,
-         'CarpenterOperationPage requires CarpenterPageKind.operation.',
-       );
+  });
 
   /// Stable page descriptor. Its kind must be [CarpenterPageKind.operation].
   final CarpenterPageDescriptor descriptor;
@@ -99,6 +97,10 @@ final class CarpenterOperationPage extends StatelessWidget {
   /// Builds the bounded operation root and persistent footer composition.
   @override
   Widget build(BuildContext context) {
+    assert(
+      descriptor.kind == CarpenterPageKind.operation,
+      'CarpenterOperationPage requires CarpenterPageKind.operation.',
+    );
     final actions = CarpenterHeaderActions(
       primary: primaryActions,
       secondary: secondaryActions,
