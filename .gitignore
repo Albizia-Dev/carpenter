@@ -88,6 +88,8 @@ pubspec.lock
 !example/pubspec.lock
 !widgetbook/pubspec.lock
 !tool/documentation/pubspec.lock
+!lib/src/carpenter_older/src/component/icon/
+!lib/src/carpenter_older/src/component/icon/**
 doc/api/
 .env*
 *.dart.js

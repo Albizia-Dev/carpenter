@@ -12,7 +12,7 @@ Carpenter is pre-1.0. The public API is usable, but still evolving as production
 
 ```yaml
 dependencies:
-  carpenter: ^0.4.0
+  carpenter: ^0.4.1
 ```
 
 The umbrella import remains supported and is the simplest option for application code that uses Carpenter across layers:
@@ -44,7 +44,7 @@ import 'package:carpenter/carpenter_older.dart';
 ```
 
 Для перехода замените `package:carpenter_older/carpenter.dart` этим импортом,
-обновите зависимость `carpenter` до `^0.4.0` и удалите отдельную зависимость
+обновите зависимость `carpenter` до `^0.4.1` и удалите отдельную зависимость
 `carpenter_older` из `pubspec.yaml`. Имена, сигнатуры, экспортируемая навигация
 и поведение старого API сохранены.
 

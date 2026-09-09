@@ -1,3 +1,9 @@
+# 0.4.1
+
+- Fixed the legacy entrypoint in the published package by including the legacy
+  icon implementation that a case-insensitive Git ignore rule omitted from 0.4.0.
+- Kept the complete legacy API available through `carpenter_older.dart`.
+
 # 0.4.0
 
 - Bundled the complete `carpenter_older` 0.0.1 implementation inside Carpenter,
