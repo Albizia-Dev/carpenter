@@ -18,37 +18,43 @@ enum _CollectionScenario {
 }
 
 final collectionPageComponent = WidgetbookComponent(
-  name: 'Collection Page',
+  name: 'Collection page',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _collectionPlayground),
     WidgetbookUseCase(
-      name: 'Network workflow',
+      name: 'Scenario · Network workflow',
       builder: _networkCollectionCase,
     ),
   ],
 );
 
 final objectPageComponent = WidgetbookComponent(
-  name: 'Object Page',
+  name: 'Object page',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _objectPlayground),
-    WidgetbookUseCase(name: 'Loaded invoice', builder: _networkObjectCase),
+    WidgetbookUseCase(
+      name: 'Scenario · Loaded invoice',
+      builder: _networkObjectCase,
+    ),
   ],
 );
 
 final formPageComponent = WidgetbookComponent(
-  name: 'Form Page',
+  name: 'Form page',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _formPlayground),
-    WidgetbookUseCase(name: 'Async save', builder: _networkFormCase),
+    WidgetbookUseCase(name: 'Scenario · Async save', builder: _networkFormCase),
   ],
 );
 
 final masterDetailPageComponent = WidgetbookComponent(
-  name: 'Master Detail Page',
+  name: 'Master detail page',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _masterDetailPlayground),
-    WidgetbookUseCase(name: 'Invoice inbox', builder: _networkMasterDetailCase),
+    WidgetbookUseCase(
+      name: 'Scenario · Invoice inbox',
+      builder: _networkMasterDetailCase,
+    ),
   ],
 );
 
@@ -77,17 +83,19 @@ Widget buildNetworkMasterDetailPageDemo() => const _NetworkMasterDetailPage();
 
 Widget _collectionPlayground(BuildContext context) {
   final rowCount = context.knobs.int.slider(
-    label: 'Collection · Rows',
+    label: 'Data · Collection / Rows',
     initialValue: 12,
     min: 0,
     max: 50,
   );
   final scenario = context.knobs.object.dropdown(
-    label: 'Collection · State',
+    label: 'Data · Collection / State',
     options: _CollectionScenario.values,
     labelBuilder: semanticValueLabel,
   );
-  final selected = context.knobs.boolean(label: 'Selection · Has selection');
+  final selected = context.knobs.boolean(
+    label: 'Behavior · Selection / Has selection',
+  );
   return layoutViewportPreview(
     context,
     child: _CollectionPagePreview(
@@ -100,7 +108,7 @@ Widget _collectionPlayground(BuildContext context) {
 
 Widget _objectPlayground(BuildContext context) {
   final showSecondary = context.knobs.boolean(
-    label: 'Regions · Show secondary',
+    label: 'Layout · Regions / Show secondary',
     initialValue: true,
   );
   final longContent = context.knobs.boolean(label: 'Content · Long text');
@@ -127,12 +135,14 @@ Widget _objectPlayground(BuildContext context) {
 
 Widget _formPlayground(BuildContext context) {
   final dirty = context.knobs.boolean(
-    label: 'Form · Dirty',
+    label: 'Behavior · Form / Dirty',
     initialValue: true,
   );
-  final validation = context.knobs.boolean(label: 'Form · Validation summary');
+  final validation = context.knobs.boolean(
+    label: 'Behavior · Form / Validation summary',
+  );
   final phase = context.knobs.object.segmented(
-    label: 'Save · Execution',
+    label: 'Behavior · Save / Execution',
     options: ActionExecutionPhase.values,
     labelBuilder: semanticValueLabel,
   );
@@ -148,7 +158,7 @@ Widget _formPlayground(BuildContext context) {
 
 Widget _masterDetailPlayground(BuildContext context) {
   final selected = context.knobs.boolean(
-    label: 'Selection · Has detail',
+    label: 'Behavior · Selection / Has detail',
     initialValue: true,
   );
   return layoutViewportPreview(

@@ -1,5 +1,4 @@
 import 'package:carpenter/carpenter.dart';
-import 'package:carpenter/gravity_icons.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
@@ -7,7 +6,7 @@ import '../../helpers/labels.dart';
 
 final gravityIconsComponent = WidgetbookComponent(
   name: 'Gravity icons',
-  useCases: [WidgetbookUseCase(name: 'Catalog', builder: _catalog)],
+  useCases: [WidgetbookUseCase(name: 'Reference · Catalog', builder: _catalog)],
 );
 
 Widget _catalog(BuildContext context) {

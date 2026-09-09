@@ -10,7 +10,7 @@ final tabsComponent = WidgetbookComponent(
 );
 
 final definitionListComponent = WidgetbookComponent(
-  name: 'Definition List',
+  name: 'Definition list',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _definitionPlayground),
   ],

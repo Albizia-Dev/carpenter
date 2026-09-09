@@ -8,7 +8,7 @@ final dialogComponent = WidgetbookComponent(
   name: 'Dialog',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'Nested overlay', builder: _nested),
+    WidgetbookUseCase(name: 'Scenario · Nested overlay', builder: _nested),
   ],
 );
 
@@ -28,7 +28,7 @@ Widget _playground(BuildContext context) {
     max: 600,
   );
   final policy = context.knobs.object.segmented(
-    label: 'Dismiss · Policy',
+    label: 'Behavior · Dismiss / Policy',
     options: DialogDismissPolicy.values,
     labelBuilder: semanticValueLabel,
   );

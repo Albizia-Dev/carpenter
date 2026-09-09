@@ -10,9 +10,12 @@ final inputComponent = WidgetbookComponent(
   name: 'Input',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'Size comparison', builder: _sizeComparison),
-    WidgetbookUseCase(name: 'Availability', builder: _availabilityComparison),
-    WidgetbookUseCase(name: 'Feedback', builder: _feedbackComparison),
+    WidgetbookUseCase(name: 'Variants · Sizes', builder: _sizeComparison),
+    WidgetbookUseCase(
+      name: 'States · Availability',
+      builder: _availabilityComparison,
+    ),
+    WidgetbookUseCase(name: 'States · Feedback', builder: _feedbackComparison),
     WidgetbookUseCase(name: 'Accessibility', builder: _accessibility),
   ],
 );

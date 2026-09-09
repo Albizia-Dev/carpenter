@@ -6,7 +6,7 @@ final fileInputComponent = WidgetbookComponent(
   name: 'File input',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _linked),
-    WidgetbookUseCase(name: 'Attachments', builder: _attachments),
+    WidgetbookUseCase(name: 'Scenario · Attachments', builder: _attachments),
   ],
 );
 

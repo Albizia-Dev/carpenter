@@ -7,13 +7,16 @@ import 'package:widgetbook/widgetbook.dart';
 import '../../helpers/preview.dart';
 
 final applicationRuntimeComponent = WidgetbookComponent(
-  name: 'Runtime & Commands',
+  name: 'Runtime & commands',
   useCases: [
     WidgetbookUseCase(
       name: 'Playground',
       builder: (_) => const _RuntimePreview(),
     ),
-    WidgetbookUseCase(name: 'Raw runtime scope', builder: _rawRuntimeScope),
+    WidgetbookUseCase(
+      name: 'Scenario · Raw runtime scope',
+      builder: _rawRuntimeScope,
+    ),
   ],
 );
 

@@ -5,6 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+import '../../helpers/labels.dart';
+
 import '../../helpers/preview.dart';
 
 enum _SurfaceKind { inline, sidePanel }
@@ -13,7 +15,10 @@ final controlComponent = WidgetbookComponent(
   name: 'Control',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _control),
-    WidgetbookUseCase(name: 'Interaction state', builder: _controlState),
+    WidgetbookUseCase(
+      name: 'States · Interaction state',
+      builder: _controlState,
+    ),
   ],
 );
 
@@ -21,7 +26,7 @@ final noticeComponent = WidgetbookComponent(
   name: 'Notice',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _noticePlayground),
-    WidgetbookUseCase(name: 'Tone matrix', builder: _notices),
+    WidgetbookUseCase(name: 'Variants · Tone matrix', builder: _notices),
   ],
 );
 
@@ -29,7 +34,10 @@ final expanderComponent = WidgetbookComponent(
   name: 'Expander',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _expander),
-    WidgetbookUseCase(name: 'Expanded / collapsed', builder: _expanderStates),
+    WidgetbookUseCase(
+      name: 'Variants · Expanded / collapsed',
+      builder: _expanderStates,
+    ),
   ],
 );
 
@@ -37,7 +45,10 @@ final commandComponent = WidgetbookComponent(
   name: 'Commands',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _commandPlayground),
-    WidgetbookUseCase(name: 'Collect input', builder: _commandInputPlayground),
+    WidgetbookUseCase(
+      name: 'Scenario · Collect input',
+      builder: _commandInputPlayground,
+    ),
   ],
 );
 
@@ -47,7 +58,7 @@ final hotkeyComponent = WidgetbookComponent(
 );
 
 final surfaceHostComponent = WidgetbookComponent(
-  name: 'Surface Host',
+  name: 'Surface host',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _surfacePlayground),
   ],
@@ -63,7 +74,7 @@ Widget _control(BuildContext context) {
     initialValue: 'Custom interactive region',
   );
   final autofocus = context.knobs.boolean(
-    label: 'Behaviour · Autofocus',
+    label: 'Behavior · Autofocus',
     initialValue: false,
   );
   final enabled = context.knobs.boolean(
@@ -149,7 +160,7 @@ Widget _noticePlayground(BuildContext context) {
     label: 'Appearance · Tone',
     options: CarpenterNoticeTone.values,
     initialOption: CarpenterNoticeTone.warning,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
   final showAction = context.knobs.boolean(
     label: 'Content · Action',
@@ -160,7 +171,7 @@ Widget _noticePlayground(BuildContext context) {
     initialValue: 'Retry',
   );
   final dismissible = context.knobs.boolean(
-    label: 'Behaviour · Dismissible',
+    label: 'Behavior · Dismissible',
     initialValue: true,
   );
   final width = context.knobs.double.slider(
@@ -270,18 +281,18 @@ Widget _commandPlayground(BuildContext context) {
     label: 'Appearance · Presentation',
     options: CarpenterCommandPresentation.values,
     initialOption: CarpenterCommandPresentation.primary,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
   final enabled = context.knobs.boolean(
     label: 'State · Enabled',
     initialValue: true,
   );
   final fail = context.knobs.boolean(
-    label: 'Execution · Fail',
+    label: 'State · Execution / Fail',
     initialValue: false,
   );
   final delay = context.knobs.double.slider(
-    label: 'Execution · Delay (ms)',
+    label: 'State · Execution / Delay (ms)',
     initialValue: 700,
     min: 0,
     max: 2000,
@@ -492,11 +503,11 @@ final class _CommandInputPreviewState extends State<_CommandInputPreview> {
 }
 
 Widget _hotkeys(BuildContext context) {
-  final platform = context.knobs.object.segmented(
-    label: 'Platform · Target',
+  final platform = context.knobs.object.dropdown(
+    label: 'Layout · Platform / Target',
     options: TargetPlatform.values,
     initialOption: TargetPlatform.macOS,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
   final title = context.knobs.string(
     label: 'Content · Title',
@@ -528,7 +539,7 @@ Widget _hotkeys(BuildContext context) {
 
 Widget _surfacePlayground(BuildContext context) {
   final kind = context.knobs.object.segmented(
-    label: 'Surface · Kind',
+    label: 'Behavior · Surface / Kind',
     options: _SurfaceKind.values,
     initialOption: _SurfaceKind.sidePanel,
     labelBuilder: (value) => switch (value) {

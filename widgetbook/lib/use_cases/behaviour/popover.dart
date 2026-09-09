@@ -9,7 +9,10 @@ final popoverComponent = WidgetbookComponent(
   name: 'Popover',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'Overlay edge cases', builder: _edgeCases),
+    WidgetbookUseCase(
+      name: 'Edge cases · Overlay edge cases',
+      builder: _edgeCases,
+    ),
   ],
 );
 
@@ -18,8 +21,8 @@ Widget _playground(BuildContext context) {
     label: 'State · Open',
     initialValue: true,
   );
-  final placement = context.knobs.object.segmented(
-    label: 'Position · Placement',
+  final placement = context.knobs.object.dropdown(
+    label: 'Layout · Position / Placement',
     options: OverlayPlacement.values,
     initialOption: OverlayPlacement.bottomStart,
     labelBuilder: semanticValueLabel,

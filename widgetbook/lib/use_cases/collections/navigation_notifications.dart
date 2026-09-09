@@ -8,22 +8,25 @@ final breadcrumbsComponent = WidgetbookComponent(
   name: 'Breadcrumbs',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _breadcrumbs),
-    WidgetbookUseCase(name: 'Long path', builder: _breadcrumbsLong),
+    WidgetbookUseCase(
+      name: 'Edge cases · Long path',
+      builder: _breadcrumbsLong,
+    ),
   ],
 );
 
 final notificationListComponent = WidgetbookComponent(
-  name: 'Notification List',
+  name: 'Notification list',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _notifications),
-    WidgetbookUseCase(name: 'Empty', builder: _notificationsEmpty),
+    WidgetbookUseCase(name: 'States · Empty', builder: _notificationsEmpty),
   ],
 );
 
 Widget _breadcrumbs(BuildContext context) {
   final maxVisible = context.knobs.double
       .slider(
-        label: 'Behaviour · Visible items',
+        label: 'Behavior · Visible items',
         initialValue: 4,
         min: 2,
         max: 6,
@@ -49,7 +52,7 @@ Widget _breadcrumbs(BuildContext context) {
   return preview(
     SizedBox(
       width: context.knobs.double.slider(
-        label: 'Layout \u00b7 Available width',
+        label: 'Layout · Available width',
         initialValue: 480,
         min: 80,
         max: 800,
@@ -58,7 +61,7 @@ Widget _breadcrumbs(BuildContext context) {
         items: items,
         maxVisibleItems: maxVisible,
         overflowLabel: context.knobs.string(
-          label: 'Accessibility \u00b7 Overflow label',
+          label: 'Accessibility · Overflow label',
           initialValue: 'More breadcrumb items',
         ),
       ),

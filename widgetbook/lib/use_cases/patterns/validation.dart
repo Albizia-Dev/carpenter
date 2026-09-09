@@ -5,14 +5,14 @@ import 'package:widgetbook/widgetbook.dart';
 import '../../helpers/preview.dart';
 
 final validationComponent = WidgetbookComponent(
-  name: 'Form Validation',
+  name: 'Form validation',
   useCases: [
     WidgetbookUseCase(
       name: 'Playground',
       builder: (context) => preview(
         ValidationPreview(
           showDescription: context.knobs.boolean(
-            label: 'Content \u00b7 Show description',
+            label: 'Content · Show description',
             initialValue: true,
           ),
         ),

@@ -15,18 +15,24 @@ enum _LoadingPresentation {
 }
 
 final loadingBoundaryComponent = WidgetbookComponent(
-  name: 'Loading Boundary',
+  name: 'Loading boundary',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _presentation),
-    WidgetbookUseCase(name: 'Concurrent operations', builder: _aggregation),
-    WidgetbookUseCase(name: 'Nested boundaries', builder: _nested),
-    WidgetbookUseCase(name: 'No scope fallback', builder: _noScope),
+    WidgetbookUseCase(
+      name: 'Scenario · Concurrent operations',
+      builder: _aggregation,
+    ),
+    WidgetbookUseCase(name: 'Scenario · Nested boundaries', builder: _nested),
+    WidgetbookUseCase(
+      name: 'Edge cases · No scope fallback',
+      builder: _noScope,
+    ),
   ],
 );
 
 Widget _presentation(BuildContext context) {
   final presentation = context.knobs.object.segmented(
-    label: 'Presentation · Loading UI',
+    label: 'Appearance · Presentation / Loading UI',
     options: _LoadingPresentation.values,
     initialOption: _LoadingPresentation.headerProgress,
     labelBuilder: (value) => switch (value) {

@@ -7,31 +7,31 @@ import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
 
 final collectionKernelComponent = WidgetbookComponent(
-  name: 'Collection Kernel',
+  name: 'Collection kernel',
   useCases: [WidgetbookUseCase(name: 'Playground', builder: _playground)],
 );
 
 Widget _playground(BuildContext context) {
   final scenario = context.knobs.object.dropdown(
-    label: 'Snapshot · Scenario',
+    label: 'State · Snapshot / Scenario',
     options: DemoCollectionScenario.values,
     initialOption: DemoCollectionScenario.refreshing,
     labelBuilder: semanticValueLabel,
   );
   final pagination = context.knobs.object.segmented(
-    label: 'Pagination · Contract',
+    label: 'Data · Pagination / Contract',
     options: DemoPaginationFixture.values,
     initialOption: DemoPaginationFixture.cursor,
     labelBuilder: semanticValueLabel,
   );
   final selectionMode = context.knobs.object.segmented(
-    label: 'Selection · Mode',
+    label: 'Behavior · Selection / Mode',
     options: CollectionSelectionMode.values,
     initialOption: CollectionSelectionMode.multiple,
     labelBuilder: semanticValueLabel,
   );
   final optimistic = context.knobs.boolean(
-    label: 'Mutation · Optimistic',
+    label: 'Data · Mutation / Optimistic',
     initialValue: true,
   );
   final snapshot = demoCollectionSnapshot<String>(

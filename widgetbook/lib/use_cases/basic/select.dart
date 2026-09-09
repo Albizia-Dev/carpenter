@@ -9,8 +9,11 @@ final selectComponent = WidgetbookComponent(
   name: 'Select',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'Size comparison', builder: _sizeComparison),
-    WidgetbookUseCase(name: 'Edge cases', builder: _edgeCases),
+    WidgetbookUseCase(name: 'Variants · Sizes', builder: _sizeComparison),
+    WidgetbookUseCase(
+      name: 'Edge cases · Content and geometry',
+      builder: _edgeCases,
+    ),
   ],
 );
 

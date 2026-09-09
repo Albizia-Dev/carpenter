@@ -9,10 +9,8 @@ enum _ProjectTab { overview, documents, relations, finance }
 enum _DocumentStage { common, design, working }
 
 final projectPageSampleComponent = WidgetbookComponent(
-  name: 'Project Page',
-  useCases: [
-    WidgetbookUseCase(name: 'Playground', builder: _projectPage),
-  ],
+  name: 'Project page',
+  useCases: [WidgetbookUseCase(name: 'Playground', builder: _projectPage)],
 );
 
 Widget _projectPage(BuildContext context) {
@@ -649,7 +647,8 @@ final class _ProjectPageSampleState extends State<_ProjectPageSample> {
           .map(filterNode)
           .whereType<CarpenterTreeNode<_DocumentItem>>()
           .toList(growable: false);
-      final matches = node.label.toLowerCase().contains(query) ||
+      final matches =
+          node.label.toLowerCase().contains(query) ||
           node.value.cipher.toLowerCase().contains(query) ||
           node.value.designer.toLowerCase().contains(query);
       if (!matches && children.isEmpty) return null;

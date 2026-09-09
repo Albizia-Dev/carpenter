@@ -7,24 +7,24 @@ import '../../helpers/labels.dart';
 enum _ListScenario { loaded, loading, refreshing, error, empty }
 
 final dataListComponent = WidgetbookComponent(
-  name: 'Data List',
+  name: 'Data list',
   useCases: [WidgetbookUseCase(name: 'Playground', builder: _playground)],
 );
 
 Widget _playground(BuildContext context) {
   final count = context.knobs.int.slider(
-    label: 'Collection · Items',
+    label: 'Data · Collection / Items',
     initialValue: 8,
     min: 0,
     max: 30,
   );
   final scenario = context.knobs.object.segmented(
-    label: 'Collection · State',
+    label: 'Data · Collection / State',
     options: _ListScenario.values,
     labelBuilder: semanticValueLabel,
   );
   final selectable = context.knobs.boolean(
-    label: 'Selection · Enabled',
+    label: 'Behavior · Selection / Enabled',
     initialValue: true,
   );
   return SizedBox(

@@ -7,7 +7,7 @@ import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
 
 final comboBoxComponent = WidgetbookComponent(
-  name: 'Combo Box',
+  name: 'Combo box',
   useCases: [WidgetbookUseCase(name: 'Playground', builder: _playground)],
 );
 
@@ -31,8 +31,8 @@ Widget _playground(BuildContext context) {
     min: 0,
     max: 30,
   );
-  final placement = context.knobs.object.segmented(
-    label: 'Overlay · Placement',
+  final placement = context.knobs.object.dropdown(
+    label: 'Behavior · Overlay / Placement',
     options: OverlayPlacement.values,
     initialOption: OverlayPlacement.bottomStart,
     labelBuilder: semanticValueLabel,

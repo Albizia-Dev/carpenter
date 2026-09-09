@@ -5,7 +5,7 @@ import 'package:widgetbook/widgetbook.dart';
 import '../../helpers/preview.dart';
 
 final contextActionsComponent = WidgetbookComponent(
-  name: 'Context Actions',
+  name: 'Context actions',
   useCases: [WidgetbookUseCase(name: 'Playground', builder: _contextActions)],
 );
 

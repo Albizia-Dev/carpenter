@@ -11,7 +11,10 @@ final avatarComponent = WidgetbookComponent(
   name: 'Avatar',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _avatarPlayground),
-    WidgetbookUseCase(name: 'Sizes and content', builder: _avatarMatrix),
+    WidgetbookUseCase(
+      name: 'Variants · Sizes and content',
+      builder: _avatarMatrix,
+    ),
   ],
 );
 
@@ -19,30 +22,33 @@ final activityComponent = WidgetbookComponent(
   name: 'Activity',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _activityPlayground),
-    WidgetbookUseCase(name: 'Sizes', builder: _activitySizes),
+    WidgetbookUseCase(name: 'Variants · Sizes', builder: _activitySizes),
   ],
 );
 
 final colorPickerComponent = WidgetbookComponent(
-  name: 'Color Picker',
+  name: 'Color picker',
   useCases: [WidgetbookUseCase(name: 'Playground', builder: _colorPicker)],
 );
 
 final dateInputComponent = WidgetbookComponent(
-  name: 'Date Input',
+  name: 'Date input',
   useCases: [WidgetbookUseCase(name: 'Playground', builder: _dateInput)],
 );
 
 final toggleButtonComponent = WidgetbookComponent(
-  name: 'Toggle Button',
+  name: 'Toggle button',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _toggleButton),
-    WidgetbookUseCase(name: 'Roles and sizes', builder: _toggleMatrix),
+    WidgetbookUseCase(
+      name: 'Variants · Roles and sizes',
+      builder: _toggleMatrix,
+    ),
   ],
 );
 
 final selectionButtonGroupComponent = WidgetbookComponent(
-  name: 'Selection Button Group',
+  name: 'Selection button group',
   useCases: [
     WidgetbookUseCase(
       name: 'Playground',
@@ -56,7 +62,7 @@ Widget _avatarPlayground(BuildContext context) {
     label: 'Content · Type',
     options: _AvatarContent.values,
     initialOption: _AvatarContent.initials,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
   final initials = context.knobs.string(
     label: 'Content · Initials',
@@ -117,39 +123,39 @@ Widget _avatarMatrix(BuildContext context) => preview(
 
 Widget _activityPlayground(BuildContext context) {
   final value = context.knobs.double.slider(
-    label: 'Progress · Value',
+    label: 'State · Progress / Value',
     initialValue: .64,
     min: 0,
     max: 1,
     divisions: 100,
   );
   final width = context.knobs.double.slider(
-    label: 'Progress · Width (rem)',
+    label: 'State · Progress / Width (rem)',
     initialValue: 20,
     min: 5,
     max: 45,
     divisions: 32,
   );
   final height = context.knobs.double.slider(
-    label: 'Progress · Height (rem)',
+    label: 'State · Progress / Height (rem)',
     initialValue: .25,
     min: .125,
     max: 1,
     divisions: 14,
   );
   final showLoader = context.knobs.boolean(
-    label: 'Loader · Visible',
+    label: 'Data · Loader / Visible',
     initialValue: true,
   );
   final loaderSize = context.knobs.double.slider(
-    label: 'Loader · Size (rem)',
+    label: 'Data · Loader / Size (rem)',
     initialValue: 1.5,
     min: .75,
     max: 4,
     divisions: 26,
   );
   final strokeWidth = context.knobs.double.slider(
-    label: 'Loader · Stroke (rem)',
+    label: 'Data · Loader / Stroke (rem)',
     initialValue: .15625,
     min: .0625,
     max: .5,
@@ -204,7 +210,7 @@ Widget _activitySizes(BuildContext context) => previewColumn([
 
 Widget _colorPicker(BuildContext context) {
   final initialValue = context.knobs.color(
-    label: 'Value · Initial color',
+    label: 'Content · Value / Initial color',
     initialValue: const Color(0xff2688d9),
   );
   final enabled = context.knobs.boolean(
@@ -285,7 +291,7 @@ final class _ColorPickerPreviewState extends State<_ColorPickerPreview> {
 
 Widget _dateInput(BuildContext context) {
   final initialValue = context.knobs.dateTimeOrNull(
-    label: 'Value · Date',
+    label: 'Content · Value / Date',
     initialValue: DateTime(2026, 8, 28),
     start: DateTime(2025),
     end: DateTime(2028, 12, 31),
@@ -299,7 +305,7 @@ Widget _dateInput(BuildContext context) {
     initialValue: true,
   );
   final allowClear = context.knobs.boolean(
-    label: 'Behaviour · Allow clear',
+    label: 'Behavior · Allow clear',
     initialValue: true,
   );
 
@@ -384,7 +390,7 @@ Widget _toggleButton(BuildContext context) {
     label: 'State · Enabled',
     initialValue: true,
   );
-  final role = context.knobs.object.segmented(
+  final role = context.knobs.object.dropdown(
     label: 'Appearance · Role',
     options: ActionColorRole.values,
     initialOption: ActionColorRole.primary,

@@ -2,24 +2,26 @@ import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+import '../../helpers/labels.dart';
+
 import '../../helpers/preview.dart';
 
 enum _MaskPreset { date, time, account }
 
 final maskedInputComponent = WidgetbookComponent(
-  name: 'Masked Input',
+  name: 'Masked input',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _maskedInput),
-    WidgetbookUseCase(name: 'Presets', builder: _maskedPresets),
+    WidgetbookUseCase(name: 'Variants · Presets', builder: _maskedPresets),
   ],
 );
 
 Widget _maskedInput(BuildContext context) {
   final preset = context.knobs.object.segmented(
-    label: 'Mask · Preset',
+    label: 'Content · Mask / Preset',
     options: _MaskPreset.values,
     initialOption: _MaskPreset.date,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
   final enabled = context.knobs.boolean(
     label: 'State · Enabled',

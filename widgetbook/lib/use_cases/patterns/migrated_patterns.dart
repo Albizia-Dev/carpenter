@@ -2,6 +2,8 @@ import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+import '../../helpers/labels.dart';
+
 enum _EditorScenario {
   ready,
   dirty,
@@ -37,22 +39,22 @@ final explorerPatternComponent = WidgetbookComponent(
 
 Widget _record(BuildContext context) {
   final title = context.knobs.string(
-    label: 'Entity · Title',
+    label: 'Data · Entity / Title',
     initialValue: 'Invoice INV-440',
   );
   final subtitle = context.knobs.string(
-    label: 'Entity · Subtitle',
+    label: 'Data · Entity / Subtitle',
     initialValue: 'Albizia LLC · 28 August 2026',
   );
   final statusLabel = context.knobs.string(
-    label: 'Status · Label',
+    label: 'State · Status / Label',
     initialValue: 'Awaiting approval',
   );
   final statusRole = context.knobs.object.segmented(
-    label: 'Status · Role',
+    label: 'State · Status / Role',
     options: FeedbackColorRole.values,
     initialOption: FeedbackColorRole.warning,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
   final amount = context.knobs.string(
     label: 'Data · Amount',
@@ -60,7 +62,7 @@ Widget _record(BuildContext context) {
   );
   final owner = context.knobs.string(label: 'Data · Owner', initialValue: 'NC');
   final showPrimaryAction = context.knobs.boolean(
-    label: 'Actions · Primary',
+    label: 'Behavior · Actions / Primary',
     initialValue: true,
   );
   final showTimeline = context.knobs.boolean(
@@ -177,7 +179,7 @@ Widget _editor(BuildContext context) {
     label: 'State · Editor',
     options: _EditorScenario.values,
     initialOption: _EditorScenario.dirty,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
   final title = context.knobs.string(
     label: 'Content · Title',
@@ -293,14 +295,14 @@ Widget _workflow(BuildContext context) {
     label: 'State · Start stage',
     options: _WorkflowStart.values,
     initialOption: _WorkflowStart.review,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
   final failTransitions = context.knobs.boolean(
-    label: 'Execution · Fail transitions',
+    label: 'State · Execution / Fail transitions',
     initialValue: false,
   );
   final delayMs = context.knobs.double.slider(
-    label: 'Execution · Delay (ms)',
+    label: 'State · Execution / Delay (ms)',
     initialValue: 500,
     min: 0,
     max: 2000,

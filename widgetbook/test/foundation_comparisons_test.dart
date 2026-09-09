@@ -13,7 +13,9 @@ void main() {
       _harness(
         Builder(
           builder: foundationColorsComponent.useCases
-              .singleWhere((useCase) => useCase.name == 'Semantic tokens')
+              .singleWhere(
+                (useCase) => useCase.name == 'Reference · Semantic tokens',
+              )
               .builder,
         ),
       ),
@@ -34,7 +36,7 @@ void main() {
       _harness(
         Builder(
           builder: buttonComponent.useCases
-              .singleWhere((useCase) => useCase.name == 'Size comparison')
+              .singleWhere((useCase) => useCase.name == 'Variants · Sizes')
               .builder,
         ),
       ),
@@ -49,7 +51,7 @@ void main() {
       _harness(
         Builder(
           builder: inputComponent.useCases
-              .singleWhere((useCase) => useCase.name == 'Size comparison')
+              .singleWhere((useCase) => useCase.name == 'Variants · Sizes')
               .builder,
         ),
       ),

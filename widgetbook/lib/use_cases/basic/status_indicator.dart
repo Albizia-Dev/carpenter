@@ -6,11 +6,14 @@ import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
 
 final statusIndicatorComponent = WidgetbookComponent(
-  name: 'Status Indicator',
+  name: 'Status indicator',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'Color roles', builder: _colorRoles),
-    WidgetbookUseCase(name: 'Edge cases', builder: _edgeCases),
+    WidgetbookUseCase(name: 'Variants · Color roles', builder: _colorRoles),
+    WidgetbookUseCase(
+      name: 'Edge cases · Content and geometry',
+      builder: _edgeCases,
+    ),
     WidgetbookUseCase(name: 'Accessibility', builder: _accessibility),
   ],
 );

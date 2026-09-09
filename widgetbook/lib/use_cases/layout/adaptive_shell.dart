@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+import '../../helpers/labels.dart';
+
 import '../../helpers/layout_viewport.dart';
 import '../../helpers/preview.dart';
 
@@ -10,7 +12,10 @@ final sidebarComponent = WidgetbookComponent(
   name: 'Sidebar',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _sidebarPlayground),
-    WidgetbookUseCase(name: 'Expanded / collapsed', builder: _sidebarMatrix),
+    WidgetbookUseCase(
+      name: 'Variants · Expanded / collapsed',
+      builder: _sidebarMatrix,
+    ),
   ],
 );
 
@@ -20,29 +25,29 @@ final shellHeaderComponent = WidgetbookComponent(
 );
 
 final rootLayoutComponent = WidgetbookComponent(
-  name: 'Root Layout',
+  name: 'Root layout',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _rootPlayground),
-    WidgetbookUseCase(name: 'Desktop', builder: _desktopRoot),
-    WidgetbookUseCase(name: 'Tablet overlay', builder: _tabletRoot),
-    WidgetbookUseCase(name: 'Mobile drawer', builder: _mobileRoot),
+    WidgetbookUseCase(name: 'Scenario · Desktop', builder: _desktopRoot),
+    WidgetbookUseCase(name: 'Scenario · Tablet overlay', builder: _tabletRoot),
+    WidgetbookUseCase(name: 'Scenario · Mobile drawer', builder: _mobileRoot),
   ],
 );
 
 Widget _sidebarPlayground(BuildContext context) {
   final expanded = context.knobs.boolean(
-    label: 'Sidebar · Expanded',
+    label: 'Layout · Sidebar / Expanded',
     initialValue: true,
   );
   final platform = context.knobs.object.segmented(
-    label: 'Environment · Platform',
+    label: 'Layout · Environment / Platform',
     options: [
       TargetPlatform.macOS,
       TargetPlatform.windows,
       TargetPlatform.linux,
     ],
     initialOption: TargetPlatform.macOS,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
   final width = expanded ? 320.0 : 96.0;
   return preview(
@@ -79,7 +84,7 @@ Widget _headerPlayground(BuildContext context) {
     defaultToNull: false,
   );
   final actionCount = context.knobs.int.slider(
-    label: 'Actions · Count',
+    label: 'Behavior · Actions / Count',
     initialValue: 2,
     min: 0,
     max: 4,

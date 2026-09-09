@@ -9,8 +9,8 @@ final checkboxComponent = WidgetbookComponent(
   name: 'Checkbox',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'Size comparison', builder: _sizeComparison),
-    WidgetbookUseCase(name: 'Color roles', builder: _colorRoles),
+    WidgetbookUseCase(name: 'Variants · Sizes', builder: _sizeComparison),
+    WidgetbookUseCase(name: 'Variants · Color roles', builder: _colorRoles),
     WidgetbookUseCase(name: 'Accessibility', builder: _accessibility),
   ],
 );
@@ -76,7 +76,7 @@ Widget _playground(BuildContext context) {
     options: ControlSize.values,
     labelBuilder: semanticValueLabel,
   );
-  final colorRole = context.knobs.object.segmented(
+  final colorRole = context.knobs.object.dropdown(
     label: 'Appearance · Color role',
     options: SelectionColorRole.values,
     initialOption: SelectionColorRole.primary,

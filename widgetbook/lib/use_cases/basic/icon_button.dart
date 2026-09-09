@@ -8,13 +8,13 @@ import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
 
 final iconButtonComponent = WidgetbookComponent(
-  name: 'Icon Button',
+  name: 'Icon button',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'Size comparison', builder: _sizeComparison),
-    WidgetbookUseCase(name: 'Color roles', builder: _colorRoles),
-    WidgetbookUseCase(name: 'Shape matrix', builder: _shapeMatrix),
-    WidgetbookUseCase(name: 'States', builder: _states),
+    WidgetbookUseCase(name: 'Variants · Sizes', builder: _sizeComparison),
+    WidgetbookUseCase(name: 'Variants · Color roles', builder: _colorRoles),
+    WidgetbookUseCase(name: 'Variants · Shapes', builder: _shapeMatrix),
+    WidgetbookUseCase(name: 'States · Overview', builder: _states),
     WidgetbookUseCase(name: 'Accessibility', builder: _accessibility),
   ],
 );
@@ -101,12 +101,12 @@ Widget _playground(BuildContext context) {
     label: 'Accessibility · Semantic label',
     initialValue: 'Добавить',
   );
-  final role = context.knobs.object.segmented(
+  final role = context.knobs.object.dropdown(
     label: 'Appearance · Role',
     options: ActionColorRole.values,
     labelBuilder: semanticValueLabel,
   );
-  final prominence = context.knobs.object.segmented(
+  final prominence = context.knobs.object.dropdown(
     label: 'Appearance · Prominence',
     options: ActionProminence.values,
     initialOption: ActionProminence.normal,

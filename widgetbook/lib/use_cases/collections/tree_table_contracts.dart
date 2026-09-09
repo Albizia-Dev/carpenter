@@ -2,16 +2,16 @@ import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-final treeTableContractsComponent = WidgetbookComponent(
-  name: 'Tree table contracts',
-  useCases: [
-    WidgetbookUseCase(
-      name: 'Playground',
-      builder: (_) => const _ProjectStructurePreview(),
-    ),
-    WidgetbookUseCase(name: 'Alignment contract', builder: _alignmentContract),
-  ],
-);
+final treeTableContractCases = <WidgetbookUseCase>[
+  WidgetbookUseCase(
+    name: 'Scenario · Project structure',
+    builder: (_) => const _ProjectStructurePreview(),
+  ),
+  WidgetbookUseCase(
+    name: 'Edge cases · Cell alignment',
+    builder: _alignmentContract,
+  ),
+];
 
 const _projectNodes = <CarpenterTreeNode<String>>[
   CarpenterTreeNode<String>(

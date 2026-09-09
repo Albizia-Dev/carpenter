@@ -6,10 +6,10 @@ import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
 
 final textAreaComponent = WidgetbookComponent(
-  name: 'Text Area',
+  name: 'Text area',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'Size comparison', builder: _sizeComparison),
+    WidgetbookUseCase(name: 'Variants · Sizes', builder: _sizeComparison),
   ],
 );
 

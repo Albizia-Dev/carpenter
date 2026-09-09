@@ -2,32 +2,37 @@ import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+import '../../helpers/labels.dart';
+
 import '../../helpers/preview.dart';
 
 final appFrameComponent = WidgetbookComponent(
-  name: 'App Frame',
+  name: 'App frame',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _appFrame),
-    WidgetbookUseCase(name: 'Desktop / touch matrix', builder: _appFrameMatrix),
+    WidgetbookUseCase(
+      name: 'Variants · Desktop / touch matrix',
+      builder: _appFrameMatrix,
+    ),
   ],
 );
 
 final tabsLayoutComponent = WidgetbookComponent(
-  name: 'Tabs Layout',
+  name: 'Tabs layout',
   useCases: [WidgetbookUseCase(name: 'Playground', builder: _tabsLayout)],
 );
 
 final restorableSplitComponent = WidgetbookComponent(
-  name: 'Restorable Split',
+  name: 'Restorable split',
   useCases: [WidgetbookUseCase(name: 'Playground', builder: _splitLayout)],
 );
 
 Widget _appFrame(BuildContext context) {
-  final platform = context.knobs.object.segmented(
-    label: 'Platform · Target',
+  final platform = context.knobs.object.dropdown(
+    label: 'Layout · Platform / Target',
     options: TargetPlatform.values,
     initialOption: TargetPlatform.macOS,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
   final title = context.knobs.string(
     label: 'Content · Title',
@@ -125,7 +130,7 @@ Widget _tabsLayout(BuildContext context) {
     label: 'Layout · Orientation',
     options: CarpenterTabsOrientation.values,
     initialOption: CarpenterTabsOrientation.adaptive,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
   final breakpoint = context.knobs.double.slider(
     label: 'Layout · Vertical breakpoint',
@@ -266,7 +271,7 @@ Widget _splitLayout(BuildContext context) {
     divisions: 54,
   );
   final resizable = context.knobs.boolean(
-    label: 'Behaviour · Resizable',
+    label: 'Behavior · Resizable',
     initialValue: true,
   );
   final showInspector = context.knobs.boolean(
@@ -274,10 +279,10 @@ Widget _splitLayout(BuildContext context) {
     initialValue: true,
   );
   final narrowRegion = context.knobs.object.segmented(
-    label: 'Responsive · Narrow region',
+    label: 'Layout · Responsive / Narrow region',
     options: CarpenterSplitNarrowRegion.values,
     initialOption: CarpenterSplitNarrowRegion.primary,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
 
   return _SplitPreview(

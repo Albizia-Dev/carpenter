@@ -12,19 +12,19 @@ enum _PaymentFilter { all, attention, completed }
 enum _PaymentDetailTab { overview, allocations, history }
 
 final paymentListSampleComponent = WidgetbookComponent(
-  name: 'Payment List',
+  name: 'Payment list',
   useCases: [WidgetbookUseCase(name: 'Playground', builder: _playground)],
 );
 
 Widget _playground(BuildContext context) {
   final pageSize = context.knobs.int.slider(
-    label: 'Network · Page size',
+    label: 'Data · Network / Page size',
     initialValue: 5,
     min: 3,
     max: 7,
   );
   final initialSelection = context.knobs.boolean(
-    label: 'Selection · Open first payment',
+    label: 'Behavior · Selection / Open first payment',
     initialValue: true,
   );
   return layoutViewportPreview(
@@ -314,7 +314,7 @@ final class _PaymentListSampleState extends State<_PaymentListSample> {
                   overflowLabel: 'Ещё',
                   items: [
                     CarpenterToolbarItem(
-                      priority: CarpenterToolbarPriority.critical,
+                      group: CarpenterToolbarGroup.primary,
                       prominence: ActionProminence.high,
                       action: CarpenterActionDescriptor(
                         id: 'allocate-${payment.id}',
@@ -337,7 +337,7 @@ final class _PaymentListSampleState extends State<_PaymentListSample> {
                       ),
                     ),
                     CarpenterToolbarItem(
-                      priority: CarpenterToolbarPriority.overflow,
+                      group: CarpenterToolbarGroup.overflow,
                       action: CarpenterActionDescriptor(
                         id: 'download-${payment.id}',
                         label: 'Скачать подтверждение',
@@ -348,7 +348,7 @@ final class _PaymentListSampleState extends State<_PaymentListSample> {
                       ),
                     ),
                     CarpenterToolbarItem(
-                      priority: CarpenterToolbarPriority.overflow,
+                      group: CarpenterToolbarGroup.overflow,
                       action: CarpenterActionDescriptor(
                         id: 'reject-${payment.id}',
                         label: 'Отклонить',

@@ -8,21 +8,21 @@ final menuComponent = WidgetbookComponent(
   name: 'Menu',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'Long menu', builder: _longMenu),
+    WidgetbookUseCase(name: 'Edge cases · Long menu', builder: _longMenu),
   ],
 );
 
 Widget _playground(BuildContext context) {
   final first = context.knobs.string(
-    label: 'Actions · First label',
+    label: 'Behavior · Actions / First label',
     initialValue: 'Открыть',
   );
   final second = context.knobs.string(
-    label: 'Actions · Second label',
+    label: 'Behavior · Actions / Second label',
     initialValue: 'Дублировать',
   );
   final disabled = context.knobs.boolean(
-    label: 'Actions · Disable second',
+    label: 'Behavior · Actions / Disable second',
     initialValue: true,
   );
   return preview(

@@ -1,5 +1,7 @@
 import 'package:widgetbook/widgetbook.dart';
 
+import 'helpers/catalog_group.dart';
+
 import 'use_cases/application/runtime_commands.dart';
 import 'use_cases/basic/autosuggest.dart';
 import 'use_cases/basic/additional_primitives.dart';
@@ -40,7 +42,6 @@ import 'use_cases/collections/filter_bar.dart';
 import 'use_cases/collections/migrated_collections.dart';
 import 'use_cases/collections/navigation_notifications.dart';
 import 'use_cases/collections/table.dart';
-import 'use_cases/collections/tree_table_contracts.dart';
 import 'use_cases/foundation/colors.dart';
 import 'use_cases/foundation/gravity_icons.dart';
 import 'use_cases/foundation/typography.dart';
@@ -58,139 +59,249 @@ import 'use_cases/samples/payment_list.dart';
 import 'use_cases/samples/project_page.dart';
 
 /// The single registry used by the app and catalog coverage tests.
+/// Navigation follows user tasks; source files retain their implementation layers.
 final List<WidgetbookNode> carpenterCatalog = [
-  WidgetbookFolder(
+  catalogGroup(
     name: 'Foundation',
     children: [
-      foundationColorsComponent,
-      foundationTypographyComponent,
-      gravityIconsComponent,
+      WidgetbookFolder(
+        name: 'Tokens',
+        children: [foundationColorsComponent, foundationTypographyComponent],
+      ),
+      WidgetbookFolder(name: 'Icons', children: [gravityIconsComponent]),
     ],
   ),
-  WidgetbookFolder(
-    name: 'Basic',
+  catalogGroup(
+    name: 'Components',
     children: [
-      textComponent,
-      iconComponent,
-      gravityIconComponent,
-      avatarComponent,
-      avatarGroupComponent,
-      badgeComponent,
-      statusIndicatorComponent,
-      activityComponent,
-      buttonComponent,
-      iconButtonComponent,
-      toggleButtonComponent,
-      selectionButtonGroupComponent,
-      cardComponent,
-      linkComponent,
-      inputComponent,
-      maskedInputComponent,
-      fileInputComponent,
-      uploadProgressComponent,
-      fieldShellComponent,
-      numberInputComponent,
-      textAreaComponent,
-      calendarComponent,
-      dateInputComponent,
-      dateRangeInputComponent,
-      timeInputComponent,
-      colorPickerComponent,
-      checkboxComponent,
-      radioGroupComponent,
-      switchComponent,
-      selectComponent,
-      comboBoxComponent,
-      autosuggestComponent,
-      asyncAutosuggestComponent,
+      WidgetbookFolder(
+        name: 'Actions',
+        children: [
+          buttonComponent,
+          iconButtonComponent,
+          toggleButtonComponent,
+          linkComponent,
+        ],
+      ),
+      WidgetbookFolder(
+        name: 'Content',
+        children: [
+          textComponent,
+          iconComponent,
+          gravityIconComponent,
+          avatarComponent,
+          avatarGroupComponent,
+          cardComponent,
+        ],
+      ),
+      WidgetbookFolder(
+        name: 'Text input',
+        children: [
+          fieldShellComponent,
+          inputComponent,
+          maskedInputComponent,
+          numberInputComponent,
+          textAreaComponent,
+        ],
+      ),
+      WidgetbookFolder(
+        name: 'Selection',
+        children: [
+          checkboxComponent,
+          radioGroupComponent,
+          switchComponent,
+          selectionButtonGroupComponent,
+          selectComponent,
+          comboBoxComponent,
+          autosuggestComponent,
+          asyncAutosuggestComponent,
+          colorPickerComponent,
+        ],
+      ),
+      WidgetbookFolder(
+        name: 'Date and time',
+        children: [
+          calendarComponent,
+          dateInputComponent,
+          dateRangeInputComponent,
+          timeInputComponent,
+        ],
+      ),
+      WidgetbookFolder(
+        name: 'Files',
+        children: [fileInputComponent, uploadProgressComponent],
+      ),
+      WidgetbookFolder(
+        name: 'Feedback',
+        children: [
+          badgeComponent,
+          statusIndicatorComponent,
+          activityComponent,
+          noticeComponent,
+        ],
+      ),
     ],
   ),
-  WidgetbookFolder(
-    name: 'Behaviour',
-    children: [
-      controlComponent,
-      contextActionsComponent,
-      dragAndDropComponent,
-      loadingBoundaryComponent,
-      popoverComponent,
-      menuComponent,
-      dropdownComponent,
-      tooltipComponent,
-      toastComponent,
-      dialogComponent,
-      noticeComponent,
-      expanderComponent,
-      commandComponent,
-      hotkeyComponent,
-      surfaceHostComponent,
-    ],
-  ),
-  WidgetbookFolder(
+  catalogGroup(
     name: 'Collections',
     children: [
-      collectionKernelComponent,
-      collectionLifecycleComponent,
-      filterBarComponent,
-      breadcrumbsComponent,
-      explorerInteractionsComponent,
-      dataListComponent,
-      reorderableCollectionComponent,
-      treeViewComponent,
-      treeTableComponent,
-      treeTableContractsComponent,
-      kanbanComponent,
-      planningBoardComponent,
-      listTileComponent,
-      definitionListComponent,
-      notificationListComponent,
-      tabsComponent,
-      paginationBarComponent,
-      tableComponent,
-      editableTableComponent,
-      inspectorComponent,
+      WidgetbookFolder(
+        name: 'Lists',
+        children: [
+          dataListComponent,
+          listTileComponent,
+          reorderableCollectionComponent,
+          notificationListComponent,
+          definitionListComponent,
+        ],
+      ),
+      WidgetbookFolder(
+        name: 'Tables and trees',
+        children: [
+          tableComponent,
+          editableTableComponent,
+          treeViewComponent,
+          treeTableComponent,
+        ],
+      ),
+      WidgetbookFolder(
+        name: 'Boards',
+        children: [kanbanComponent, planningBoardComponent],
+      ),
+      WidgetbookFolder(
+        name: 'Navigation and filtering',
+        children: [
+          filterBarComponent,
+          breadcrumbsComponent,
+          tabsComponent,
+          paginationBarComponent,
+        ],
+      ),
+      WidgetbookFolder(name: 'Inspection', children: [inspectorComponent]),
     ],
   ),
-  WidgetbookFolder(
+  catalogGroup(
+    name: 'Overlays',
+    children: [
+      WidgetbookFolder(
+        name: 'Menus',
+        children: [menuComponent, dropdownComponent, contextActionsComponent],
+      ),
+      WidgetbookFolder(
+        name: 'Floating content',
+        children: [popoverComponent, tooltipComponent],
+      ),
+      WidgetbookFolder(
+        name: 'Messages',
+        children: [dialogComponent, toastComponent],
+      ),
+    ],
+  ),
+  catalogGroup(
     name: 'Layout',
+    fullViewport: true,
     children: [
-      sidebarComponent,
-      shellHeaderComponent,
-      rootLayoutComponent,
-      applicationShellComponent,
-      appFrameComponent,
-      pageHeaderComponent,
-      headerActionsComponent,
-      toolbarComponent,
-      splitViewComponent,
-      restorableSplitComponent,
-      tabsLayoutComponent,
-      adaptiveRegionComponent,
-      masterDetailComponent,
+      WidgetbookFolder(
+        name: 'Shells',
+        children: [
+          applicationShellComponent,
+          appFrameComponent,
+          rootLayoutComponent,
+          sidebarComponent,
+          shellHeaderComponent,
+        ],
+      ),
+      WidgetbookFolder(
+        name: 'Page structure',
+        children: [
+          pageHeaderComponent,
+          headerActionsComponent,
+          toolbarComponent,
+        ],
+      ),
+      WidgetbookFolder(
+        name: 'Regions',
+        children: [
+          splitViewComponent,
+          restorableSplitComponent,
+          tabsLayoutComponent,
+          adaptiveRegionComponent,
+          masterDetailComponent,
+          expanderComponent,
+        ],
+      ),
     ],
   ),
-  WidgetbookFolder(
+  catalogGroup(
+    name: 'Pages',
+    fullViewport: true,
+    children: [
+      WidgetbookFolder(
+        name: 'Browse',
+        children: [
+          collectionPageComponent,
+          listReportComponent,
+          masterDetailPageComponent,
+          explorerPatternComponent,
+        ],
+      ),
+      WidgetbookFolder(
+        name: 'Details',
+        children: [objectPageComponent, recordPatternComponent],
+      ),
+      WidgetbookFolder(
+        name: 'Edit',
+        children: [
+          formPageComponent,
+          editorPatternComponent,
+          validationComponent,
+        ],
+      ),
+      WidgetbookFolder(
+        name: 'Workflows',
+        children: [workflowPatternComponent, nestedCompositionComponent],
+      ),
+      WidgetbookFolder(name: 'States', children: [pageStateComponent]),
+    ],
+  ),
+  catalogGroup(
     name: 'Application',
-    children: [applicationRuntimeComponent],
-  ),
-  WidgetbookFolder(
-    name: 'Page Patterns',
     children: [
-      pageStateComponent,
-      collectionPageComponent,
-      listReportComponent,
-      objectPageComponent,
-      recordPatternComponent,
-      formPageComponent,
-      editorPatternComponent,
-      validationComponent,
-      masterDetailPageComponent,
-      explorerPatternComponent,
-      workflowPatternComponent,
-      nestedCompositionComponent,
+      WidgetbookFolder(
+        name: 'Runtime and commands',
+        children: [
+          applicationRuntimeComponent,
+          commandComponent,
+          hotkeyComponent,
+          surfaceHostComponent,
+        ],
+      ),
+      WidgetbookFolder(
+        name: 'Interaction',
+        children: [
+          controlComponent,
+          dragAndDropComponent,
+          explorerInteractionsComponent,
+        ],
+      ),
+      WidgetbookFolder(
+        name: 'Data lifecycle',
+        children: [
+          loadingBoundaryComponent,
+          collectionKernelComponent,
+          collectionLifecycleComponent,
+        ],
+      ),
     ],
   ),
-  WidgetbookFolder(
-    name: 'Samples',
-    children: [paymentListSampleComponent, projectPageSampleComponent],
+  catalogGroup(
+    name: 'Examples',
+    fullViewport: true,
+    children: [
+      WidgetbookFolder(
+        name: 'Business workflows',
+        children: [paymentListSampleComponent, projectPageSampleComponent],
+      ),
+    ],
   ),
 ];

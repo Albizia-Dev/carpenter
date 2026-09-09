@@ -11,11 +11,17 @@ final buttonComponent = WidgetbookComponent(
   name: 'Button',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'Prominence scale', builder: _prominenceScale),
-    WidgetbookUseCase(name: 'Size comparison', builder: _sizeComparison),
-    WidgetbookUseCase(name: 'Color roles', builder: _colorRoles),
-    WidgetbookUseCase(name: 'States', builder: _states),
-    WidgetbookUseCase(name: 'Geometry regressions', builder: _edgeCases),
+    WidgetbookUseCase(
+      name: 'Variants · Prominence scale',
+      builder: _prominenceScale,
+    ),
+    WidgetbookUseCase(name: 'Variants · Sizes', builder: _sizeComparison),
+    WidgetbookUseCase(name: 'Variants · Color roles', builder: _colorRoles),
+    WidgetbookUseCase(name: 'States · Overview', builder: _states),
+    WidgetbookUseCase(
+      name: 'Edge cases · Geometry regressions',
+      builder: _edgeCases,
+    ),
     WidgetbookUseCase(name: 'Accessibility', builder: _accessibility),
   ],
 );
@@ -118,13 +124,13 @@ Widget _playground(BuildContext context) {
     options: CarpenterActionIconPosition.values,
     labelBuilder: semanticValueLabel,
   );
-  final role = context.knobs.object.segmented(
+  final role = context.knobs.object.dropdown(
     label: 'Appearance · Role',
     options: ActionColorRole.values,
     initialOption: ActionColorRole.primary,
     labelBuilder: semanticValueLabel,
   );
-  final prominence = context.knobs.object.segmented(
+  final prominence = context.knobs.object.dropdown(
     label: 'Appearance · Prominence',
     options: ActionProminence.values,
     initialOption: ActionProminence.normal,

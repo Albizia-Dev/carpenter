@@ -9,10 +9,8 @@ enum _ReconciliationView { create, linked }
 enum _ObjectType { project, order }
 
 final nestedCompositionComponent = WidgetbookComponent(
-  name: 'Nested Composition',
-  useCases: [
-    WidgetbookUseCase(name: 'Playground', builder: _playground),
-  ],
+  name: 'Nested composition',
+  useCases: [WidgetbookUseCase(name: 'Playground', builder: _playground)],
 );
 
 Widget _playground(BuildContext context) => layoutViewportPreview(
@@ -58,8 +56,7 @@ final class _NestedCompositionPreviewState
   Widget build(BuildContext context) {
     final objects = _filter(_objects, _objectSearch.text);
     final payments = _filter(_payments, _paymentSearch.text);
-    final canLink =
-        !_objectSelection.isEmpty && !_paymentSelection.isEmpty;
+    final canLink = !_objectSelection.isEmpty && !_paymentSelection.isEmpty;
 
     return CarpenterOperationPage(
       descriptor: _descriptor,
@@ -88,7 +85,8 @@ final class _NestedCompositionPreviewState
       attention: _view == _ReconciliationView.linked
           ? const CarpenterNotice(
               title: 'Показаны только активные связи',
-              message: 'Вернитесь в режим создания, чтобы сопоставить новую пару.',
+              message:
+                  'Вернитесь в режим создания, чтобы сопоставить новую пару.',
               tone: CarpenterNoticeTone.info,
             )
           : null,
@@ -199,7 +197,8 @@ final class _NestedCompositionPreviewState
               onInvoke: canLink
                   ? () => setState(() {
                       _objectSelection = CollectionSelection<String>.multiple();
-                      _paymentSelection = CollectionSelection<String>.multiple();
+                      _paymentSelection =
+                          CollectionSelection<String>.multiple();
                     })
                   : null,
             ),
@@ -224,9 +223,8 @@ List<_OperationItem> _filter(List<_OperationItem> source, String query) {
   if (normalized.isEmpty) return source;
   return source
       .where(
-        (item) => '${item.title} ${item.subtitle}'
-            .toLowerCase()
-            .contains(normalized),
+        (item) =>
+            '${item.title} ${item.subtitle}'.toLowerCase().contains(normalized),
       )
       .toList(growable: false);
 }

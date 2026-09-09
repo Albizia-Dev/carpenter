@@ -8,8 +8,11 @@ import '../../helpers/preview.dart';
 final foundationTypographyComponent = WidgetbookComponent(
   name: 'Typography',
   useCases: [
-    WidgetbookUseCase(name: 'Scale', builder: _scale),
-    WidgetbookUseCase(name: 'Content stress', builder: _contentStress),
+    WidgetbookUseCase(name: 'Reference · Scale', builder: _scale),
+    WidgetbookUseCase(
+      name: 'Reference · Content stress',
+      builder: _contentStress,
+    ),
   ],
 );
 

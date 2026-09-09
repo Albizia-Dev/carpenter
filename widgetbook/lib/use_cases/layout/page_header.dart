@@ -6,15 +6,18 @@ import '../../helpers/labels.dart';
 import '../../helpers/layout_viewport.dart';
 
 final pageHeaderComponent = WidgetbookComponent(
-  name: 'Page Header',
+  name: 'Page header',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _pageHeaderPlayground),
-    WidgetbookUseCase(name: 'Content stress', builder: _pageHeaderStress),
+    WidgetbookUseCase(
+      name: 'Edge cases · Content stress',
+      builder: _pageHeaderStress,
+    ),
   ],
 );
 
 final headerActionsComponent = WidgetbookComponent(
-  name: 'Header Actions',
+  name: 'Header actions',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _actionsPlayground),
   ],
@@ -35,13 +38,13 @@ Widget _pageHeaderPlayground(BuildContext context) {
     initialValue: true,
   );
   final primaryCount = context.knobs.int.slider(
-    label: 'Actions · Primary',
+    label: 'Behavior · Actions / Primary',
     initialValue: 1,
     min: 0,
     max: 3,
   );
   final secondaryCount = context.knobs.int.slider(
-    label: 'Actions · Secondary',
+    label: 'Behavior · Actions / Secondary',
     initialValue: 2,
     min: 0,
     max: 6,
@@ -105,18 +108,18 @@ Widget _pageHeaderStress(BuildContext context) => layoutViewportPreview(
 
 Widget _actionsPlayground(BuildContext context) {
   final phase = context.knobs.object.segmented(
-    label: 'Primary · Execution',
+    label: 'Behavior · Primary / Execution',
     options: ActionExecutionPhase.values,
     labelBuilder: semanticValueLabel,
   );
   final secondaryCount = context.knobs.int.slider(
-    label: 'Secondary · Count',
+    label: 'Behavior · Secondary / Count',
     initialValue: 3,
     min: 0,
     max: 8,
   );
   final destructiveCount = context.knobs.int.slider(
-    label: 'Destructive · Count',
+    label: 'Behavior · Destructive / Count',
     initialValue: 1,
     min: 0,
     max: 3,

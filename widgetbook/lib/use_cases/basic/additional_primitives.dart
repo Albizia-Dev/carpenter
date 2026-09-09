@@ -12,11 +12,11 @@ final calendarComponent = WidgetbookComponent(
       name: 'Playground',
       builder: (context) {
         final bounded = context.knobs.boolean(
-          label: 'Behavior \u00b7 Limit date range',
+          label: 'Behavior · Limit date range',
           initialValue: true,
         );
         final selected = context.knobs.boolean(
-          label: 'State \u00b7 Initial selection',
+          label: 'State · Initial selection',
           initialValue: true,
         );
         return preview(
@@ -80,21 +80,21 @@ final class _CalendarPreviewState extends State<CalendarPreview> {
 }
 
 final asyncAutosuggestComponent = WidgetbookComponent(
-  name: 'Async Autosuggest',
+  name: 'Async autosuggest',
   useCases: [
     WidgetbookUseCase(
       name: 'Playground',
       builder: (context) => preview(
         AsyncAutosuggestPreview(
-          fail: context.knobs.boolean(label: 'Data \u00b7 Fail requests'),
+          fail: context.knobs.boolean(label: 'Data · Fail requests'),
           minimumQueryLength: context.knobs.int.slider(
-            label: 'Behavior \u00b7 Minimum characters',
+            label: 'Behavior · Minimum characters',
             initialValue: 1,
             min: 1,
             max: 4,
           ),
           availability: context.knobs.object.dropdown(
-            label: 'State \u00b7 Availability',
+            label: 'State · Availability',
             options: FieldAvailability.values,
             labelBuilder: semanticValueLabel,
           ),
@@ -158,20 +158,20 @@ final class _AsyncAutosuggestPreviewState
 }
 
 final uploadProgressComponent = WidgetbookComponent(
-  name: 'Upload Progress',
+  name: 'Upload progress',
   useCases: [
     WidgetbookUseCase(
       name: 'Playground',
       builder: (context) => preview(
         CarpenterUploadProgress(
           value: context.knobs.double.slider(
-            label: 'State \u00b7 Progress',
+            label: 'State · Progress',
             initialValue: .5,
             min: 0,
             max: 1,
           ),
           semanticLabel: context.knobs.string(
-            label: 'Content \u00b7 Semantic label',
+            label: 'Content · Semantic label',
             initialValue: 'Invoice attachment upload',
           ),
         ),
@@ -181,19 +181,19 @@ final uploadProgressComponent = WidgetbookComponent(
 );
 
 final fieldShellComponent = WidgetbookComponent(
-  name: 'Field Shell',
+  name: 'Field shell',
   useCases: [
     WidgetbookUseCase(
       name: 'Playground',
       builder: (context) => preview(
         CarpenterFieldShell(
           availability: context.knobs.object.dropdown(
-            label: 'State \u00b7 Availability',
+            label: 'State · Availability',
             options: FieldAvailability.values,
             labelBuilder: semanticValueLabel,
           ),
           size: context.knobs.object.dropdown(
-            label: 'Appearance \u00b7 Size',
+            label: 'Appearance · Size',
             options: FieldSize.values,
             initialOption: FieldSize.medium,
             labelBuilder: semanticValueLabel,
@@ -201,20 +201,20 @@ final fieldShellComponent = WidgetbookComponent(
           shape: CarpenterShape.rounded,
           states: const {},
           label: context.knobs.string(
-            label: 'Content \u00b7 Label',
+            label: 'Content · Label',
             initialValue: 'Custom field',
           ),
           description:
               context.knobs.boolean(
-                label: 'Content \u00b7 Show description',
+                label: 'Content · Show description',
                 initialValue: true,
               )
               ? 'Shell for an application-owned editing control'
               : null,
-          errorText: context.knobs.boolean(label: 'State \u00b7 Show error')
+          errorText: context.knobs.boolean(label: 'State · Show error')
               ? 'A value is required'
               : null,
-          required: context.knobs.boolean(label: 'State \u00b7 Required'),
+          required: context.knobs.boolean(label: 'State · Required'),
           child: const CarpenterText.body('Read-only demonstration content'),
         ),
       ),
@@ -223,7 +223,7 @@ final fieldShellComponent = WidgetbookComponent(
 );
 
 final gravityIconComponent = WidgetbookComponent(
-  name: 'Gravity Icon',
+  name: 'Gravity icon',
   useCases: [
     WidgetbookUseCase(
       name: 'Playground',
@@ -231,13 +231,13 @@ final gravityIconComponent = WidgetbookComponent(
         GravityIcon(
           GravityIcons.folder,
           size: context.knobs.object.dropdown(
-            label: 'Appearance \u00b7 Size',
+            label: 'Appearance · Size',
             options: IconSize.values,
             initialOption: IconSize.medium,
             labelBuilder: semanticValueLabel,
           ),
           colorRole: context.knobs.object.dropdown(
-            label: 'Appearance \u00b7 Color role',
+            label: 'Appearance · Color role',
             options: ContentColorRole.values,
             labelBuilder: semanticValueLabel,
           ),

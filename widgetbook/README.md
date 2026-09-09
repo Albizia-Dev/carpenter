@@ -1,53 +1,77 @@
 # Carpenter Widgetbook
 
-The catalog is executable documentation of Carpenter's public API. Its single
-registry is `lib/catalog.dart`; the app and catalog tests use that same object.
+Каталог показывает публичный API современного Carpenter. Единственный реестр —
+`lib/catalog.dart`. Legacy из `carpenter_older.dart` намеренно не включён:
+не добавляйте для него разделы и сценарии.
 
-## Run and verify
+## Навигация
+
+| Раздел | Что искать |
+| --- | --- |
+| Foundation | Цвета, типографика, каталог иконок |
+| Components | Действия, контент, ввод текста, выбор, даты, файлы, обратная связь |
+| Collections | Списки, таблицы и деревья, доски, фильтрация, инспектор |
+| Overlays | Меню, всплывающее содержимое, диалоги и уведомления |
+| Layout | Оболочки приложения, структура страницы, адаптивные области |
+| Pages | Просмотр коллекций, карточки, редактирование, процессы, состояния |
+| Application | Runtime, команды, взаимодействия и жизненный цикл данных |
+| Examples | Составные рабочие экраны платежей и проектов |
+
+Навигация организована по назначению. Расположение исходников сохраняет слои
+библиотеки. Например, проверки выравнивания Tree table находятся рядом с его
+основным примером, а не в отдельном псевдокомпоненте.
+
+У каждого компонента вне Foundation первым идёт единственный `Playground`.
+Дополнительные случаи используют общие префиксы: `Variants` для сравнения
+вариантов, `States` для состояний, `Edge cases` для ограничений и пограничных
+условий, `Scenario` для взаимодействий, `Accessibility` для доступности.
+Справочные страницы Foundation используют `Reference`.
+Названия компонентов пишутся в sentence case.
+
+## Окружение и настройки
+
+Viewport задаётся только общим addon: телефон и планшет в двух ориентациях,
+малый и большой desktop. Размеры берутся из тех же пресетов, что используются
+в регрессионных тестах. Явные фиксированные рамки допустимы в пограничных кейсах.
+Ширина родителя в проверке конкретного компонента не заменяет viewport.
+
+Общими остаются восемь комбинаций светлой/тёмной темы, обычной/компактной
+плотности и обычного/высокого контраста, масштаб текста, направление LTR/RTL,
+скорость анимации, zoom и семантика. Текст примеров наследует цвет Carpenter.
+Отдельные компоненты получают отступ 1.5 rem; Layout, Pages и Examples занимают
+весь viewport. Обёртка не добавляет прокрутку: ею управляет сам пример.
+
+Настройки группируются как `Content`, `Appearance`, `State`, `Behavior`, `Data`,
+`Layout`, `Accessibility`. Уточнение объекта помещается после категории,
+например `Behavior · Selection / Mode`. Метки enum формируются через
+`semanticValueLabel`, без технических camelCase-имён. Большие семейства ролей,
+размещения и платформ выбираются выпадающим списком, чтобы не растягивать
+панель настроек.
+
+Примеры владеют своими контроллерами и освобождают их. Для загрузок и ошибок
+используются локальные детерминированные данные. Импорт Carpenter — только
+`package:carpenter/carpenter.dart`; не добавляйте зависимости на `src/` или legacy.
+
+## Проверки
+
+Из `widgetbook/`:
 
 ```sh
-flutter pub get
-flutter run -d chrome
 dart analyze lib test
 flutter test
-flutter build web --release --base-href /carpenter/
 ```
 
-The interactive run command is for developers; repository automation uses only
-static analysis, non-golden widget tests, and builds. Do not add screenshot or
-golden tests.
+Тесты проверяют структуру и уникальность каталога, сохранение сценариев,
+ограничения preview, темы и поведение существующих примеров. Снимки экрана,
+golden-тесты и ручной запуск приложения не входят в автоматическую проверку.
 
-## Catalog conventions
+Из `tool/documentation/`:
 
-Use the existing groups: Foundation, Basic, Behaviour, Collections, Layout,
-Page Patterns, Samples. Each component outside Foundation has exactly one
-`Playground`. Additional cases isolate a meaningful contract or compare roles;
-they must not duplicate every possible knob combination.
+```sh
+dart run bin/audit.dart ../.. --check
+```
 
-Use the global viewport, theme, density, contrast, units, text scaling, motion,
-and semantics controls. The shared theme list covers light/dark, normal/compact,
-and normal/high-contrast combinations. Do not add another viewport selector to
-a component. Fixed viewport helpers remain available for explicitly named
-regression scenarios, not as a competing global environment.
-
-Knobs use semantic labels such as `Content`, `State`, `Appearance`, `Behavior`,
-and `Data`. Enum labels go through `semanticValueLabel`; the fallback humanizes
-new enum names rather than exposing qualified Dart identifiers.
-
-Stateful examples own and dispose their controllers. Demonstrate real edits,
-selection and callbacks, with deterministic fixtures and local fake loaders.
-Do not call live services or pretend a decorated error is validation. Use
-`package:carpenter/carpenter.dart`, not implementation imports.
-
-The additional primitives, editable table, and validation examples exercise
-calendar selection, async options and failure/cancellation, custom field
-shells, upload progress, bundled SVG icons, row addition/removal, totals, and
-field-validation summaries.
-
-## Coverage status
-
-The public API is larger than the current catalog. This refactor does not claim
-that every public widget and state has been covered. Run the documentation audit
-from `../tool/documentation` for current counts, evidence and named remaining
-debt. Catalog-source references, registration tests and behavioral tests are
-separate measurements, not interchangeable percentages.
+Аудит измеряет ссылки на публичные конструкторы, а не полноту визуального
+покрытия. Базовую линию долга нельзя увеличивать ради прохождения проверки.
+Наличие примера в исходнике, регистрация в каталоге и поведенческий тест —
+отдельные свидетельства; каталог пока не покрывает весь публичный API.

@@ -5,7 +5,7 @@ import 'package:widgetbook/widgetbook.dart';
 import '../../helpers/preview.dart';
 
 final explorerInteractionsComponent = WidgetbookComponent(
-  name: 'Explorer Interactions',
+  name: 'Explorer interactions',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _explorerInteractions),
   ],

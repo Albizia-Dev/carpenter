@@ -10,8 +10,14 @@ final tableComponent = WidgetbookComponent(
   name: 'Table',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'Alignment contract', builder: _alignmentContract),
-    WidgetbookUseCase(name: 'Edge cases', builder: _edgeCases),
+    WidgetbookUseCase(
+      name: 'Edge cases · Cell alignment',
+      builder: _alignmentContract,
+    ),
+    WidgetbookUseCase(
+      name: 'Edge cases · Content and geometry',
+      builder: _edgeCases,
+    ),
   ],
 );
 
@@ -23,30 +29,31 @@ Widget _playground(BuildContext context) {
     max: 100,
   );
   final scenario = context.knobs.object.dropdown(
-    label: 'Snapshot · Scenario',
+    label: 'State · Snapshot / Scenario',
     options: DemoCollectionScenario.values,
     initialOption: DemoCollectionScenario.loaded,
     labelBuilder: semanticValueLabel,
   );
   final pagination = context.knobs.object.segmented(
-    label: 'Pagination · Contract',
+    label: 'Data · Pagination / Contract',
     options: DemoPaginationFixture.values,
     initialOption: DemoPaginationFixture.cursor,
     labelBuilder: semanticValueLabel,
   );
   final selectionMode = context.knobs.object.segmented(
-    label: 'Selection · Mode',
+    label: 'Behavior · Selection / Mode',
     options: CollectionSelectionMode.values,
     initialOption: CollectionSelectionMode.multiple,
     labelBuilder: semanticValueLabel,
   );
-  final narrow = context.knobs.boolean(label: 'Viewport · Narrow');
   final longText = context.knobs.boolean(label: 'Content · Long text');
-  final manyColumns = context.knobs.boolean(label: 'Columns · Many columns');
+  final manyColumns = context.knobs.boolean(
+    label: 'Data · Columns / Many columns',
+  );
 
   return preview(
     SizedBox(
-      width: narrow ? 320 : 900,
+      width: double.infinity,
       child: _TablePreview(
         rowCount: rowCount,
         scenario: scenario,

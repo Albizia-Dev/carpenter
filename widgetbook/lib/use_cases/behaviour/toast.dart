@@ -11,7 +11,7 @@ final toastComponent = WidgetbookComponent(
 
 Widget _playground(BuildContext context) {
   final role = context.knobs.object.segmented(
-    label: 'Feedback · Role',
+    label: 'State · Feedback / Role',
     options: [
       FeedbackColorRole.info,
       FeedbackColorRole.success,
@@ -33,24 +33,24 @@ Widget _playground(BuildContext context) {
     initialValue: true,
   );
   final duration = context.knobs.object.segmented(
-    label: 'Motion · Duration',
+    label: 'Behavior · Motion / Duration',
     options: ToastDuration.values,
     labelBuilder: semanticValueLabel,
   );
   final placement = context.knobs.object.segmented(
-    label: 'Stack · Placement',
+    label: 'Layout · Stack / Placement',
     options: CarpenterToastPlacement.values,
     initialOption: CarpenterToastPlacement.topEnd,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
   final maxVisible = context.knobs.int.slider(
-    label: 'Stack · Max visible',
+    label: 'Layout · Stack / Max visible',
     initialValue: 3,
     min: 1,
     max: 8,
   );
   final burstSize = context.knobs.int.slider(
-    label: 'Stack · Burst size',
+    label: 'Layout · Stack / Burst size',
     initialValue: 4,
     min: 1,
     max: 12,

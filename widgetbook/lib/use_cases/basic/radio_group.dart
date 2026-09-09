@@ -8,11 +8,11 @@ import '../../helpers/preview.dart';
 enum _Plan { starter, team, enterprise }
 
 final radioGroupComponent = WidgetbookComponent(
-  name: 'Radio Group',
+  name: 'Radio group',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'Size comparison', builder: _sizeComparison),
-    WidgetbookUseCase(name: 'Color roles', builder: _colorRoles),
+    WidgetbookUseCase(name: 'Variants · Sizes', builder: _sizeComparison),
+    WidgetbookUseCase(name: 'Variants · Color roles', builder: _colorRoles),
   ],
 );
 
@@ -73,7 +73,7 @@ Widget _playground(BuildContext context) {
     label: 'State · Value',
     options: _Plan.values,
     initialOption: _Plan.team,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
   final orientation = context.knobs.object.segmented(
     label: 'Layout · Orientation',
@@ -85,7 +85,7 @@ Widget _playground(BuildContext context) {
     options: ControlSize.values,
     labelBuilder: semanticValueLabel,
   );
-  final colorRole = context.knobs.object.segmented(
+  final colorRole = context.knobs.object.dropdown(
     label: 'Appearance · Color role',
     options: SelectionColorRole.values,
     initialOption: SelectionColorRole.primary,

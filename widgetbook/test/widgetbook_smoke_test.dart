@@ -15,55 +15,74 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
-  test(
-    'catalog has stable groups, unique names, and canonical playgrounds',
-    () {
-      expect(carpenterCatalog.map((node) => node.name), [
-        'Foundation',
-        'Basic',
-        'Behaviour',
-        'Collections',
-        'Layout',
-        'Application',
-        'Page Patterns',
-        'Samples',
-      ]);
-      final paths = <String>{};
-      for (final group in carpenterCatalog) {
-        final children = group.children!;
-        expect(children, isNotEmpty, reason: group.name);
+  test('catalog has stable groups, unique names, and canonical playgrounds', () {
+    expect(carpenterCatalog.map((node) => node.name), [
+      'Foundation',
+      'Components',
+      'Collections',
+      'Overlays',
+      'Layout',
+      'Pages',
+      'Application',
+      'Examples',
+    ]);
+    final componentNames = <String>{};
+    final caseBuilders = <Object>{};
+    void visit(WidgetbookNode node, String parent) {
+      final path = '$parent/${node.name}';
+      expect(node.name.trim(), node.name);
+      final children = node.children!;
+      expect(children, isNotEmpty, reason: path);
+      expect(
+        children.map((child) => child.name).toSet(),
+        hasLength(children.length),
+        reason: 'Duplicate path: $path',
+      );
+      if (node is WidgetbookComponent) {
         expect(
-          children.map((node) => node.name).toSet().length,
-          children.length,
-          reason: 'Duplicate component in ${group.name}',
+          componentNames.add(node.name),
+          isTrue,
+          reason: 'Component registered more than once: $path',
         );
-        for (final component in children.cast<WidgetbookComponent>()) {
-          expect(component.name.trim(), component.name);
-          expect(component.useCases, isNotEmpty, reason: component.name);
+        for (final useCase in node.useCases) {
+          expect(useCase.name.trim(), useCase.name);
+          caseBuilders.add(useCase.builder);
           expect(
-            component.useCases.map((item) => item.name).toSet().length,
-            component.useCases.length,
-            reason: 'Duplicate case in ${component.name}',
+            useCase.name,
+            matches(
+              r'^(Playground|Accessibility|(Reference|Variants|States|Edge cases|Scenario) · .+)$',
+            ),
+            reason: path,
           );
-          for (final useCase in component.useCases) {
-            expect(
-              paths.add('${group.name}/${component.name}/${useCase.name}'),
-              isTrue,
-            );
-            expect(useCase.name.trim(), useCase.name);
-          }
-          // Foundation pages compare tokens rather than instantiate one widget.
-          if (group.name != 'Foundation') {
-            expect(
-              component.useCases.where((item) => item.name == 'Playground'),
-              hasLength(1),
-              reason: '${group.name}/${component.name}',
-            );
-          }
+        }
+        if (!path.startsWith('/Foundation/')) {
+          expect(node.useCases.first.name, 'Playground', reason: path);
+          expect(
+            node.useCases.where((item) => item.name == 'Playground'),
+            hasLength(1),
+            reason: path,
+          );
+        }
+      } else {
+        for (final child in children) {
+          visit(child, path);
         }
       }
-    },
-  );
+    }
+
+    for (final group in carpenterCatalog) {
+      visit(group, '');
+    }
+    expect(componentNames, isNot(contains('Tree table contracts')));
+    expect(
+      componentNames,
+      containsAll(['Tree table', 'Payment list', 'Project page']),
+    );
+    // Inventory before reorganization: 99 components, 178 scenarios.
+    // Contract demos now belong to Tree table; no scenario was removed.
+    expect(componentNames, hasLength(98));
+    expect(caseBuilders, hasLength(178));
+  });
 
   test(
     'shared environment covers all brightness, density, and contrast axes',

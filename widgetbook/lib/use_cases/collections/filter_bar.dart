@@ -5,44 +5,44 @@ import 'package:widgetbook/widgetbook.dart';
 import '../../helpers/preview.dart';
 
 final filterBarComponent = WidgetbookComponent(
-  name: 'Filter Bar',
+  name: 'Filter bar',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'Alignment stress', builder: _alignmentStress),
-    WidgetbookUseCase(name: 'Responsive states', builder: _responsiveStates),
+    WidgetbookUseCase(
+      name: 'Edge cases · Alignment stress',
+      builder: _alignmentStress,
+    ),
+    WidgetbookUseCase(
+      name: 'States · Responsive states',
+      builder: _responsiveStates,
+    ),
   ],
 );
 
 Widget _playground(BuildContext context) {
-  final width = context.knobs.double.slider(
-    label: 'Viewport · Width',
-    initialValue: 880,
-    min: 280,
-    max: 1200,
-  );
   final activeFilters = context.knobs.int.slider(
-    label: 'Filters · Active count',
+    label: 'Data · Filters / Active count',
     initialValue: 2,
     min: 0,
     max: 8,
   );
   final filters = context.knobs.int.slider(
-    label: 'Filters · Controls',
+    label: 'Data · Filters / Controls',
     initialValue: 3,
     min: 0,
     max: 6,
   );
   final extraActions = context.knobs.boolean(
-    label: 'Actions · Extra actions',
+    label: 'Behavior · Actions / Extra actions',
     initialValue: true,
   );
   final labeledSearch = context.knobs.boolean(
-    label: 'Search · Show label',
+    label: 'Data · Search / Show label',
     initialValue: true,
   );
   return preview(
     SizedBox(
-      width: width,
+      width: double.infinity,
       child: _FilterBarPreview(
         activeFilters: activeFilters,
         filterCount: filters,

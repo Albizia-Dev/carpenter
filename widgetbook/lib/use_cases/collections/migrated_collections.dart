@@ -4,34 +4,37 @@ import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
-import '../../helpers/preview.dart';
+import '../../helpers/labels.dart';
 
-import 'package:carpenter_units/carpenter_units.dart';
+import '../../helpers/preview.dart';
 
 enum _CollectionFailureMode { none, initial, query, refresh, loadMore }
 
 enum _InspectorSample { nested, compact, empty, list }
 
 final collectionLifecycleComponent = WidgetbookComponent(
-  name: 'Collection Lifecycle',
+  name: 'Collection lifecycle',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _lifecyclePlayground),
   ],
 );
 
 final listTileComponent = WidgetbookComponent(
-  name: 'List Tile',
+  name: 'List tile',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _listTilePlayground),
-    WidgetbookUseCase(name: 'State matrix', builder: _listTiles),
+    WidgetbookUseCase(name: 'States · Overview', builder: _listTiles),
   ],
 );
 
 final paginationBarComponent = WidgetbookComponent(
-  name: 'Pagination Bar',
+  name: 'Pagination bar',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _pagination),
-    WidgetbookUseCase(name: 'Scenarios', builder: _paginationScenarios),
+    WidgetbookUseCase(
+      name: 'Scenario · Scenarios',
+      builder: _paginationScenarios,
+    ),
   ],
 );
 
@@ -42,27 +45,27 @@ final inspectorComponent = WidgetbookComponent(
 
 Widget _lifecyclePlayground(BuildContext context) {
   final delayMs = context.knobs.double.slider(
-    label: 'Network · Delay (ms)',
+    label: 'Data · Network / Delay (ms)',
     initialValue: 550,
     min: 0,
     max: 2000,
     divisions: 20,
   );
   final debounceMs = context.knobs.double.slider(
-    label: 'Search · Debounce (ms)',
+    label: 'Data · Search / Debounce (ms)',
     initialValue: 350,
     min: 0,
     max: 1000,
     divisions: 20,
   );
   final failureMode = context.knobs.object.segmented(
-    label: 'Network · Failure',
+    label: 'Data · Network / Failure',
     options: _CollectionFailureMode.values,
     initialOption: _CollectionFailureMode.none,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
   final hasMore = context.knobs.boolean(
-    label: 'Paging · Has next page',
+    label: 'Data · Paging / Has next page',
     initialValue: true,
   );
   final searchLabel = context.knobs.string(
@@ -387,7 +390,7 @@ Widget _pagination(BuildContext context) {
       )
       .round();
   final siblingCount = context.knobs.int.slider(
-    label: 'Navigation · Sibling pages',
+    label: 'Behavior · Navigation / Sibling pages',
     initialValue: 1,
     min: 0,
     max: 4,
@@ -504,18 +507,18 @@ Widget _inspector(BuildContext context) {
     label: 'Data · Sample',
     options: _InspectorSample.values,
     initialOption: _InspectorSample.nested,
-    labelBuilder: (value) => value.name,
+    labelBuilder: semanticValueLabel,
   );
   final emptyMessage = context.knobs.string(
     label: 'Content · Empty message',
     initialValue: 'No data',
   );
   final uppercaseLabels = context.knobs.boolean(
-    label: 'Formatting · Uppercase labels',
+    label: 'Appearance · Formatting / Uppercase labels',
     initialValue: false,
   );
   final hideTechnical = context.knobs.boolean(
-    label: 'Formatting · Hide id fields',
+    label: 'Appearance · Formatting / Hide id fields',
     initialValue: false,
   );
   final width = context.knobs.double.slider(

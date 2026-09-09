@@ -15,20 +15,20 @@ Widget _playground(BuildContext context) {
     label: 'Content · Text',
     initialValue: 'Создать копию документа',
   );
-  final placement = context.knobs.object.segmented(
-    label: 'Position · Placement',
+  final placement = context.knobs.object.dropdown(
+    label: 'Layout · Position / Placement',
     options: OverlayPlacement.values,
     initialOption: OverlayPlacement.top,
     labelBuilder: semanticValueLabel,
   );
   final showDelay = context.knobs.object.segmented(
-    label: 'Motion · Show delay',
+    label: 'Behavior · Motion / Show delay',
     options: TooltipDelay.values,
     initialOption: TooltipDelay.long,
     labelBuilder: semanticValueLabel,
   );
   final hideDelay = context.knobs.object.segmented(
-    label: 'Motion · Hide delay',
+    label: 'Behavior · Motion / Hide delay',
     options: TooltipDelay.values,
     initialOption: TooltipDelay.short,
     labelBuilder: semanticValueLabel,

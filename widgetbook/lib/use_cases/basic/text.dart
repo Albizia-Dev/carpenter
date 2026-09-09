@@ -9,7 +9,10 @@ final textComponent = WidgetbookComponent(
   name: 'Text',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'Edge cases', builder: _edgeCases),
+    WidgetbookUseCase(
+      name: 'Edge cases · Content and geometry',
+      builder: _edgeCases,
+    ),
     WidgetbookUseCase(name: 'Accessibility', builder: _accessibility),
   ],
 );
@@ -48,19 +51,19 @@ Widget _playground(BuildContext context) {
     defaultToNull: true,
   );
   final maxLines = context.knobs.intOrNull.input(
-    label: 'Behaviour · Max lines',
+    label: 'Behavior · Max lines',
     initialValue: 2,
     defaultToNull: true,
   );
   final overflow = context.knobs.objectOrNull.dropdown(
-    label: 'Behaviour · Overflow',
+    label: 'Behavior · Overflow',
     options: TextOverflow.values,
     initialOption: TextOverflow.ellipsis,
     labelBuilder: semanticValueLabel,
     defaultToNull: true,
   );
   final softWrap = context.knobs.booleanOrNull(
-    label: 'Behaviour · Soft wrap',
+    label: 'Behavior · Soft wrap',
     initialValue: true,
     defaultToNull: true,
   );

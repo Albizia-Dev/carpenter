@@ -2,16 +2,19 @@ import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 
 Widget preview(Widget child) => Align(
-  alignment: Alignment.topLeft,
+  alignment: AlignmentDirectional.topStart,
   child: SingleChildScrollView(child: child),
 );
 
 Widget previewColumn(List<Widget> children) => preview(
   Column(
     crossAxisAlignment: CrossAxisAlignment.start,
-    children: children
-        .expand((child) => [child, const _PreviewGap()])
-        .toList(growable: false),
+    children: [
+      for (var index = 0; index < children.length; index++) ...[
+        if (index > 0) const _PreviewGap(),
+        children[index],
+      ],
+    ],
   ),
 );
 

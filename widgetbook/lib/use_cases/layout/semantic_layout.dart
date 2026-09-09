@@ -8,10 +8,13 @@ import '../../helpers/demo_network.dart';
 import '../../helpers/layout_viewport.dart';
 
 final applicationShellComponent = WidgetbookComponent(
-  name: 'Application Shell',
+  name: 'Application shell',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _shellPlayground),
-    WidgetbookUseCase(name: 'Invoice workspace', builder: _workspaceCase),
+    WidgetbookUseCase(
+      name: 'Scenario · Invoice workspace',
+      builder: _workspaceCase,
+    ),
   ],
 );
 
@@ -19,27 +22,33 @@ final toolbarComponent = WidgetbookComponent(
   name: 'Toolbar',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _toolbarPlayground),
-    WidgetbookUseCase(name: 'Async actions', builder: _asyncToolbarCase),
+    WidgetbookUseCase(
+      name: 'Scenario · Async actions',
+      builder: _asyncToolbarCase,
+    ),
   ],
 );
 
 final splitViewComponent = WidgetbookComponent(
-  name: 'Split View',
+  name: 'Split view',
   useCases: [WidgetbookUseCase(name: 'Playground', builder: _splitPlayground)],
 );
 
 final adaptiveRegionComponent = WidgetbookComponent(
-  name: 'Adaptive Region',
+  name: 'Adaptive region',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _adaptivePlayground),
   ],
 );
 
 final masterDetailComponent = WidgetbookComponent(
-  name: 'Master / Detail',
+  name: 'Master / detail',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _masterDetailPlayground),
-    WidgetbookUseCase(name: 'Network records', builder: _networkRecordsCase),
+    WidgetbookUseCase(
+      name: 'Scenario · Network records',
+      builder: _networkRecordsCase,
+    ),
   ],
 );
 
@@ -65,9 +74,11 @@ Widget buildInvoiceWorkspaceDemo() => const _InvoiceWorkspace();
 Widget buildNetworkRecordsDemo() => const _NetworkMasterDetail();
 
 Widget _shellPlayground(BuildContext context) {
-  final touch = context.knobs.boolean(label: 'Capabilities · Touch oriented');
+  final touch = context.knobs.boolean(
+    label: 'Behavior · Capabilities / Touch oriented',
+  );
   final showSecondary = context.knobs.boolean(
-    label: 'Regions · Show secondary',
+    label: 'Layout · Regions / Show secondary',
   );
   return layoutViewportPreview(
     context,
@@ -92,7 +103,7 @@ Widget _shellPlayground(BuildContext context) {
 
 Widget _toolbarPlayground(BuildContext context) {
   final count = context.knobs.int.slider(
-    label: 'Actions · Count',
+    label: 'Behavior · Actions / Count',
     initialValue: 5,
     min: 1,
     max: 8,
@@ -110,9 +121,9 @@ Widget _toolbarPlayground(BuildContext context) {
                 label: 'Action ${index + 1}',
                 onInvoke: () {},
               ),
-              priority: index == 0
-                  ? CarpenterToolbarPriority.critical
-                  : CarpenterToolbarPriority.normal,
+              group: index == 0
+                  ? CarpenterToolbarGroup.primary
+                  : CarpenterToolbarGroup.secondary,
               prominence: index == 0
                   ? ActionProminence.high
                   : ActionProminence.ghost,
@@ -125,13 +136,13 @@ Widget _toolbarPlayground(BuildContext context) {
 
 Widget _splitPlayground(BuildContext context) {
   final initialPosition = context.knobs.double.slider(
-    label: 'Split · Position',
+    label: 'Layout · Split / Position',
     initialValue: 0.45,
     min: 0.2,
     max: 0.8,
   );
   final orientation = context.knobs.object.segmented(
-    label: 'Split · Orientation',
+    label: 'Layout · Split / Orientation',
     options: CarpenterSplitOrientation.values,
     labelBuilder: semanticValueLabel,
   );
@@ -146,11 +157,11 @@ Widget _splitPlayground(BuildContext context) {
 
 Widget _adaptivePlayground(BuildContext context) {
   final visible = context.knobs.boolean(
-    label: 'Region · Visible',
+    label: 'Layout · Region / Visible',
     initialValue: true,
   );
   final role = context.knobs.object.segmented(
-    label: 'Region · Role',
+    label: 'Layout · Region / Role',
     options: CarpenterRegionRole.values,
     initialOption: CarpenterRegionRole.secondary,
     labelBuilder: semanticValueLabel,
@@ -169,7 +180,7 @@ Widget _adaptivePlayground(BuildContext context) {
 
 Widget _masterDetailPlayground(BuildContext context) {
   final selected = context.knobs.boolean(
-    label: 'Selection · Has detail',
+    label: 'Behavior · Selection / Has detail',
     initialValue: true,
   );
   return layoutViewportPreview(
@@ -386,7 +397,7 @@ final class _AsyncToolbarState extends State<_AsyncToolbar> {
           colorRole: ActionColorRole.primary,
           onInvoke: _saving ? null : () => _run(save: true),
         ),
-        priority: CarpenterToolbarPriority.critical,
+        group: CarpenterToolbarGroup.primary,
         prominence: ActionProminence.high,
         executionPhase: _saving
             ? ActionExecutionPhase.running
@@ -408,7 +419,7 @@ final class _AsyncToolbarState extends State<_AsyncToolbar> {
           label: 'Export report',
           onInvoke: () {},
         ),
-        priority: CarpenterToolbarPriority.overflow,
+        group: CarpenterToolbarGroup.overflow,
       ),
     ],
   );

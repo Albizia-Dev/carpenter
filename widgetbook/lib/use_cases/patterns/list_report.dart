@@ -7,22 +7,25 @@ import '../../helpers/labels.dart';
 import '../../helpers/layout_viewport.dart';
 
 final listReportComponent = WidgetbookComponent(
-  name: 'List Report',
+  name: 'List report',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'Operational report', builder: _operationalReport),
+    WidgetbookUseCase(
+      name: 'Scenario · Operational report',
+      builder: _operationalReport,
+    ),
   ],
 );
 
 Widget _playground(BuildContext context) {
   final scenario = context.knobs.object.dropdown(
-    label: 'Collection · State',
+    label: 'Data · Collection / State',
     options: DemoCollectionScenario.values,
     initialOption: DemoCollectionScenario.loaded,
     labelBuilder: semanticValueLabel,
   );
   final rows = context.knobs.int.slider(
-    label: 'Collection · Rows',
+    label: 'Data · Collection / Rows',
     initialValue: 8,
     min: 0,
     max: 40,

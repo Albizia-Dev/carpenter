@@ -5,12 +5,12 @@ import 'package:widgetbook/widgetbook.dart';
 import '../../helpers/preview.dart';
 
 final editableTableComponent = WidgetbookComponent(
-  name: 'Editable Table',
+  name: 'Editable table',
   useCases: [
     WidgetbookUseCase(
       name: 'Playground',
       builder: (context) {
-        final empty = context.knobs.boolean(label: 'Data \u00b7 Start empty');
+        final empty = context.knobs.boolean(label: 'Data · Start empty');
         return preview(
           EditableTablePreview(key: ValueKey(empty), initiallyEmpty: empty),
         );

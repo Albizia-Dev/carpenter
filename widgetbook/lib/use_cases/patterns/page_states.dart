@@ -6,10 +6,10 @@ import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
 
 final pageStateComponent = WidgetbookComponent(
-  name: 'Page State',
+  name: 'Page state',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
-    WidgetbookUseCase(name: 'State matrix', builder: _matrix),
+    WidgetbookUseCase(name: 'States · Overview', builder: _matrix),
   ],
 );
 

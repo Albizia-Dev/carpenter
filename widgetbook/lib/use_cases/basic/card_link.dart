@@ -15,7 +15,7 @@ final linkComponent = WidgetbookComponent(
   name: 'Link',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _linkPlayground),
-    WidgetbookUseCase(name: 'Roles', builder: _linkRoles),
+    WidgetbookUseCase(name: 'Variants · Roles', builder: _linkRoles),
   ],
 );
 
@@ -164,7 +164,7 @@ Widget _linkPlayground(BuildContext context) {
   final overrideColor = context.knobs.boolean(
     label: 'Appearance · Override action color',
   );
-  final colorRole = context.knobs.object.segmented(
+  final colorRole = context.knobs.object.dropdown(
     label: 'Appearance · Action color',
     options: ActionColorRole.values,
     initialOption: ActionColorRole.utility,

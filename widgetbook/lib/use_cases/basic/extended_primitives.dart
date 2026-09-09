@@ -6,20 +6,20 @@ import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
 
 final numberInputComponent = WidgetbookComponent(
-  name: 'Number Input',
+  name: 'Number input',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _numberInput),
-    WidgetbookUseCase(name: 'States', builder: _numberStates),
+    WidgetbookUseCase(name: 'States · Overview', builder: _numberStates),
   ],
 );
 
 final timeInputComponent = WidgetbookComponent(
-  name: 'Time Input',
+  name: 'Time input',
   useCases: [WidgetbookUseCase(name: 'Playground', builder: _timeInput)],
 );
 
 final dateRangeInputComponent = WidgetbookComponent(
-  name: 'Date Range Input',
+  name: 'Date range input',
   useCases: [WidgetbookUseCase(name: 'Playground', builder: _dateRangeInput)],
 );
 
@@ -27,29 +27,29 @@ final badgeComponent = WidgetbookComponent(
   name: 'Badge',
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _badge),
-    WidgetbookUseCase(name: 'Roles', builder: _badgeRoles),
+    WidgetbookUseCase(name: 'Variants · Roles', builder: _badgeRoles),
   ],
 );
 
 final avatarGroupComponent = WidgetbookComponent(
-  name: 'Avatar Group',
+  name: 'Avatar group',
   useCases: [WidgetbookUseCase(name: 'Playground', builder: _avatarGroup)],
 );
 
 Widget _numberInput(BuildContext context) {
   final initial = context.knobs.double.slider(
-    label: 'Value · Initial',
+    label: 'Content · Value / Initial',
     initialValue: 1250.5,
     min: -10000,
     max: 10000,
     divisions: 200,
   );
   final allowDecimal = context.knobs.boolean(
-    label: 'Behaviour · Decimal',
+    label: 'Behavior · Decimal',
     initialValue: true,
   );
   final allowNegative = context.knobs.boolean(
-    label: 'Behaviour · Negative',
+    label: 'Behavior · Negative',
     initialValue: true,
   );
   final enabled = context.knobs.boolean(
@@ -141,13 +141,13 @@ Widget _numberStates(BuildContext context) => previewColumn([
 
 Widget _timeInput(BuildContext context) {
   final minuteStep = context.knobs.object.segmented(
-    label: 'Behaviour · Minute step',
+    label: 'Behavior · Minute step',
     options: const [1, 5, 10, 15, 30],
     initialOption: 5,
     labelBuilder: (value) => '$value min',
   );
   final allowClear = context.knobs.boolean(
-    label: 'Behaviour · Allow clear',
+    label: 'Behavior · Allow clear',
     initialValue: true,
   );
   final enabled = context.knobs.boolean(
@@ -193,13 +193,13 @@ final class _TimePreviewState extends State<_TimePreview> {
 
 Widget _dateRangeInput(BuildContext context) {
   final start = context.knobs.dateTimeOrNull(
-    label: 'Value · Start',
+    label: 'Content · Value / Start',
     initialValue: DateTime(2026, 9, 1),
     start: DateTime(2025),
     end: DateTime(2028, 12, 31),
   );
   final end = context.knobs.dateTimeOrNull(
-    label: 'Value · End',
+    label: 'Content · Value / End',
     initialValue: DateTime(2026, 9, 12),
     start: DateTime(2025),
     end: DateTime(2028, 12, 31),
@@ -301,7 +301,7 @@ Widget _avatarGroup(BuildContext context) {
       .round();
   final maxVisible = context.knobs.double
       .slider(
-        label: 'Behaviour · Visible',
+        label: 'Behavior · Visible',
         initialValue: 4,
         min: 1,
         max: 8,

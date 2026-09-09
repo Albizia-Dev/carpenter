@@ -24,10 +24,19 @@ const _weights = <int>[
 final foundationColorsComponent = WidgetbookComponent(
   name: 'Colors',
   useCases: [
-    WidgetbookUseCase(name: 'Palettes', builder: _palettes),
-    WidgetbookUseCase(name: 'Semantic tokens', builder: _semanticTokens),
-    WidgetbookUseCase(name: 'Action matrix', builder: _actionMatrix),
-    WidgetbookUseCase(name: 'Selection roles', builder: _selectionRoles),
+    WidgetbookUseCase(name: 'Reference · Palettes', builder: _palettes),
+    WidgetbookUseCase(
+      name: 'Reference · Semantic tokens',
+      builder: _semanticTokens,
+    ),
+    WidgetbookUseCase(
+      name: 'Reference · Action matrix',
+      builder: _actionMatrix,
+    ),
+    WidgetbookUseCase(
+      name: 'Reference · Selection roles',
+      builder: _selectionRoles,
+    ),
   ],
 );
 

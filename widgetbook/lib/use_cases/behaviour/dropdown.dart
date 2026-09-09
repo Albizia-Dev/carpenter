@@ -12,28 +12,32 @@ final dropdownComponent = WidgetbookComponent(
 
 Widget _playground(BuildContext context) {
   final label = context.knobs.string(
-    label: 'Trigger · Label',
+    label: 'Behavior · Trigger / Label',
     initialValue: 'Действия',
   );
-  final iconOnly = context.knobs.boolean(label: 'Trigger · Icon only');
-  final role = context.knobs.object.segmented(
-    label: 'Trigger · Role',
+  final iconOnly = context.knobs.boolean(
+    label: 'Behavior · Trigger / Icon only',
+  );
+  final role = context.knobs.object.dropdown(
+    label: 'Behavior · Trigger / Role',
     options: ActionColorRole.values,
     initialOption: ActionColorRole.utility,
     labelBuilder: semanticValueLabel,
   );
-  final prominence = context.knobs.object.segmented(
-    label: 'Trigger · Prominence',
+  final prominence = context.knobs.object.dropdown(
+    label: 'Behavior · Trigger / Prominence',
     options: ActionProminence.values,
     labelBuilder: semanticValueLabel,
   );
   final size = context.knobs.object.segmented(
-    label: 'Trigger · Size',
+    label: 'Behavior · Trigger / Size',
     options: ControlSize.values,
     labelBuilder: semanticValueLabel,
   );
   final requestedOpen = context.knobs.boolean(label: 'State · Open');
-  final disableArchive = context.knobs.boolean(label: 'Menu · Disable archive');
+  final disableArchive = context.knobs.boolean(
+    label: 'Behavior · Menu / Disable archive',
+  );
   return preview(
     _DropdownPreview(
       label: label,

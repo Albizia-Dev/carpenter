@@ -6,25 +6,25 @@ import '../../helpers/labels.dart';
 import '../../helpers/preview.dart';
 
 final dragAndDropComponent = WidgetbookComponent(
-  name: 'Drag & Drop',
+  name: 'Drag & drop',
   useCases: [WidgetbookUseCase(name: 'Playground', builder: _dragAndDrop)],
 );
 
 Widget _dragAndDrop(BuildContext context) {
   final operation = context.knobs.object.segmented(
-    label: 'Drag · Operation',
+    label: 'Behavior · Drag / Operation',
     options: CarpenterDragOperation.values,
     initialOption: CarpenterDragOperation.move,
     labelBuilder: semanticValueLabel,
   );
   final axis = context.knobs.object.segmented(
-    label: 'Target · Axis',
+    label: 'Behavior · Target / Axis',
     options: CarpenterDropAxis.values,
     initialOption: CarpenterDropAxis.vertical,
     labelBuilder: semanticValueLabel,
   );
   final activation = context.knobs.object.segmented(
-    label: 'Drag · Activation',
+    label: 'Behavior · Drag / Activation',
     options: CarpenterDragActivation.values,
     initialOption: CarpenterDragActivation.immediate,
     labelBuilder: semanticValueLabel,

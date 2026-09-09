@@ -2,6 +2,8 @@ import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 
+import 'tree_table_contracts.dart';
+
 final reorderableCollectionComponent = WidgetbookComponent(
   name: 'Reorderable collection',
   useCases: [
@@ -10,7 +12,7 @@ final reorderableCollectionComponent = WidgetbookComponent(
       builder: (_) => const _ReorderPreview(),
     ),
     WidgetbookUseCase(
-      name: 'Constrained',
+      name: 'Edge cases · Constrained',
       builder: (context) => SizedBox(
         width: context.units(16.rem),
         child: const _ReorderPreview(),
@@ -33,6 +35,7 @@ final treeTableComponent = WidgetbookComponent(
       name: 'Playground',
       builder: (_) => const _TreeTablePreview(),
     ),
+    ...treeTableContractCases,
   ],
 );
 
@@ -191,7 +194,7 @@ final class _TreeTablePreviewState extends State<_TreeTablePreview> {
       }),
       onSelectionChanged: (ids) => setState(() => _selected = ids),
       columns: [
-        CarpenterTreeTableColumn<String>(
+        CarpenterTreeTableColumn<String>.custom(
           id: 'kind',
           header: 'Kind',
           cellBuilder: (context, node) => CarpenterText.caption(
@@ -199,7 +202,7 @@ final class _TreeTablePreviewState extends State<_TreeTablePreview> {
             colorRole: ContentColorRole.secondary,
           ),
         ),
-        CarpenterTreeTableColumn<String>(
+        CarpenterTreeTableColumn<String>.custom(
           id: 'state',
           header: 'State',
           cellBuilder: (context, node) => CarpenterText.caption(
