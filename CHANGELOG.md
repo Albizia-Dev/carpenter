@@ -1,3 +1,7 @@
+## 0.4.7
+
+- Allow host font families and fallback families in the shared typography resolver, consistently across content and component roles.
+
 ## 0.4.6
 
 - Project commands with asynchronously collected input into shared header, menu, and dialog actions. Cancellation, unmounting, and changed availability prevent late execution; scoped command effects and error handling remain intact.

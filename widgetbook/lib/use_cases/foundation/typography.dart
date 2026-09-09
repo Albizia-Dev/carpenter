@@ -16,35 +16,50 @@ final foundationTypographyComponent = WidgetbookComponent(
   ],
 );
 
-Widget _scale(BuildContext context) => preview(
-  Builder(
-    builder: (context) {
-      final gap = context.units(CarpenterTheme.of(context).spacing.large);
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (final role in TypographyRole.values) ...[
-            CarpenterText(
-              semanticValueLabel(role),
-              role: role,
-              emphasis: TypographyEmphasis.strong,
-            ),
-            SizedBox(height: gap),
-            for (final emphasis in TypographyEmphasis.values) ...[
-              CarpenterText(
-                '${semanticValueLabel(role)} · ${semanticValueLabel(emphasis)} · Платёж по договору №1542',
-                role: role,
-                emphasis: emphasis,
-              ),
-              SizedBox(height: gap / 2),
+Widget _scale(BuildContext context) {
+  final family = context.knobs.object.dropdown(
+    label: 'Style · Font family',
+    options: ['Inherited', 'Arial', 'monospace'],
+    initialOption: 'Inherited',
+  );
+  return preview(
+    CarpenterTheme(
+      data: CarpenterTheme.of(context).copyWith(
+        typography: CarpenterTypographyTheme(
+          fontFamily: family == 'Inherited' ? null : family,
+          fontFamilyFallback: const ['sans-serif'],
+        ),
+      ),
+      child: Builder(
+        builder: (context) {
+          final gap = context.units(CarpenterTheme.of(context).spacing.large);
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              for (final role in TypographyRole.values) ...[
+                CarpenterText(
+                  semanticValueLabel(role),
+                  role: role,
+                  emphasis: TypographyEmphasis.strong,
+                ),
+                SizedBox(height: gap),
+                for (final emphasis in TypographyEmphasis.values) ...[
+                  CarpenterText(
+                    '${semanticValueLabel(role)} · ${semanticValueLabel(emphasis)} · Платёж по договору №1542',
+                    role: role,
+                    emphasis: emphasis,
+                  ),
+                  SizedBox(height: gap / 2),
+                ],
+                SizedBox(height: gap),
+              ],
             ],
-            SizedBox(height: gap),
-          ],
-        ],
-      );
-    },
-  ),
-);
+          );
+        },
+      ),
+    ),
+  );
+}
 
 Widget _contentStress(BuildContext context) => previewColumn([
   SizedBox(

@@ -99,6 +99,7 @@ final class CarpenterThemeData {
   /// Brightness, contrast, and density remain owned by the light/dark
   /// factories so token-derived geometry cannot become internally inconsistent.
   CarpenterThemeData copyWith({
+    CarpenterTypographyTheme? typography,
     CarpenterContentTheme? content,
     CarpenterActionTheme? actions,
     CarpenterFieldTheme? fields,
@@ -111,7 +112,7 @@ final class CarpenterThemeData {
     brightness: brightness,
     contrast: contrast,
     density: density,
-    typography: typography,
+    typography: typography ?? this.typography,
     content: content ?? this.content,
     actions: actions ?? this.actions,
     fields: fields ?? this.fields,
@@ -150,8 +151,15 @@ final class CarpenterTheme extends InheritedWidget {
 /// Resolves semantic Carpenter typography roles and component text treatments into Flutter [TextStyle] values using the active unit scale.
 @immutable
 final class CarpenterTypographyTheme {
-  /// Creates the stateless typography resolver backed by Carpenter tokens.
-  const CarpenterTypographyTheme();
+  /// Creates a token-backed typography resolver. Optional font families apply
+  /// uniformly to text and component roles; null inherits the host font.
+  const CarpenterTypographyTheme({this.fontFamily, this.fontFamilyFallback});
+
+  /// Preferred application font family. Null preserves Flutter inheritance.
+  final String? fontFamily;
+
+  /// Ordered fallback fonts used when the preferred family lacks a glyph.
+  final List<String>? fontFamilyFallback;
 
   /// Resolves general semantic typography [role] and [emphasis] into a unit-aware text style.
   TextStyle resolve(
@@ -315,6 +323,8 @@ final class CarpenterTypographyTheme {
     final fontSize = context.units(fontSizeUnit);
     final lineHeight = context.units(lineHeightUnit);
     return TextStyle(
+      fontFamily: fontFamily,
+      fontFamilyFallback: fontFamilyFallback,
       fontSize: fontSize,
       height: lineHeight / fontSize,
       fontWeight: FontWeight.lerp(
