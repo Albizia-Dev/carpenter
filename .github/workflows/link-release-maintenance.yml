@@ -1,0 +1,53 @@
+name: Link release maintenance
+on:
+  push:
+    branches: [fix/link-roles-0.3.4]
+permissions:
+  contents: write
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+      - name: Resolve audit dependencies
+        working-directory: tool/documentation
+        run: dart pub get --enforce-lockfile
+      - name: Refresh resolved documentation debt
+        working-directory: tool/documentation
+        run: dart run bin/audit.dart ../.. --write-baseline
+      - name: Refresh 0.3.4 release notes
+        shell: bash
+        run: |
+          if ! grep -q '^# 0.3.4$' CHANGELOG.md; then
+            cat > /tmp/changelog-0.3.4 <<'EOF'
+          # 0.3.4
+
+          - Added semantic `CarpenterLinkRole` variants for inline, standalone,
+            subtle, and prominent link presentation.
+          - Added independent `CarpenterLinkUnderline` policies with semantic
+            automatic defaults and explicit always, hover/focus, or none behavior.
+          - Changed the default `CarpenterLink` treatment to neutral standalone
+            styling with hover/focus underline while preserving explicit action
+            color overrides.
+          - Added Widgetbook role coverage and regression tests for link styling,
+            focus behavior, activation, and accessibility semantics.
+
+          EOF
+            cat CHANGELOG.md >> /tmp/changelog-0.3.4
+            mv /tmp/changelog-0.3.4 CHANGELOG.md
+          fi
+      - name: Commit generated release documentation
+        shell: bash
+        run: |
+          if git diff --quiet -- tool/documentation/coverage-baseline.json CHANGELOG.md; then
+            exit 0
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add tool/documentation/coverage-baseline.json CHANGELOG.md
+          git commit -m 'docs: update 0.3.4 release documentation'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
