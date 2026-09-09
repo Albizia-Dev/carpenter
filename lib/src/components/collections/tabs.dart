@@ -185,12 +185,7 @@ final class _CarpenterTabsState<T> extends State<CarpenterTabs<T>> {
               start: ShapeRole.none,
               end: ShapeRole.none,
             ),
-            onInvoke: enabled
-                ? () {
-                    focusNode.requestFocus();
-                    widget.onChanged!(tab.value);
-                  }
-                : null,
+            onInvoke: enabled ? () => widget.onChanged!(tab.value) : null,
           ),
         ),
       ),
