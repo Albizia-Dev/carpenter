@@ -56,7 +56,7 @@ final class _CarpenterLoaderState extends State<CarpenterLoader>
     final accent = theme.actions
         .resolve(
           ActionColorRole.primary,
-          ActionProminence.high,
+          ActionProminence.filled,
           const <WidgetState>{},
         )
         .background;

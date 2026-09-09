@@ -111,13 +111,7 @@ final class _CheckboxIndicator extends StatelessWidget {
     final theme = CarpenterTheme.of(context);
     final inset = context.units(theme.spacing.checkboxMarkInset(sizeRole));
     final strokeWidth = context.units(theme.shapes.checkboxBorderWidth);
-    final radius = switch (sizeRole) {
-      ControlSize.xsmall ||
-      ControlSize.small => context.units(theme.shapes.checkboxRadius(sizeRole)),
-      ControlSize.medium ||
-      ControlSize.large ||
-      ControlSize.xlarge => context.units(const Rem(.125)),
-    };
+    final radius = context.units(theme.shapes.checkboxRadius(sizeRole));
     return AnimatedContainer(
       duration: theme.motion.transitionDuration(context),
       curve: theme.motion.stateCurve,

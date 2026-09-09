@@ -6,7 +6,7 @@ import '../../foundation/theme.dart';
 import '../../internal/overlay/anchored_overlay_positioner.dart';
 import '../basic/button/button.dart';
 import '../basic/button/icon_button.dart';
-import '../basic/icons.dart';
+import '../basic/gravity_icons.g.dart';
 import 'action_overflow.dart';
 import 'menu/menu.dart';
 import 'menu/menu_entry.dart';
@@ -314,7 +314,7 @@ final class _ActionStripOverflowButtonState
   Widget build(BuildContext context) => KeyedSubtree(
     key: _anchorKey,
     child: CarpenterIconButton(
-      icon: CarpenterIcons.more,
+      icon: GravityIcons.ellipsis,
       semanticLabel: widget.label,
       prominence: ActionProminence.ghost,
       size: widget.size,

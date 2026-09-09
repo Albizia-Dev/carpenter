@@ -11,7 +11,6 @@ import '../../basic/gravity_icons.g.dart';
 import '../../basic/icon.dart';
 import '../../basic/button/button.dart';
 import '../../basic/button/icon_button.dart';
-import '../../basic/icons.dart';
 import '../../basic/text.dart';
 import '../../behaviour/drag_and_drop/drag_operation.dart';
 import '../../behaviour/drag_and_drop/drag_payload.dart';
@@ -599,7 +598,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
           ),
           if (widget.onRetryLoad != null)
             CarpenterIconButton(
-              icon: CarpenterIcons.refresh,
+              icon: GravityIcons.arrowRotateRight,
               semanticLabel: 'Retry loading ${node.label}',
               prominence: ActionProminence.ghost,
               size: ControlSize.xsmall,

@@ -1,7 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-
 import 'package:carpenter_mordant/carpenter_mordant.dart' as _i1;
 
 const PaletteTokens palette = PaletteTokens();
@@ -1440,29 +1439,29 @@ final class ComponentSelectionCheckboxSizeTokens {
 final class ComponentSelectionCheckboxRadiusTokens {
   const ComponentSelectionCheckboxRadiusTokens();
 
-  _i1.Rem get xsmall => shape.roundedXsmall;
+  _i1.Rem get xsmall => const _i1.Rem(0.2);
 
-  _i1.Rem get small => shape.roundedXsmall;
+  _i1.Rem get small => const _i1.Rem(0.225);
 
-  _i1.Rem get medium => shape.roundedXsmall;
+  _i1.Rem get medium => const _i1.Rem(0.25);
 
-  _i1.Rem get large => shape.roundedXsmall;
+  _i1.Rem get large => const _i1.Rem(0.275);
 
-  _i1.Rem get xlarge => shape.roundedXsmall;
+  _i1.Rem get xlarge => const _i1.Rem(0.3);
 }
 
 final class ComponentSelectionCheckboxMarkInsetTokens {
   const ComponentSelectionCheckboxMarkInsetTokens();
 
-  _i1.Rem get xsmall => spacing.selection.markInset;
+  _i1.Rem get xsmall => const _i1.Rem(0.2);
 
-  _i1.Rem get small => spacing.selection.markInset;
+  _i1.Rem get small => const _i1.Rem(0.225);
 
-  _i1.Rem get medium => spacing.selection.markInset;
+  _i1.Rem get medium => const _i1.Rem(0.25);
 
-  _i1.Rem get large => spacing.selection.markInset;
+  _i1.Rem get large => const _i1.Rem(0.275);
 
-  _i1.Rem get xlarge => spacing.selection.markInset;
+  _i1.Rem get xlarge => const _i1.Rem(0.3);
 }
 
 final class ComponentSelectionCheckboxTokens {
@@ -1499,15 +1498,15 @@ final class ComponentSelectionRadioSizeTokens {
 final class ComponentSelectionRadioMarkInsetTokens {
   const ComponentSelectionRadioMarkInsetTokens();
 
-  _i1.Rem get xsmall => spacing.selection.markInset;
+  _i1.Rem get xsmall => const _i1.Rem(0.2);
 
-  _i1.Rem get small => spacing.selection.markInset;
+  _i1.Rem get small => const _i1.Rem(0.225);
 
-  _i1.Rem get medium => spacing.selection.markInset;
+  _i1.Rem get medium => const _i1.Rem(0.25);
 
-  _i1.Rem get large => spacing.selection.markInset;
+  _i1.Rem get large => const _i1.Rem(0.275);
 
-  _i1.Rem get xlarge => spacing.selection.markInset;
+  _i1.Rem get xlarge => const _i1.Rem(0.3);
 }
 
 final class ComponentSelectionRadioTokens {
@@ -1829,7 +1828,7 @@ final class LightContentTokens {
 
   _i1.Color get inverse => palette.white;
 
-  _i1.Color get disabled => palette.neutral[400];
+  _i1.Color get disabled => palette.neutral[700];
 }
 
 final class LightFocusTokens {
@@ -1857,13 +1856,13 @@ final class LightActionTokens {
 
   _i1.Color get neutralPressed => palette.neutral[900];
 
-  _i1.Color get primary => palette.brand[600];
+  _i1.Color get primary => palette.brand[700];
 
   _i1.Color get primaryHover => palette.brand[700];
 
   _i1.Color get primaryPressed => palette.brand[800];
 
-  _i1.Color get utility => palette.utility[600];
+  _i1.Color get utility => palette.utility[700];
 
   _i1.Color get utilityHover => palette.utility[700];
 
@@ -1895,7 +1894,7 @@ final class LightActionTokens {
 
   _i1.Color get disabledBackground => palette.neutral[200];
 
-  _i1.Color get disabledForeground => palette.neutral[500];
+  _i1.Color get disabledForeground => palette.neutral[700];
 
   _i1.Color get neutralState => const _i1.Color(0x1C51515D);
 
@@ -1941,7 +1940,7 @@ final class LightFieldTokens {
 
   _i1.Color get placeholder => palette.neutral[500];
 
-  _i1.Color get border => palette.neutral[300];
+  _i1.Color get border => palette.neutral[500];
 
   _i1.Color get borderHovered => palette.neutral[500];
 
@@ -1967,13 +1966,13 @@ final class LightSelectionTokens {
 
   _i1.Color get supporting => palette.neutral[600];
 
-  _i1.Color get disabledForeground => palette.neutral[500];
+  _i1.Color get disabledForeground => palette.neutral[700];
 
   _i1.Color get background => palette.white;
 
   _i1.Color get backgroundHovered => palette.neutral[50];
 
-  _i1.Color get border => palette.neutral[400];
+  _i1.Color get border => palette.neutral[500];
 
   _i1.Color get borderHovered => palette.neutral[600];
 
@@ -2021,11 +2020,11 @@ final class LightSelectionTokens {
 
   _i1.Color get disabledBackground => palette.neutral[100];
 
-  _i1.Color get disabledBorder => palette.neutral[300];
+  _i1.Color get disabledBorder => palette.neutral[500];
 
-  _i1.Color get disabledSelected => palette.neutral[300];
+  _i1.Color get disabledSelected => palette.neutral[500];
 
-  _i1.Color get disabledMark => palette.neutral[600];
+  _i1.Color get disabledMark => palette.white;
 }
 
 final class LightOverlayTokens {
@@ -2105,7 +2104,7 @@ final class DarkContentTokens {
 
   _i1.Color get inverse => palette.neutral[950];
 
-  _i1.Color get disabled => palette.neutral[500];
+  _i1.Color get disabled => palette.neutral[300];
 }
 
 final class DarkFocusTokens {
@@ -2133,13 +2132,13 @@ final class DarkActionTokens {
 
   _i1.Color get neutralPressed => palette.white;
 
-  _i1.Color get primary => palette.brand[400];
+  _i1.Color get primary => palette.brand[300];
 
   _i1.Color get primaryHover => palette.brand[300];
 
   _i1.Color get primaryPressed => palette.brand[200];
 
-  _i1.Color get utility => palette.utility[400];
+  _i1.Color get utility => palette.utility[300];
 
   _i1.Color get utilityHover => palette.utility[300];
 
@@ -2169,9 +2168,9 @@ final class DarkActionTokens {
 
   _i1.Color get infoPressed => palette.white;
 
-  _i1.Color get disabledBackground => palette.neutral[700];
+  _i1.Color get disabledBackground => palette.neutral[800];
 
-  _i1.Color get disabledForeground => palette.neutral[400];
+  _i1.Color get disabledForeground => palette.neutral[200];
 
   _i1.Color get neutralState => const _i1.Color(0x24D7D7DD);
 
@@ -2217,9 +2216,9 @@ final class DarkFieldTokens {
 
   _i1.Color get placeholder => palette.neutral[400];
 
-  _i1.Color get border => palette.neutral[700];
+  _i1.Color get border => palette.neutral[400];
 
-  _i1.Color get borderHovered => palette.neutral[500];
+  _i1.Color get borderHovered => palette.neutral[300];
 
   _i1.Color get borderFocused => palette.brand[300];
 
@@ -2243,13 +2242,13 @@ final class DarkSelectionTokens {
 
   _i1.Color get supporting => palette.neutral[300];
 
-  _i1.Color get disabledForeground => palette.neutral[500];
+  _i1.Color get disabledForeground => palette.neutral[300];
 
   _i1.Color get background => palette.neutral[950];
 
   _i1.Color get backgroundHovered => palette.neutral[900];
 
-  _i1.Color get border => palette.neutral[600];
+  _i1.Color get border => palette.neutral[400];
 
   _i1.Color get borderHovered => palette.neutral[300];
 
@@ -2297,11 +2296,11 @@ final class DarkSelectionTokens {
 
   _i1.Color get disabledBackground => palette.neutral[900];
 
-  _i1.Color get disabledBorder => palette.neutral[700];
+  _i1.Color get disabledBorder => palette.neutral[400];
 
-  _i1.Color get disabledSelected => palette.neutral[700];
+  _i1.Color get disabledSelected => palette.neutral[400];
 
-  _i1.Color get disabledMark => palette.neutral[400];
+  _i1.Color get disabledMark => palette.neutral[950];
 }
 
 final class DarkOverlayTokens {

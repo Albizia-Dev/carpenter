@@ -122,6 +122,10 @@ Widget _avatarMatrix(BuildContext context) => preview(
 );
 
 Widget _activityPlayground(BuildContext context) {
+  final inProgress = context.knobs.boolean(
+    label: 'State · In progress (unknown total)',
+    initialValue: true,
+  );
   final value = context.knobs.double.slider(
     label: 'State · Progress / Value',
     initialValue: .64,
@@ -172,12 +176,14 @@ Widget _activityPlayground(BuildContext context) {
     SizedBox(
       width: context.units(width.rem),
       child: CarpenterProgress(
-        value: value,
+        value: inProgress ? null : value,
         height: height.rem,
         semanticLabel: semanticLabel,
       ),
     ),
-    CarpenterText.caption('${(value * 100).round()}% complete'),
+    CarpenterText.caption(
+      inProgress ? 'In progress' : '${(value * 100).round()}% complete',
+    ),
   ]);
 }
 

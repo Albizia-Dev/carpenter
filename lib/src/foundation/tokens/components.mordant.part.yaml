@@ -295,18 +295,18 @@ component:
         xlarge: "${size.selection.indicatorXlarge}"
 
       radius:
-        xsmall: "${shape.roundedXsmall}"
-        small: "${shape.roundedXsmall}"
-        medium: "${shape.roundedXsmall}"
-        large: "${shape.roundedXsmall}"
-        xlarge: "${shape.roundedXsmall}"
+        xsmall: .2rem
+        small: .225rem
+        medium: .25rem
+        large: .275rem
+        xlarge: .3rem
 
       markInset:
-        xsmall: "${spacing.selection.markInset}"
-        small: "${spacing.selection.markInset}"
-        medium: "${spacing.selection.markInset}"
-        large: "${spacing.selection.markInset}"
-        xlarge: "${spacing.selection.markInset}"
+        xsmall: .2rem
+        small: .225rem
+        medium: .25rem
+        large: .275rem
+        xlarge: .3rem
 
       borderWidth: "${border.standard}"
       markStrokeWidth: "${border.strong}"
@@ -320,11 +320,11 @@ component:
         xlarge: "${size.selection.indicatorXlarge}"
 
       markInset:
-        xsmall: "${spacing.selection.markInset}"
-        small: "${spacing.selection.markInset}"
-        medium: "${spacing.selection.markInset}"
-        large: "${spacing.selection.markInset}"
-        xlarge: "${spacing.selection.markInset}"
+        xsmall: .2rem
+        small: .225rem
+        medium: .25rem
+        large: .275rem
+        xlarge: .3rem
 
       borderWidth: "${border.standard}"
 

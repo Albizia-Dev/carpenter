@@ -47,9 +47,9 @@ final class CarpenterLink extends StatelessWidget {
   /// Creates a semantic link.
   ///
   /// The default [role] is [CarpenterLinkRole.standalone], which uses a neutral
-  /// action color and only underlines on hover or keyboard focus. Use
-  /// [CarpenterLinkRole.inline] for the conventional permanently-underlined
-  /// utility-colored hyperlink treatment.
+  /// action color without an underline in any state. Set [underline] to
+  /// [CarpenterLinkUnderline.auto] to opt into role-based decoration, or
+  /// [CarpenterLinkUnderline.always] for underlined prose links.
   const CarpenterLink({
     super.key,
     required this.label,
@@ -57,7 +57,7 @@ final class CarpenterLink extends StatelessWidget {
     this.semanticLabel,
     this.icon,
     this.role = CarpenterLinkRole.standalone,
-    this.underline = CarpenterLinkUnderline.auto,
+    this.underline = CarpenterLinkUnderline.none,
     ActionColorRole? colorRole,
     this.focusNode,
     this.autofocus = false,

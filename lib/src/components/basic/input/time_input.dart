@@ -1,9 +1,11 @@
+import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../foundation/roles.dart';
-import '../../behaviour/dialog.dart';
-import '../icons.dart';
-import 'adaptive_picker.dart';
+import '../../../internal/date/picker_host.dart';
+import '../button/button.dart';
+import '../gravity_icons.g.dart';
+import 'time_choices.dart';
 import 'field_shell.dart';
 import 'masked_input.dart';
 
@@ -37,7 +39,7 @@ CarpenterTime? carpenterParseTime(String value) {
   return CarpenterTime(hour: hour, minute: minute);
 }
 
-/// Controlled 24-hour field with masked manual entry and an adaptive picker action.
+/// Controlled 24-hour field with numeric keyboard entry and non-modal anchored/inline selection.
 final class CarpenterTimeInput extends StatefulWidget {
   const CarpenterTimeInput({
     super.key,
@@ -108,6 +110,7 @@ final class _CarpenterTimeInputState extends State<CarpenterTimeInput> {
   @override
   void didUpdateWidget(CarpenterTimeInput oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!_interactive) _open = false;
     if (oldWidget.value != widget.value) _syncText();
   }
 
@@ -122,7 +125,9 @@ final class _CarpenterTimeInputState extends State<CarpenterTimeInput> {
   }
 
   void _setOpen(bool value) {
+    if (value && !_interactive) return;
     if (value) _draft = _initialDraft();
+    if (value) FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _open = value);
   }
 
@@ -177,53 +182,44 @@ final class _CarpenterTimeInputState extends State<CarpenterTimeInput> {
 
   @override
   Widget build(BuildContext context) {
-    final wheel = carpenterUsesWheelPicker(context);
-    return CarpenterDialog(
-      open: _open,
+    return PickerHost(
+      open: _open && _interactive,
       onOpenChanged: _setOpen,
-      title: 'Choose time',
-      dismissPolicy: DialogDismissPolicy.outsideAndEscape,
-      actions: [
-        if (widget.allowClear)
-          CarpenterActionDescriptor(
-            id: 'time.clear',
-            label: 'Clear',
-            onInvoke: _clear,
+      picker: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          TimeChoices(
+            key: ValueKey(
+              '${_draft.hour}:${_draft.minute}:${widget.minuteStep}',
+            ),
+            hour: _draft.hour,
+            minute: _draft.minute,
+            minuteStep: widget.minuteStep,
+            onChanged: (hour, minute) {
+              _draft = CarpenterTime(hour: hour, minute: minute);
+              _applyDraft();
+            },
           ),
-        CarpenterActionDescriptor(
-          id: 'time.cancel',
-          label: 'Cancel',
-          onInvoke: () => _setOpen(false),
-        ),
-        CarpenterActionDescriptor(
-          id: 'time.apply',
-          label: 'Apply',
-          colorRole: ActionColorRole.primary,
-          onInvoke: _applyDraft,
-        ),
-      ],
-      content: wheel
-          ? CarpenterTimeWheel(
-              hour: _draft.hour,
-              minute: _draft.minute,
-              minuteStep: widget.minuteStep,
-              onChanged: (hour, minute) => setState(
-                () => _draft = CarpenterTime(hour: hour, minute: minute),
-              ),
-            )
-          : CarpenterTimeSelect(
-              hour: _draft.hour,
-              minute: _draft.minute,
-              minuteStep: widget.minuteStep,
-              onChanged: (hour, minute) => setState(
-                () => _draft = CarpenterTime(hour: hour, minute: minute),
+          if (widget.allowClear) ...[
+            SizedBox(height: context.units(.5.rem)),
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: CarpenterButton(
+                label: 'Clear',
+                size: ControlSize.small,
+                prominence: ActionProminence.ghost,
+                onInvoke: _clear,
               ),
             ),
-      child: CarpenterMaskedInput(
+          ],
+        ],
+      ),
+      field: CarpenterMaskedInput(
         controller: _controller,
         mask: CarpenterInputMask.time,
         label: widget.label,
-        placeholder: widget.placeholder,
+        placeholder: widget.placeholder ?? 'HH:MM',
         description: widget.description,
         feedback: widget.feedback,
         errorText: widget.errorText ?? _validationError,
@@ -234,14 +230,14 @@ final class _CarpenterTimeInputState extends State<CarpenterTimeInput> {
             : FieldAvailability.disabled,
         size: widget.size,
         shape: widget.shape,
-        keyboardType: TextInputType.datetime,
+        keyboardType: TextInputType.number,
         autofocus: widget.autofocus,
         trailingAction: CarpenterActionDescriptor(
           id: 'time.open-picker',
           label: 'Choose time',
           semanticLabel: 'Open time picker',
-          icon: CarpenterIcons.clock,
-          onInvoke: _interactive ? () => _setOpen(true) : null,
+          icon: GravityIcons.clock,
+          onInvoke: _interactive ? () => _setOpen(!_open) : null,
         ),
         onChanged: _interactive ? _handleTextChanged : null,
       ),

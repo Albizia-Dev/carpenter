@@ -5,7 +5,7 @@ import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
 import '../basic/button/icon_button.dart';
 import '../basic/card.dart';
-import '../basic/icons.dart';
+import '../basic/gravity_icons.g.dart';
 import '../basic/text.dart';
 import 'kanban.dart';
 
@@ -184,8 +184,8 @@ final class _PlanningLaneView<L, C, T> extends StatelessWidget {
                 if (onExpansionChanged != null)
                   CarpenterIconButton(
                     icon: collapsed
-                        ? CarpenterIcons.chevronRight
-                        : CarpenterIcons.sortDown,
+                        ? GravityIcons.arrowChevronRight
+                        : GravityIcons.arrowChevronDown,
                     semanticLabel: collapsed
                         ? 'Expand ${lane.title}'
                         : 'Collapse ${lane.title}',

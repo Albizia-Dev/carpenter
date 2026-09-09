@@ -10,7 +10,7 @@ import '../../behaviour/drag_and_drop/drop_target.dart';
 import '../button/icon_button.dart';
 import '../card.dart';
 import '../icon.dart';
-import '../icons.dart';
+import '../gravity_icons.g.dart';
 import '../progress.dart';
 import '../text.dart';
 import 'field_shell.dart';
@@ -212,12 +212,12 @@ final class _CarpenterFileInputState<T> extends State<CarpenterFileInput<T>> {
                 : FieldAvailability.readOnly,
             size: widget.size,
             shape: widget.shape,
-            leadingIcon: CarpenterIcons.file,
+            leadingIcon: GravityIcons.file,
             trailingAction: CarpenterActionDescriptor(
               id: 'file.browse',
               label: 'Choose files',
               semanticLabel: 'Choose files',
-              icon: CarpenterIcons.openFile,
+              icon: GravityIcons.folderOpen,
               onInvoke: widget.availability == FieldAvailability.enabled
                   ? widget.onBrowseRequested
                   : null,
@@ -275,12 +275,12 @@ final class CarpenterFileDropZone<T> extends StatelessWidget {
               children: [
                 if (state.hovering)
                   CarpenterIcon.feedback(
-                    CarpenterIcons.upload,
+                    GravityIcons.arrowUpFromLine,
                     feedbackRole: role,
                   )
                 else
                   const CarpenterIcon(
-                    CarpenterIcons.upload,
+                    GravityIcons.arrowUpFromLine,
                     colorRole: ContentColorRole.secondary,
                   ),
                 SizedBox(height: context.units(.5.rem)),
@@ -362,14 +362,14 @@ final class CarpenterUploadProgress extends StatelessWidget {
   /// upload-specific accessible label.
   const CarpenterUploadProgress({
     super.key,
-    required this.value,
+    this.value,
     this.semanticLabel = 'Upload progress',
   });
 
-  /// Completed fraction of the transfer. Supply a finite value between zero
-  /// and one; this wrapper forwards it to CarpenterProgress without its own
-  /// conversion.
-  final double value;
+  /// Completed fraction, or null while work is in progress with no known
+  /// total. Finite fractions are clamped by CarpenterProgress to zero through
+  /// one; indeterminate progress has no numeric accessibility value.
+  final double? value;
 
   /// Accessible name of the transfer, defaulting to Upload progress.
   /// Distinguish concurrent uploads with different labels.
@@ -456,7 +456,7 @@ final class _AttachmentRow<T> extends StatelessWidget {
             Row(
               children: [
                 const CarpenterIcon(
-                  CarpenterIcons.file,
+                  GravityIcons.file,
                   colorRole: ContentColorRole.secondary,
                 ),
                 SizedBox(width: gap),
@@ -489,7 +489,7 @@ final class _AttachmentRow<T> extends StatelessWidget {
                 if (item.phase == CarpenterAttachmentPhase.failed &&
                     onRetry != null)
                   CarpenterIconButton(
-                    icon: CarpenterIcons.refresh,
+                    icon: GravityIcons.arrowRotateRight,
                     semanticLabel: 'Retry ${item.name}',
                     prominence: ActionProminence.ghost,
                     size: ControlSize.xsmall,
@@ -497,7 +497,7 @@ final class _AttachmentRow<T> extends StatelessWidget {
                   ),
                 if (onRemove != null)
                   CarpenterIconButton(
-                    icon: CarpenterIcons.clear,
+                    icon: GravityIcons.xmark,
                     semanticLabel: 'Remove ${item.name}',
                     colorRole: ActionColorRole.danger,
                     prominence: ActionProminence.ghost,

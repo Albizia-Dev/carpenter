@@ -158,7 +158,7 @@ Widget _linkPlayground(BuildContext context) {
   final underline = context.knobs.object.segmented(
     label: 'Appearance · Underline',
     options: CarpenterLinkUnderline.values,
-    initialOption: CarpenterLinkUnderline.auto,
+    initialOption: CarpenterLinkUnderline.none,
     labelBuilder: semanticValueLabel,
   );
   final overrideColor = context.knobs.boolean(

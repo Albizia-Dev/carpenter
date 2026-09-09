@@ -64,6 +64,7 @@ void main() {
           CarpenterLink(
             label: entry.key.name,
             role: entry.key,
+            underline: CarpenterLinkUnderline.auto,
             onInvoke: _noop,
           ),
           theme: theme,
@@ -87,6 +88,7 @@ void main() {
       app(
         CarpenterLink(
           label: 'Focused account',
+          underline: CarpenterLinkUnderline.auto,
           autofocus: true,
           onInvoke: _noop,
         ),

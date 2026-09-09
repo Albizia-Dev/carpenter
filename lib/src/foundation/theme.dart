@@ -672,16 +672,12 @@ final class CarpenterActionTheme {
     if (states.contains(WidgetState.disabled)) {
       final background = switch (prominence) {
         ActionProminence.filled => disabledBackground,
-        ActionProminence.high => Color.lerp(
-          transparent,
-          disabledBackground,
-          .72,
-        )!,
-        ActionProminence.normal => Color.lerp(
-          transparent,
-          disabledBackground,
-          .48,
-        )!,
+        ActionProminence.high => disabledBackground.withValues(
+          alpha: disabledBackground.a * .72,
+        ),
+        ActionProminence.normal => disabledBackground.withValues(
+          alpha: disabledBackground.a * .48,
+        ),
         ActionProminence.ghost ||
         ActionProminence.outlined ||
         ActionProminence.low => transparent,
@@ -693,7 +689,9 @@ final class CarpenterActionTheme {
         border: prominence == ActionProminence.outlined
             ? disabledForeground
             : transparent,
-        loadingAccent: disabledForeground,
+        loadingAccent: disabledForeground.withValues(
+          alpha: disabledForeground.a * .05,
+        ),
       );
     }
 
@@ -719,42 +717,42 @@ final class CarpenterActionTheme {
         foreground: inverse,
         icon: inverse,
         border: semantic,
-        loadingAccent: palette.hovered,
+        loadingAccent: palette.pressed,
       ),
       ActionProminence.high => CarpenterActionStyle(
         background: active ? palette.strongState : highBackground,
         foreground: semantic,
         icon: semantic,
         border: transparent,
-        loadingAccent: palette.strongState,
+        loadingAccent: palette.state.withValues(alpha: palette.state.a * .25),
       ),
       ActionProminence.normal => CarpenterActionStyle(
         background: active ? palette.strongState : palette.state,
         foreground: semantic,
         icon: semantic,
         border: transparent,
-        loadingAccent: palette.strongState,
+        loadingAccent: palette.state.withValues(alpha: palette.state.a * .25),
       ),
       ActionProminence.low => CarpenterActionStyle(
         background: active ? palette.state : lowBackground,
         foreground: semantic,
         icon: semantic,
         border: transparent,
-        loadingAccent: palette.state,
+        loadingAccent: palette.state.withValues(alpha: palette.state.a * .25),
       ),
       ActionProminence.outlined => CarpenterActionStyle(
         background: active ? palette.state : transparent,
         foreground: semantic,
         icon: semantic,
         border: semantic,
-        loadingAccent: palette.state,
+        loadingAccent: palette.state.withValues(alpha: palette.state.a * .25),
       ),
       ActionProminence.ghost => CarpenterActionStyle(
         background: active ? palette.state : transparent,
         foreground: semantic,
         icon: semantic,
         border: transparent,
-        loadingAccent: palette.state,
+        loadingAccent: palette.state.withValues(alpha: palette.state.a * .25),
       ),
     };
   }

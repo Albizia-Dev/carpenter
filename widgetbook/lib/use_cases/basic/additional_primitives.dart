@@ -164,12 +164,17 @@ final uploadProgressComponent = WidgetbookComponent(
       name: 'Playground',
       builder: (context) => preview(
         CarpenterUploadProgress(
-          value: context.knobs.double.slider(
-            label: 'State · Progress',
-            initialValue: .5,
-            min: 0,
-            max: 1,
-          ),
+          value:
+              context.knobs.boolean(
+                label: 'State · In progress (unknown total)',
+              )
+              ? null
+              : context.knobs.double.slider(
+                  label: 'State · Progress',
+                  initialValue: .5,
+                  min: 0,
+                  max: 1,
+                ),
           semanticLabel: context.knobs.string(
             label: 'Content · Semantic label',
             initialValue: 'Invoice attachment upload',

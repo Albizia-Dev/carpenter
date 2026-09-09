@@ -5,7 +5,7 @@ import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
 import '../basic/button/button.dart';
 import '../basic/button/icon_button.dart';
-import '../basic/icons.dart';
+import '../basic/gravity_icons.g.dart';
 import '../basic/text.dart';
 
 /// Adaptive page navigation with previous/next controls and a compact page window.
@@ -70,7 +70,9 @@ final class CarpenterPaginationBar extends StatelessWidget {
     required bool enabled,
     CarpenterShape shape = CarpenterShape.rounded,
   }) => CarpenterIconButton(
-    icon: previous ? CarpenterIcons.chevronLeft : CarpenterIcons.chevronRight,
+    icon: previous
+        ? GravityIcons.arrowChevronLeft
+        : GravityIcons.arrowChevronRight,
     semanticLabel: semanticLabel,
     size: ControlSize.small,
     colorRole: ActionColorRole.utility,

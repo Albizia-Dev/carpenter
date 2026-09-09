@@ -1,9 +1,10 @@
+import '../../internal/rendering/icon_renderer.dart';
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
-import 'icons.dart';
+import 'gravity_icons.g.dart';
 import 'text.dart';
 
 /// Compact identity primitive for initials, images or arbitrary avatar content.
@@ -59,8 +60,8 @@ final class CarpenterAvatar extends StatelessWidget {
                 emphasis: TypographyEmphasis.strong,
                 colorRole: ContentColorRole.inverse,
               )
-            : Icon(
-                CarpenterIcons.account,
+            : IconRenderer(
+                icon: GravityIcons.person,
                 size: extent * .52,
                 color: style.foreground,
               ));

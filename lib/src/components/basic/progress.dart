@@ -7,7 +7,8 @@ import '../../foundation/theme.dart';
 /// Linear progress indicator.
 ///
 /// A finite [value] is clamped to 0..1 and rendered as determinate progress.
-/// Leave [value] null for an indeterminate activity indicator.
+/// Leave [value] null for an indeterminate activity indicator. Non-finite
+/// values also use indeterminate presentation instead of an invalid percentage.
 final class CarpenterProgress extends StatefulWidget {
   const CarpenterProgress({
     super.key,
@@ -28,7 +29,7 @@ final class _CarpenterProgressState extends State<CarpenterProgress>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(vsync: this);
 
-  bool get _indeterminate => widget.value == null;
+  bool get _indeterminate => widget.value == null || !widget.value!.isFinite;
 
   @override
   void didChangeDependencies() {
@@ -68,12 +69,14 @@ final class _CarpenterProgressState extends State<CarpenterProgress>
     final accent = theme.actions
         .resolve(
           ActionColorRole.primary,
-          ActionProminence.high,
+          ActionProminence.filled,
           const <WidgetState>{},
         )
         .background;
     final value = widget.value;
-    final normalized = value?.clamp(0.0, 1.0).toDouble();
+    final normalized = _indeterminate
+        ? null
+        : value!.clamp(0.0, 1.0).toDouble();
 
     return Semantics(
       label: widget.semanticLabel,

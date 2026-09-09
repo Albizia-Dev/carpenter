@@ -2,11 +2,13 @@ import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../foundation/roles.dart';
-import '../../behaviour/dialog.dart';
+import '../../../internal/date/picker_host.dart';
+import '../../../internal/date/calendar_model.dart';
+import '../button/button.dart';
 import '../calendar.dart';
-import '../icons.dart';
+import '../gravity_icons.g.dart';
 import '../text.dart';
-import 'adaptive_picker.dart';
+
 import 'date_input.dart';
 import 'field_shell.dart';
 import 'masked_input.dart';
@@ -43,7 +45,7 @@ CarpenterDateRange? carpenterParseDateRange(String value) {
   return CarpenterDateRange(start: start, end: end);
 }
 
-/// Controlled inclusive date range field with a mask and adaptive picker action.
+/// Controlled inclusive date range field with numeric entry and a shared non-modal range calendar.
 final class CarpenterDateRangeInput extends StatefulWidget {
   const CarpenterDateRangeInput({
     super.key,
@@ -93,6 +95,7 @@ final class _CarpenterDateRangeInputState
     extends State<CarpenterDateRangeInput> {
   final TextEditingController _controller = TextEditingController();
   bool _open = false;
+  DateTime? _rangeAnchor;
   String? _validationError;
   late DateTime _start = _initialStart();
   late DateTime _end = _initialEnd(_start);
@@ -100,14 +103,14 @@ final class _CarpenterDateRangeInputState
   bool get _interactive =>
       widget.enabled && widget.availability == FieldAvailability.enabled;
 
-  DateTime _initialStart() => _clampDate(
+  DateTime _initialStart() => CalendarModel.clamp(
     widget.value?.start ?? DateTime.now(),
     widget.firstDate,
     widget.lastDate,
   );
 
   DateTime _initialEnd(DateTime start) {
-    final candidate = _clampDate(
+    final candidate = CalendarModel.clamp(
       widget.value?.end ?? start,
       start,
       widget.lastDate,
@@ -124,6 +127,7 @@ final class _CarpenterDateRangeInputState
   @override
   void didUpdateWidget(CarpenterDateRangeInput oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (!_interactive) _open = false;
     if (oldWidget.value != widget.value) _syncText();
   }
 
@@ -140,10 +144,13 @@ final class _CarpenterDateRangeInputState
   }
 
   void _setOpen(bool value) {
+    if (value && !_interactive) return;
     if (value) {
+      _rangeAnchor = null;
       _start = _initialStart();
       _end = _initialEnd(_start);
     }
+    if (value) FocusManager.instance.primaryFocus?.unfocus();
     setState(() => _open = value);
   }
 
@@ -163,14 +170,21 @@ final class _CarpenterDateRangeInputState
     if (range != null && error == null) widget.onChanged(range);
   }
 
-  void _changeStart(DateTime value) {
-    setState(() {
-      _start = value;
-      if (_end.isBefore(value)) _end = value;
-    });
+  void _selectDate(DateTime value) {
+    if (_rangeAnchor == null) {
+      setState(() {
+        _rangeAnchor = value;
+        _start = value;
+        _end = value;
+      });
+      return;
+    }
+    final anchor = _rangeAnchor!;
+    _start = value.isBefore(anchor) ? value : anchor;
+    _end = value.isBefore(anchor) ? anchor : value;
+    _rangeAnchor = null;
+    _applyDraft();
   }
-
-  void _changeEnd(DateTime value) => setState(() => _end = value);
 
   void _applyDraft() {
     final range = CarpenterDateRange(start: _start, end: _end);
@@ -203,78 +217,51 @@ final class _CarpenterDateRangeInputState
 
   @override
   Widget build(BuildContext context) {
-    final wheel = carpenterUsesWheelPicker(context);
-    return CarpenterDialog(
-      open: _open,
+    return PickerHost(
+      open: _open && _interactive,
       onOpenChanged: _setOpen,
-      title: 'Choose date range',
-      dismissPolicy: DialogDismissPolicy.outsideAndEscape,
-      actions: [
-        if (widget.allowClear)
-          CarpenterActionDescriptor(
-            id: 'date-range.clear',
-            label: 'Clear',
-            onInvoke: _clear,
+      picker: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              CarpenterText.label(
+                _rangeAnchor == null ? 'Choose start date' : 'Choose end date',
+              ),
+              SizedBox(height: context.units(.5.rem)),
+              CarpenterCalendar(
+                selected: _rangeAnchor == null ? widget.value?.start : _start,
+                rangeStart: _rangeAnchor ?? widget.value?.start,
+                rangeEnd: _rangeAnchor == null ? widget.value?.end : null,
+                firstDate: widget.firstDate,
+                lastDate: widget.lastDate,
+                initialMonth: _start,
+                onChanged: _selectDate,
+              ),
+            ],
           ),
-        CarpenterActionDescriptor(
-          id: 'date-range.cancel',
-          label: 'Cancel',
-          onInvoke: () => _setOpen(false),
-        ),
-        CarpenterActionDescriptor(
-          id: 'date-range.apply',
-          label: 'Apply',
-          colorRole: ActionColorRole.primary,
-          onInvoke: _applyDraft,
-        ),
-      ],
-      content: LayoutBuilder(
-        builder: (context, constraints) {
-          final gap = context.units(.75.rem);
-          final compact = constraints.maxWidth < context.units(40.rem);
-          final startPicker = _RangePicker(
-            label: 'Start date',
-            wheel: wheel,
-            selected: _start,
-            firstDate: widget.firstDate,
-            lastDate: _end,
-            onChanged: _changeStart,
-          );
-          final endPicker = _RangePicker(
-            label: 'End date',
-            wheel: wheel,
-            selected: _end,
-            firstDate: _start,
-            lastDate: widget.lastDate,
-            onChanged: _changeEnd,
-          );
-          return SizedBox(
-            width: compact ? constraints.maxWidth : context.units(42.rem),
-            child: compact
-                ? Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      startPicker,
-                      SizedBox(height: gap),
-                      endPicker,
-                    ],
-                  )
-                : Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(child: startPicker),
-                      SizedBox(width: gap),
-                      Expanded(child: endPicker),
-                    ],
-                  ),
-          );
-        },
+          if (widget.allowClear) ...[
+            SizedBox(height: context.units(.5.rem)),
+            Align(
+              alignment: AlignmentDirectional.centerEnd,
+              child: CarpenterButton(
+                label: 'Clear',
+                size: ControlSize.small,
+                prominence: ActionProminence.ghost,
+                onInvoke: _clear,
+              ),
+            ),
+          ],
+        ],
       ),
-      child: CarpenterMaskedInput(
+      field: CarpenterMaskedInput(
         controller: _controller,
         mask: CarpenterInputMask.dateRange,
         label: widget.label,
-        placeholder: widget.placeholder,
+        placeholder: widget.placeholder ?? 'DD.MM.YYYY – DD.MM.YYYY',
         description: widget.description,
         feedback: widget.feedback,
         errorText: widget.errorText ?? _validationError,
@@ -285,63 +272,19 @@ final class _CarpenterDateRangeInputState
             : FieldAvailability.disabled,
         size: widget.size,
         shape: widget.shape,
-        keyboardType: TextInputType.datetime,
+        keyboardType: TextInputType.number,
         autofocus: widget.autofocus,
         trailingAction: CarpenterActionDescriptor(
           id: 'date-range.open-picker',
           label: 'Choose date range',
           semanticLabel: 'Open date range picker',
-          icon: CarpenterIcons.calendar,
-          onInvoke: _interactive ? () => _setOpen(true) : null,
+          icon: GravityIcons.calendar,
+          onInvoke: _interactive ? () => _setOpen(!_open) : null,
         ),
         onChanged: _interactive ? _handleTextChanged : null,
       ),
     );
   }
-}
-
-final class _RangePicker extends StatelessWidget {
-  const _RangePicker({
-    required this.label,
-    required this.wheel,
-    required this.selected,
-    required this.firstDate,
-    required this.lastDate,
-    required this.onChanged,
-  });
-
-  final String label;
-  final bool wheel;
-  final DateTime selected;
-  final DateTime? firstDate;
-  final DateTime? lastDate;
-  final ValueChanged<DateTime> onChanged;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    mainAxisSize: MainAxisSize.min,
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      CarpenterText.label(label, emphasis: TypographyEmphasis.strong),
-      SizedBox(height: context.units(.5.rem)),
-      if (wheel)
-        CarpenterDateWheel(
-          value: selected,
-          firstDate: firstDate,
-          lastDate: lastDate,
-          semanticLabel: label,
-          onChanged: onChanged,
-        )
-      else
-        CarpenterCalendar(
-          selected: selected,
-          firstDate: firstDate,
-          lastDate: lastDate,
-          initialMonth: selected,
-          onChanged: onChanged,
-        ),
-    ],
-  );
 }
 
 String? _rangeError(
@@ -357,17 +300,6 @@ String? _rangeError(
     return 'End date is after the allowed range';
   }
   return null;
-}
-
-DateTime _clampDate(DateTime value, DateTime? firstDate, DateTime? lastDate) {
-  final date = _dateOnly(value);
-  if (firstDate != null && date.isBefore(_dateOnly(firstDate))) {
-    return _dateOnly(firstDate);
-  }
-  if (lastDate != null && date.isAfter(_dateOnly(lastDate))) {
-    return _dateOnly(lastDate);
-  }
-  return date;
 }
 
 DateTime _dateOnly(DateTime value) =>
