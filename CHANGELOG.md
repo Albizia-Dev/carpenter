@@ -1,3 +1,9 @@
+# 0.4.5
+
+- Collection search can atomically update domain filters and reset pagination
+  while retaining shared debounce and cancellation. Clearing a draft or applying
+  an explicit query now cancels stale pending search commits.
+
 # 0.4.4
 
 - Input now supports native capitalization and a non-editable unit suffix.

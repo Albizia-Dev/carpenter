@@ -78,7 +78,10 @@ final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
   /// ends. [load] returns replacement snapshots; [loadMore], when supplied,
   /// must return already accumulated items. [keyOf] identifies items for
   /// event application. The default snapshot is initial-loading and search
-  /// debounce is 350 milliseconds.
+  /// debounce is 350 milliseconds. [queryForSearch] optionally maps the trimmed
+  /// search into a domain filter and resets paging atomically when debounce
+  /// commits. Return a query with the supplied search; without a mapper only
+  /// the search field changes.
   CollectionLifecycleController({
     required CollectionLifecycleLoader<T, F> load,
     required CollectionQuery<F> query,
@@ -86,12 +89,17 @@ final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
     CollectionLoadMore<T, F>? loadMore,
     CollectionSnapshot<T>? initialSnapshot,
     this.searchDebounce = const Duration(milliseconds: 350),
-  }) : _load = load,
+    CollectionQuery<F> Function(CollectionQuery<F> current, String search)?
+    queryForSearch,
+  }) : _queryForSearch = queryForSearch,
+       _load = load,
        _loadMore = loadMore,
        _query = query,
        _keyOf = keyOf,
        _snapshot = initialSnapshot ?? CollectionSnapshot<T>.initialLoading();
 
+  final CollectionQuery<F> Function(CollectionQuery<F> current, String search)?
+  _queryForSearch;
   final CollectionLifecycleLoader<T, F> _load;
   final CollectionLoadMore<T, F>? _loadMore;
   final K Function(T item) _keyOf;
@@ -127,16 +135,18 @@ final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
   /// Debounces a trimmed search value before issuing a query load.
   ///
   /// An unchanged committed string is ignored; empty text clears search. This
-  /// method does not reset pagination. Use [updateQuery] to change search and
-  /// page together when that is required by the data source.
+  /// method preserves pagination unless the constructor's query mapper resets
+  /// it. Returning to the committed search cancels an outstanding debounce.
   void updateSearch(String value) {
     final normalized = value.trim();
-    if ((_query.search ?? '') == normalized) return;
     _searchTimer?.cancel();
+    if ((_query.search ?? '') == normalized) return;
     _searchTimer = Timer(searchDebounce, () {
-      _query = normalized.isEmpty
-          ? _query.copyWith(clearSearch: true)
-          : _query.copyWith(search: normalized);
+      _query =
+          _queryForSearch?.call(_query, normalized) ??
+          (normalized.isEmpty
+              ? _query.copyWith(clearSearch: true)
+              : _query.copyWith(search: normalized));
       _run(CollectionRequestReason.query);
     });
   }
@@ -144,9 +154,10 @@ final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
   /// Stores [query] and, by default, awaits a query load.
   ///
   /// With [load] false, only the query is stored: no request or notification
-  /// is emitted. This does not cancel a pending search debounce; keep one
-  /// owner for query changes.
+  /// is emitted. Explicit query updates cancel pending search debounce so an
+  /// older draft cannot overwrite the new filter or pagination state.
   Future<void> updateQuery(CollectionQuery<F> query, {bool load = true}) async {
+    _searchTimer?.cancel();
     _query = query;
     if (load) await _run(CollectionRequestReason.query);
   }

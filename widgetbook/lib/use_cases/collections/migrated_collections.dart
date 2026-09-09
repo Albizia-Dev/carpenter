@@ -126,6 +126,13 @@ final class _LifecyclePreviewState extends State<_LifecyclePreview> {
         query: CollectionQuery<String>(search: ''),
         keyOf: (item) => item,
         searchDebounce: widget.debounce,
+        queryForSearch: (query, search) => query.copyWith(
+          search: search,
+          page: const CollectionProgressivePageRequest(
+            loadedCount: 0,
+            batchSize: 20,
+          ),
+        ),
         load: (query, request) async {
           await Future<void>.delayed(widget.delay);
           if (request.cancellation.isCancelled) {
