@@ -58,6 +58,7 @@ final class _AutosuggestPreview extends StatefulWidget {
 
 final class _AutosuggestPreviewState extends State<_AutosuggestPreview> {
   final _controller = TextEditingController();
+  final _nextController = TextEditingController();
   var _open = false;
   String? _selected;
 
@@ -77,6 +78,7 @@ final class _AutosuggestPreviewState extends State<_AutosuggestPreview> {
   @override
   void dispose() {
     _controller.dispose();
+    _nextController.dispose();
     super.dispose();
   }
 
@@ -102,6 +104,11 @@ final class _AutosuggestPreviewState extends State<_AutosuggestPreview> {
       SizedBox(height: context.units(1.rem)),
       CarpenterText.caption(
         'query="${_controller.text}" · selected=${_selected ?? '—'} · suggestions=${_suggestions.length}',
+      ),
+      SizedBox(height: context.units(.75.rem)),
+      CarpenterInput(
+        controller: _nextController,
+        label: 'Следующее поле — Tab или клик',
       ),
     ],
   );

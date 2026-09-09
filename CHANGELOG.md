@@ -1,3 +1,8 @@
+## 0.4.8
+
+- Separate pointer focus from keyboard focus highlighting in action controls; tabs keep one selected traversal stop and preserve arrow-key navigation.
+- Autosuggest and ComboBox close suggestions when focus leaves, let outside clicks reach the next control, and keep editing focus during suggestion selection. Only the active suggestion is highlighted.
+
 ## 0.4.7
 
 - Allow host font families and fallback families in the shared typography resolver, consistently across content and component roles.

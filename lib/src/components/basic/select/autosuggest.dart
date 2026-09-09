@@ -8,6 +8,8 @@ import '../input/field_shell.dart';
 ///
 /// Query and suggestions remain caller-owned. Overlay visibility is
 /// self-managed by default; pass both [open] and [onOpenChanged] to control it.
+/// Suggestions retain editing focus. Leaving the field closes the popup;
+/// outside pointer events reach their target without restoring field focus.
 final class CarpenterAutosuggest<T> extends StatefulWidget {
   const CarpenterAutosuggest({
     super.key,

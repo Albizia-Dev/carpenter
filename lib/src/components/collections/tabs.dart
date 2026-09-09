@@ -27,6 +27,10 @@ final class CarpenterTab<T> {
 }
 
 /// A controlled semantic tab list. Tab content remains caller-owned.
+///
+/// Tab enters at the selected enabled tab; arrow keys move selection and focus.
+/// Pointer selection keeps focus for subsequent keyboard navigation without a
+/// keyboard focus outline. Tab leaves the tab list for the next control.
 final class CarpenterTabs<T> extends StatefulWidget {
   const CarpenterTabs({
     super.key,
@@ -147,6 +151,12 @@ final class _CarpenterTabsState<T> extends State<CarpenterTabs<T>> {
     final selected = tab.value == widget.value;
     final enabled = tab.enabled && widget.onChanged != null;
     final focusNode = _focusNodes.putIfAbsent(tab.value, FocusNode.new);
+    final entry =
+        widget.tabs
+            .where((item) => item.enabled && item.value == widget.value)
+            .firstOrNull ??
+        widget.tabs.where((item) => item.enabled).firstOrNull;
+    focusNode.skipTraversal = !enabled || tab.value != entry?.value;
     final theme = CarpenterTheme.of(context);
     final activeStyle = theme.actions.resolve(
       ActionColorRole.utility,

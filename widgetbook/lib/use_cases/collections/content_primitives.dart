@@ -37,15 +37,22 @@ final class _TabsPreviewState extends State<_TabsPreview> {
   var _value = 0;
 
   @override
-  Widget build(BuildContext context) => CarpenterTabs<int>(
-    value: _value,
-    onChanged: widget.enabled
-        ? (value) => setState(() => _value = value)
-        : null,
-    tabs: const [
-      CarpenterTab(value: 0, label: 'Overview'),
-      CarpenterTab(value: 1, label: 'Allocations'),
-      CarpenterTab(value: 2, label: 'History'),
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      CarpenterTabs<int>(
+        value: _value,
+        onChanged: widget.enabled
+            ? (value) => setState(() => _value = value)
+            : null,
+        tabs: const [
+          CarpenterTab(value: 0, label: 'Overview'),
+          CarpenterTab(value: 1, label: 'Allocations'),
+          CarpenterTab(value: 2, label: 'History'),
+        ],
+      ),
+      SizedBox(height: context.units(.75.rem)),
+      CarpenterButton(label: 'После табов — Tab для перехода', onInvoke: () {}),
     ],
   );
 }

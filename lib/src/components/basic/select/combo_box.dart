@@ -9,6 +9,8 @@ import 'select.dart';
 ///
 /// Value and query remain caller-owned. Overlay visibility is self-managed by
 /// default; pass both [open] and [onOpenChanged] to control it explicitly.
+/// Suggestions retain editing focus. Leaving the field closes the popup;
+/// outside pointer events reach their target without restoring field focus.
 final class CarpenterComboBox<T> extends StatefulWidget {
   const CarpenterComboBox({
     super.key,

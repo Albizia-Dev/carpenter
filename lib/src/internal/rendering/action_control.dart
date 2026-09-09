@@ -94,10 +94,9 @@ final class ActionControl extends StatelessWidget {
             focusNode: focusNode,
             autofocus: autofocus,
             builder: (context, states, showFocusHighlight) {
-              final visualStates =
-                  _running && states.contains(WidgetState.disabled)
-                  ? ({...states}..remove(WidgetState.disabled))
-                  : states;
+              final visualStates = {...states};
+              if (_running) visualStates.remove(WidgetState.disabled);
+              if (!showFocusHighlight) visualStates.remove(WidgetState.focused);
               final style = theme.actions.resolve(
                 colorRole,
                 prominence,

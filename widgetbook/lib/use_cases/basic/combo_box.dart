@@ -68,6 +68,7 @@ final class _ComboPreview extends StatefulWidget {
 
 final class _ComboPreviewState extends State<_ComboPreview> {
   final _controller = TextEditingController();
+  final _nextController = TextEditingController();
   int? _value;
   var _open = false;
 
@@ -91,6 +92,7 @@ final class _ComboPreviewState extends State<_ComboPreview> {
   @override
   void dispose() {
     _controller.dispose();
+    _nextController.dispose();
     super.dispose();
   }
 
@@ -125,6 +127,11 @@ final class _ComboPreviewState extends State<_ComboPreview> {
       SizedBox(height: context.units(.75.rem)),
       CarpenterText.caption(
         'query="${_controller.text}" · value=${_value ?? '—'} · options=${_options.length}',
+      ),
+      SizedBox(height: context.units(.75.rem)),
+      CarpenterInput(
+        controller: _nextController,
+        label: 'Следующее поле — Tab или клик',
       ),
     ],
   );

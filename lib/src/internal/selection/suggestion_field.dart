@@ -74,6 +74,7 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
   final MenuNavigation<Object> _navigation = MenuNavigation();
   FocusNode? _ownedFocusNode;
   bool _suppressFocusOpenUntilBlur = false;
+  final Object _tapGroup = Object();
 
   FocusNode get _focusNode => widget.focusNode ?? _ownedFocusNode!;
   bool get _enabled =>
@@ -122,6 +123,7 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
   void _handleFocusChanged() {
     if (!_focusNode.hasFocus) {
       _suppressFocusOpenUntilBlur = false;
+      if (widget.open) widget.onOpenChanged(false);
       return;
     }
     if (_suppressFocusOpenUntilBlur || !_enabled || widget.open) return;
@@ -282,14 +284,25 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
       ),
     );
     return AnchoredOverlayHost(
+      dismissOnOutside: false,
+      restoreFocus: false,
       open: widget.open && _enabled,
       onOpenChanged: widget.onOpenChanged,
       placement: widget.placement,
       takeFocus: false,
       allowAnchorInteraction: true,
       matchAnchorWidth: true,
-      anchor: anchor,
-      overlayBuilder: (context) => _buildMenu(),
+      anchor: TapRegion(
+        groupId: _tapGroup,
+        onTapOutside: (_) {
+          if (widget.open) widget.onOpenChanged(false);
+        },
+        child: anchor,
+      ),
+      overlayBuilder: (context) => TapRegion(
+        groupId: _tapGroup,
+        child: ExcludeFocus(child: _buildMenu()),
+      ),
     );
   }
 
@@ -325,8 +338,8 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
             semanticLabel: option.effectiveSemanticLabel,
             enabled: option.enabled,
             selected:
-                option.id == _navigation.highlightedKey ||
-                option.id == widget.selectedOptionId,
+                option.id ==
+                (_navigation.highlightedKey ?? widget.selectedOptionId),
             onActivate: option.enabled ? () => _select(option) : null,
           ),
       ],

@@ -41,6 +41,7 @@ final class _InteractiveRegionState extends State<InteractiveRegion> {
   bool _focused = false;
   bool _pressed = false;
   bool _showFocusHighlight = false;
+  bool _pointerFocus = false;
 
   bool get _enabled =>
       widget.onActivate != null || widget.onDoubleActivate != null;
@@ -60,12 +61,23 @@ final class _InteractiveRegionState extends State<InteractiveRegion> {
 
   void _setFocus(bool value) {
     if (_focused == value) return;
-    setState(() => _focused = value);
+    setState(() {
+      _focused = value;
+      if (!value) _pointerFocus = false;
+    });
   }
 
   void _setPressed(bool value) {
     if (_pressed == value) return;
     setState(() => _pressed = value);
+    if (!value && _pointerFocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        // A click need not focus an action. Do not suppress a later Tab entry.
+        if (mounted && !_focused && _pointerFocus) {
+          setState(() => _pointerFocus = false);
+        }
+      });
+    }
   }
 
   void _activate() {
@@ -84,62 +96,83 @@ final class _InteractiveRegionState extends State<InteractiveRegion> {
 
   @override
   Widget build(BuildContext context) {
-    return FocusableActionDetector(
-      enabled: _enabled,
-      focusNode: widget.focusNode,
-      autofocus: widget.autofocus,
-      includeFocusSemantics: widget.includeFocusSemantics,
-      onFocusChange: _setFocus,
-      onShowFocusHighlight: (value) {
-        if (_showFocusHighlight == value) return;
-        setState(() => _showFocusHighlight = value);
+    return Focus(
+      canRequestFocus: false,
+      onKeyEvent: (_, event) {
+        if (event is KeyDownEvent && _pointerFocus) {
+          setState(() => _pointerFocus = false);
+        }
+        return KeyEventResult.ignored;
       },
-      shortcuts:
-          widget.handlesActivationShortcuts ||
-              widget.shortcutCallbacks.isNotEmpty
-          ? <ShortcutActivator, Intent>{
-              if (widget.handlesActivationShortcuts) ...const {
-                SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
-                SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
-              },
-              for (final entry in widget.shortcutCallbacks.entries)
-                entry.key: VoidCallbackIntent(entry.value),
-            }
-          : null,
-      actions:
-          widget.handlesActivationShortcuts ||
-              widget.shortcutCallbacks.isNotEmpty
-          ? <Type, Action<Intent>>{
-              if (widget.handlesActivationShortcuts)
-                ActivateIntent: CallbackAction<ActivateIntent>(
-                  onInvoke: (_) {
-                    _activate();
-                    return null;
-                  },
-                ),
-              if (widget.shortcutCallbacks.isNotEmpty)
-                VoidCallbackIntent: VoidCallbackAction(),
-            }
-          : null,
-      child: MouseRegion(
-        cursor: _interactive
-            ? SystemMouseCursors.click
-            : SystemMouseCursors.basic,
-        onEnter: _interactive ? (_) => _setHover(true) : null,
-        onExit: _interactive ? (_) => _setHover(false) : null,
-        child: Listener(
-          behavior: HitTestBehavior.opaque,
-          onPointerDown: _interactive ? (_) => _setPressed(true) : null,
-          onPointerUp: _interactive ? (_) => _setPressed(false) : null,
-          onPointerCancel: _interactive ? (_) => _setPressed(false) : null,
-          child: GestureDetector(
+      child: FocusableActionDetector(
+        enabled: _enabled,
+        focusNode: widget.focusNode,
+        autofocus: widget.autofocus,
+        includeFocusSemantics: widget.includeFocusSemantics,
+        onFocusChange: _setFocus,
+        onShowFocusHighlight: (value) {
+          if (_showFocusHighlight == value) return;
+          setState(() => _showFocusHighlight = value);
+        },
+        shortcuts:
+            widget.handlesActivationShortcuts ||
+                widget.shortcutCallbacks.isNotEmpty
+            ? <ShortcutActivator, Intent>{
+                if (widget.handlesActivationShortcuts) ...const {
+                  SingleActivator(LogicalKeyboardKey.enter): ActivateIntent(),
+                  SingleActivator(LogicalKeyboardKey.space): ActivateIntent(),
+                },
+                for (final entry in widget.shortcutCallbacks.entries)
+                  entry.key: VoidCallbackIntent(entry.value),
+              }
+            : null,
+        actions:
+            widget.handlesActivationShortcuts ||
+                widget.shortcutCallbacks.isNotEmpty
+            ? <Type, Action<Intent>>{
+                if (widget.handlesActivationShortcuts)
+                  ActivateIntent: CallbackAction<ActivateIntent>(
+                    onInvoke: (_) {
+                      if (_pointerFocus) setState(() => _pointerFocus = false);
+                      _activate();
+                      return null;
+                    },
+                  ),
+                if (widget.shortcutCallbacks.isNotEmpty)
+                  VoidCallbackIntent: VoidCallbackAction(),
+              }
+            : null,
+        child: MouseRegion(
+          cursor: _interactive
+              ? SystemMouseCursors.click
+              : SystemMouseCursors.basic,
+          onEnter: _interactive ? (_) => _setHover(true) : null,
+          onExit: _interactive ? (_) => _setHover(false) : null,
+          child: Listener(
             behavior: HitTestBehavior.opaque,
-            excludeFromSemantics: true,
-            onTap: _interactive && widget.onActivate != null ? _activate : null,
-            onDoubleTap: _interactive && widget.onDoubleActivate != null
-                ? _doubleActivate
+            onPointerDown: _interactive
+                ? (_) {
+                    setState(() => _pointerFocus = true);
+                    _setPressed(true);
+                  }
                 : null,
-            child: widget.builder(context, _states, _showFocusHighlight),
+            onPointerUp: _interactive ? (_) => _setPressed(false) : null,
+            onPointerCancel: _interactive ? (_) => _setPressed(false) : null,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              excludeFromSemantics: true,
+              onTap: _interactive && widget.onActivate != null
+                  ? _activate
+                  : null,
+              onDoubleTap: _interactive && widget.onDoubleActivate != null
+                  ? _doubleActivate
+                  : null,
+              child: widget.builder(
+                context,
+                _states,
+                _showFocusHighlight && !_pointerFocus,
+              ),
+            ),
           ),
         ),
       ),
