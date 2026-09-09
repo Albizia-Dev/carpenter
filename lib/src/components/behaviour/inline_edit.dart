@@ -19,8 +19,9 @@ final class _InlineCancelIntent extends Intent {
 /// other structured-value surfaces.
 ///
 /// Carpenter owns focus/keyboard/action presentation while the caller owns the
-/// meaningful edit state and persistence. The idle pencil becomes a checkmark
-/// while editing; Enter commits and Escape cancels by default.
+/// meaningful edit state and persistence. The idle pencil becomes explicit
+/// cancel/save actions while editing; Enter commits and Escape cancels by
+/// default.
 final class CarpenterInlineEdit extends StatelessWidget {
   /// Creates controlled inline-edit chrome around [value] and [editor].
   const CarpenterInlineEdit({
@@ -86,6 +87,14 @@ final class CarpenterInlineEdit extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(child: editing ? editor : value),
+        if (editing)
+          CarpenterIconButton(
+            icon: GravityIcons.xmark,
+            semanticLabel: 'Cancel editing',
+            prominence: ActionProminence.ghost,
+            size: actionSize,
+            onPressed: committing ? null : onCancelRequested,
+          ),
         CarpenterIconButton(
           icon: editing ? GravityIcons.check : GravityIcons.pencil,
           semanticLabel: editing ? commitSemanticLabel : editSemanticLabel,
