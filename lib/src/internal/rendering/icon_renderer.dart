@@ -1,5 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+import '../../components/basic/gravity_icons.g.dart';
+import '../../components/basic/icons.dart';
 import '../../foundation/icon_data.dart';
 
 /// Internal renderer for every Carpenter icon slot.
@@ -20,12 +22,7 @@ final class IconRenderer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return switch (icon) {
-      IconData data => Icon(
-        data,
-        size: size,
-        color: color,
-        semanticLabel: semanticLabel,
-      ),
+      IconData data => _buildFrameworkIcon(context, data),
       CarpenterIconData data => data.buildIcon(
         context,
         size: size,
@@ -38,5 +35,32 @@ final class IconRenderer extends StatelessWidget {
         'Expected IconData or CarpenterIconData.',
       ),
     };
+  }
+
+  Widget _buildFrameworkIcon(BuildContext context, IconData data) {
+    final gravity = switch (data) {
+      CarpenterIcons.search => GravityIcons.magnifier,
+      CarpenterIcons.clear => GravityIcons.xmark,
+      CarpenterIcons.add => GravityIcons.plus,
+      CarpenterIcons.edit => GravityIcons.pencil,
+      CarpenterIcons.archive => GravityIcons.archive,
+      CarpenterIcons.file => GravityIcons.file,
+      CarpenterIcons.more => GravityIcons.ellipsis,
+      _ => null,
+    };
+    if (gravity != null) {
+      return gravity.buildIcon(
+        context,
+        size: size,
+        color: color,
+        semanticLabel: semanticLabel,
+      );
+    }
+    return Icon(
+      data,
+      size: size,
+      color: color,
+      semanticLabel: semanticLabel,
+    );
   }
 }
