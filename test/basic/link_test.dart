@@ -3,20 +3,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
-  Widget harness(Widget child, {CarpenterThemeData? theme}) => UnitsRoot(
-    rem: const Px(16),
-    child: CarpenterTheme(
-      data: theme ?? CarpenterThemeData.light(),
-      child: const MediaQuery(
-        data: MediaQueryData(),
-        child: Directionality(
-          textDirection: TextDirection.ltr,
-          child: FocusScope(child: SizedBox()),
-        ),
-      ),
-    ),
-  );
-
   Widget app(Widget child, {CarpenterThemeData? theme}) => UnitsRoot(
     rem: const Px(16),
     child: CarpenterTheme(
@@ -51,7 +37,7 @@ void main() {
     tester,
   ) async {
     final theme = CarpenterThemeData.light();
-    final cases = <CarpenterLinkRole, (ActionColorRole, TextDecoration)> {
+    final cases = <CarpenterLinkRole, (ActionColorRole, TextDecoration)>{
       CarpenterLinkRole.inline: (
         ActionColorRole.utility,
         TextDecoration.underline,
