@@ -17,10 +17,15 @@ void main() {
     ),
   );
 
-  testWidgets('standalone is the neutral non-underlined default', (tester) async {
+  testWidgets('standalone is the neutral non-underlined default', (
+    tester,
+  ) async {
     final theme = CarpenterThemeData.light();
     await tester.pumpWidget(
-      app(CarpenterLink(label: 'Account', onInvoke: _noop), theme: theme),
+      app(
+        CarpenterLink(label: 'Account', onInvoke: _noop),
+        theme: theme,
+      ),
     );
 
     final text = tester.widget<Text>(find.text('Account'));
@@ -46,10 +51,7 @@ void main() {
         ActionColorRole.neutral,
         TextDecoration.none,
       ),
-      CarpenterLinkRole.subtle: (
-        ActionColorRole.neutral,
-        TextDecoration.none,
-      ),
+      CarpenterLinkRole.subtle: (ActionColorRole.neutral, TextDecoration.none),
       CarpenterLinkRole.prominent: (
         ActionColorRole.primary,
         TextDecoration.none,
@@ -96,7 +98,9 @@ void main() {
     expect(text.style!.decoration, TextDecoration.underline);
   });
 
-  testWidgets('explicit underline policy overrides role default', (tester) async {
+  testWidgets('explicit underline policy overrides role default', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       app(
         CarpenterLink(
@@ -108,7 +112,10 @@ void main() {
       ),
     );
     expect(
-      tester.widget<Text>(find.text('Inline without underline')).style!.decoration,
+      tester
+          .widget<Text>(find.text('Inline without underline'))
+          .style!
+          .decoration,
       TextDecoration.none,
     );
 
@@ -153,7 +160,9 @@ void main() {
     expect(text.style!.color, expected.foreground);
   });
 
-  testWidgets('link keeps activation and accessibility semantics', (tester) async {
+  testWidgets('link keeps activation and accessibility semantics', (
+    tester,
+  ) async {
     var invoked = false;
     await tester.pumpWidget(
       app(
