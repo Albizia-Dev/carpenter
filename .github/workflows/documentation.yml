@@ -30,11 +30,14 @@ jobs:
       - name: Test export resolution and regression gates
         working-directory: tool/documentation
         run: dart test
-      - name: Refresh resolved documentation debt and release notes
+      - name: Refresh resolved documentation debt
+        if: github.event_name == 'pull_request'
+        working-directory: tool/documentation
+        run: dart run bin/audit.dart ../.. --write-baseline
+      - name: Refresh 0.3.4 release notes and commit documentation
         if: github.event_name == 'pull_request'
         shell: bash
         run: |
-          dart run tool/documentation/bin/audit.dart . --write-baseline
           if ! grep -q '^# 0.3.4$' CHANGELOG.md; then
             cat > /tmp/changelog-0.3.4 <<'EOF'
           # 0.3.4
