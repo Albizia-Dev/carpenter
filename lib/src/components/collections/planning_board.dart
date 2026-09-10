@@ -184,8 +184,8 @@ final class _PlanningLaneView<L, C, T> extends StatelessWidget {
                 if (onExpansionChanged != null)
                   CarpenterIconButton(
                     icon: collapsed
-                        ? GravityIcons.arrowChevronRight
-                        : GravityIcons.arrowChevronDown,
+                        ? GravityIcons.chevronRight
+                        : GravityIcons.chevronDown,
                     semanticLabel: collapsed
                         ? 'Expand ${lane.title}'
                         : 'Collapse ${lane.title}',

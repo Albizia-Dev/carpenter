@@ -1,3 +1,38 @@
+## Unreleased
+
+- Preserve mounted page content and natural document height during refresh, blocking and skeleton states; show indeterminate progress when no percentage is available.
+
+- Add controlled searchable MultiSelect with removable values, bounded results and caller-owned remote search state; replace entity checkbox lists in Projects+ specimens.
+
+- Keep definition-list actions adjacent to their values and tighten metadata row spacing.
+- Add opt-in frozen first columns to EditableTable, preserving editor identity, focus, hit testing and RTL positioning during horizontal scrolling.
+- Refine Projects+ board metadata, linked-record selection and conflict comparison specimens.
+
+- Present kanban columns as unframed lanes with compact count badges; card builders own item surfaces.
+- Include fixed column widths and row spacing in editable-table horizontal scroll extents.
+- Add 28 deterministic Projects+ compositions to Widgetbook, including boards, forms, materials, financials and correspondence.
+
+- Add an open-state chevron to select fields, preserving field state colors and sizing.
+
+- Add controlled inline disclosure and persistent condition summaries to FilterBar; hide secondary Treasury filters by default.
+- Keep single-line input hints within one line; remove empty search-label spacing.
+- Localize pagination labels and retain leading totals at narrow widths and larger text scales.
+- Add deterministic Treasury page and panel compositions, including record tabs, to Widgetbook.
+
+- Add CarpenterExpander.listGroup for flush homogeneous list groups: no nested card or content padding, with a shared disclosure header.
+
+- Align tree branch/leaf disclosure lanes and row heights, including scaled text; use directional chevrons and ellipsized labels.
+- Give list slots semantic typography and move rich-row trailing content below descriptions on narrow layouts.
+- Avoid expander layout invalidation when nested sections close with animations disabled.
+- Make expander headers keyboard/click accessible with disclosure semantics and icons; preserve independent header actions.
+- Add shared desktop payment, account, folder-tree and nested audit examples to Widgetbook with visual goldens.
+
+- Fix definition-list spacing and compact status badges in project layouts.
+- Keep constrained button labels on one line and account for text scale and focus in action-strip sizing.
+- Wrap filled selection groups into readable rows and preserve keyboard navigation after controlled rebuilds.
+- Preserve tree row identity when root items change during filtering; keep table text within complete visible lines at larger text scales.
+- Add shared dsktp project/materials examples to Widgetbook with desktop, narrow, editing, loading, and scaled-text goldens.
+
 ## 0.4.10
 
 - Date input reports incomplete, invalid and accepted edits through the optional `onInputValidityChanged` callback so forms can block stale-value submission.

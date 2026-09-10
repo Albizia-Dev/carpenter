@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/services.dart';
@@ -466,6 +467,8 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
           widget.itemBuilder?.call(context, node, state) ??
           CarpenterText.label(
             node.label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             emphasis: state.selected || state.focused
                 ? TypographyEmphasis.medium
                 : TypographyEmphasis.regular,
@@ -497,6 +500,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
               trailing: _actions(context, actions),
             )
           : CarpenterListTile(
+              contentPadding: false,
               selected: state.selected,
               semanticLabel: node.effectiveSemanticLabel,
               onInvoke: () => _select(node),
@@ -504,9 +508,29 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
                   ? null
                   : () => _activate(node),
               leading: prefix,
-              title: title,
+              title: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: math.max(
+                    context.units(theme.sizes.minimumTarget),
+                    theme.sizes.actionExtent(context, ControlSize.xsmall) +
+                        2 * context.units(theme.focus.gap),
+                  ),
+                ),
+                child: Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: title,
+                ),
+              ),
               trailing: _actions(context, actions),
             );
+      if (!widget.tableRows) {
+        row = Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.units(theme.spacing.small),
+          ),
+          child: row,
+        );
+      }
       if (state.cut && widget.rowBuilder == null) {
         row = Opacity(opacity: .55, child: row);
       }
@@ -618,9 +642,6 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
   Widget build(BuildContext context) {
     if (_pendingRevealId != null) _scheduleReveal(_pendingRevealId!);
     Widget rows = Column(
-      key: ValueKey<Object>(
-        Object.hashAll(widget.nodes.map((node) => node.id)),
-      ),
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -728,11 +749,15 @@ final class _TreeRowPrefix<T> extends StatelessWidget {
         SizedBox(width: indent),
         if (node.canExpand)
           AnimatedRotation(
-            turns: expanded ? .25 : 0,
+            turns: expanded
+                ? (Directionality.of(context) == TextDirection.rtl ? -.25 : .25)
+                : 0,
             duration: theme.motion.transitionDuration(context),
             curve: theme.motion.stateCurve,
             child: CarpenterIconButton(
-              icon: GravityIcons.arrowChevronRight,
+              icon: Directionality.of(context) == TextDirection.rtl
+                  ? GravityIcons.chevronLeft
+                  : GravityIcons.chevronRight,
               semanticLabel: expanded
                   ? 'Collapse ${node.label}'
                   : 'Expand ${node.label}',
@@ -743,7 +768,11 @@ final class _TreeRowPrefix<T> extends StatelessWidget {
           )
         else
           SizedBox(
-            width: context.units(theme.sizes.control(ControlSize.xsmall)),
+            width: math.max(
+              context.units(theme.sizes.minimumTarget),
+              theme.sizes.actionExtent(context, ControlSize.xsmall) +
+                  2 * context.units(theme.focus.gap),
+            ),
           ),
         if (icon != null) ...[
           SizedBox(width: gap),

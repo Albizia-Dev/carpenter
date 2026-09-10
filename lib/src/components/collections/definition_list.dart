@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
@@ -21,7 +23,12 @@ typedef CarpenterDefinitionActionsBuilder<T> =
 /// can place it inside any semantic page region without nested surfaces.
 /// [actions] and [secondaryActions] describe optional row actions; primary
 /// icon-bearing actions stay inline when space permits while secondary actions
-/// use the shared adaptive overflow presentation.
+/// use the shared adaptive overflow presentation. Icon action lanes reserve
+/// only their control extent. Actions follow the intrinsic value width, while
+/// long values and editors may use the available space without pushing actions out.
+/// Wide layouts align terms to the longest label, capped at 40% of the row;
+/// narrow layouts place each term above its value. Text actions follow below
+/// the value on narrow layouts so their labels retain the available width.
 final class CarpenterDefinitionList<T> extends StatelessWidget {
   /// Creates a chrome-free responsive definition list.
   const CarpenterDefinitionList({
@@ -69,11 +76,37 @@ final class CarpenterDefinitionList<T> extends StatelessWidget {
             constraints.maxWidth,
           ) ==
           CarpenterViewportClass.narrow;
+      final theme = CarpenterTheme.of(context);
+      var termWidth = 0.0;
+      if (!compact) {
+        for (final item in items) {
+          final painter = TextPainter(
+            text: TextSpan(
+              text: term(item),
+              style: theme.typography.resolve(
+                context,
+                TypographyRole.label,
+                TypographyEmphasis.regular,
+              ),
+            ),
+            textDirection: Directionality.of(context),
+            textScaler: MediaQuery.textScalerOf(context),
+          )..layout();
+          termWidth = math.max(termWidth, painter.width.ceilToDouble());
+          painter.dispose();
+        }
+        final inset = context.units(theme.spacing.medium);
+        termWidth = math.min(
+          termWidth,
+          math.max(0, constraints.maxWidth - inset * 3) * 0.4,
+        );
+      }
       return Semantics(
         container: true,
         explicitChildNodes: true,
         label: semanticLabel,
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
           children: [
             for (final item in items)
@@ -84,6 +117,7 @@ final class CarpenterDefinitionList<T> extends StatelessWidget {
                 actions: actions?.call(item) ?? const [],
                 secondaryActions: secondaryActions?.call(item) ?? const [],
                 compact: compact,
+                termWidth: termWidth,
                 actionsSemanticLabel: actionsSemanticLabel,
                 actionsOverflowLabel: actionsOverflowLabel,
               ),
@@ -102,6 +136,7 @@ final class _DefinitionRow<T> extends StatelessWidget {
     required this.actions,
     required this.secondaryActions,
     required this.compact,
+    required this.termWidth,
     required this.actionsSemanticLabel,
     required this.actionsOverflowLabel,
   });
@@ -112,6 +147,7 @@ final class _DefinitionRow<T> extends StatelessWidget {
   final List<CarpenterActionDescriptor> actions;
   final List<CarpenterActionDescriptor> secondaryActions;
   final bool compact;
+  final double termWidth;
   final String actionsSemanticLabel;
   final String actionsOverflowLabel;
 
@@ -128,24 +164,36 @@ final class _DefinitionRow<T> extends StatelessWidget {
       container: true,
       label: term,
       child: Padding(
-        padding: EdgeInsets.all(context.units(theme.spacing.medium)),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.units(theme.spacing.medium),
+          vertical: context.units(theme.spacing.small),
+        ),
         child: compact
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   label,
                   SizedBox(height: context.units(theme.spacing.small)),
-                  _ValueAndActions(value: value, actions: actionStrip),
+                  _ValueAndActions(
+                    value: value,
+                    actions: actionStrip,
+                    primaryActions: actions,
+                    secondaryActions: secondaryActions,
+                  ),
                 ],
               )
             : Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Expanded(flex: 2, child: label),
+                  SizedBox(width: termWidth, child: label),
                   SizedBox(width: context.units(theme.spacing.medium)),
                   Expanded(
-                    flex: 3,
-                    child: _ValueAndActions(value: value, actions: actionStrip),
+                    child: _ValueAndActions(
+                      value: value,
+                      actions: actionStrip,
+                      primaryActions: actions,
+                      secondaryActions: secondaryActions,
+                    ),
                   ),
                 ],
               ),
@@ -158,6 +206,7 @@ final class _DefinitionRow<T> extends StatelessWidget {
       return null;
     }
     return CarpenterActionStrip(
+      alignment: AlignmentDirectional.centerStart,
       items: [
         for (final action in actions)
           CarpenterActionStripItem(
@@ -183,7 +232,15 @@ final class _DefinitionRow<T> extends StatelessWidget {
 }
 
 final class _ValueAndActions extends StatelessWidget {
-  const _ValueAndActions({required this.value, required this.actions});
+  const _ValueAndActions({
+    required this.value,
+    required this.actions,
+    required this.primaryActions,
+    required this.secondaryActions,
+  });
+
+  final List<CarpenterActionDescriptor> primaryActions;
+  final List<CarpenterActionDescriptor> secondaryActions;
 
   final Widget value;
   final Widget? actions;
@@ -191,19 +248,56 @@ final class _ValueAndActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final actionStrip = actions;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Expanded(child: value),
-        if (actionStrip != null) ...[
-          SizedBox(
-            width: context.units(
-              CarpenterTheme.of(context).spacing.layoutToolbar,
+    if (actionStrip == null) return value;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final visible = primaryActions
+            .where((action) => action.visible)
+            .toList();
+        final iconLane = visible.every((action) => action.icon != null);
+        final compact =
+            const CarpenterViewportPolicy().resolve(
+              context,
+              constraints.maxWidth,
+            ) ==
+            CarpenterViewportClass.narrow;
+        if (!iconLane && compact) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              value,
+              SizedBox(
+                height: context.units(CarpenterTheme.of(context).spacing.small),
+              ),
+              actionStrip,
+            ],
+          );
+        }
+        final preferred = iconLane
+            ? CarpenterActionStrip.compactExtent(
+                context,
+                inlineActions: visible.length,
+                reserveOverflow: secondaryActions.any(
+                  (action) => action.visible,
+                ),
+              )
+            : constraints.maxWidth / 2;
+        final extent = math.min(preferred, constraints.maxWidth / 2);
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Flexible(fit: FlexFit.loose, child: value),
+            SizedBox(
+              width: context.units(
+                CarpenterTheme.of(context).spacing.layoutToolbar,
+              ),
             ),
-          ),
-          Flexible(child: actionStrip),
-        ],
-      ],
+            SizedBox(width: extent, child: actionStrip),
+          ],
+        );
+      },
     );
   }
 }

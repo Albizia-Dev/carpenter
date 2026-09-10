@@ -17,6 +17,9 @@ final class CarpenterPaginationBar extends StatelessWidget {
     required this.onPageChanged,
     this.leading,
     this.siblingCount = 1,
+    this.pageLabelBuilder,
+    this.previousPageLabel = 'Previous page',
+    this.nextPageLabel = 'Next page',
   }) : assert(page > 0),
        assert(totalPages > 0),
        assert(page <= totalPages),
@@ -27,6 +30,13 @@ final class CarpenterPaginationBar extends StatelessWidget {
   final ValueChanged<int> onPageChanged;
   final Widget? leading;
   final int siblingCount;
+
+  /// Localized visible page summary. Defaults to English when omitted.
+  final String Function(int page, int totalPages)? pageLabelBuilder;
+
+  /// Accessible labels for the previous/next navigation actions.
+  final String previousPageLabel;
+  final String nextPageLabel;
 
   List<int?> get _pageWindow {
     if (totalPages <= 7) {
@@ -71,8 +81,8 @@ final class CarpenterPaginationBar extends StatelessWidget {
     CarpenterShape shape = CarpenterShape.rounded,
   }) => CarpenterIconButton(
     icon: previous
-        ? GravityIcons.arrowChevronLeft
-        : GravityIcons.arrowChevronRight,
+        ? GravityIcons.chevronLeft
+        : GravityIcons.chevronRight,
     semanticLabel: semanticLabel,
     size: ControlSize.small,
     colorRole: ActionColorRole.utility,
@@ -85,24 +95,27 @@ final class CarpenterPaginationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.small);
-    final label = CarpenterText.body('Page $page of $totalPages');
+    final label = CarpenterText.body(
+      pageLabelBuilder?.call(page, totalPages) ?? 'Page $page of $totalPages',
+    );
     final previous = _navigationButton(
       previous: true,
-      semanticLabel: 'Previous page',
+      semanticLabel: previousPageLabel,
       target: page - 1,
       enabled: page > 1,
     );
     final next = _navigationButton(
       previous: false,
-      semanticLabel: 'Next page',
+      semanticLabel: nextPageLabel,
       target: page + 1,
       enabled: page < totalPages,
     );
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        if (constraints.maxWidth < context.units(30.rem)) {
-          return Row(
+        if (constraints.maxWidth <
+            MediaQuery.textScalerOf(context).scale(context.units(30.rem))) {
+          final navigation = Row(
             children: [
               previous,
               SizedBox(width: gap),
@@ -111,6 +124,17 @@ final class CarpenterPaginationBar extends StatelessWidget {
               next,
             ],
           );
+          return leading == null
+              ? navigation
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    leading!,
+                    SizedBox(height: gap),
+                    navigation,
+                  ],
+                );
         }
 
         const joinedShape = CarpenterShape(
@@ -138,7 +162,7 @@ final class CarpenterPaginationBar extends StatelessWidget {
               children: [
                 _navigationButton(
                   previous: true,
-                  semanticLabel: 'Previous page',
+                  semanticLabel: previousPageLabel,
                   target: page - 1,
                   enabled: page > 1,
                   shape: joinedShape,
@@ -169,7 +193,7 @@ final class CarpenterPaginationBar extends StatelessWidget {
                     ),
                 _navigationButton(
                   previous: false,
-                  semanticLabel: 'Next page',
+                  semanticLabel: nextPageLabel,
                   target: page + 1,
                   enabled: page < totalPages,
                   shape: joinedShape,

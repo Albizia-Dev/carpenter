@@ -9,6 +9,10 @@ import 'state.dart';
 import 'package:carpenter_units/carpenter_units.dart';
 
 /// Standard rendering of infrastructure-level page states.
+///
+/// Works in bounded workspaces and content-sized document viewports. Refreshing
+/// keeps the content mounted and interactive; blocking preserves its state while
+/// excluding pointer input and keyboard focus. Unknown progress is indeterminate.
 final class CarpenterPageStateBoundary extends StatelessWidget {
   const CarpenterPageStateBoundary({
     super.key,
@@ -20,55 +24,18 @@ final class CarpenterPageStateBoundary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => switch (state) {
-    CarpenterPageReady() => child,
+    CarpenterPageReady() => _content(context),
     CarpenterPageInitialLoading(:final presentation) =>
       presentation == CarpenterLoadingPresentation.topBar
-          ? Stack(
-              fit: StackFit.expand,
-              children: [
-                child,
-                const Align(
-                  alignment: Alignment.topCenter,
-                  child: CarpenterProgress(value: .45),
-                ),
-              ],
-            )
+          ? _content(context, refreshing: true)
           : presentation == CarpenterLoadingPresentation.skeleton
-          ? ColoredBox(
-              color: CarpenterTheme.of(context).surface.subtle,
-              child: const SizedBox.expand(),
-            )
+          ? _content(context, skeleton: true)
           : const Center(child: CarpenterLoader()),
-    CarpenterPageRefreshing() => Stack(
-      fit: StackFit.expand,
-      children: [
-        child,
-        const Align(
-          alignment: Alignment.topCenter,
-          child: CarpenterProgress(value: .65),
-        ),
-      ],
-    ),
-    CarpenterPageBlocking(:final message) => Stack(
-      fit: StackFit.expand,
-      children: [
-        child,
-        ColoredBox(
-          color: CarpenterTheme.of(context).overlay.scrim,
-          child: Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const CarpenterLoader(),
-                if (message != null) ...[
-                  SizedBox(height: context.units(.75.rem)),
-                  Text(message),
-                ],
-              ],
-            ),
-          ),
-        ),
-      ],
+    CarpenterPageRefreshing() => _content(context, refreshing: true),
+    CarpenterPageBlocking(:final message) => _content(
+      context,
+      blocking: true,
+      message: message,
     ),
     CarpenterPageEmpty(:final descriptor) => _CenteredState(
       title: descriptor.title,
@@ -113,6 +80,60 @@ final class CarpenterPageStateBoundary extends StatelessWidget {
               ),
       ),
   };
+
+  // The same content slot survives ready/refreshing/blocking transitions.
+  // Positioned overlays follow its natural height in a document viewport and
+  // fill the available space in a bounded collection viewport.
+  Widget _content(
+    BuildContext context, {
+    bool refreshing = false,
+    bool blocking = false,
+    bool skeleton = false,
+    String? message,
+  }) => Stack(
+    fit: StackFit.passthrough,
+    children: [
+      ExcludeFocus(
+        excluding: blocking || skeleton,
+        child: AbsorbPointer(
+          absorbing: blocking || skeleton,
+          child: ExcludeSemantics(
+            excluding: skeleton,
+            child: Opacity(opacity: skeleton ? 0 : 1, child: child),
+          ),
+        ),
+      ),
+      if (refreshing)
+        const Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: IgnorePointer(child: CarpenterProgress()),
+        ),
+      if (skeleton)
+        Positioned.fill(
+          child: ColoredBox(color: CarpenterTheme.of(context).surface.subtle),
+        ),
+      if (blocking)
+        Positioned.fill(
+          child: ColoredBox(
+            color: CarpenterTheme.of(context).overlay.scrim,
+            child: Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CarpenterLoader(),
+                  if (message != null) ...[
+                    SizedBox(height: context.units(.75.rem)),
+                    Text(message),
+                  ],
+                ],
+              ),
+            ),
+          ),
+        ),
+    ],
+  );
 }
 
 final class _CenteredState extends StatelessWidget {

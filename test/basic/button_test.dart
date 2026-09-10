@@ -91,7 +91,7 @@ void main() {
       );
       final text = tester.widget<Text>(find.text(size.name));
       expect(
-        text.textSpan!.style!.fontSize,
+        text.style!.fontSize,
         theme.typography
             .action(context, size, TypographyEmphasis.medium)
             .fontSize,

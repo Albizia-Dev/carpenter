@@ -2,6 +2,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../components/basic/input/field_shell.dart';
+import 'package:carpenter_units/carpenter_units.dart';
+import 'icon_renderer.dart';
+import '../../components/basic/gravity_icons.g.dart';
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
 import 'interactive_region.dart';
@@ -98,6 +101,15 @@ final class SelectableField extends StatelessWidget {
               feedback: feedback,
               errorText: errorText,
               required: required,
+              trailing: ExcludeSemantics(
+                child: IconRenderer(
+                  icon: open
+                      ? GravityIcons.chevronUp
+                      : GravityIcons.chevronDown,
+                  size: context.units(theme.sizes.fieldIcon(size)),
+                  color: style.icon,
+                ),
+              ),
               child: Text(
                 hasValue ? valueText! : (placeholder ?? ''),
                 maxLines: 1,

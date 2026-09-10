@@ -114,6 +114,7 @@ final class _FilterBarPreview extends StatefulWidget {
 
 final class _FilterBarPreviewState extends State<_FilterBarPreview> {
   final _searchController = TextEditingController();
+  bool _expanded = false;
 
   @override
   void dispose() {
@@ -129,12 +130,24 @@ final class _FilterBarPreviewState extends State<_FilterBarPreview> {
     onSearchChanged: (_) => setState(() {}),
     activeFilterCount:
         widget.activeFilters + (_searchController.text.isEmpty ? 0 : 1),
-    filterControls: [
-      for (var index = 0; index < widget.filterCount; index++)
-        CarpenterButton.outlined(
-          label: index.isEven ? 'Status ${index + 1}' : 'Period ${index + 1}',
-          size: ControlSize.medium,
-          onPressed: () {},
+    filtersExpanded: _expanded,
+    onFiltersExpandedChanged: (value) => setState(() => _expanded = value),
+    advancedFilters: Wrap(
+      spacing: context.units(0.5.rem),
+      runSpacing: context.units(0.5.rem),
+      children: [
+        for (var index = 0; index < widget.filterCount; index++)
+          CarpenterButton.outlined(
+            label: index.isEven ? 'Status ${index + 1}' : 'Period ${index + 1}',
+            size: ControlSize.medium,
+            onPressed: () {},
+          ),
+      ],
+    ),
+    activeFilterSummary: [
+      if (widget.activeFilters > 0)
+        const CarpenterText.body(
+          'Status: awaiting payment · Period: September',
         ),
     ],
     clearAction: CarpenterActionDescriptor(

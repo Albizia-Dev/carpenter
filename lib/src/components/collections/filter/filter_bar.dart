@@ -18,6 +18,12 @@ final class CarpenterFilterBar extends StatelessWidget {
     this.searchAvailability = FieldAvailability.enabled,
     this.filterControls = const [],
     this.activeFilterCount = 0,
+    this.advancedFilters,
+    this.filtersExpanded = false,
+    this.onFiltersExpandedChanged,
+    this.filterToggleLabel = 'Filters',
+    this.activeFilterSummary = const [],
+    this.activeFilterLabelBuilder,
     this.clearAction,
     this.actions = const [],
     this.semanticLabel = 'Filters',
@@ -30,6 +36,26 @@ final class CarpenterFilterBar extends StatelessWidget {
   final FieldAvailability searchAvailability;
   final List<Widget> filterControls;
   final int activeFilterCount;
+
+  /// Additional controls revealed below the toolbar, without an overlay.
+  /// Values and validation remain owned by the caller when collapsed.
+  final Widget? advancedFilters;
+
+  /// Controlled disclosure state; changing viewport width does not reset it.
+  final bool filtersExpanded;
+
+  /// Requests disclosure changes. A null callback disables the toggle.
+  final ValueChanged<bool>? onFiltersExpandedChanged;
+
+  /// Localized toggle label; the active count is appended when nonzero.
+  final String filterToggleLabel;
+
+  /// Persistent summaries, typically removable condition chips. These remain
+  /// visible when additional controls are collapsed. The caller owns removal.
+  final List<Widget> activeFilterSummary;
+
+  /// Localizes the active count when no disclosure toggle is present.
+  final String Function(int count)? activeFilterLabelBuilder;
   final CarpenterActionDescriptor? clearAction;
   final List<CarpenterActionDescriptor> actions;
   final String semanticLabel;
@@ -45,16 +71,30 @@ final class CarpenterFilterBar extends StatelessWidget {
       );
       final search = CarpenterInput(
         controller: searchController,
-        label: searchLabel,
+        label: searchLabel.isEmpty ? null : searchLabel,
         placeholder: searchPlaceholder,
         availability: searchAvailability,
         onChanged: onSearchChanged,
-        semanticLabel: searchLabel,
+        semanticLabel: searchLabel.isEmpty ? searchPlaceholder : searchLabel,
       );
       final supporting = <Widget>[
-        if (activeFilterCount > 0)
+        if (advancedFilters != null)
+          Semantics(
+            expanded: filtersExpanded,
+            child: CarpenterButton.outlined(
+              label: activeFilterCount == 0
+                  ? filterToggleLabel
+                  : '$filterToggleLabel ($activeFilterCount)',
+              onInvoke: onFiltersExpandedChanged == null
+                  ? null
+                  : () => onFiltersExpandedChanged!(!filtersExpanded),
+            ),
+          ),
+        if (activeFilterCount > 0 && advancedFilters == null)
           CarpenterStatusIndicator(
-            label: '$activeFilterCount active filters',
+            label:
+                activeFilterLabelBuilder?.call(activeFilterCount) ??
+                '$activeFilterCount active filters',
             role: FeedbackColorRole.info,
           ),
         if (clearAction != null && activeFilterCount > 0)
@@ -71,7 +111,7 @@ final class CarpenterFilterBar extends StatelessWidget {
               size: ControlSize.small,
             ),
       ];
-      return Semantics(
+      final toolbar = Semantics(
         container: true,
         explicitChildNodes: true,
         label: semanticLabel,
@@ -113,6 +153,21 @@ final class CarpenterFilterBar extends StatelessWidget {
                   ...supporting,
                 ],
               ),
+      );
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          toolbar,
+          if (activeFilterSummary.isNotEmpty) ...[
+            SizedBox(height: gap),
+            Wrap(spacing: gap, runSpacing: gap, children: activeFilterSummary),
+          ],
+          if (advancedFilters != null && filtersExpanded) ...[
+            SizedBox(height: gap),
+            advancedFilters!,
+          ],
+        ],
       );
     },
   );

@@ -31,7 +31,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final fieldWidth = tester.getSize(find.byType(CarpenterInput)).width;
+    final fieldWidth = tester.getSize(find.byType(CarpenterFieldShell)).width;
     final menuWidth = tester.getSize(find.byType(MenuPanel)).width;
     expect(menuWidth, fieldWidth);
     expect(tester.takeException(), isNull);

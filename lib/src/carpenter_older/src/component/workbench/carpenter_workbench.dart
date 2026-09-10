@@ -1,5 +1,6 @@
 // Bundled in carpenter: legacy package imports relocated; behavior unchanged.
 import 'dart:async';
+import 'package:carpenter/gravity_icons.dart';
 
 import 'package:carpenter/src/carpenter_older/src/component/button/carpenter_button.dart';
 import 'package:carpenter/src/carpenter_older/src/component/control/carpenter_control.dart';
@@ -870,7 +871,13 @@ class _CarpenterExpanderState extends State<CarpenterExpander> {
           children: [
             CarpenterListTile(
               title: widget.header,
-              trailing: Text(expanded ? '⌃' : '⌄'),
+              trailing:
+                  (expanded ? GravityIcons.chevronUp : GravityIcons.chevronDown)
+                      .buildIcon(
+                        context,
+                        size: 16,
+                        color: context.face.color('text.secondary'),
+                      ),
               onPressed: () {
                 setState(() => expanded = !expanded);
                 widget.onChanged?.call(expanded);
@@ -980,7 +987,11 @@ class CarpenterSelect<T> extends StatelessWidget {
               child: selectedChild,
             ),
           const SizedBox(width: 8),
-          const Text('⌄'),
+          GravityIcons.chevronDown.buildIcon(
+            context,
+            size: 16,
+            color: context.face.color('text.secondary'),
+          ),
         ],
       ),
     );

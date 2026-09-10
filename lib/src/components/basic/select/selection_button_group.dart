@@ -1,8 +1,12 @@
+import 'dart:math' as math;
+
+import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../foundation/icon_data.dart';
 import '../../../foundation/roles.dart';
+import '../../../foundation/theme.dart';
 import '../button/toggle_button.dart';
 
 /// Descriptor for one choice in a controlled [CarpenterSelectionButtonGroup].
@@ -81,7 +85,9 @@ final class CarpenterSelectionButtonGroup<T> extends StatefulWidget {
   ///
   /// This is useful for compact scope switchers whose choices must remain
   /// simultaneously reachable instead of overflowing off-screen. In an
-  /// unbounded horizontal context the group keeps its intrinsic width.
+  /// unbounded horizontal context the group keeps its intrinsic width. Bounded
+  /// groups wrap into joined rows when labels would otherwise be truncated;
+  /// keyboard traversal keeps the original option order.
   final bool fillAvailableWidth;
 
   @override
@@ -113,7 +119,6 @@ final class _CarpenterSelectionButtonGroupState<T>
       widget.options.length,
       (index) => FocusNode(
         debugLabel: 'Selection button ${widget.options[index].label}',
-        onKeyEvent: (node, event) => _handleKey(index, event),
       ),
     );
   }
@@ -133,10 +138,11 @@ final class _CarpenterSelectionButtonGroupState<T>
   void _move(int index, int delta) {
     final callback = widget.onChanged;
     if (callback == null) return;
-    var target = index;
-    while (true) {
-      target = (target + delta).clamp(0, widget.options.length - 1);
-      if (target == index) return;
+    for (
+      var target = index + delta;
+      target >= 0 && target < widget.options.length;
+      target += delta
+    ) {
       if (widget.options[target].enabled) {
         callback(widget.options[target].value);
         _focusNodes[target].requestFocus();
@@ -177,41 +183,123 @@ final class _CarpenterSelectionButtonGroupState<T>
   }
 
   @override
-  Widget build(BuildContext context) => Semantics(
-    container: true,
-    explicitChildNodes: true,
-    label: widget.semanticLabel,
-    child: LayoutBuilder(
-      builder: (context, constraints) {
-        final distribute =
-            widget.fillAvailableWidth && constraints.hasBoundedWidth;
-        Widget option(int index) => CarpenterToggleButton(
-          label: widget.options[index].label,
-          semanticLabel: widget.options[index].semanticLabel,
-          checked: widget.options[index].value == widget.value,
-          icon: widget.options[index].icon,
-          size: widget.size,
-          colorRole: widget.colorRole,
-          shape: CarpenterShape(
-            start: index == 0 ? ShapeRole.rounded : ShapeRole.none,
-            end: index == widget.options.length - 1
-                ? ShapeRole.rounded
-                : ShapeRole.none,
-          ),
-          focusNode: _focusNodes[index],
-          onChanged: widget.onChanged == null || !widget.options[index].enabled
-              ? null
-              : (_) => widget.onChanged!(widget.options[index].value),
-        );
+  Widget build(BuildContext context) => Focus(
+    canRequestFocus: false,
+    skipTraversal: true,
+    onKeyEvent: (_, event) {
+      final index = _focusNodes.indexWhere((node) => node.hasFocus);
+      return index < 0 ? KeyEventResult.ignored : _handleKey(index, event);
+    },
+    child: Semantics(
+      container: true,
+      explicitChildNodes: true,
+      label: widget.semanticLabel,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final distribute =
+              widget.fillAvailableWidth && constraints.hasBoundedWidth;
+          Widget option(int index, {required bool first, required bool last}) =>
+              CarpenterToggleButton(
+                label: widget.options[index].label,
+                semanticLabel: widget.options[index].semanticLabel,
+                checked: widget.options[index].value == widget.value,
+                icon: widget.options[index].icon,
+                size: widget.size,
+                colorRole: widget.colorRole,
+                shape: CarpenterShape(
+                  start: first ? ShapeRole.rounded : ShapeRole.none,
+                  end: last ? ShapeRole.rounded : ShapeRole.none,
+                ),
+                focusNode: _focusNodes[index],
+                onChanged:
+                    widget.onChanged == null || !widget.options[index].enabled
+                    ? null
+                    : (_) => widget.onChanged!(widget.options[index].value),
+              );
 
-        return Row(
-          mainAxisSize: distribute ? MainAxisSize.max : MainAxisSize.min,
-          children: [
-            for (var index = 0; index < widget.options.length; index++)
-              if (distribute) Expanded(child: option(index)) else option(index),
-          ],
-        );
-      },
+          final rows = <List<int>>[[]];
+          var widest = 0.0;
+          final theme = CarpenterTheme.of(context);
+          for (var index = 0; index < widget.options.length; index++) {
+            if (distribute) {
+              final item = widget.options[index];
+              final painter = TextPainter(
+                text: TextSpan(
+                  text: item.label,
+                  style: theme.typography.action(
+                    context,
+                    widget.size,
+                    TypographyEmphasis.medium,
+                  ),
+                ),
+                textDirection: Directionality.of(context),
+                textScaler: MediaQuery.textScalerOf(context),
+                maxLines: 1,
+              )..layout();
+              final width =
+                  painter.width.ceilToDouble() +
+                  context.units(
+                        theme.spacing.actionHorizontalPadding(widget.size),
+                      ) *
+                      2 +
+                  context.units(theme.shapes.actionBorderWidth) * 2 +
+                  context.units(theme.focus.gap) * 2 +
+                  (item.icon == null
+                      ? 0
+                      : MediaQuery.textScalerOf(context).scale(
+                              context.units(
+                                theme.sizes.actionIcon(widget.size),
+                              ),
+                            ) +
+                            context.units(
+                              theme.spacing.actionGap(widget.size),
+                            ));
+              painter.dispose();
+              final nextWidest = math.max(widest, width);
+              if (rows.last.isNotEmpty &&
+                  nextWidest * (rows.last.length + 1) > constraints.maxWidth) {
+                rows.add([]);
+                widest = width;
+              } else {
+                widest = nextWidest;
+              }
+            }
+            rows.last.add(index);
+          }
+          Widget row(List<int> indices) => Row(
+            mainAxisSize: distribute ? MainAxisSize.max : MainAxisSize.min,
+            children: [
+              for (final index in indices)
+                if (distribute)
+                  Expanded(
+                    child: option(
+                      index,
+                      first: index == indices.first,
+                      last: index == indices.last,
+                    ),
+                  )
+                else
+                  option(
+                    index,
+                    first: index == indices.first,
+                    last: index == indices.last,
+                  ),
+            ],
+          );
+          if (rows.length == 1) return row(rows.single);
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var index = 0; index < rows.length; index++) ...[
+                if (index > 0)
+                  SizedBox(height: context.units(theme.spacing.small) / 2),
+                row(rows[index]),
+              ],
+            ],
+          );
+        },
+      ),
     ),
   );
 }

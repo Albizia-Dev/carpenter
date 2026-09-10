@@ -3,10 +3,14 @@ import 'dart:ui' show PointerDeviceKind;
 import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_svg/flutter_svg.dart' show vg;
 
-const _arrow = IconData(0x2192, matchTextDirection: true);
+import '../helpers/golden_fonts.dart';
+
+const _arrow = GravityIcons.arrowRight;
 
 void main() {
+  setUpAll(() => loadGoldenFonts('test/goldens/fonts'));
   Future<void> golden(
     WidgetTester tester, {
     required CarpenterThemeData theme,
@@ -23,7 +27,9 @@ void main() {
       UnitsRoot(
         rem: const Px(16),
         child: CarpenterTheme(
-          data: theme,
+          data: theme.copyWith(
+            typography: const CarpenterTypographyTheme(fontFamily: 'Onest'),
+          ),
           child: MediaQuery(
             data: MediaQueryData(
               textScaler: TextScaler.linear(textScale),
@@ -44,6 +50,8 @@ void main() {
         ),
       ),
     );
+    await tester.pump();
+    await tester.runAsync(() => vg.waitForPendingDecodes());
     await tester.pump();
     await expectLater(
       find.byKey(const ValueKey('golden')),
@@ -93,7 +101,9 @@ void main() {
       UnitsRoot(
         rem: const Px(16),
         child: CarpenterTheme(
-          data: theme,
+          data: theme.copyWith(
+            typography: const CarpenterTypographyTheme(fontFamily: 'Onest'),
+          ),
           child: Directionality(
             textDirection: TextDirection.ltr,
             child: ColoredBox(
@@ -155,6 +165,8 @@ void main() {
     focusNode.requestFocus();
     await tester.pump();
 
+    await tester.runAsync(() => vg.waitForPendingDecodes());
+    await tester.pump();
     await expectLater(
       find.byKey(const ValueKey('states-golden')),
       matchesGoldenFile('goldens/action_control_states.png'),

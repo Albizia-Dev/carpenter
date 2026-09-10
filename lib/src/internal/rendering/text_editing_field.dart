@@ -24,6 +24,7 @@ final class TextEditingField extends StatefulWidget {
     this.required = false,
     this.leading,
     this.trailing,
+    this.selectedValues,
     this.onChanged,
     this.onSubmitted,
     this.keyboardType,
@@ -50,6 +51,7 @@ final class TextEditingField extends StatefulWidget {
   final bool required;
   final Widget? leading;
   final Widget? trailing;
+  final Widget? selectedValues;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
   final TextInputType? keyboardType;
@@ -198,7 +200,13 @@ final class _TextEditingFieldState extends State<TextEditingField>
       children: [
         if (widget.controller.text.isEmpty && widget.placeholder != null)
           IgnorePointer(
-            child: Text(widget.placeholder!, style: placeholderStyle),
+            child: Text(
+              widget.placeholder!,
+              style: placeholderStyle,
+              maxLines: widget.maxLines,
+              softWrap: widget.maxLines != 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         Semantics(
           container: true,
@@ -241,8 +249,23 @@ final class _TextEditingFieldState extends State<TextEditingField>
         required: widget.required,
         leading: widget.leading,
         trailing: widget.trailing,
-        fixedHeight: widget.minLines == 1 && widget.maxLines == 1,
-        child: editor,
+        fixedHeight:
+            widget.selectedValues == null &&
+            widget.minLines == 1 &&
+            widget.maxLines == 1,
+        child: widget.selectedValues == null
+            ? editor
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  widget.selectedValues!,
+                  SizedBox(
+                    height: context.units(theme.spacing.fieldContentGap),
+                  ),
+                  editor,
+                ],
+              ),
       ),
     );
   }

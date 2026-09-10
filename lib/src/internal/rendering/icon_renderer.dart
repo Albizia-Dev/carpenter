@@ -39,6 +39,16 @@ final class IconRenderer extends StatelessWidget {
 
   Widget _buildFrameworkIcon(BuildContext context, IconData data) {
     final gravity = switch (data) {
+      CarpenterIcons.back => GravityIcons.chevronLeft,
+      CarpenterIcons.next => GravityIcons.chevronRight,
+      CarpenterIcons.refresh => GravityIcons.arrowRotateRight,
+      CarpenterIcons.restore => GravityIcons.arrowRotateLeft,
+      CarpenterIcons.download => GravityIcons.arrowDown,
+      CarpenterIcons.upload => GravityIcons.arrowUp,
+      CarpenterIcons.arrowDownFilled => GravityIcons.arrowDown,
+      CarpenterIcons.arrowUpRight => GravityIcons.arrowUpRight,
+      CarpenterIcons.sortDown => GravityIcons.arrowDown,
+      CarpenterIcons.sortUp => GravityIcons.arrowUp,
       CarpenterIcons.search => GravityIcons.magnifier,
       CarpenterIcons.clear => GravityIcons.xmark,
       CarpenterIcons.add => GravityIcons.plus,
@@ -56,11 +66,6 @@ final class IconRenderer extends StatelessWidget {
         semanticLabel: semanticLabel,
       );
     }
-    return Icon(
-      data,
-      size: size,
-      color: color,
-      semanticLabel: semanticLabel,
-    );
+    return Icon(data, size: size, color: color, semanticLabel: semanticLabel);
   }
 }

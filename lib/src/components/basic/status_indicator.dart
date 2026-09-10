@@ -4,6 +4,8 @@ import 'package:flutter/widgets.dart';
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
 
+/// Compact status badge. Its background follows the label even when a parent
+/// stretches the available row; long labels may wrap within that row.
 final class CarpenterStatusIndicator extends StatelessWidget {
   const CarpenterStatusIndicator({
     super.key,
@@ -32,21 +34,26 @@ final class CarpenterStatusIndicator extends StatelessWidget {
       topEnd: endRadius,
       bottomEnd: endRadius,
     );
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: colors.background,
-        borderRadius: borderRadius,
-      ),
-      child: Padding(
-        padding: EdgeInsets.symmetric(
-          horizontal: context.units(theme.spacing.statusHorizontal),
-          vertical: context.units(theme.spacing.statusVertical),
+    return Align(
+      alignment: AlignmentDirectional.centerStart,
+      widthFactor: 1,
+      heightFactor: 1,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: colors.background,
+          borderRadius: borderRadius,
         ),
-        child: Text(
-          label,
-          style: theme.typography
-              .status(context, TypographyEmphasis.medium)
-              .copyWith(color: colors.foreground),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: context.units(theme.spacing.statusHorizontal),
+            vertical: context.units(theme.spacing.statusVertical),
+          ),
+          child: Text(
+            label,
+            style: theme.typography
+                .status(context, TypographyEmphasis.medium)
+                .copyWith(color: colors.foreground),
+          ),
         ),
       ),
     );

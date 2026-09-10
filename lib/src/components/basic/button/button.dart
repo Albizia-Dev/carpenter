@@ -10,6 +10,9 @@ import '../../../internal/rendering/icon_renderer.dart';
 /// Semantic text action with optional icon, keyboard/focus handling, and
 /// caller-controlled execution feedback.
 ///
+/// Labels stay on one line and ellipsize within constrained widths, preserving
+/// the semantic control height. The complete label remains in semantics.
+///
 /// Provide [onPressed] for new code; [onInvoke] is a compatibility alias and
 /// must not be supplied together with it. The button does not await
 /// asynchronous work or infer [executionPhase]. Use a command binding for
@@ -239,39 +242,37 @@ final class _ButtonContent extends StatelessWidget {
         .action(context, size, TypographyEmphasis.medium)
         .copyWith(color: style.foreground);
 
-    final hasGlyph = icon != null;
     final glyph = icon == null
         ? null
-        : WidgetSpan(
-            alignment: PlaceholderAlignment.middle,
-            child: SizedBox.square(
-              dimension: iconDimension,
-              child: IconRenderer(
-                icon: icon!,
-                size: iconDimension,
-                color: style.icon,
-              ),
-            ),
+        : IconRenderer(
+            icon: icon!,
+            size: MediaQuery.textScalerOf(context).scale(iconDimension),
+            color: style.icon,
           );
-    final spacer = WidgetSpan(child: SizedBox(width: gap));
-    final spans = <InlineSpan>[
-      if (hasGlyph && iconPosition == CarpenterActionIconPosition.leading)
-        glyph!,
-      if (hasGlyph && iconPosition == CarpenterActionIconPosition.leading)
-        spacer,
-      TextSpan(text: label),
-      if (hasGlyph && iconPosition == CarpenterActionIconPosition.trailing)
-        spacer,
-      if (hasGlyph && iconPosition == CarpenterActionIconPosition.trailing)
-        glyph!,
-    ];
-
-    return Text.rich(
-      TextSpan(style: textStyle, children: spans),
-      maxLines: 2,
-      overflow: TextOverflow.ellipsis,
-      textAlign: TextAlign.center,
-      textWidthBasis: TextWidthBasis.longestLine,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (glyph != null &&
+            iconPosition == CarpenterActionIconPosition.leading) ...[
+          glyph,
+          SizedBox(width: gap),
+        ],
+        Flexible(
+          child: Text(
+            label,
+            style: textStyle,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+          ),
+        ),
+        if (glyph != null &&
+            iconPosition == CarpenterActionIconPosition.trailing) ...[
+          SizedBox(width: gap),
+          glyph,
+        ],
+      ],
     );
   }
 }

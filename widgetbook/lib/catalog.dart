@@ -1,9 +1,11 @@
+import 'use_cases/samples/projects_plus/catalog.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import 'helpers/catalog_group.dart';
 
 import 'use_cases/application/runtime_commands.dart';
 import 'use_cases/basic/autosuggest.dart';
+import 'use_cases/basic/multi_select.dart';
 import 'use_cases/basic/additional_primitives.dart';
 import 'use_cases/basic/button.dart';
 import 'use_cases/basic/card_link.dart';
@@ -57,6 +59,9 @@ import 'use_cases/patterns/page_patterns.dart';
 import 'use_cases/patterns/page_states.dart';
 import 'use_cases/samples/payment_list.dart';
 import 'use_cases/samples/project_page.dart';
+import 'use_cases/samples/dsktp_layouts.dart';
+import 'use_cases/samples/dsktp_collections.dart';
+import 'use_cases/samples/treasury/catalog.dart';
 
 /// The single registry used by the app and catalog coverage tests.
 /// Navigation follows user tasks; source files retain their implementation layers.
@@ -114,6 +119,7 @@ final List<WidgetbookNode> carpenterCatalog = [
           selectComponent,
           comboBoxComponent,
           autosuggestComponent,
+          multiSelectComponent,
           asyncAutosuggestComponent,
           colorPickerComponent,
         ],
@@ -301,7 +307,20 @@ final List<WidgetbookNode> carpenterCatalog = [
     children: [
       WidgetbookFolder(
         name: 'Business workflows',
-        children: [paymentListSampleComponent, projectPageSampleComponent],
+        children: [
+          paymentListSampleComponent,
+          projectPageSampleComponent,
+          dsktpLayoutsComponent,
+          dsktpCollectionsComponent,
+          WidgetbookFolder(
+            name: 'Treasury · dsktp',
+            children: treasuryComponents,
+          ),
+          WidgetbookFolder(
+            name: 'Проекты+ · dsktp',
+            children: projectsPlusComponents,
+          ),
+        ],
       ),
     ],
   ),

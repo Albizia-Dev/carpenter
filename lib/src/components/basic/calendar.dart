@@ -212,7 +212,7 @@ final class _CarpenterCalendarState extends State<CarpenterCalendar> {
                         ? '$firstYear–${firstYear + 11}'
                         : '${_monthNames[_month.month - 1]} ${_month.year}',
                     semanticLabel: 'Choose month and year',
-                    icon: GravityIcons.arrowChevronDown,
+                    icon: GravityIcons.chevronDown,
                     iconPosition: CarpenterActionIconPosition.trailing,
                     colorRole: ActionColorRole.neutral,
                     prominence: ActionProminence.ghost,
@@ -227,8 +227,8 @@ final class _CarpenterCalendarState extends State<CarpenterCalendar> {
                 ),
                 CarpenterIconButton(
                   icon: Directionality.of(context) == TextDirection.rtl
-                      ? GravityIcons.arrowChevronRight
-                      : GravityIcons.arrowChevronLeft,
+                      ? GravityIcons.chevronRight
+                      : GravityIcons.chevronLeft,
                   semanticLabel: 'Previous month',
                   size: ControlSize.small,
                   prominence: ActionProminence.ghost,
@@ -236,8 +236,8 @@ final class _CarpenterCalendarState extends State<CarpenterCalendar> {
                 ),
                 CarpenterIconButton(
                   icon: Directionality.of(context) == TextDirection.rtl
-                      ? GravityIcons.arrowChevronLeft
-                      : GravityIcons.arrowChevronRight,
+                      ? GravityIcons.chevronLeft
+                      : GravityIcons.chevronRight,
                   semanticLabel: 'Next month',
                   size: ControlSize.small,
                   prominence: ActionProminence.ghost,

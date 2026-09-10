@@ -2,8 +2,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../components/basic/input/field_shell.dart';
-import '../../components/basic/input/input.dart';
+import '../rendering/text_editing_field.dart';
+import '../../components/basic/button/icon_button.dart';
 import '../../foundation/roles.dart';
+import '../../foundation/theme.dart';
 import '../overlay/anchored_overlay_host.dart';
 import 'menu_navigation.dart';
 import 'menu_panel.dart';
@@ -18,6 +20,7 @@ final class SuggestionField<T> extends StatefulWidget {
     required this.onQueryChanged,
     required this.onSelected,
     this.selectedOptionId,
+    this.selectedValues,
     this.loadState = OptionsLoadState.ready,
     this.loadingText = 'Loading',
     this.emptyText = 'No options',
@@ -46,6 +49,7 @@ final class SuggestionField<T> extends StatefulWidget {
   final ValueChanged<String>? onQueryChanged;
   final ValueChanged<CarpenterOption<T>>? onSelected;
   final Object? selectedOptionId;
+  final Widget? selectedValues;
   final OptionsLoadState loadState;
   final String loadingText;
   final String emptyText;
@@ -262,7 +266,10 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
         onPointerDown: _enabled && !widget.open
             ? (_) => _openFromPointer()
             : null,
-        child: CarpenterInput(
+        child: TextEditingField(
+          minLines: 1,
+          maxLines: 1,
+          selectedValues: widget.selectedValues,
           controller: widget.controller,
           label: widget.label,
           placeholder: widget.placeholder,
@@ -274,8 +281,16 @@ final class _SuggestionFieldState<T> extends State<SuggestionField<T>> {
           availability: effectiveAvailability,
           size: widget.size,
           shape: widget.shape,
-          trailingAction: effectiveAvailability == FieldAvailability.enabled
-              ? widget.clearAction
+          trailing:
+              effectiveAvailability == FieldAvailability.enabled &&
+                  widget.clearAction != null
+              ? CarpenterIconButton.fromAction(
+                  widget.clearAction!,
+                  prominence: ActionProminence.ghost,
+                  size: CarpenterTheme.of(
+                    context,
+                  ).sizes.controlForField(widget.size),
+                )
               : null,
           onChanged: _queryChanged,
           focusNode: _focusNode,

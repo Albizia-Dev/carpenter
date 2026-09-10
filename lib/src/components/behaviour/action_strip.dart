@@ -70,7 +70,7 @@ final class CarpenterActionStrip extends StatelessWidget {
   }) {
     assert(inlineActions >= 0);
     final theme = CarpenterTheme.of(context);
-    final control = context.units(theme.sizes.actionHeight(size));
+    final control = theme.sizes.actionExtent(context, size);
     final gap = context.units(theme.spacing.layoutToolbar);
     final count = inlineActions + (reserveOverflow ? 1 : 0);
     if (count == 0) return 0;
@@ -92,8 +92,13 @@ final class CarpenterActionStrip extends StatelessWidget {
             children: [
               for (var index = 0; index < layout.visible.length; index++) ...[
                 if (index > 0) _gap(context),
-                Flexible(
-                  fit: FlexFit.loose,
+                SizedBox(
+                  width: layout.iconOnly
+                      ? CarpenterTheme.of(context).sizes.actionExtent(
+                          context,
+                          layout.visible[index].size,
+                        )
+                      : _itemWidth(context, layout.visible[index]),
                   child: _ActionStripAction(
                     item: layout.visible[index],
                     forceIcon: layout.iconOnly,
@@ -103,9 +108,9 @@ final class CarpenterActionStrip extends StatelessWidget {
               if (layout.overflow.isNotEmpty) ...[
                 if (layout.visible.isNotEmpty) _gap(context),
                 SizedBox.square(
-                  dimension: context.units(
-                    CarpenterTheme.of(context).sizes.actionHeight(overflowSize),
-                  ),
+                  dimension: CarpenterTheme.of(
+                    context,
+                  ).sizes.actionExtent(context, overflowSize),
                   child: _ActionStripOverflowButton(
                     items: layout.overflow,
                     label: overflowLabel,
@@ -127,7 +132,7 @@ final class CarpenterActionStrip extends StatelessWidget {
   _ActionStripLayout _layoutItems(BuildContext context, double availableWidth) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.layoutToolbar);
-    final overflowWidth = context.units(theme.sizes.actionHeight(overflowSize));
+    final overflowWidth = theme.sizes.actionExtent(context, overflowSize);
     final entries = [
       for (final item in items)
         if (item.action.visible)
@@ -143,7 +148,7 @@ final class CarpenterActionStrip extends StatelessWidget {
             expandedWidth: _itemWidth(context, item),
             iconWidth: item.action.icon == null
                 ? null
-                : context.units(theme.sizes.actionHeight(item.size)),
+                : theme.sizes.actionExtent(context, item.size),
           ),
     ];
     final resolution = const ActionOverflowResolver<CarpenterActionStripItem>()
@@ -164,7 +169,7 @@ final class CarpenterActionStrip extends StatelessWidget {
     final theme = CarpenterTheme.of(context);
     if (item.presentation == CarpenterActionStripPresentation.icon &&
         item.action.icon != null) {
-      return context.units(theme.sizes.actionHeight(item.size));
+      return theme.sizes.actionExtent(context, item.size);
     }
     final painter = TextPainter(
       text: TextSpan(
@@ -184,9 +189,18 @@ final class CarpenterActionStrip extends StatelessWidget {
     );
     final icon = item.action.icon == null
         ? 0.0
-        : context.units(theme.sizes.actionIcon(item.size)) +
+        : MediaQuery.textScalerOf(
+                context,
+              ).scale(context.units(theme.sizes.actionIcon(item.size))) +
               context.units(theme.spacing.actionGap(item.size));
-    return painter.width + horizontal * 2 + icon;
+    final width =
+        painter.width.ceilToDouble() +
+        horizontal * 2 +
+        icon +
+        context.units(theme.shapes.actionBorderWidth) * 2 +
+        context.units(theme.focus.gap) * 2;
+    painter.dispose();
+    return width;
   }
 }
 

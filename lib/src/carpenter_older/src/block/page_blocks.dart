@@ -1,5 +1,6 @@
 // Bundled in carpenter: legacy package imports relocated; behavior unchanged.
 import 'dart:async';
+import 'package:carpenter/gravity_icons.dart';
 
 import 'package:carpenter/src/carpenter_older/src/component/button/carpenter_button.dart';
 import 'package:carpenter/src/carpenter_older/src/component/card/carpenter_card.dart';
@@ -73,7 +74,12 @@ class _CarpenterPageSectionState extends State<CarpenterPageSection> {
         CarpenterIconButton(
           semanticLabel: expanded ? 'Свернуть' : 'Развернуть',
           onPressed: () => setState(() => expanded = !expanded),
-          icon: CarpenterText(expanded ? '⌃' : '⌄'),
+          icon: (expanded ? GravityIcons.chevronUp : GravityIcons.chevronDown)
+              .buildIcon(
+                context,
+                size: 16,
+                color: context.face.color('text.secondary'),
+              ),
         ),
     ];
 

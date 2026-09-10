@@ -78,10 +78,9 @@ void main() {
       componentNames,
       containsAll(['Tree table', 'Payment list', 'Project page']),
     );
-    // Inventory before reorganization: 99 components, 178 scenarios.
-    // Contract demos now belong to Tree table; no scenario was removed.
-    expect(componentNames, hasLength(99));
-    expect(caseBuilders, hasLength(180));
+    // Includes shared desktop project/materials golden scenarios.
+    expect(componentNames, hasLength(162));
+    expect(caseBuilders, hasLength(266));
   });
 
   test(

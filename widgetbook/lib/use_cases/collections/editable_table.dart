@@ -72,6 +72,7 @@ final class _EditableTablePreviewState extends State<EditableTablePreview> {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       CarpenterEditableTable<_DraftRow>(
+        freezeFirstColumn: true,
         items: _rows,
         semanticLabel: 'Draft invoice lines',
         selected: (row) => row.id == _selected,

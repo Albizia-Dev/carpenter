@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
-import '../basic/card.dart';
+import '../basic/status_indicator.dart';
 import '../basic/text.dart';
 import '../behaviour/drag_and_drop/drag_operation.dart';
 import '../behaviour/drag_and_drop/drag_payload.dart';
@@ -105,6 +105,10 @@ final class _KanbanDragData<C, T> {
 }
 
 /// Controlled multi-column board with cross-column and within-column DnD.
+///
+/// Columns are unframed lanes with a title, count and header divider. The
+/// caller's cardBuilder owns card surfaces; the column adds no nested card
+/// padding or border around the lane.
 ///
 /// In a bounded viewport each column scrolls vertically beneath its fixed
 /// heading. In an unbounded layout columns expand to their content height;
@@ -330,8 +334,9 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
 
     Widget buildColumn(
       CarpenterDropTargetState<_KanbanDragData<C, T>> targetState,
-    ) => CarpenterCard(
-      semanticLabel: column.semanticLabel ?? column.title,
+    ) => Semantics(
+      container: true,
+      label: column.semanticLabel ?? column.title,
       child: ConstrainedBox(
         constraints: BoxConstraints(minHeight: context.units(12.rem)),
         child: LayoutBuilder(
@@ -345,11 +350,17 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
                       emphasis: TypographyEmphasis.strong,
                     ),
                   ),
-                  CarpenterText.caption(
-                    '${column.cards.length}',
-                    colorRole: ContentColorRole.secondary,
+                  SizedBox(width: gap),
+                  CarpenterStatusIndicator(
+                    label: '${column.cards.length}',
+                    role: FeedbackColorRole.neutral,
                   ),
                 ],
+              ),
+              SizedBox(height: gap),
+              Container(
+                height: context.units(theme.shapes.tableBorderWidth),
+                color: theme.overlay.border,
               ),
               SizedBox(height: gap),
             ];

@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/rendering.dart';
 
 import '../../../foundation/roles.dart';
 import '../../../foundation/theme.dart';
@@ -37,6 +38,7 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
     this.selected,
     this.minimumWidth = const Rem(48),
     this.emptyMessage = 'No rows',
+    this.freezeFirstColumn = false,
     this.semanticLabel = 'Editable table',
   });
 
@@ -44,6 +46,10 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
   /// Mutate application state and rebuild to reflect edits, insertion, or
   /// removal.
   final List<T> items;
+
+  /// Keeps the first column visible while the remaining columns scroll.
+  /// The same cell remains mounted, preserving focus and editor state.
+  final bool freezeFirstColumn;
 
   /// Ordered column descriptors supplying headers, cell builders, horizontal
   /// alignment, and width policy. Use stable unique IDs to address footer
@@ -72,7 +78,8 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
   final bool Function(T item)? selected;
 
   /// Minimum table content width, defaulting to 48 rem. A narrower viewport
-  /// gets horizontal scrolling rather than compressed columns.
+  /// gets horizontal scrolling rather than compressed columns. The sum of fixed
+  /// column widths, flexible minima and row insets also contributes to this floor.
   final LengthUnit minimumWidth;
 
   /// Text displayed instead of body rows when items is empty. Headers, header
@@ -86,7 +93,11 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
   /// CarpenterTheme. Width constraints determine whether a horizontal scroll
   /// view is needed; vertical scrolling belongs to the parent.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => _EditableTableScrollHost(
+    builder: (context, controller) => _build(context, controller),
+  );
+
+  Widget _build(BuildContext context, ScrollController controller) {
     final theme = CarpenterTheme.of(context);
     final rowGap = context.units(theme.spacing.small);
     final horizontal = context.units(theme.spacing.tableHorizontal);
@@ -109,7 +120,22 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
           final viewportWidth = constraints.maxWidth.isFinite
               ? constraints.maxWidth
               : minWidth;
-          final contentWidth = math.max(viewportWidth, minWidth);
+          final columnsWidth = columns.fold<double>(0, (total, column) {
+            final width =
+                column.width.policy == CarpenterTableColumnWidthPolicy.fixed
+                ? column.width.preferred
+                : column.width.minimum;
+            return total + context.units(width ?? theme.sizes.tableColumnMin);
+          });
+          final requiredWidth =
+              columnsWidth +
+              horizontal * 2 +
+              math.max(0, columns.length - 1) *
+                  context.units(theme.spacing.small);
+          final contentWidth = math.max(
+            viewportWidth,
+            math.max(minWidth, requiredWidth),
+          );
 
           final table = SizedBox(
             width: contentWidth,
@@ -136,6 +162,8 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
                   ),
                   child: _row(
                     context,
+                    controller,
+                    theme.surface.subtle,
                     columns
                         .map(
                           (column) => CarpenterText.label(
@@ -187,6 +215,10 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
                         ),
                         child: _row(
                           context,
+                          controller,
+                          selected?.call(item) == true
+                              ? selectedBackground
+                              : theme.surface.base,
                           columns
                               .map(
                                 (column) => column.cellBuilder(context, item),
@@ -204,6 +236,8 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
                     ),
                     child: _row(
                       context,
+                      controller,
+                      theme.surface.subtle,
                       columns
                           .map(
                             (column) =>
@@ -219,6 +253,7 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
 
           if (contentWidth <= viewportWidth) return table;
           return SingleChildScrollView(
+            controller: controller,
             scrollDirection: Axis.horizontal,
             child: table,
           );
@@ -227,10 +262,20 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
     );
   }
 
-  Widget _row(BuildContext context, List<Widget> cells) {
+  Widget _row(
+    BuildContext context,
+    ScrollController controller,
+    Color background,
+    List<Widget> cells,
+  ) {
     final gap = context.units(CarpenterTheme.of(context).spacing.small);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return _PinnedTableRow(
+      offset: freezeFirstColumn && controller.hasClients
+          ? controller.offset
+          : 0,
+      direction: Directionality.of(context),
+      background: background,
+      inset: context.units(CarpenterTheme.of(context).spacing.tableHorizontal),
       children: [
         for (var index = 0; index < columns.length; index++) ...[
           if (index > 0) SizedBox(width: gap),
@@ -259,5 +304,158 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
       );
     }
     return Expanded(flex: column.width.flex, child: aligned);
+  }
+}
+
+final class _EditableTableScrollHost extends StatefulWidget {
+  const _EditableTableScrollHost({required this.builder});
+  final Widget Function(BuildContext, ScrollController) builder;
+  @override
+  State<_EditableTableScrollHost> createState() =>
+      _EditableTableScrollHostState();
+}
+
+final class _EditableTableScrollHostState
+    extends State<_EditableTableScrollHost> {
+  final controller = ScrollController();
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+    animation: controller,
+    builder: (context, _) => widget.builder(context, controller),
+  );
+}
+
+/// Paints the first flex child after its siblings, with a matching hit-test and
+/// semantics transform. Layout still includes it exactly once.
+final class _PinnedTableRow extends MultiChildRenderObjectWidget {
+  const _PinnedTableRow({
+    required this.offset,
+    required this.direction,
+    required this.background,
+    required this.inset,
+    required super.children,
+  });
+  final double offset;
+  final TextDirection direction;
+  final Color background;
+  final double inset;
+  @override
+  _RenderPinnedTableRow createRenderObject(BuildContext context) =>
+      _RenderPinnedTableRow(offset, direction, background, inset);
+  @override
+  void updateRenderObject(
+    BuildContext context,
+    _RenderPinnedTableRow renderObject,
+  ) {
+    renderObject
+      ..textDirection = direction
+      ..pinOffset = offset
+      ..background = background
+      ..inset = inset;
+  }
+}
+
+final class _RenderPinnedTableRow extends RenderFlex {
+  _RenderPinnedTableRow(
+    this._pinOffset,
+    TextDirection direction,
+    this._background,
+    this._inset,
+  ) : super(
+        direction: Axis.horizontal,
+        textDirection: direction,
+        crossAxisAlignment: CrossAxisAlignment.center,
+      );
+  double _pinOffset;
+  Color _background;
+  double _inset;
+  set inset(double value) {
+    if (_inset == value) return;
+    _inset = value;
+    markNeedsPaint();
+  }
+
+  set pinOffset(double value) {
+    if (_pinOffset == value) return;
+    _pinOffset = value;
+    markNeedsPaint();
+    markNeedsSemanticsUpdate();
+  }
+
+  set background(Color value) {
+    if (_background == value) return;
+    _background = value;
+    markNeedsPaint();
+  }
+
+  Offset _offset(RenderBox child) =>
+      (child.parentData! as FlexParentData).offset +
+      (child == firstChild
+          ? Offset(
+              textDirection == TextDirection.rtl ? -_pinOffset : _pinOffset,
+              0,
+            )
+          : Offset.zero);
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    var child = firstChild == null ? null : childAfter(firstChild!);
+    while (child != null) {
+      context.paintChild(child, offset + _offset(child));
+      child = childAfter(child);
+    }
+    final first = firstChild;
+    if (first != null) {
+      final position = offset + _offset(first);
+      context.canvas.drawRect(
+        Rect.fromLTWH(
+          position.dx - _inset,
+          offset.dy,
+          first.size.width + _inset * 2,
+          size.height,
+        ),
+        Paint()..color = _background,
+      );
+      context.paintChild(first, position);
+    }
+  }
+
+  @override
+  bool hitTestChildren(BoxHitTestResult result, {required Offset position}) {
+    bool hit(RenderBox child) => result.addWithPaintOffset(
+      offset: _offset(child),
+      position: position,
+      hitTest: (result, transformed) =>
+          child.hitTest(result, position: transformed),
+    );
+    final first = firstChild;
+    if (first != null) {
+      if (hit(first)) return true;
+      // The opaque pinned surface must also occlude pointer events below it.
+      final pinnedBounds = Rect.fromLTWH(
+        _offset(first).dx - _inset,
+        0,
+        first.size.width + _inset * 2,
+        size.height,
+      );
+      if (pinnedBounds.contains(position)) return false;
+    }
+    var child = lastChild;
+    while (child != null && child != firstChild) {
+      if (hit(child)) return true;
+      child = childBefore(child);
+    }
+    return false;
+  }
+
+  @override
+  void applyPaintTransform(RenderBox child, Matrix4 transform) {
+    final offset = _offset(child);
+    transform.translateByDouble(offset.dx, offset.dy, 0, 1);
   }
 }

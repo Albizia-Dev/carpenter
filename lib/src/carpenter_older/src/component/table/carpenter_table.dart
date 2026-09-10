@@ -4,6 +4,7 @@ import 'package:carpenter/src/carpenter_older/src/component/input/carpenter_inpu
 import 'package:carpenter/src/carpenter_older/src/component/workbench/carpenter_workbench.dart';
 import 'package:carpenter/src/carpenter_older/src/root/context.dart';
 import 'package:flutter/widgets.dart';
+import 'package:carpenter/gravity_icons.dart';
 
 typedef CarpenterTableValue<T> = Object? Function(T item);
 typedef CarpenterTableCellBuilder<T> =
@@ -234,13 +235,29 @@ final class _CarpenterTableState<T> extends State<CarpenterTable<T>> {
                 onTap: column.sortable ? () => _sort(column.id) : null,
                 child: Align(
                   alignment: column.align,
-                  child: Text(
-                    column.id == sortColumnId
-                        ? '${column.label} ${sortAscending ? '▲' : '▼'}'
-                        : column.label,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: context.face.type('label.strong'),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          column.label,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.face.type('label.strong'),
+                        ),
+                      ),
+                      if (column.id == sortColumnId) ...[
+                        const SizedBox(width: 4),
+                        (sortAscending
+                                ? GravityIcons.arrowUp
+                                : GravityIcons.arrowDown)
+                            .buildIcon(
+                              context,
+                              size: 16,
+                              color: context.face.color('text.secondary'),
+                            ),
+                      ],
+                    ],
                   ),
                 ),
               ),

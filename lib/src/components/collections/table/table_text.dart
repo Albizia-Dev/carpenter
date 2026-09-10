@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/widgets.dart';
 
 import '../../../foundation/roles.dart';
@@ -6,7 +8,9 @@ import '../../../foundation/theme.dart';
 enum CarpenterTableTypographyRole { header, cell }
 
 /// Text primitive that resolves typography from table component tokens rather
-/// than generic label/body roles.
+/// than generic label/body roles. In a fixed-height row, the line limit is
+/// reduced to the number of complete lines that fit at the current text scale.
+/// Unbounded content retains the caller-provided [maxLines].
 final class CarpenterTableText extends StatelessWidget {
   const CarpenterTableText(
     this.data, {
@@ -70,14 +74,29 @@ final class CarpenterTableText extends StatelessWidget {
         emphasis,
       ),
     };
-    return Text(
-      data,
-      style: style.copyWith(color: theme.content.resolve(colorRole)),
-      textAlign: textAlign,
-      maxLines: maxLines,
-      overflow: overflow,
-      softWrap: softWrap,
-      semanticsLabel: semanticsLabel,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        var visibleLines = maxLines;
+        if (constraints.hasBoundedHeight) {
+          final lineHeight =
+              MediaQuery.textScalerOf(context).scale(style.fontSize!) *
+              style.height!;
+          final fittingLines = math.max(
+            1,
+            (constraints.maxHeight / lineHeight).floor(),
+          );
+          visibleLines = math.min(maxLines ?? fittingLines, fittingLines);
+        }
+        return Text(
+          data,
+          style: style.copyWith(color: theme.content.resolve(colorRole)),
+          textAlign: textAlign,
+          maxLines: visibleLines,
+          overflow: overflow,
+          softWrap: softWrap,
+          semanticsLabel: semanticsLabel,
+        );
+      },
     );
   }
 }

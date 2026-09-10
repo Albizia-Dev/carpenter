@@ -10,8 +10,62 @@ final pageStateComponent = WidgetbookComponent(
   useCases: [
     WidgetbookUseCase(name: 'Playground', builder: _playground),
     WidgetbookUseCase(name: 'States · Overview', builder: _matrix),
+    WidgetbookUseCase(
+      name: 'Edge cases · Document refresh',
+      builder: _documentState,
+    ),
   ],
 );
+
+Widget _documentState(BuildContext context) {
+  final mode = context.knobs.object.segmented(
+    label: 'Operation',
+    options: const ['Ready', 'Refreshing', 'Saving', 'Skeleton'],
+  );
+  return preview(
+    SizedBox(
+      width: context.units(32.5.rem),
+      height: context.units(20.rem),
+      child: SingleChildScrollView(
+        child: CarpenterPageStateBoundary(
+          state: switch (mode) {
+            'Refreshing' => const CarpenterPageRefreshing(),
+            'Saving' => const CarpenterPageBlocking(message: 'Saving'),
+            'Skeleton' => const CarpenterPageInitialLoading(
+              presentation: CarpenterLoadingPresentation.skeleton,
+            ),
+            _ => const CarpenterPageReady(),
+          },
+          child: const _DocumentDraft(),
+        ),
+      ),
+    ),
+  );
+}
+
+class _DocumentDraft extends StatefulWidget {
+  const _DocumentDraft();
+  @override
+  State<_DocumentDraft> createState() => _DocumentDraftState();
+}
+
+class _DocumentDraftState extends State<_DocumentDraft> {
+  final controller = TextEditingController(text: 'Edit, then change operation');
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => CarpenterPageBody(
+    children: [
+      CarpenterInput(controller: controller, label: 'Draft'),
+      for (var i = 0; i < 8; i++)
+        CarpenterText.body('Document section ${i + 1}'),
+    ],
+  );
+}
 
 Widget _playground(BuildContext context) {
   final kind = context.knobs.object.segmented(
