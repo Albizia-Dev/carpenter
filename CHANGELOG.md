@@ -1,3 +1,7 @@
+## 0.4.10
+
+- Date input reports incomplete, invalid and accepted edits through the optional `onInputValidityChanged` callback so forms can block stale-value submission.
+
 ## 0.4.9
 
 - Kanban columns scroll independently below fixed headings in bounded layouts, preserving content-sized embedding and stable column scroll positions.

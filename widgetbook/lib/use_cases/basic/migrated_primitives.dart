@@ -341,6 +341,7 @@ final class _DateInputPreview extends StatefulWidget {
 }
 
 final class _DateInputPreviewState extends State<_DateInputPreview> {
+  bool _inputValid = true;
   late DateTime? _value = widget.initialValue;
 
   @override
@@ -360,6 +361,8 @@ final class _DateInputPreviewState extends State<_DateInputPreview> {
         children: [
           CarpenterDateInput(
             value: _value,
+            onInputValidityChanged: (valid) =>
+                setState(() => _inputValid = valid),
             placeholder: widget.placeholder,
             firstDate: DateTime(2025),
             lastDate: DateTime(2028, 12, 31),
@@ -368,6 +371,10 @@ final class _DateInputPreviewState extends State<_DateInputPreview> {
             onChanged: (value) => setState(() => _value = value),
           ),
           SizedBox(height: context.units(.75.rem)),
+          if (!_inputValid)
+            const CarpenterText.caption(
+              'Complete or correct the date before saving',
+            ),
           CarpenterText.caption(
             _value == null
                 ? 'No date selected'

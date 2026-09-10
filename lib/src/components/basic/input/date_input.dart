@@ -30,10 +30,14 @@ DateTime? carpenterParseDate(String value) {
 
 /// Controlled date field with numeric keyboard entry and non-modal anchored/inline selection.
 final class CarpenterDateInput extends StatefulWidget {
+  /// Edits a controlled date using text entry or the shared calendar picker.
+  /// The caller commits accepted dates through [onChanged]. Use
+  /// [onInputValidityChanged] to prevent submitting an incomplete text draft.
   const CarpenterDateInput({
     super.key,
     this.value,
     required this.onChanged,
+    this.onInputValidityChanged,
     this.label,
     this.placeholder,
     this.description,
@@ -53,6 +57,14 @@ final class CarpenterDateInput extends StatefulWidget {
 
   final DateTime? value;
   final ValueChanged<DateTime?> onChanged;
+
+  /// Reports whether each user edit can be submitted, before [onChanged].
+  /// Incomplete, impossible and out-of-bounds dates report false without
+  /// replacing [value]. Optional clearable empty input reports true. Calendar
+  /// selection and the clear action also report validity. No event is emitted
+  /// on initial build or external value replacement; callers own those values.
+  /// Omit the callback when only accepted dates are needed.
+  final ValueChanged<bool>? onInputValidityChanged;
   final String? label;
   final String? placeholder;
   final String? description;
@@ -120,16 +132,21 @@ final class _CarpenterDateInputState extends State<CarpenterDateInput> {
 
   void _handleTextChanged(String text) {
     if (text.isEmpty) {
+      widget.onInputValidityChanged?.call(
+        widget.allowClear && !widget.required,
+      );
       setState(() => _validationError = null);
       if (widget.allowClear) widget.onChanged(null);
       return;
     }
     if (!CarpenterInputMask.date.isComplete(text)) {
+      widget.onInputValidityChanged?.call(false);
       if (_validationError != null) setState(() => _validationError = null);
       return;
     }
     final parsed = carpenterParseDate(text);
     final error = _dateError(parsed, widget.firstDate, widget.lastDate);
+    widget.onInputValidityChanged?.call(error == null);
     setState(() => _validationError = error);
     if (parsed != null && error == null) widget.onChanged(parsed);
   }
@@ -144,6 +161,7 @@ final class _CarpenterDateInputState extends State<CarpenterDateInput> {
       _validationError = null;
       _open = false;
     });
+    widget.onInputValidityChanged?.call(true);
     widget.onChanged(_draft);
   }
 
@@ -153,6 +171,7 @@ final class _CarpenterDateInputState extends State<CarpenterDateInput> {
       _validationError = null;
       _open = false;
     });
+    widget.onInputValidityChanged?.call(!widget.required);
     widget.onChanged(null);
   }
 
