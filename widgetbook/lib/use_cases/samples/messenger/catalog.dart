@@ -2,8 +2,10 @@ import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 import '../../../helpers/layout_viewport.dart';
+import 'access.dart';
 
 final messengerComponents = [
+  messengerAccessComponent,
   WidgetbookComponent(
     name: 'Message attachments',
     useCases: [

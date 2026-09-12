@@ -1,3 +1,9 @@
+## Unreleased — Messenger access
+
+- Add experimental controlled CarpenterMessengerAccess: credential form, connection, account preparation, browser handoff, failure and exit stages.
+- Preserve form geometry during submission, obscure passwords by default, support keyboard submission and keyboard-inset scrolling.
+- Add a canonical Widgetbook Playground and five light/dark/large-text goldens plus interaction checks.
+
 ## Unreleased — Contextual workspace shell
 
 - Add controlled CarpenterWorkspaceShell and CarpenterNavigationPalette, with adaptive navigation, workspace selection, global header actions, notice/activity slots and caller-owned search states.
