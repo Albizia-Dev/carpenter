@@ -1520,7 +1520,6 @@
     "lib/src/components/layout/restorable_split.dart::field:CarpenterAdaptiveSplitLayout.secondary": "a8e87435f2369747d6a8ebc625f392dd6ae353fce00f891a7d25b90a23a6f089",
     "lib/src/components/layout/restorable_split.dart::method:CarpenterAdaptiveSplitLayout.createState": "6cd6f49122fbcdf9c412defe6b197bf1c6213ca7c8b2fd460e35f14762e41bec",
     "lib/src/components/layout/root_layout.dart::class:CarpenterRootLayoutContext": "f4912fc0f79950893a2fb9fea4b6e2589bd962cfb7e2bcf01ef73227d605e339",
-    "lib/src/components/layout/root_layout.dart::constructor:CarpenterRootLayout.new": "56876c7f6f24e7a22f87497d971849e9d2c2c28541e81e9c967b0163e0edba76",
     "lib/src/components/layout/root_layout.dart::constructor:CarpenterRootLayoutContext.new": "5fffcb6aff58b1bff4c3fcf7289d120571680f4310d6cb2d1f49845fdaa51fc9",
     "lib/src/components/layout/root_layout.dart::enum:CarpenterRootLayoutPresentation": "6b6cd8d58793946fe73cc327dbb69bff7cb3e14809c77f91796de9e583106f4b",
     "lib/src/components/layout/root_layout.dart::enumValue:CarpenterRootLayoutPresentation.desktop": "68693d02ab4fbb2331b8cc39915322e48e61f06d4d1b31e7d19913202857bc8a",

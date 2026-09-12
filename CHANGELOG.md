@@ -1,3 +1,9 @@
+## Unreleased — Contextual workspace shell
+
+- Add controlled CarpenterWorkspaceShell and CarpenterNavigationPalette, with adaptive navigation, workspace selection, global header actions, notice/activity slots and caller-owned search states.
+- Keep page editors mounted while navigation collapses, changes breakpoint or opens as a modal drawer; share Escape, focus trapping and focus restoration with other overlays.
+- Add a canonical Widgetbook Playground with 55 named scenarios and wide/narrow behavioral coverage; document application-owned routing, permissions and persistence.
+
 ## Unreleased — Messenger attachment messages
 
 - Add controlled file labels to message bubbles and captionless composer submission for persisted attachments.

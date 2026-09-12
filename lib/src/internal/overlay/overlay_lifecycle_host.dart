@@ -61,6 +61,7 @@ final class _OverlayLifecycleHostState extends State<OverlayLifecycleHost> {
   void didUpdateWidget(OverlayLifecycleHost oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.open != widget.open) {
+      if (widget.open) _previousFocus = FocusManager.instance.primaryFocus;
       _dismissRequested = false;
       _scheduleSync();
     }
@@ -75,7 +76,7 @@ final class _OverlayLifecycleHostState extends State<OverlayLifecycleHost> {
 
   void _show() {
     if (_controller.isShowing) return;
-    _previousFocus = FocusManager.instance.primaryFocus;
+    _previousFocus ??= FocusManager.instance.primaryFocus;
     _controller.show();
     if (!widget.takeFocus) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -143,14 +144,20 @@ final class _OverlayLifecycleHostState extends State<OverlayLifecycleHost> {
 
   @override
   Widget build(BuildContext context) {
-    final child = widget.dismissOnEscape && widget.open
-        ? CallbackShortcuts(
-            bindings: {
-              const SingleActivator(LogicalKeyboardKey.escape): _dismiss,
-            },
-            child: widget.child,
-          )
-        : widget.child;
+    // Keep the child path stable while opening: editors must not remount.
+    final child = CallbackShortcuts(
+      bindings: {
+        if (widget.dismissOnEscape && widget.open)
+          const SingleActivator(LogicalKeyboardKey.escape): _dismiss,
+      },
+      child: ExcludeFocus(
+        excluding: widget.open && widget.modal,
+        child: ExcludeSemantics(
+          excluding: widget.open && widget.modal,
+          child: widget.child,
+        ),
+      ),
+    );
     return OverlayPortal.overlayChildLayoutBuilder(
       controller: _controller,
       child: child,

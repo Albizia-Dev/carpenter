@@ -1,3 +1,4 @@
+import 'use_cases/samples/workspace/catalog.dart';
 import 'use_cases/samples/messenger/catalog.dart';
 import 'use_cases/samples/projects_plus/catalog.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -218,6 +219,7 @@ final List<WidgetbookNode> carpenterCatalog = [
           applicationShellComponent,
           appFrameComponent,
           rootLayoutComponent,
+          workspaceShellComponent,
           sidebarComponent,
           shellHeaderComponent,
         ],

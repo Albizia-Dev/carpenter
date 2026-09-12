@@ -1,9 +1,14 @@
-import 'package:flutter/services.dart';
+import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../foundation/adaptive.dart';
 import '../../foundation/theme.dart';
 import 'sidebar.dart';
+import '../../internal/overlay/overlay_lifecycle_host.dart';
+import '../basic/button/icon_button.dart';
+import '../basic/gravity_icons.g.dart';
+import '../basic/text.dart';
+import '../../foundation/roles.dart';
 
 enum CarpenterRootLayoutPresentation { desktop, tablet, mobile }
 
@@ -38,12 +43,15 @@ typedef CarpenterRootHeaderBuilder =
 /// width and uses the expanded sidebar as a drawer.
 final class CarpenterRootLayout extends StatelessWidget {
   /// Composes the application navigation and content; navigation defaults are Russian.
+  /// Creates an adaptive root; [sidebarVisible] only reserves docked space.
+  /// The temporary drawer stays controlled by [sidebarOpen] on narrow hosts.
   const CarpenterRootLayout({
     super.key,
     required this.sidebar,
     required this.body,
     this.headerBuilder,
     this.sidebarExpanded = true,
+    this.sidebarVisible = true,
     this.onSidebarExpandedChanged,
     this.sidebarOpen = false,
     this.onSidebarOpenChanged,
@@ -55,6 +63,10 @@ final class CarpenterRootLayout extends StatelessWidget {
   final CarpenterSidebarData sidebar;
   final Widget body;
   final CarpenterRootHeaderBuilder? headerBuilder;
+
+  /// Whether desktop reserves navigation space. Compact viewports still offer
+  /// the caller-controlled drawer. This never unmounts [body].
+  final bool sidebarVisible;
   final bool sidebarExpanded;
   final ValueChanged<bool>? onSidebarExpandedChanged;
   final bool sidebarOpen;
@@ -93,66 +105,88 @@ final class CarpenterRootLayout extends StatelessWidget {
         ],
       );
 
-      Widget base = switch (presentation) {
-        CarpenterRootLayoutPresentation.desktop => Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
+      final docked =
+          presentation != CarpenterRootLayoutPresentation.mobile &&
+          sidebarVisible;
+      final expanded =
+          presentation == CarpenterRootLayoutPresentation.desktop &&
+          sidebarExpanded;
+      final base = Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (docked)
             CarpenterSidebar(
+              key: const ValueKey('docked-navigation'),
               data: _effectiveSidebar(closeOnSelection: false),
-              expanded: sidebarExpanded,
+              expanded: expanded,
             ),
-            Expanded(child: rightRegion),
-          ],
-        ),
-        CarpenterRootLayoutPresentation.tablet => Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            CarpenterSidebar(
-              data: _effectiveSidebar(closeOnSelection: false),
-              expanded: false,
-            ),
-            Expanded(child: rightRegion),
-          ],
-        ),
-        CarpenterRootLayoutPresentation.mobile => rightRegion,
-      };
-
-      if (overlayOpen) {
-        base = CallbackShortcuts(
-          bindings: <ShortcutActivator, VoidCallback>{
-            const SingleActivator(LogicalKeyboardKey.escape): _closeOverlay,
-          },
-          child: Focus(
-            autofocus: true,
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                base,
-                GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: _closeOverlay,
-                  child: ColoredBox(color: theme.overlay.scrim),
-                ),
-                Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: CarpenterSidebar(
-                    data: _effectiveSidebar(
-                      closeOnSelection: closeOverlayOnSelection,
-                    ),
-                    expanded: true,
+          Expanded(key: const ValueKey('primary-region'), child: rightRegion),
+        ],
+      );
+      final layered = Overlay.wrap(
+        child: OverlayLifecycleHost(
+          open: overlayOpen,
+          onOpenChanged: (open) => onSidebarOpenChanged?.call(open),
+          modal: true,
+          trapFocus: true,
+          scrimColor: theme.overlay.scrim,
+          overlayBuilder: (context, info, dismiss) => Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: SizedBox(
+              width: context
+                  .units(theme.sizes.layoutNavigationSide)
+                  .clamp(0, info.overlaySize.width),
+              height: info.overlaySize.height,
+              child: Semantics(
+                scopesRoute: true,
+                explicitChildNodes: true,
+                namesRoute: true,
+                label: sidebar.semanticLabel,
+                child: ColoredBox(
+                  color: theme.surface.subtle,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(
+                          context.units(theme.spacing.small),
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: CarpenterText.label(sidebar.semanticLabel),
+                            ),
+                            CarpenterIconButton(
+                              icon: GravityIcons.xmark,
+                              semanticLabel: 'Закрыть навигацию',
+                              prominence: ActionProminence.ghost,
+                              onPressed: dismiss,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: CarpenterSidebar(
+                          data: _effectiveSidebar(
+                            closeOnSelection: closeOverlayOnSelection,
+                          ),
+                          expanded: true,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
-        );
-      }
+          child: base,
+        ),
+      );
 
       return Semantics(
         container: true,
         explicitChildNodes: true,
         label: semanticLabel,
-        child: ColoredBox(color: theme.surface.base, child: base),
+        child: ColoredBox(color: theme.surface.base, child: layered),
       );
     },
   );

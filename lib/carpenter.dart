@@ -195,3 +195,7 @@ export 'src/foundation/tokens/carpenter.mordant.g.dart'
 export 'src/components/layout/patterns/messaging/messenger_workspace.dart';
 export 'src/components/layout/patterns/messaging/messenger_recovery.dart';
 export 'src/components/layout/patterns/messaging/attachment_tray.dart';
+
+// Contextual workspace composition.
+export 'src/components/layout/patterns/workspace/workspace_shell.dart';
+export 'src/components/layout/patterns/workspace/navigation_palette.dart';
