@@ -281,6 +281,7 @@ class _TreasuryPreviewState extends State<TreasuryPagePreview> {
                 color: CarpenterTheme.of(context).overlay.border,
               ),
             CarpenterListTile(
+              presentation: CarpenterListTilePresentation.collectionRow,
               selected: _selected.contains(row.title),
               title: Text(row.title),
               subtitle: Text(row.detail),
@@ -311,6 +312,7 @@ class _TreasuryPreviewState extends State<TreasuryPagePreview> {
           children: [
             for (final row in values)
               CarpenterListTile(
+                presentation: CarpenterListTilePresentation.collectionRow,
                 title: Text(row.title),
                 subtitle: Text(row.detail),
                 trailing: text(row.value),

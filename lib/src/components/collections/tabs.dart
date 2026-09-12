@@ -32,13 +32,14 @@ final class CarpenterTab<T> {
 /// Pointer selection keeps focus for subsequent keyboard navigation without a
 /// keyboard focus outline. Tab leaves the tab list for the next control.
 final class CarpenterTabs<T> extends StatefulWidget {
+  /// Emits tab selection requests; the current tab remains controlled by the caller.
   const CarpenterTabs({
     super.key,
     required this.value,
     required this.onChanged,
     required this.tabs,
     this.size = ControlSize.small,
-    this.semanticLabel = 'Tabs',
+    this.semanticLabel = 'Вкладки',
   }) : assert(tabs.length > 0);
 
   final T value;

@@ -53,7 +53,7 @@ final class CarpenterSelectionButtonGroup<T> extends StatefulWidget {
     required this.onChanged,
     this.size = ControlSize.medium,
     this.colorRole = ActionColorRole.primary,
-    this.semanticLabel = 'View selection',
+    this.semanticLabel = 'Выбор представления',
     this.fillAvailableWidth = false,
   }) : assert(options.length > 0);
 

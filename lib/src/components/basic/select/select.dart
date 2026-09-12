@@ -14,6 +14,7 @@ typedef CarpenterValueEquality<T> = bool Function(T first, T second);
 /// is self-managed by default because it is ephemeral interaction state. Pass
 /// both [open] and [onOpenChanged] when an application needs to control it.
 final class CarpenterSelect<T> extends StatefulWidget {
+  /// Selects a controlled option; Russian empty feedback can be overridden by the caller.
   const CarpenterSelect({
     super.key,
     required this.value,
@@ -35,7 +36,7 @@ final class CarpenterSelect<T> extends StatefulWidget {
     this.isSameValue,
     this.focusNode,
     this.autofocus = false,
-    this.emptyText = 'No options',
+    this.emptyText = 'Нет вариантов',
   }) : assert(
          open == null || onOpenChanged != null,
          'Controlled CarpenterSelect.open requires onOpenChanged.',

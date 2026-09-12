@@ -1,4 +1,79 @@
+## Unreleased — Contextual workspace shell
+
+- Add controlled CarpenterWorkspaceShell and CarpenterNavigationPalette, with adaptive navigation, workspace selection, global header actions, notice/activity slots and caller-owned search states.
+- Keep page editors mounted while navigation collapses, changes breakpoint or opens as a modal drawer; share Escape, focus trapping and focus restoration with other overlays.
+- Add a canonical Widgetbook Playground with 55 named scenarios and wide/narrow behavioral coverage; document application-owned routing, permissions and persistence.
+
+## Unreleased — Messenger attachment messages
+
+- Add controlled file labels to message bubbles and captionless composer submission for persisted attachments.
+- Keep the composer at the bottom when the attachment tray is shorter than its height limit.
+- Add a Widgetbook ready-file/send/retry scenario and wide/light and narrow/dark/large-text golden coverage.
+
+## Unreleased — RSP detail loading
+
+- Add controlled result-loading composition that unmounts acceptance actions during loading/failure.
+- Add Widgetbook initial/loading/error scenes, three goldens, and retry verification without automatic acceptance.
+
+## Unreleased — RSP result acceptance
+
+- Add reviewRequired recovery state for a confirmed earlier command whose current result must be reloaded; avoid falsely reporting that confirmation was rejected.
+
+- Add controlled result acceptance composition with explicit unknown-outcome recovery, permission-based action visibility, and no optimistic success.
+- Add Widgetbook phases and five reviewed golden cases using generated Core fixture text.
+
+## Unreleased — Work inbox
+
+- Keep one shared stale-data recovery notice visible above both list and details; show refresh progress within details.
+- Generate Widgetbook inbox fixtures from the shared Core scenario catalog, including typed kind mapping and matching description search/order.
+
+- Add controlled CarpenterWorkInbox with search, filters, flat queue rows, responsive details, explicit return to list, preview and recovery states.
+- Add canonical Widgetbook scenes and six light/dark/narrow/large-text golden cases with filtering, recovery and navigation checks.
+
+## Unreleased — Messenger workspace
+
+- Notify the host when pending original navigation is cancelled by the user, allowing scoped queued lookup cancellation.
+
+- Cancel pending quote navigation on a host-reported failure for that message; add an original-lookup failure scenario to Widgetbook.
+
+- Automatically open a requested quote original when the host resolves it; cancel pending navigation on explicit cancellation, scrolling, another quote, or room disposal.
+
+- Add a host callback for unavailable quoted originals and an accessible room-scoped lookup status, with a Widgetbook recovery scenario.
+
+- Add loaded-original navigation from quotes with lazy variable-height history, an explicit original marker, return to latest, and an unavailable-original state.
+
+- Add controlled reply actions and quote previews in message bubbles/composer, with cancellation and a narrow-screen golden.
+- Ignore pointer-up pressed-state updates after an interactive region is disposed by opening a long-press menu.
+
+- Add optional controlled directory search and visible-ID filtering without losing the selected detail; clear/Escape restores the list, and empty/error states remain distinct.
+- Add controlled messenger workspace, bubbles and composer with per-room history loading/retry presentation and explicit NeedAnswer.
+- Use compact conversation headers, separate incoming/outgoing surfaces, bounded message widths, timestamp slots and consecutive-author grouping with stable identities and a five-minute/same-day bound.
+- Move message copy to a keyboard/pointer action menu and send to the composer trailing action. Bubble menus require an Overlay ancestor; controlled callbacks remain host-owned.
+- Cover the canonical Widgetbook layout in light/narrow/dark/large-text and grouped-message goldens, including keyboard, clipboard and draft-preservation behavior.
+
+## Unreleased — Nested actions
+
+- Add `CarpenterActionDescriptor.group` and recursive children for menu and toolbar actions, retaining existing constructor calls.
+- Navigate submenu levels with Enter/Right, Back/Left and Escape; selecting a leaf dismisses the menu. Submenus stay within the anchored menu bounds on compact screens.
+- Add `CarpenterPageHeader.overflowActions` for actions that always remain under the overflow button.
+
+## Unreleased — Treasury interaction refinements
+
+- Add optional independent `onOpen` navigation to expandable surfaces and optional shortcut badges to buttons, including descriptor-based actions.
+- Keep section actions aligned with their heading and measure shortcut badges in action overflow layout.
+- Use Russian default calendar, pagination, input, collection and action guidance; compact pagination uses x/y and wide pagination omits redundant summary text.
+- Preserve existing constructor calls; Widgetbook playgrounds expose disclosure navigation and shortcut badges.
+
 ## Unreleased
+
+- Keep page and entity header actions beside the heading at compact widths, collapsing into overflow without moving below it.
+- Add variable-height collection rows with parent-owned corners and optional DataList item padding for composed interactive rows.
+
+- Preserve the invoking page default text style when opening typed dialogs, including editor panels.
+
+- Add controlled toggle actions across buttons, icon buttons and menus: neutral when off, the configured action role when on, with native toggle semantics.
+- Show shortcuts in action menus and icon hover hints; add optional identity slots to page and record headers.
+- Add adaptive editor dialogs and opt-in short-list wrapping without changing existing defaults.
 
 - Preserve mounted page content and natural document height during refresh, blocking and skeleton states; show indeterminate progress when no percentage is available.
 

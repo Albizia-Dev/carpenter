@@ -1,5 +1,7 @@
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
+import '../../foundation/hotkey_formatter.dart';
 
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
@@ -47,9 +49,9 @@ final class CarpenterActionStrip extends StatelessWidget {
     super.key,
     required this.items,
     this.alignment = AlignmentDirectional.centerEnd,
-    this.overflowLabel = 'More actions',
+    this.overflowLabel = 'Действия',
     this.overflowSize = ControlSize.medium,
-    this.semanticLabel = 'Actions',
+    this.semanticLabel = 'Панель действий',
   });
 
   final List<CarpenterActionStripItem> items;
@@ -193,7 +195,31 @@ final class CarpenterActionStrip extends StatelessWidget {
                 context,
               ).scale(context.units(theme.sizes.actionIcon(item.size))) +
               context.units(theme.spacing.actionGap(item.size));
+    var badgeWidth = 0.0;
+    if (item.action.shortcut != null) {
+      final badge = TextPainter(
+        text: TextSpan(
+          text: CarpenterHotkeyFormatter(
+            platform: defaultTargetPlatform,
+          ).formatActivator(item.action.shortcut!),
+          style: theme.typography.resolve(
+            context,
+            TypographyRole.caption,
+            TypographyEmphasis.regular,
+          ),
+        ),
+        textDirection: Directionality.of(context),
+        textScaler: MediaQuery.textScalerOf(context),
+        maxLines: 1,
+      )..layout();
+      badgeWidth =
+          badge.width.ceilToDouble() +
+          context.units(theme.spacing.small) +
+          context.units(theme.spacing.actionGap(item.size));
+      badge.dispose();
+    }
     final width =
+        badgeWidth +
         painter.width.ceilToDouble() +
         horizontal * 2 +
         icon +
@@ -216,6 +242,18 @@ final class _ActionStripAction extends StatelessWidget {
         (forceIcon ||
             item.presentation == CarpenterActionStripPresentation.icon) &&
         item.action.icon != null;
+    if (item.action.children.isNotEmpty) {
+      return _ActionStripOverflowButton(
+        items: [
+          for (final action in item.action.children)
+            CarpenterActionStripItem(action: action),
+        ],
+        label: item.action.effectiveSemanticLabel,
+        size: item.size,
+        trigger: item,
+        iconOnly: iconOnly,
+      );
+    }
     if (iconOnly) {
       return CarpenterIconButton.fromAction(
         item.action,
@@ -238,8 +276,12 @@ final class _ActionStripOverflowButton extends StatefulWidget {
     required this.items,
     required this.label,
     required this.size,
+    this.trigger,
+    this.iconOnly = false,
   });
 
+  final CarpenterActionStripItem? trigger;
+  final bool iconOnly;
   final List<CarpenterActionStripItem> items;
   final String label;
   final ControlSize size;
@@ -327,13 +369,30 @@ final class _ActionStripOverflowButtonState
   @override
   Widget build(BuildContext context) => KeyedSubtree(
     key: _anchorKey,
-    child: CarpenterIconButton(
-      icon: GravityIcons.ellipsis,
-      semanticLabel: widget.label,
-      prominence: ActionProminence.ghost,
-      size: widget.size,
-      onPressed: _toggle,
-    ),
+    child: widget.trigger != null && !widget.iconOnly
+        ? CarpenterButton(
+            label: widget.trigger!.action.label,
+            icon: widget.trigger!.action.icon,
+            prominence: widget.trigger!.prominence,
+            colorRole: widget.trigger!.action.colorRole,
+            size: widget.size,
+            executionPhase: widget.trigger!.executionPhase,
+            onPressed: widget.trigger!.action.isEnabled ? _toggle : null,
+          )
+        : CarpenterIconButton(
+            icon: widget.trigger?.action.icon ?? GravityIcons.ellipsis,
+            semanticLabel: widget.label,
+            prominence: widget.trigger?.prominence ?? ActionProminence.ghost,
+            colorRole:
+                widget.trigger?.action.colorRole ?? ActionColorRole.neutral,
+            executionPhase:
+                widget.trigger?.executionPhase ?? ActionExecutionPhase.idle,
+            size: widget.size,
+            onPressed:
+                widget.trigger == null || widget.trigger!.action.isEnabled
+                ? _toggle
+                : null,
+          ),
   );
 }
 

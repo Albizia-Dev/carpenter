@@ -38,11 +38,19 @@ Widget _playground(BuildContext context) {
     initialValue: true,
   );
   return _DialogPreview(
+    presentation: context.knobs.object.segmented(
+      label: 'Layout · Presentation',
+      options: CarpenterDialogPresentation.values,
+      labelBuilder: (value) => value == CarpenterDialogPresentation.editor
+          ? 'Editor panel / page'
+          : 'Centered',
+    ),
     title: title,
     content: content,
     height: height,
     policy: policy,
     actions: actions,
+    loading: context.knobs.boolean(label: 'Behavior · Confirm loading'),
   );
 }
 
@@ -51,16 +59,20 @@ Widget _nested(BuildContext context) => const _NestedDialogPreview();
 final class _DialogPreview extends StatefulWidget {
   const _DialogPreview({
     required this.title,
+    required this.presentation,
     required this.content,
     required this.height,
     required this.policy,
     required this.actions,
+    required this.loading,
   });
+  final CarpenterDialogPresentation presentation;
   final String title;
   final String content;
   final double height;
   final DialogDismissPolicy policy;
   final bool actions;
+  final bool loading;
   @override
   State<_DialogPreview> createState() => _DialogPreviewState();
 }
@@ -69,6 +81,12 @@ final class _DialogPreviewState extends State<_DialogPreview> {
   var _open = false;
   @override
   Widget build(BuildContext context) => CarpenterDialog(
+    presentation: widget.presentation,
+    actionExecutionPhases: {
+      'confirm': widget.loading
+          ? ActionExecutionPhase.running
+          : ActionExecutionPhase.idle,
+    },
     open: _open,
     onOpenChanged: (value) => setState(() => _open = value),
     title: widget.title,

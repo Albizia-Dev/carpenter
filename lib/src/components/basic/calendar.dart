@@ -211,7 +211,7 @@ final class _CarpenterCalendarState extends State<CarpenterCalendar> {
                     label: _view == _CalendarView.years
                         ? '$firstYear–${firstYear + 11}'
                         : '${_monthNames[_month.month - 1]} ${_month.year}',
-                    semanticLabel: 'Choose month and year',
+                    semanticLabel: 'Выбрать месяц и год',
                     icon: GravityIcons.chevronDown,
                     iconPosition: CarpenterActionIconPosition.trailing,
                     colorRole: ActionColorRole.neutral,
@@ -229,7 +229,7 @@ final class _CarpenterCalendarState extends State<CarpenterCalendar> {
                   icon: Directionality.of(context) == TextDirection.rtl
                       ? GravityIcons.chevronRight
                       : GravityIcons.chevronLeft,
-                  semanticLabel: 'Previous month',
+                  semanticLabel: 'Предыдущий месяц',
                   size: ControlSize.small,
                   prominence: ActionProminence.ghost,
                   onInvoke: _canMove(-step) ? () => _move(-step) : null,
@@ -238,7 +238,7 @@ final class _CarpenterCalendarState extends State<CarpenterCalendar> {
                   icon: Directionality.of(context) == TextDirection.rtl
                       ? GravityIcons.chevronLeft
                       : GravityIcons.chevronRight,
-                  semanticLabel: 'Next month',
+                  semanticLabel: 'Следующий месяц',
                   size: ControlSize.small,
                   prominence: ActionProminence.ghost,
                   onInvoke: _canMove(step) ? () => _move(step) : null,
@@ -399,7 +399,7 @@ final class _CarpenterCalendarState extends State<CarpenterCalendar> {
                                               widget.onChanged(date);
                                             },
                                       label: carpenterFormatDate(date),
-                                      hint: today ? 'Today' : null,
+                                      hint: today ? 'Сегодня' : null,
                                       excludeSemantics: true,
                                       child: Container(
                                         constraints: BoxConstraints(
@@ -469,17 +469,17 @@ final class _CarpenterCalendarState extends State<CarpenterCalendar> {
 String carpenterFormatDate(DateTime value) =>
     '${value.day.toString().padLeft(2, '0')}.${value.month.toString().padLeft(2, '0')}.${value.year.toString().padLeft(4, '0')}';
 const _monthNames = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
+  'Январь',
+  'Февраль',
+  'Март',
+  'Апрель',
+  'Май',
+  'Июнь',
+  'Июль',
+  'Август',
+  'Сентябрь',
+  'Октябрь',
+  'Ноябрь',
+  'Декабрь',
 ];
-const _weekdayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const _weekdayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];

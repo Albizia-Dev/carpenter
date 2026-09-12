@@ -1,4 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import '../../../foundation/hotkey_formatter.dart';
+import '../../../internal/rendering/tooltip.dart';
 
 import '../../../foundation/icon_data.dart';
 import '../../../foundation/roles.dart';
@@ -27,6 +30,8 @@ final class CarpenterIconButton extends StatelessWidget {
     this.executionPhase = ActionExecutionPhase.idle,
     this.focusNode,
     this.autofocus = false,
+    this.shortcut,
+    this.toggled,
   }) : _visible = true,
        _semanticHint = null,
        assert(
@@ -51,6 +56,8 @@ final class CarpenterIconButton extends StatelessWidget {
        onPressed = action.onInvoke,
        onInvoke = null,
        colorRole = action.colorRole,
+       toggled = action.toggled,
+       shortcut = action.shortcut,
        _visible = action.visible,
        _semanticHint = action.disabledReason;
 
@@ -72,6 +79,10 @@ final class CarpenterIconButton extends StatelessWidget {
   /// Semantic action or selection color resolved from the current Carpenter
   /// theme.
   final ActionColorRole colorRole;
+
+  /// Controlled switch state. Null keeps ordinary action semantics; false
+  /// renders neutral and true renders [colorRole]. The callback owns updates.
+  final bool? toggled;
 
   /// Visual emphasis independently of the action's semantic color role.
   final ActionProminence prominence;
@@ -95,6 +106,9 @@ final class CarpenterIconButton extends StatelessWidget {
   /// Whether the control requests focus when first attached. Defaults to
   /// false.
   final bool autofocus;
+
+  /// Shortcut metadata displayed on hover; binding remains with the caller.
+  final ShortcutActivator? shortcut;
   final bool _visible;
   final String? _semanticHint;
 
@@ -103,11 +117,12 @@ final class CarpenterIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!_visible) return const SizedBox.shrink();
-    return ActionControl(
+    final control = ActionControl(
       semanticLabel: semanticLabel,
       semanticHint: _semanticHint,
       onInvoke: _effectiveOnPressed,
       colorRole: colorRole,
+      toggled: toggled,
       prominence: prominence,
       size: size,
       shape: shape,
@@ -117,6 +132,17 @@ final class CarpenterIconButton extends StatelessWidget {
       autofocus: autofocus,
       childBuilder: (context, style, iconDimension) =>
           IconRenderer(icon: icon, size: iconDimension, color: style.icon),
+    );
+    final keys = shortcut == null
+        ? null
+        : CarpenterHotkeyFormatter(
+            platform: defaultTargetPlatform,
+          ).formatActivator(shortcut!);
+    return MergeSemantics(
+      child: ActionTooltip(
+        text: keys == null ? semanticLabel : '$semanticLabel · $keys',
+        child: control,
+      ),
     );
   }
 }

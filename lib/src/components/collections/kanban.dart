@@ -118,6 +118,7 @@ final class _KanbanDragData<C, T> {
 /// sharing [dragGroupId]. This is how [CarpenterPlanningBoard] enables moves
 /// across lanes without making card state internal.
 final class CarpenterKanban<C, T> extends StatefulWidget {
+  /// Renders controlled columns and cards with Russian default empty and accessibility labels.
   const CarpenterKanban({
     super.key,
     required this.columns,
@@ -129,8 +130,8 @@ final class CarpenterKanban<C, T> extends StatefulWidget {
     this.onRetry,
     this.dragGroupId,
     this.dragActivation = CarpenterDragActivation.immediate,
-    this.emptyLabel = 'No cards',
-    this.semanticLabel = 'Kanban board',
+    this.emptyLabel = 'Нет карточек',
+    this.semanticLabel = 'Канбан',
   });
 
   final List<CarpenterKanbanColumn<C, T>> columns;
@@ -382,7 +383,7 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
               _tailDrop(context, column),
               if (column.loadState == CarpenterKanbanLoadState.loading)
                 const CarpenterText.caption(
-                  'Loading…',
+                  'Загрузка…',
                   colorRole: ContentColorRole.secondary,
                   textAlign: TextAlign.center,
                 ),
@@ -403,7 +404,7 @@ final class _CarpenterKanbanState<C, T> extends State<CarpenterKanban<C, T>> {
                 GestureDetector(
                   onTap: () => widget.onLoadMore!(column),
                   child: const CarpenterText.caption(
-                    'Load more',
+                    'Загрузить ещё',
                     colorRole: ContentColorRole.secondary,
                     textAlign: TextAlign.center,
                   ),

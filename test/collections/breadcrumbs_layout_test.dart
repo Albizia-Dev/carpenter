@@ -112,7 +112,7 @@ void main() {
       ),
     );
     expect(find.text('Long ancestor'), findsNothing);
-    await tester.tap(find.bySemanticsLabel('More breadcrumb items'));
+    await tester.tap(find.bySemanticsLabel('Другие разделы'));
     await tester.pumpAndSettle();
     expect(find.text('Long ancestor'), findsOneWidget);
     await tester.tap(find.text('Long ancestor'));
@@ -155,7 +155,7 @@ void main() {
         ),
       );
       expect(tester.takeException(), isNull);
-      await tester.tap(find.bySemanticsLabel('More breadcrumb items'));
+      await tester.tap(find.bySemanticsLabel('Другие разделы'));
       await tester.pumpAndSettle();
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pumpAndSettle();

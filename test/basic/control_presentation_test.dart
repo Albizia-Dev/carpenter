@@ -153,7 +153,7 @@ void main() {
           find.byWidgetPredicate(
             (widget) =>
                 widget is CarpenterIconButton &&
-                widget.semanticLabel == 'Close notice',
+                widget.semanticLabel == 'Закрыть уведомление',
           ),
         );
         expect(actionCalls, 1);

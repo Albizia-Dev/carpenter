@@ -4,14 +4,15 @@ import '../../../foundation/roles.dart';
 import '../toolbar.dart';
 
 final class CarpenterHeaderActions extends StatelessWidget {
+  /// Groups primary, secondary and destructive actions with a Russian overflow label.
   const CarpenterHeaderActions({
     super.key,
     this.primary = const [],
     this.secondary = const [],
     this.destructive = const [],
     this.primaryExecutionPhase = ActionExecutionPhase.idle,
-    this.overflowLabel = 'More actions',
-    this.semanticLabel = 'Page actions',
+    this.overflowLabel = 'Действия',
+    this.semanticLabel = 'Действия страницы',
   });
 
   final List<CarpenterActionDescriptor> primary;

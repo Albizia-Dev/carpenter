@@ -142,7 +142,7 @@ void main() {
     );
 
     expect(find.text('Archive'), findsNothing);
-    await tester.tap(find.bySemanticsLabel('More actions'));
+    await tester.tap(find.bySemanticsLabel('Действия'));
     await tester.pumpAndSettle();
     expect(find.text('Archive'), findsOneWidget);
   });
@@ -190,7 +190,7 @@ void main() {
       ),
     );
 
-    final action = find.bySemanticsLabel('More actions');
+    final action = find.bySemanticsLabel('Действия');
     final before = tester.getCenter(action).dx;
     await tester.drag(
       find.byType(SingleChildScrollView),

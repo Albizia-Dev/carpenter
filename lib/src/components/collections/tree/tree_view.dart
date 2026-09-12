@@ -73,6 +73,9 @@ final class CarpenterTreeController extends ChangeNotifier {
 }
 
 /// Controlled hierarchical collection with keyboard navigation and DnD.
+/// Pointer selection also focuses the tree, so subsequent keyboard navigation
+/// and ancestor command shortcuts operate on the selected row. Selection itself
+/// remains controlled by [selectedIds] and [onSelectionChanged].
 final class CarpenterTreeView<T> extends StatefulWidget {
   /// Creates a controlled hierarchical view of [nodes].
   const CarpenterTreeView({
@@ -101,7 +104,7 @@ final class CarpenterTreeView<T> extends StatefulWidget {
     this.dragActivation = CarpenterDragActivation.immediate,
     this.dragOperations = const {CarpenterDragOperation.move},
     this.autoExpandOnHover = true,
-    this.semanticLabel = 'Tree',
+    this.semanticLabel = 'Дерево',
   });
 
   final List<CarpenterTreeNode<T>> nodes;
@@ -139,6 +142,7 @@ final class CarpenterTreeView<T> extends StatefulWidget {
 }
 
 final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
+  final FocusNode _focusNode = FocusNode(debugLabel: 'CarpenterTreeView');
   Object? _focusedId;
   Object? _selectionAnchorId;
   Object? _draggingId;
@@ -185,6 +189,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
   void dispose() {
     widget.controller?.removeListener(_handleRevealRequest);
     _autoExpandTimer?.cancel();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -240,6 +245,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
   }
 
   void _select(CarpenterTreeNode<T> node) {
+    _focusNode.requestFocus();
     _focusedId = node.id;
     final callback = widget.onSelectionChanged;
     if (callback == null ||
@@ -609,7 +615,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
     final node = entry.node;
     final child = switch (node.loadState) {
       CarpenterTreeLoadState.loading => const CarpenterText.caption(
-        'Loading…',
+        'Загрузка…',
         colorRole: ContentColorRole.secondary,
       ),
       CarpenterTreeLoadState.failed => Row(
@@ -672,6 +678,7 @@ final class _CarpenterTreeViewState<T> extends State<CarpenterTreeView<T>> {
     }
     return CarpenterDragScope(
       child: Focus(
+        focusNode: _focusNode,
         autofocus: true,
         onKeyEvent: _handleKey,
         child: Semantics(

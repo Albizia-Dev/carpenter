@@ -21,14 +21,14 @@ void main() {
               onOpenChanged: (value) => update(() => open = value),
               anchor: const SizedBox(width: 80, height: 32),
               content: const CarpenterText.body('Popover content'),
-              semanticLabel: 'Details',
+              semanticLabel: 'Реквизиты',
             );
           },
         ),
       ),
     );
     expect(find.text('Popover content'), findsNothing);
-    await tester.tap(find.bySemanticsLabel('Details'));
+    await tester.tap(find.bySemanticsLabel('Реквизиты'));
     await tester.pumpAndSettle();
     expect(open, isTrue);
     expect(find.text('Popover content'), findsOneWidget);

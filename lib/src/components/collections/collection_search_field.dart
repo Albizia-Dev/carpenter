@@ -9,10 +9,11 @@ import 'contracts/collection_lifecycle_controller.dart';
 /// Debounce, cancellation and stale-response protection remain controller-owned;
 /// this widget only keeps the text editor synchronized with the query.
 final class CarpenterCollectionSearchField<T, K, F> extends StatefulWidget {
+  /// Edits a controlled collection query with a Russian default clear-action label.
   const CarpenterCollectionSearchField({
     super.key,
     required this.controller,
-    this.label = 'Search',
+    this.label = 'Поиск',
     this.placeholder,
     this.width = const Rem(32.5),
   });

@@ -52,6 +52,7 @@ enum CarpenterPageHeaderBehavior {
 /// [CarpenterRegionScrollOwnership.child]. Ordinary document or form content
 /// can use [CarpenterRegionScrollOwnership.region].
 final class CarpenterPageRegion extends StatelessWidget {
+  /// Composes page chrome and scroll ownership with Russian accessibility defaults.
   const CarpenterPageRegion({
     super.key,
     required this.body,
@@ -61,7 +62,7 @@ final class CarpenterPageRegion extends StatelessWidget {
     this.headerBehavior = CarpenterPageHeaderBehavior.sticky,
     this.scrollController,
     this.shortcutActions = const [],
-    this.semanticLabel = 'Page',
+    this.semanticLabel = 'Страница',
   }) : assert(
          headerBehavior != CarpenterPageHeaderBehavior.scrolls ||
              scrollOwnership == CarpenterRegionScrollOwnership.region,

@@ -33,12 +33,13 @@ final class CarpenterStandardNavigationPolicy
 }
 
 final class CarpenterNavigationRegion extends StatelessWidget {
+  /// Hosts navigation with a Russian default accessibility name.
   const CarpenterNavigationRegion({
     super.key,
     required this.builder,
     this.policy = const CarpenterStandardNavigationPolicy(),
     this.viewportPolicy = const CarpenterViewportPolicy(),
-    this.semanticLabel = 'Primary navigation',
+    this.semanticLabel = 'Основная навигация',
   });
 
   final CarpenterNavigationBuilder builder;

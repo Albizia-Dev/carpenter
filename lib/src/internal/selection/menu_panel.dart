@@ -21,17 +21,27 @@ final class MenuPanelEntry {
     required this.enabled,
     required this.onActivate,
     this.semanticHint,
+    this.shortcutLabel,
     this.icon,
     this.selected = false,
+    this.dismissOnActivate = true,
+    this.trailingIcon,
+    this.toggled,
+    this.actionColorRole = ActionColorRole.neutral,
   });
 
+  final bool dismissOnActivate;
+  final CarpenterIconSource? trailingIcon;
   final Object id;
   final String label;
   final String semanticLabel;
   final String? semanticHint;
+  final String? shortcutLabel;
   final CarpenterIconSource? icon;
   final bool enabled;
   final bool selected;
+  final bool? toggled;
+  final ActionColorRole actionColorRole;
   final VoidCallback? onActivate;
 }
 
@@ -40,13 +50,17 @@ final class MenuPanel extends StatefulWidget {
     super.key,
     required this.entries,
     this.onDismissRequested,
+    this.onBackRequested,
     this.autofocus = true,
+    this.initialFocusId,
     this.semanticLabel,
   });
 
   final List<MenuPanelEntry> entries;
   final VoidCallback? onDismissRequested;
+  final VoidCallback? onBackRequested;
   final bool autofocus;
+  final Object? initialFocusId;
   final String? semanticLabel;
 
   @override
@@ -109,7 +123,11 @@ final class _MenuPanelState extends State<MenuPanel> {
     if (!widget.autofocus) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      final key = _navigation.first();
+      final preferred = widget.initialFocusId;
+      final key =
+          widget.entries.any((entry) => entry.id == preferred && entry.enabled)
+          ? preferred
+          : _navigation.first();
       if (key != null) _focusNodes[key]?.requestFocus();
     });
   }
@@ -129,7 +147,7 @@ final class _MenuPanelState extends State<MenuPanel> {
   void _activate(MenuPanelEntry entry) {
     if (!entry.enabled || entry.onActivate == null) return;
     entry.onActivate!();
-    widget.onDismissRequested?.call();
+    if (entry.dismissOnActivate) widget.onDismissRequested?.call();
   }
 
   KeyEventResult _handleTypeahead(FocusNode node, KeyEvent event) {
@@ -162,9 +180,21 @@ final class _MenuPanelState extends State<MenuPanel> {
     const SingleActivator(LogicalKeyboardKey.arrowUp): () => _move(-1),
     const SingleActivator(LogicalKeyboardKey.home): () => _focusBoundary(true),
     const SingleActivator(LogicalKeyboardKey.end): () => _focusBoundary(false),
-    if (widget.onDismissRequested != null)
+    const SingleActivator(LogicalKeyboardKey.arrowRight): () {
+      final index = _focusedIndex;
+      if (index != null) {
+        final entry = widget.entries[index];
+        if (!entry.dismissOnActivate && entry.trailingIcon != null) {
+          _activate(entry);
+        }
+      }
+    },
+    if (widget.onBackRequested != null)
+      const SingleActivator(LogicalKeyboardKey.arrowLeft):
+          widget.onBackRequested!,
+    if (widget.onDismissRequested != null || widget.onBackRequested != null)
       const SingleActivator(LogicalKeyboardKey.escape):
-          widget.onDismissRequested!,
+          widget.onBackRequested ?? widget.onDismissRequested!,
   };
 
   @override
@@ -241,7 +271,8 @@ final class _MenuPanelItem extends StatelessWidget {
       container: true,
       button: true,
       enabled: entry.enabled,
-      selected: entry.selected,
+      selected: entry.toggled == null ? entry.selected : null,
+      toggled: entry.toggled,
       label: entry.semanticLabel,
       hint: entry.semanticHint,
       onTap: entry.enabled ? onActivate : null,
@@ -255,19 +286,30 @@ final class _MenuPanelItem extends StatelessWidget {
           final highlighted =
               states.contains(WidgetState.hovered) ||
               states.contains(WidgetState.focused);
-          final color = disabled
-              ? theme.content.disabled
-              : theme.overlay.foreground;
+          final switchStyle = entry.toggled == null
+              ? null
+              : theme.actions.resolve(
+                  entry.toggled!
+                      ? entry.actionColorRole
+                      : ActionColorRole.neutral,
+                  ActionProminence.normal,
+                  states,
+                );
+          final color =
+              switchStyle?.foreground ??
+              (disabled ? theme.content.disabled : theme.overlay.foreground);
           return FocusRing(
             visible: states.contains(WidgetState.focused) && showFocusHighlight,
             borderRadius: radius,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: entry.selected
-                    ? theme.overlay.selected
-                    : highlighted
-                    ? theme.overlay.hovered
-                    : null,
+                color:
+                    switchStyle?.background ??
+                    (entry.selected
+                        ? theme.overlay.selected
+                        : highlighted
+                        ? theme.overlay.hovered
+                        : null),
                 borderRadius: radius,
               ),
               child: Padding(
@@ -300,6 +342,27 @@ final class _MenuPanelItem extends StatelessWidget {
                             .copyWith(color: color),
                       ),
                     ),
+                    if (entry.trailingIcon != null) ...[
+                      SizedBox(
+                        width: context.units(theme.spacing.overlayMenuItemGap),
+                      ),
+                      IconRenderer(
+                        icon: entry.trailingIcon!,
+                        size: context.units(theme.sizes.menuItemIcon),
+                        color: color,
+                      ),
+                    ],
+                    if (entry.shortcutLabel != null) ...[
+                      SizedBox(
+                        width: context.units(theme.spacing.overlayMenuItemGap),
+                      ),
+                      Text(
+                        entry.shortcutLabel!,
+                        style: theme.typography
+                            .menuItem(context, TypographyEmphasis.regular)
+                            .copyWith(color: theme.content.secondary),
+                      ),
+                    ],
                   ],
                 ),
               ),

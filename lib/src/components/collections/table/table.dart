@@ -27,6 +27,7 @@ typedef CarpenterTableColumnWidthChanged =
     void Function(String columnId, LengthUnit width);
 
 final class CarpenterTable<T, K> extends StatefulWidget {
+  /// Renders controlled rows with Russian accessibility defaults and caller-owned selection.
   const CarpenterTable({
     super.key,
     required this.snapshot,
@@ -45,7 +46,7 @@ final class CarpenterTable<T, K> extends StatefulWidget {
     this.retryAction,
     this.messages = const CarpenterTableMessages(),
     this.stickyHeader = true,
-    this.semanticLabel = 'Data table',
+    this.semanticLabel = 'Таблица',
   }) : assert(columns.length > 0);
 
   final CollectionSnapshot<T> snapshot;

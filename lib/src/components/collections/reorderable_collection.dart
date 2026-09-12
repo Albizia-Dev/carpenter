@@ -65,6 +65,7 @@ final class _ReorderDragData<T> {
 
 /// Presentation-neutral controlled reorderable collection built on Carpenter DnD.
 final class CarpenterReorderableCollection<T> extends StatefulWidget {
+  /// Emits reorder requests without owning item order; accessibility defaults are Russian.
   const CarpenterReorderableCollection({
     super.key,
     required this.items,
@@ -73,7 +74,7 @@ final class CarpenterReorderableCollection<T> extends StatefulWidget {
     this.onReorder,
     this.axis = Axis.vertical,
     this.activation = CarpenterDragActivation.immediate,
-    this.semanticLabel = 'Reorderable collection',
+    this.semanticLabel = 'Упорядочиваемый список',
   });
 
   final List<T> items;

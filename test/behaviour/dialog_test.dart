@@ -6,6 +6,53 @@ import 'package:flutter_test/flutter_test.dart';
 import '../helpers/harness.dart';
 
 void main() {
+  testWidgets('dialog forwards controlled execution to the named action', (
+    tester,
+  ) async {
+    var calls = 0;
+    await tester.pumpWidget(
+      carpenterOverlayHarness(
+        CarpenterDialog(
+          open: true,
+          onOpenChanged: (_) {},
+          title: 'Форма',
+          content: const Text('Поля'),
+          actionExecutionPhases: const {'save': ActionExecutionPhase.running},
+          actions: [
+            CarpenterActionDescriptor(
+              id: 'save',
+              label: 'Сохранить',
+              onInvoke: () => calls++,
+            ),
+            CarpenterActionDescriptor(
+              id: 'cancel',
+              label: 'Отмена',
+              onInvoke: () {},
+            ),
+          ],
+          child: const SizedBox(),
+        ),
+      ),
+    );
+    await tester.pump();
+    final save = find.widgetWithText(CarpenterButton, 'Сохранить');
+    expect(
+      tester.widget<CarpenterButton>(save).executionPhase,
+      ActionExecutionPhase.running,
+    );
+    expect(
+      tester
+          .widget<CarpenterButton>(
+            find.widgetWithText(CarpenterButton, 'Отмена'),
+          )
+          .executionPhase,
+      ActionExecutionPhase.idle,
+    );
+    await tester.tap(save);
+    expect(calls, 0);
+    await tester.pumpWidget(const SizedBox());
+  });
+
   testWidgets(
     'showCarpenterDialog captures local theme and rem and returns value',
     (tester) async {

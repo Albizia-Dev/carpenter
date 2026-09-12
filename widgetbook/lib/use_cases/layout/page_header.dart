@@ -54,6 +54,10 @@ Widget _pageHeaderPlayground(BuildContext context) {
     child: Align(
       alignment: AlignmentDirectional.topStart,
       child: CarpenterPageHeader(
+        leading:
+            context.knobs.boolean(label: 'Content · Avatar', initialValue: true)
+            ? const CarpenterAvatar(initials: 'SK')
+            : null,
         title: title,
         subtitle: subtitle,
         status: showStatus

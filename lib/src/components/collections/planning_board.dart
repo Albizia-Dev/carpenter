@@ -47,6 +47,7 @@ typedef CarpenterPlanningLaneExpansionChanged =
 /// Multi-lane planning surface built from compatible Kanban drag surfaces.
 /// Lane expansion and card collections remain controlled by the caller.
 final class CarpenterPlanningBoard<L, C, T> extends StatefulWidget {
+  /// Renders controlled planning lanes with a Russian default accessibility label.
   const CarpenterPlanningBoard({
     super.key,
     required this.lanes,
@@ -57,7 +58,7 @@ final class CarpenterPlanningBoard<L, C, T> extends StatefulWidget {
     this.onMove,
     this.onLoadMore,
     this.onRetry,
-    this.semanticLabel = 'Planning board',
+    this.semanticLabel = 'Планирование',
   });
 
   final List<CarpenterPlanningLane<L, C, T>> lanes;

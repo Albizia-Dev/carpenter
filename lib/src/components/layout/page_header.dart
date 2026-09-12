@@ -1,7 +1,6 @@
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
-import '../../foundation/adaptive.dart';
 import '../../foundation/roles.dart';
 import '../../foundation/theme.dart';
 import '../basic/status_indicator.dart';
@@ -18,29 +17,42 @@ final class CarpenterPageStatus {
 }
 
 final class CarpenterPageHeader extends StatelessWidget {
+  /// Creates a responsive heading. [leading] hosts an optional identity visual;
+  /// title, metadata and action contracts remain owned by the caller.
   const CarpenterPageHeader({
     super.key,
     required this.title,
     this.subtitle,
+    this.leading,
     this.status,
     this.breadcrumbs,
     this.actions,
     this.primaryActions = const [],
     this.secondaryActions = const [],
+    this.overflowActions = const [],
     this.semanticLabel,
   }) : assert(
          actions == null ||
-             (primaryActions.length == 0 && secondaryActions.length == 0),
+             (primaryActions.length == 0 &&
+                 secondaryActions.length == 0 &&
+                 overflowActions.length == 0),
          'Use either actions or descriptor action lists.',
        );
 
   final String title;
   final String? subtitle;
+
+  /// Optional identity visual beside the title, such as an avatar.
+  final Widget? leading;
   final CarpenterPageStatus? status;
   final Widget? breadcrumbs;
   final Widget? actions;
   final List<CarpenterActionDescriptor> primaryActions;
   final List<CarpenterActionDescriptor> secondaryActions;
+
+  /// Actions that always appear under the overflow button, even on wide screens.
+  /// Nested action groups retain their hierarchy in that menu.
+  final List<CarpenterActionDescriptor> overflowActions;
   final String? semanticLabel;
 
   @override
@@ -50,12 +62,8 @@ final class CarpenterPageHeader extends StatelessWidget {
       final externalGap = context.units(theme.spacing.layoutHeader);
       final internalGap = context.units(theme.spacing.small) / 2;
       final statusGap = context.units(theme.spacing.small);
-      final viewport = const CarpenterViewportPolicy().resolve(
-        context,
-        constraints.maxWidth,
-      );
       final actionWidget = actions ?? _descriptorActions();
-      final titleBlock = Column(
+      final titleContent = Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -84,23 +92,26 @@ final class CarpenterPageHeader extends StatelessWidget {
           ],
         ],
       );
+      final titleBlock = leading == null
+          ? titleContent
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                leading!,
+                SizedBox(width: externalGap),
+                Expanded(child: titleContent),
+              ],
+            );
       final content = actionWidget == null
           ? titleBlock
-          : viewport == CarpenterViewportClass.narrow
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                titleBlock,
-                SizedBox(height: externalGap),
-                actionWidget,
-              ],
-            )
           : ActionOverflowLayout(
+              keepInline: true,
               content: titleBlock,
               actions: actionWidget,
               gap: externalGap,
-              minimumInlineActionWidth: context.units(
-                theme.sizes.actionHeight(ControlSize.medium),
+              minimumInlineActionWidth: theme.sizes.actionExtent(
+                context,
+                ControlSize.medium,
               ),
             );
       return Semantics(
@@ -114,9 +125,13 @@ final class CarpenterPageHeader extends StatelessWidget {
   );
 
   Widget? _descriptorActions() {
-    if (primaryActions.isEmpty && secondaryActions.isEmpty) return null;
+    if (primaryActions.isEmpty &&
+        secondaryActions.isEmpty &&
+        overflowActions.isEmpty) {
+      return null;
+    }
     return CarpenterToolbar(
-      semanticLabel: '$title actions',
+      semanticLabel: '$title: действия',
       items: [
         for (final action in primaryActions)
           CarpenterToolbarItem(
@@ -128,6 +143,11 @@ final class CarpenterPageHeader extends StatelessWidget {
           CarpenterToolbarItem(
             action: action,
             group: CarpenterToolbarGroup.secondary,
+          ),
+        for (final action in overflowActions)
+          CarpenterToolbarItem(
+            action: action,
+            group: CarpenterToolbarGroup.overflow,
           ),
       ],
     );

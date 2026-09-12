@@ -68,7 +68,8 @@ final class _InteractiveRegionState extends State<InteractiveRegion> {
   }
 
   void _setPressed(bool value) {
-    if (_pressed == value) return;
+    // A long press may replace this region before the matching pointer-up.
+    if (!mounted || _pressed == value) return;
     setState(() => _pressed = value);
     if (!value && _pointerFocus) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

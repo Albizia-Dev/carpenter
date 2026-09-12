@@ -19,11 +19,12 @@ typedef CarpenterCollectionRenderer<T> =
 
 @immutable
 final class CarpenterCollectionPageMessages {
+  /// Overrides Russian page-level loading and failure feedback.
   const CarpenterCollectionPageMessages({
     this.loading = 'Loading collection',
-    this.zero = 'No records yet',
+    this.zero = 'Записей пока нет',
     this.emptyResult = 'No matching records',
-    this.initialError = 'Collection could not be loaded',
+    this.initialError = 'Не удалось загрузить список',
     this.refreshing = 'Refreshing collection',
     this.refreshError = 'Refresh failed. Existing records are preserved.',
   });
@@ -185,7 +186,7 @@ final class _CollectionPageBody<T, K> extends StatelessWidget {
                   priority: CarpenterToolbarPriority.critical,
                 ),
             ],
-            semanticLabel: 'Selection actions',
+            semanticLabel: 'Действия с выбранным',
           ),
           SizedBox(height: gap),
         ],

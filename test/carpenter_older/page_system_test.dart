@@ -573,7 +573,7 @@ void main() {
             sections: const [
               CarpenterRecordSection(
                 id: CarpenterPageSectionId('details'),
-                title: 'Details',
+                title: 'Реквизиты',
                 child: CarpenterText('Account number'),
               ),
             ],
@@ -584,7 +584,7 @@ void main() {
       expect(_findText('Main account'), findsOneWidget);
       expect(_findText('100 RUB'), findsOneWidget);
       expect(_findText('Requires attention'), findsOneWidget);
-      expect(_findText('Details'), findsOneWidget);
+      expect(_findText('Реквизиты'), findsOneWidget);
       expect(_findText('Account number'), findsOneWidget);
     });
 

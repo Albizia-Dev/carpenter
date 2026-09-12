@@ -120,7 +120,7 @@ void main() {
       }),
       findsNothing,
     );
-    expect(find.bySemanticsLabel('More actions'), findsOneWidget);
+    expect(find.bySemanticsLabel('Действия'), findsOneWidget);
     await tester.tap(find.bySemanticsLabel('Edit account'));
     expect(invocations, 1);
   });

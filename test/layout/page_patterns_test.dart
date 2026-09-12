@@ -85,7 +85,7 @@ void main() {
     await pump(
       CollectionSnapshot<String>(contentState: CollectionContentState.zero),
     );
-    expect(find.text('No records yet'), findsOneWidget);
+    expect(find.text('Записей пока нет'), findsOneWidget);
 
     await pump(
       CollectionSnapshot<String>(
@@ -234,7 +234,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Unsaved changes'), findsOneWidget);
+    expect(find.text('Несохранённые изменения'), findsOneWidget);
     expect(find.text('Validation summary'), findsOneWidget);
     await tester.tap(find.text('Save'));
     await tester.tap(find.text('Cancel'));

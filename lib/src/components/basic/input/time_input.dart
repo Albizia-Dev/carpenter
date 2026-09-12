@@ -144,9 +144,9 @@ final class _CarpenterTimeInputState extends State<CarpenterTimeInput> {
     final parsed = carpenterParseTime(text);
     String? error;
     if (parsed == null) {
-      error = 'Invalid time';
+      error = 'Некорректное время';
     } else if (parsed.minute % widget.minuteStep != 0) {
-      error = 'Minute must match a ${widget.minuteStep}-minute step';
+      error = 'Минуты должны соответствовать шагу ${widget.minuteStep} мин.';
     }
     setState(() => _validationError = error);
     if (parsed != null && error == null) widget.onChanged(parsed);
@@ -206,7 +206,7 @@ final class _CarpenterTimeInputState extends State<CarpenterTimeInput> {
             Align(
               alignment: AlignmentDirectional.centerEnd,
               child: CarpenterButton(
-                label: 'Clear',
+                label: 'Очистить',
                 size: ControlSize.small,
                 prominence: ActionProminence.ghost,
                 onInvoke: _clear,
@@ -219,7 +219,7 @@ final class _CarpenterTimeInputState extends State<CarpenterTimeInput> {
         controller: _controller,
         mask: CarpenterInputMask.time,
         label: widget.label,
-        placeholder: widget.placeholder ?? 'HH:MM',
+        placeholder: widget.placeholder ?? 'ЧЧ:ММ',
         description: widget.description,
         feedback: widget.feedback,
         errorText: widget.errorText ?? _validationError,
@@ -234,8 +234,8 @@ final class _CarpenterTimeInputState extends State<CarpenterTimeInput> {
         autofocus: widget.autofocus,
         trailingAction: CarpenterActionDescriptor(
           id: 'time.open-picker',
-          label: 'Choose time',
-          semanticLabel: 'Open time picker',
+          label: 'Выбрать время',
+          semanticLabel: 'Открыть выбор времени',
           icon: GravityIcons.clock,
           onInvoke: _interactive ? () => _setOpen(!_open) : null,
         ),

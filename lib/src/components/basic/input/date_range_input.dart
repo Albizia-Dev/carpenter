@@ -229,7 +229,9 @@ final class _CarpenterDateRangeInputState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               CarpenterText.label(
-                _rangeAnchor == null ? 'Choose start date' : 'Choose end date',
+                _rangeAnchor == null
+                    ? 'Выберите начальную дату'
+                    : 'Выберите конечную дату',
               ),
               SizedBox(height: context.units(.5.rem)),
               CarpenterCalendar(
@@ -248,7 +250,7 @@ final class _CarpenterDateRangeInputState
             Align(
               alignment: AlignmentDirectional.centerEnd,
               child: CarpenterButton(
-                label: 'Clear',
+                label: 'Очистить',
                 size: ControlSize.small,
                 prominence: ActionProminence.ghost,
                 onInvoke: _clear,
@@ -261,7 +263,7 @@ final class _CarpenterDateRangeInputState
         controller: _controller,
         mask: CarpenterInputMask.dateRange,
         label: widget.label,
-        placeholder: widget.placeholder ?? 'DD.MM.YYYY – DD.MM.YYYY',
+        placeholder: widget.placeholder ?? 'ДД.ММ.ГГГГ – ДД.ММ.ГГГГ',
         description: widget.description,
         feedback: widget.feedback,
         errorText: widget.errorText ?? _validationError,
@@ -276,8 +278,8 @@ final class _CarpenterDateRangeInputState
         autofocus: widget.autofocus,
         trailingAction: CarpenterActionDescriptor(
           id: 'date-range.open-picker',
-          label: 'Choose date range',
-          semanticLabel: 'Open date range picker',
+          label: 'Выбрать период',
+          semanticLabel: 'Открыть выбор периода',
           icon: GravityIcons.calendar,
           onInvoke: _interactive ? () => _setOpen(!_open) : null,
         ),
@@ -292,12 +294,12 @@ String? _rangeError(
   DateTime? firstDate,
   DateTime? lastDate,
 ) {
-  if (value == null) return 'Invalid date range';
+  if (value == null) return 'Некорректный период';
   if (firstDate != null && value.start.isBefore(_dateOnly(firstDate))) {
-    return 'Start date is before the allowed range';
+    return 'Начальная дата раньше допустимой';
   }
   if (lastDate != null && value.end.isAfter(_dateOnly(lastDate))) {
-    return 'End date is after the allowed range';
+    return 'Конечная дата позже допустимой';
   }
   return null;
 }

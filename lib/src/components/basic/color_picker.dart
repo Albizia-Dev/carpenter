@@ -130,7 +130,7 @@ final class _CarpenterColorPickerState extends State<CarpenterColorPicker> {
     final compactBreakpoint = context.units(32.5.rem);
 
     return Semantics(
-      label: 'Color picker',
+      label: 'Выбор цвета',
       enabled: widget.enabled,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,

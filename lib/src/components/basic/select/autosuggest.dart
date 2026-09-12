@@ -11,6 +11,7 @@ import '../input/field_shell.dart';
 /// Suggestions retain editing focus. Leaving the field closes the popup;
 /// outside pointer events reach their target without restoring field focus.
 final class CarpenterAutosuggest<T> extends StatefulWidget {
+  /// Combines controlled text and suggestions; default empty feedback is Russian.
   const CarpenterAutosuggest({
     super.key,
     required this.controller,
@@ -35,9 +36,9 @@ final class CarpenterAutosuggest<T> extends StatefulWidget {
     this.focusNode,
     this.autofocus = false,
     this.replaceQueryOnSelection = true,
-    this.loadingText = 'Loading',
-    this.emptyText = 'No suggestions',
-    this.failedText = 'Unable to load suggestions',
+    this.loadingText = 'Загрузка…',
+    this.emptyText = 'Нет подсказок',
+    this.failedText = 'Не удалось загрузить подсказки',
   }) : assert(
          open == null || onOpenChanged != null,
          'Controlled CarpenterAutosuggest.open requires onOpenChanged.',

@@ -22,15 +22,15 @@ final class CarpenterMultiSelect<T> extends StatefulWidget {
     required this.onChanged,
     required this.onQueryChanged,
     this.label,
-    this.placeholder = 'Search',
+    this.placeholder = 'Поиск',
     this.semanticLabel,
     this.availability = FieldAvailability.enabled,
     this.loadState = OptionsLoadState.ready,
     this.maximumSuggestions = 20,
-    this.loadingText = 'Loading',
-    this.emptyText = 'No matches',
-    this.failedText = 'Unable to load results',
-    this.removeLabel = 'Remove',
+    this.loadingText = 'Загрузка…',
+    this.emptyText = 'Ничего не найдено',
+    this.failedText = 'Не удалось загрузить результаты',
+    this.removeLabel = 'Удалить',
   }) : assert(maximumSuggestions > 0);
 
   /// Selected options, independent of the current result page. Ids are unique.

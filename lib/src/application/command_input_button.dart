@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 
 import '../components/basic/button/button.dart';
 import '../foundation/roles.dart';
+import '../foundation/icon_data.dart';
 import 'command.dart';
 
 /// Asynchronously collects input for a command immediately before execution;
@@ -86,6 +87,7 @@ extension CarpenterCommandInputActionProjection<I> on CarpenterCommand<I> {
     BuildContext context, {
     required CarpenterCommandInputBuilder<I> inputBuilder,
     String? label,
+    CarpenterIconSource? icon,
   }) {
     final current = state.value;
     final visible = current.visibility == CarpenterCommandVisibility.visible;
@@ -113,6 +115,7 @@ extension CarpenterCommandInputActionProjection<I> on CarpenterCommand<I> {
     return CarpenterActionDescriptor(
       id: id,
       label: label ?? title,
+      icon: icon,
       visible: visible,
       colorRole: switch (presentation) {
         CarpenterCommandPresentation.danger => ActionColorRole.danger,

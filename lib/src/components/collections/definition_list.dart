@@ -38,9 +38,9 @@ final class CarpenterDefinitionList<T> extends StatelessWidget {
     required this.valueBuilder,
     this.actions,
     this.secondaryActions,
-    this.semanticLabel = 'Details',
-    this.actionsSemanticLabel = 'Row actions',
-    this.actionsOverflowLabel = 'More actions',
+    this.semanticLabel = 'Реквизиты',
+    this.actionsSemanticLabel = 'Действия со строкой',
+    this.actionsOverflowLabel = 'Действия',
   });
 
   /// Structured values presented in source order.

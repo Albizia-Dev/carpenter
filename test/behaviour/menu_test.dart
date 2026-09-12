@@ -105,7 +105,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       carpenterHarness(
-        CarpenterMenu(items: items(<String>[]), semanticLabel: 'Actions'),
+        CarpenterMenu(items: items(<String>[]), semanticLabel: 'Действия'),
         theme: CarpenterThemeData.dark(contrast: ContrastMode.high),
         direction: TextDirection.rtl,
         textScale: 2,

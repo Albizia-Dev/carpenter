@@ -383,7 +383,8 @@ final class CarpenterWorkflowPage<TState, TContext> extends StatelessWidget {
             secondary: [
               CarpenterButton(
                 label: cancelLabel,
-                prominence: ActionProminence.outlined,
+                prominence: ActionProminence.ghost,
+                colorRole: ActionColorRole.neutral,
                 onInvoke: controller.executing ? null : controller.cancel,
               ),
               for (final transition in transitions.take(
@@ -391,7 +392,8 @@ final class CarpenterWorkflowPage<TState, TContext> extends StatelessWidget {
               ))
                 CarpenterButton(
                   label: transition.title,
-                  prominence: ActionProminence.outlined,
+                  prominence: ActionProminence.ghost,
+                  colorRole: ActionColorRole.neutral,
                   onInvoke:
                       !controller.executing &&
                           transition.canExecute(
@@ -406,6 +408,9 @@ final class CarpenterWorkflowPage<TState, TContext> extends StatelessWidget {
               if (submit != null)
                 CarpenterButton(
                   label: submit.title,
+                  executionPhase: controller.executing
+                      ? ActionExecutionPhase.running
+                      : ActionExecutionPhase.idle,
                   colorRole: ActionColorRole.primary,
                   prominence: ActionProminence.high,
                   onInvoke:

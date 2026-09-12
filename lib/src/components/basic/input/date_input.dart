@@ -205,7 +205,7 @@ final class _CarpenterDateInputState extends State<CarpenterDateInput> {
             Align(
               alignment: AlignmentDirectional.centerEnd,
               child: CarpenterButton(
-                label: 'Clear',
+                label: 'Очистить',
                 size: ControlSize.small,
                 prominence: ActionProminence.ghost,
                 onInvoke: _clear,
@@ -218,7 +218,7 @@ final class _CarpenterDateInputState extends State<CarpenterDateInput> {
         controller: _controller,
         mask: CarpenterInputMask.date,
         label: widget.label,
-        placeholder: widget.placeholder ?? 'DD.MM.YYYY',
+        placeholder: widget.placeholder ?? 'ДД.ММ.ГГГГ',
         description: widget.description,
         feedback: widget.feedback,
         errorText: widget.errorText ?? _validationError,
@@ -233,8 +233,8 @@ final class _CarpenterDateInputState extends State<CarpenterDateInput> {
         autofocus: widget.autofocus,
         trailingAction: CarpenterActionDescriptor(
           id: 'date.open-picker',
-          label: 'Choose date',
-          semanticLabel: 'Open date picker',
+          label: 'Выбрать дату',
+          semanticLabel: 'Открыть календарь',
           icon: GravityIcons.calendar,
           onInvoke: _interactive ? () => _setOpen(!_open) : null,
         ),
@@ -245,13 +245,13 @@ final class _CarpenterDateInputState extends State<CarpenterDateInput> {
 }
 
 String? _dateError(DateTime? value, DateTime? firstDate, DateTime? lastDate) {
-  if (value == null) return 'Invalid date';
+  if (value == null) return 'Некорректная дата';
   final date = DateTime(value.year, value.month, value.day);
   if (firstDate != null && date.isBefore(_dateOnly(firstDate))) {
-    return 'Date is before the allowed range';
+    return 'Дата раньше допустимого диапазона';
   }
   if (lastDate != null && date.isAfter(_dateOnly(lastDate))) {
-    return 'Date is after the allowed range';
+    return 'Дата позже допустимого диапазона';
   }
   return null;
 }

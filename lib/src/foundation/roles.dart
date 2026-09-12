@@ -394,8 +394,9 @@ enum CarpenterActionIconPosition {
 /// consistent label, icon, availability, semantics, shortcut, and invocation.
 @immutable
 final class CarpenterActionDescriptor {
-  /// Creates an action descriptor. A `null` [onInvoke] makes the action unavailable
-  /// while preserving its identity and presentation metadata.
+  /// Creates an action descriptor. A leaf with `null` [onInvoke] is unavailable.
+  /// Nonempty [children] instead define a group, preserving the same identity
+  /// and presentation metadata when it moves between toolbar and menu.
   const CarpenterActionDescriptor({
     required this.id,
     required this.label,
@@ -406,7 +407,65 @@ final class CarpenterActionDescriptor {
     this.shortcut,
     this.visible = true,
     this.disabledReason,
+    this.toggled,
+    this.children = const [],
   });
+
+  /// Creates a nested action group. Activating it opens its visible children;
+  /// it never executes a command. Empty groups, or groups with no available
+  /// descendants, are disabled. IDs must be unique within each sibling level.
+  const CarpenterActionDescriptor.group({
+    required String id,
+    required String label,
+    required List<CarpenterActionDescriptor> children,
+    CarpenterIconSource? icon,
+    bool visible = true,
+    String? semanticLabel,
+  }) : this(
+         id: id,
+         label: label,
+         onInvoke: null,
+         children: children,
+         icon: icon,
+         visible: visible,
+         semanticLabel: semanticLabel,
+       );
+
+  /// Nested actions, rendered as a submenu by menus and action strips.
+  /// A nonempty list takes precedence over [onInvoke]. Callers own this tree
+  /// and rebuild it when availability or controlled toggle values change.
+  final List<CarpenterActionDescriptor> children;
+
+  /// Creates a controlled switch action. Activation proposes the opposite
+  /// [value]; callers commit it by rebuilding. Off uses the neutral role, on
+  /// uses [colorRole], in buttons, icon buttons and overflow menus alike.
+  factory CarpenterActionDescriptor.toggle({
+    required String id,
+    required String label,
+    required bool value,
+    required ValueChanged<bool>? onChanged,
+    CarpenterIconSource? icon,
+    String? semanticLabel,
+    ActionColorRole colorRole = ActionColorRole.primary,
+    ShortcutActivator? shortcut,
+    bool visible = true,
+    String? disabledReason,
+  }) => CarpenterActionDescriptor(
+    id: id,
+    label: label,
+    toggled: value,
+    onInvoke: onChanged == null ? null : () => onChanged(!value),
+    icon: icon,
+    semanticLabel: semanticLabel,
+    colorRole: colorRole,
+    shortcut: shortcut,
+    visible: visible,
+    disabledReason: disabledReason,
+  );
+
+  /// Controlled switch state: null is an ordinary action, false uses neutral,
+  /// and true uses [colorRole]. Activation remains owned by [onInvoke].
+  final bool? toggled;
 
   /// Stable application-defined action identity.
   final String id;
@@ -438,8 +497,10 @@ final class CarpenterActionDescriptor {
   /// Synchronous invocation callback; `null` means the action is unavailable.
   final VoidCallback? onInvoke;
 
-  /// Whether the descriptor currently has an invocation callback.
-  bool get isEnabled => onInvoke != null;
+  /// Whether a leaf can invoke, or a group has an available visible descendant.
+  bool get isEnabled => children.isNotEmpty
+      ? children.any((child) => child.visible && child.isEnabled)
+      : onInvoke != null;
 
   /// Accessible action name, falling back to the visible [label].
   String get effectiveSemanticLabel => semanticLabel ?? label;

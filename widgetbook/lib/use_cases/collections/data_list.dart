@@ -29,10 +29,13 @@ Widget _playground(BuildContext context) {
   );
   return SizedBox(
     height: context.units(32.5.rem),
-    child: _DataListPreview(
-      count: count,
-      scenario: scenario,
-      selectable: selectable,
+    child: Align(
+      alignment: Alignment.topCenter,
+      child: _DataListPreview(
+        count: count,
+        scenario: scenario,
+        selectable: selectable,
+      ),
     ),
   );
 }
@@ -76,6 +79,14 @@ final class _DataListPreviewState extends State<_DataListPreview> {
 
   @override
   Widget build(BuildContext context) => CarpenterDataList<int, int>(
+    shrinkWrap: context.knobs.boolean(
+      label: 'Wrap short list',
+      initialValue: false,
+    ),
+    itemPadding: context.knobs.boolean(
+      label: 'Layout · Item padding',
+      initialValue: true,
+    ),
     snapshot: _snapshot,
     itemKey: (item) => item,
     itemSemanticLabel: (item) => 'Record $item',

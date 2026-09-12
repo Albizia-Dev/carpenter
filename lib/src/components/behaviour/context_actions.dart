@@ -32,7 +32,7 @@ final class CarpenterContextActionRegion extends StatefulWidget {
     super.key,
     required this.actions,
     required this.child,
-    this.semanticLabel = 'Context actions',
+    this.semanticLabel = 'Действия',
     this.onOpen,
   });
 

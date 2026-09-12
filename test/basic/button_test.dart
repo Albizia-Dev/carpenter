@@ -29,6 +29,66 @@ void main() {
     ),
   );
 
+  testWidgets('shortcut badge stays inside action and preserves invocation', (
+    tester,
+  ) async {
+    var calls = 0;
+    await tester.pumpWidget(
+      harness(
+        CarpenterButton.fromAction(
+          CarpenterActionDescriptor(
+            id: 'save',
+            label: 'Сохранить',
+            shortcut: const SingleActivator(
+              LogicalKeyboardKey.keyA,
+              control: true,
+            ),
+            onInvoke: () => calls++,
+          ),
+        ),
+      ),
+    );
+    final badge = find.textContaining('Ctrl');
+    expect(badge, findsOneWidget);
+    final button = find.byType(CarpenterButton);
+    expect(tester.getRect(button).contains(tester.getCenter(badge)), isTrue);
+    await tester.tap(badge);
+    expect(calls, 1);
+  });
+
+  testWidgets('expander open action does not change disclosure', (
+    tester,
+  ) async {
+    var opens = 0;
+    await tester.pumpWidget(
+      harness(
+        SizedBox(
+          width: 350,
+          child: CarpenterExpander.listGroup(
+            header: const Text('Счёт'),
+            content: const Text('Реквизиты'),
+            onOpen: () => opens++,
+          ),
+        ),
+      ),
+    );
+    expect(find.text('Реквизиты'), findsNothing);
+    await tester.tap(find.bySemanticsLabel('Открыть'));
+    await tester.pumpAndSettle();
+    expect(opens, 1);
+    expect(find.text('Реквизиты'), findsNothing);
+    await tester.tap(find.text('Счёт'));
+    await tester.pumpAndSettle();
+    expect(find.text('Реквизиты'), findsOneWidget);
+    await tester.tap(find.bySemanticsLabel('Открыть'));
+    await tester.pumpAndSettle();
+    expect(opens, 2);
+    expect(find.text('Реквизиты'), findsOneWidget);
+    await tester.tap(find.text('Счёт'));
+    await tester.pumpAndSettle();
+    expect(find.text('Реквизиты'), findsNothing);
+  });
+
   testWidgets('invokes once through pointer, Enter, and Space', (tester) async {
     var count = 0;
     await tester.pumpWidget(

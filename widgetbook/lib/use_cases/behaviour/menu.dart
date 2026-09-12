@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
@@ -62,6 +63,7 @@ final class _MenuPreview extends StatefulWidget {
 
 final class _MenuPreviewState extends State<_MenuPreview> {
   String _last = '—';
+  bool _matching = false;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -71,8 +73,42 @@ final class _MenuPreviewState extends State<_MenuPreview> {
         semanticLabel: 'Действия',
         items: [
           CarpenterMenuItem(
+            action: CarpenterActionDescriptor.group(
+              id: 'export',
+              label: 'Экспорт',
+              icon: GravityIcons.fileArrowDown,
+              children: [
+                CarpenterActionDescriptor.group(
+                  id: 'excel',
+                  label: 'Excel',
+                  children: [
+                    CarpenterActionDescriptor(
+                      id: 'all-excel',
+                      label: 'Все записи',
+                      onInvoke: () =>
+                          setState(() => _last = 'Excel: все записи'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          CarpenterMenuItem(
+            action: CarpenterActionDescriptor.toggle(
+              id: 'matching',
+              label: 'Совпадение по ИНН',
+              value: _matching,
+              colorRole: ActionColorRole.primary,
+              onChanged: (value) => setState(() => _matching = value),
+            ),
+          ),
+          CarpenterMenuItem(
             action: CarpenterActionDescriptor(
               id: 'first',
+              shortcut: const SingleActivator(
+                LogicalKeyboardKey.enter,
+                control: true,
+              ),
               label: widget.first,
               onInvoke: () => setState(() => _last = widget.first),
             ),

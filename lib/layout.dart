@@ -34,3 +34,6 @@ export 'src/components/layout/sidebar.dart';
 export 'src/components/layout/split_view.dart';
 export 'src/components/layout/tabs_layout.dart';
 export 'src/components/layout/toolbar.dart';
+
+export 'src/components/layout/patterns/workspace/workspace_shell.dart';
+export 'src/components/layout/patterns/workspace/navigation_palette.dart';

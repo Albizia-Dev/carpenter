@@ -36,8 +36,8 @@ final class CarpenterInlineEdit extends StatelessWidget {
     this.enabled = true,
     this.commitOnEnter = true,
     this.errorText,
-    this.editSemanticLabel = 'Edit value',
-    this.commitSemanticLabel = 'Save value',
+    this.editSemanticLabel = 'Изменить значение',
+    this.commitSemanticLabel = 'Сохранить значение',
     this.actionSize = ControlSize.xsmall,
   });
 
@@ -90,7 +90,7 @@ final class CarpenterInlineEdit extends StatelessWidget {
         if (editing)
           CarpenterIconButton(
             icon: GravityIcons.xmark,
-            semanticLabel: 'Cancel editing',
+            semanticLabel: 'Отменить изменение',
             prominence: ActionProminence.ghost,
             size: actionSize,
             onPressed: committing ? null : onCancelRequested,
@@ -179,8 +179,8 @@ final class CarpenterInlineTextEdit extends StatefulWidget {
     this.enabled = true,
     this.errorText,
     this.semanticLabel,
-    this.editSemanticLabel = 'Edit value',
-    this.commitSemanticLabel = 'Save value',
+    this.editSemanticLabel = 'Изменить значение',
+    this.commitSemanticLabel = 'Сохранить значение',
     this.actionSize = ControlSize.xsmall,
     this.fieldSize = FieldSize.small,
     this.placeholder,

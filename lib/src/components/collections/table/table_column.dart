@@ -196,7 +196,7 @@ final class CarpenterTableColumn<T> {
         const CarpenterTableColumnWidth.actionLane(),
     bool resizable = false,
     String? semanticLabel,
-    String overflowLabel = 'More actions',
+    String overflowLabel = 'Действия',
   }) => CarpenterTableColumn<T>.custom(
     id: id,
     header: header,

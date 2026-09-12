@@ -13,7 +13,7 @@ void main() {
       carpenterHarness(
         CarpenterSwitch(
           value: false,
-          label: 'Notifications',
+          label: 'Уведомления',
           onChanged: changes.add,
           autofocus: true,
         ),
@@ -24,9 +24,9 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.space);
     expect(changes, [true, true]);
     expect(
-      tester.getSemantics(find.bySemanticsLabel('Notifications')),
+      tester.getSemantics(find.bySemanticsLabel('Уведомления')),
       matchesSemantics(
-        label: 'Notifications',
+        label: 'Уведомления',
         hasToggledState: true,
         hasEnabledState: true,
         isEnabled: true,

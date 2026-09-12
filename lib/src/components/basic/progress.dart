@@ -10,11 +10,12 @@ import '../../foundation/theme.dart';
 /// Leave [value] null for an indeterminate activity indicator. Non-finite
 /// values also use indeterminate presentation instead of an invalid percentage.
 final class CarpenterProgress extends StatefulWidget {
+  /// Displays controlled progress; the default accessibility label is Russian.
   const CarpenterProgress({
     super.key,
     this.value,
     this.height = const Rem(.25),
-    this.semanticLabel = 'Progress',
+    this.semanticLabel = 'Ход выполнения',
   });
 
   final double? value;
