@@ -19,10 +19,13 @@ import '../page/state.dart';
 
 /// Rich entity header retained from the previous record pattern.
 final class CarpenterEntityHeader extends StatelessWidget {
+  /// Creates a responsive heading. [leading] hosts an optional identity visual;
+  /// title, metadata and action contracts remain owned by the caller.
   const CarpenterEntityHeader({
     super.key,
     required this.title,
     this.subtitle,
+    this.leading,
     this.status,
     this.breadcrumbs,
     this.metadata = const [],
@@ -32,6 +35,9 @@ final class CarpenterEntityHeader extends StatelessWidget {
   });
   final String title;
   final String? subtitle;
+
+  /// Optional identity visual beside the title, such as an avatar.
+  final Widget? leading;
   final CarpenterPageStatus? status;
   final Widget? breadcrumbs;
   final List<Widget> metadata;
@@ -52,6 +58,7 @@ final class CarpenterEntityHeader extends StatelessWidget {
       children: [
         CarpenterPageHeader(
           title: title,
+          leading: leading,
           subtitle: subtitle,
           status: status,
           breadcrumbs: breadcrumbs,

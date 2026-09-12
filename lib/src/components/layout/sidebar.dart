@@ -47,6 +47,7 @@ final class CarpenterSidebarSection {
 
 @immutable
 final class CarpenterSidebarData {
+  /// Describes sidebar navigation with a Russian default semantic label.
   const CarpenterSidebarData({
     required this.sections,
     this.selectedId,
@@ -55,7 +56,7 @@ final class CarpenterSidebarData {
     this.compactHeader,
     this.footer,
     this.compactFooter,
-    this.semanticLabel = 'Primary navigation',
+    this.semanticLabel = 'Основная навигация',
   });
 
   final List<CarpenterSidebarSection> sections;

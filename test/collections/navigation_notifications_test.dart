@@ -24,7 +24,7 @@ void main() {
     );
 
     expect(find.text('Current'), findsOneWidget);
-    expect(find.bySemanticsLabel('More breadcrumb items'), findsOneWidget);
+    expect(find.bySemanticsLabel('Другие разделы'), findsOneWidget);
     await tester.tap(find.text('Home'));
     expect(invoked, isTrue);
   });
@@ -50,8 +50,8 @@ void main() {
       ),
     );
 
-    expect(find.text('New'), findsOneWidget);
-    await tester.tap(find.text('Dismiss'));
+    expect(find.text('Новое'), findsOneWidget);
+    await tester.tap(find.text('Закрыть'));
     expect(dismissed, 'n1');
   });
 

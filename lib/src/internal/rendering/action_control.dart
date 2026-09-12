@@ -27,12 +27,14 @@ final class ActionControl extends StatelessWidget {
     required this.iconOnly,
     required this.childBuilder,
     this.semanticHint,
+    this.toggled,
     this.focusNode,
     this.autofocus = false,
   });
 
   final String semanticLabel;
   final String? semanticHint;
+  final bool? toggled;
   final VoidCallback? onInvoke;
   final ActionColorRole colorRole;
   final ActionProminence prominence;
@@ -78,6 +80,7 @@ final class ActionControl extends StatelessWidget {
     return Semantics(
       container: true,
       button: true,
+      toggled: toggled,
       enabled: onInvoke != null,
       label: semanticLabel,
       hint: semanticHint,
@@ -98,7 +101,7 @@ final class ActionControl extends StatelessWidget {
               if (_running) visualStates.remove(WidgetState.disabled);
               if (!showFocusHighlight) visualStates.remove(WidgetState.focused);
               final style = theme.actions.resolve(
-                colorRole,
+                toggled == false ? ActionColorRole.neutral : colorRole,
                 prominence,
                 visualStates,
               );

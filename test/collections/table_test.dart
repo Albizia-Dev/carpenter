@@ -23,7 +23,7 @@ void main() {
 
     expect(find.byKey(const ValueKey(1)), findsOneWidget);
     expect(find.byKey(const ValueKey(2)), findsOneWidget);
-    expect(find.text('Refreshing data'), findsOneWidget);
+    expect(find.text('Обновление данных…'), findsOneWidget);
     expect(find.text('Alpha'), findsOneWidget);
   });
 
@@ -135,7 +135,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.bySemanticsLabel('Select loaded rows'));
+    await tester.tap(find.bySemanticsLabel('Выбрать загруженные строки'));
     expect(changed!.selectedKeys, {900, 1, 2});
   });
 
@@ -158,7 +158,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.text('Load more'));
+    await tester.tap(find.text('Загрузить ещё'));
     expect(loads, 1);
   });
 
@@ -261,7 +261,7 @@ void main() {
       ),
     );
 
-    expect(find.text('No matching results'), findsOneWidget);
+    expect(find.text('Ничего не найдено'), findsOneWidget);
     expect(tester.takeException(), isNull);
     expect(find.bySemanticsLabel('Records'), findsOneWidget);
   });

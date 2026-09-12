@@ -307,6 +307,11 @@ Widget _listTilePlayground(BuildContext context) {
     SizedBox(
       width: context.units(width.rem),
       child: CarpenterListTile(
+        presentation: context.knobs.object.dropdown(
+          label: 'Layout · Presentation',
+          options: CarpenterListTilePresentation.values,
+          labelBuilder: semanticValueLabel,
+        ),
         leading: showLeading
             ? const CarpenterAvatar(initials: 'AB', size: Rem(2))
             : null,

@@ -14,7 +14,8 @@ typedef CarpenterDialogActionsBuilder<T> =
 /// Opens a typed Carpenter modal route and completes with the value supplied
 /// to an action's [CarpenterDialogClose].
 ///
-/// The route captures the nearest Carpenter theme and root `rem` value before
+/// The route captures the nearest Carpenter theme, default text style, and root
+/// `rem` value before
 /// entering the Navigator overlay. This keeps locally hosted Carpenter
 /// subtrees working even when the application root belongs to another UI
 /// system during an incremental migration.
@@ -42,6 +43,7 @@ Future<T?> showCarpenterDialog<T>({
   );
   final theme = CarpenterTheme.of(context);
   final rem = Px(context.units(const Rem(1)));
+  final textStyle = DefaultTextStyle.of(context);
 
   return showGeneralDialog<T>(
     context: context,
@@ -62,29 +64,44 @@ Future<T?> showCarpenterDialog<T>({
         rem: rem,
         child: CarpenterTheme(
           data: theme,
-          child: builder != null
-              ? Builder(builder: builder)
-              : CarpenterDialog(
-                  open: true,
-                  onOpenChanged: (open) {
-                    if (!open) close();
-                  },
-                  title: title!,
-                  content: content!,
-                  actions: actionsBuilder!(close),
-                  dismissPolicy: dismissPolicy,
-                  initialFocusNode: initialFocusNode,
-                  semanticLabel: semanticLabel,
-                  child: const SizedBox.shrink(),
-                ),
+          child: textStyle.wrap(
+            dialogContext,
+            builder != null
+                ? Builder(builder: builder)
+                : CarpenterDialog(
+                    open: true,
+                    onOpenChanged: (open) {
+                      if (!open) close();
+                    },
+                    title: title!,
+                    content: content!,
+                    actions: actionsBuilder!(close),
+                    dismissPolicy: dismissPolicy,
+                    initialFocusNode: initialFocusNode,
+                    semanticLabel: semanticLabel,
+                    child: const SizedBox.shrink(),
+                  ),
+          ),
         ),
       );
     },
   );
 }
 
+/// Modal geometry: forms occupy a trailing panel on wide viewports and a
+/// full page on compact viewports. Dismissal and focus behavior stay identical.
+enum CarpenterDialogPresentation {
+  /// Standard centered confirmation or short interaction.
+  centered,
+
+  /// Trailing full-height form, occupying the viewport on compact screens.
+  editor,
+}
+
 /// A controlled modal composition container with trapped keyboard focus.
 final class CarpenterDialog extends StatelessWidget {
+  /// Creates a controlled modal. [presentation] selects form geometry without
+  /// changing the caller-owned open state, validation content, or actions.
   const CarpenterDialog({
     super.key,
     required this.open,
@@ -93,9 +110,11 @@ final class CarpenterDialog extends StatelessWidget {
     required this.title,
     required this.content,
     this.actions = const [],
+    this.actionExecutionPhases = const {},
     this.dismissPolicy = DialogDismissPolicy.escapeOnly,
     this.initialFocusNode,
     this.semanticLabel,
+    this.presentation = CarpenterDialogPresentation.centered,
   });
 
   final bool open;
@@ -104,9 +123,16 @@ final class CarpenterDialog extends StatelessWidget {
   final String title;
   final Widget content;
   final List<CarpenterActionDescriptor> actions;
+
+  /// Controlled execution phases keyed by action id. Missing ids are idle;
+  /// callers own requests and rebuild this map as operations start and finish.
+  final Map<String, ActionExecutionPhase> actionExecutionPhases;
   final DialogDismissPolicy dismissPolicy;
   final FocusNode? initialFocusNode;
   final String? semanticLabel;
+
+  /// Form geometry; focus trapping and dismissal policy are unchanged.
+  final CarpenterDialogPresentation presentation;
 
   @override
   Widget build(BuildContext context) {
@@ -124,13 +150,24 @@ final class CarpenterDialog extends StatelessWidget {
       initialFocusNode: initialFocusNode,
       scrimColor: theme.overlay.scrim,
       overlayBuilder: (context, info, dismiss) {
-        final inset = context.units(theme.spacing.overlayDialogViewportInset);
-        return Center(
+        final editor = presentation == CarpenterDialogPresentation.editor;
+        final compact =
+            info.overlaySize.width < context.units(theme.sizes.layoutNarrowEnd);
+        final inset = editor
+            ? 0.0
+            : context.units(theme.spacing.overlayDialogViewportInset);
+        return Align(
+          alignment: editor ? AlignmentDirectional.centerEnd : Alignment.center,
           child: Padding(
             padding: EdgeInsets.all(inset),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                maxWidth: context.units(theme.sizes.overlayDialogMaxWidth),
+                maxWidth: editor
+                    ? (compact
+                          ? info.overlaySize.width
+                          : context.units(theme.sizes.layoutNarrowEnd))
+                    : context.units(theme.sizes.overlayDialogMaxWidth),
+                minHeight: editor ? info.overlaySize.height : 0,
                 maxHeight: (info.overlaySize.height - inset * 2)
                     .clamp(0, info.overlaySize.height)
                     .toDouble(),
@@ -176,7 +213,18 @@ final class CarpenterDialog extends StatelessWidget {
                               ),
                               children: [
                                 for (final action in actions)
-                                  CarpenterButton.fromAction(action),
+                                  CarpenterButton.fromAction(
+                                    action,
+                                    executionPhase:
+                                        actionExecutionPhases[action.id] ??
+                                        ActionExecutionPhase.idle,
+                                    prominence: !editor
+                                        ? ActionProminence.normal
+                                        : action.colorRole ==
+                                              ActionColorRole.primary
+                                        ? ActionProminence.filled
+                                        : ActionProminence.ghost,
+                                  ),
                               ],
                             ),
                           ),

@@ -10,6 +10,7 @@ import '../basic/text.dart';
 
 /// Adaptive page navigation with previous/next controls and a compact page window.
 final class CarpenterPaginationBar extends StatelessWidget {
+  /// Navigates controlled pages. Compact mode uses x/y; wide mode shows page buttons without a redundant summary.
   const CarpenterPaginationBar({
     super.key,
     required this.page,
@@ -18,8 +19,8 @@ final class CarpenterPaginationBar extends StatelessWidget {
     this.leading,
     this.siblingCount = 1,
     this.pageLabelBuilder,
-    this.previousPageLabel = 'Previous page',
-    this.nextPageLabel = 'Next page',
+    this.previousPageLabel = 'Предыдущая страница',
+    this.nextPageLabel = 'Следующая страница',
   }) : assert(page > 0),
        assert(totalPages > 0),
        assert(page <= totalPages),
@@ -31,11 +32,12 @@ final class CarpenterPaginationBar extends StatelessWidget {
   final Widget? leading;
   final int siblingCount;
 
-  /// Localized visible page summary. Defaults to English when omitted.
+  /// Localized visible page summary. Defaults to a language-neutral x/y summary on compact widths.
   final String Function(int page, int totalPages)? pageLabelBuilder;
 
   /// Accessible labels for the previous/next navigation actions.
   final String previousPageLabel;
+  /// Accessible next-page label; defaults to Russian.
   final String nextPageLabel;
 
   List<int?> get _pageWindow {
@@ -80,9 +82,7 @@ final class CarpenterPaginationBar extends StatelessWidget {
     required bool enabled,
     CarpenterShape shape = CarpenterShape.rounded,
   }) => CarpenterIconButton(
-    icon: previous
-        ? GravityIcons.chevronLeft
-        : GravityIcons.chevronRight,
+    icon: previous ? GravityIcons.chevronLeft : GravityIcons.chevronRight,
     semanticLabel: semanticLabel,
     size: ControlSize.small,
     colorRole: ActionColorRole.utility,
@@ -96,7 +96,7 @@ final class CarpenterPaginationBar extends StatelessWidget {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.small);
     final label = CarpenterText.body(
-      pageLabelBuilder?.call(page, totalPages) ?? 'Page $page of $totalPages',
+      pageLabelBuilder?.call(page, totalPages) ?? '$page/$totalPages',
     );
     final previous = _navigationButton(
       previous: true,
@@ -180,7 +180,7 @@ final class CarpenterPaginationBar extends StatelessWidget {
                       label: '$item',
                       semanticLabel: item == page
                           ? 'Current page $item'
-                          : 'Page $item',
+                          : 'Страница $item',
                       size: ControlSize.small,
                       colorRole: ActionColorRole.utility,
                       prominence: item == page
@@ -207,8 +207,6 @@ final class CarpenterPaginationBar extends StatelessWidget {
           children: [
             if (leading != null) Expanded(child: leading!),
             if (leading == null) const Spacer(),
-            label,
-            SizedBox(width: gap),
             navigation,
           ],
         );

@@ -30,7 +30,7 @@ void main() {
     );
 
     final before = tester.getSize(find.byType(CarpenterToolbar));
-    await tester.tap(find.bySemanticsLabel('More actions'));
+    await tester.tap(find.bySemanticsLabel('Действия'));
     await tester.pumpAndSettle();
 
     expect(find.text('Archive'), findsOneWidget);

@@ -12,6 +12,7 @@ import 'select.dart';
 /// Suggestions retain editing focus. Leaving the field closes the popup;
 /// outside pointer events reach their target without restoring field focus.
 final class CarpenterComboBox<T> extends StatefulWidget {
+  /// Selects a controlled value from searchable options, with Russian default empty feedback.
   const CarpenterComboBox({
     super.key,
     required this.controller,
@@ -37,9 +38,9 @@ final class CarpenterComboBox<T> extends StatefulWidget {
     this.clearAction,
     this.focusNode,
     this.autofocus = false,
-    this.loadingText = 'Loading',
-    this.emptyText = 'No options',
-    this.failedText = 'Unable to load options',
+    this.loadingText = 'Загрузка…',
+    this.emptyText = 'Нет вариантов',
+    this.failedText = 'Не удалось загрузить варианты',
   }) : assert(
          open == null || onOpenChanged != null,
          'Controlled CarpenterComboBox.open requires onOpenChanged.',

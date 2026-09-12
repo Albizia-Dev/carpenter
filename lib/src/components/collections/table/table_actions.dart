@@ -28,12 +28,13 @@ typedef CarpenterTableActionsBuilder<T> =
 /// owning table reserves the whole lane so action availability never changes
 /// row geometry.
 final class CarpenterTableActionCell extends StatelessWidget {
+  /// Renders row actions with Russian default overflow guidance.
   const CarpenterTableActionCell({
     super.key,
     this.primary = const [],
     this.secondary = const [],
-    this.overflowLabel = 'More actions',
-    this.semanticLabel = 'Row actions',
+    this.overflowLabel = 'Действия',
+    this.semanticLabel = 'Действия со строкой',
   });
 
   static const int inlinePrimaryLimit = 2;

@@ -94,7 +94,7 @@ final class CarpenterNotice extends StatelessWidget {
                         SizedBox(width: gap / 2),
                         CarpenterIconButton(
                           icon: GravityIcons.xmark,
-                          semanticLabel: 'Close notice',
+                          semanticLabel: 'Закрыть уведомление',
                           size: ControlSize.small,
                           prominence: ActionProminence.ghost,
                           onInvoke: onClose,

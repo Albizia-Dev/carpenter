@@ -1,6 +1,7 @@
 import 'package:carpenter/carpenter.dart';
 import 'package:flutter/material.dart' show Icons;
 import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:widgetbook/widgetbook.dart';
 
 import '../../helpers/curated_icons.dart';
@@ -181,6 +182,12 @@ Widget _playground(BuildContext context) {
 
   final button = _InvocationPreview(
     builder: (onPressed) => CarpenterButton(
+      toggled: context.knobs.boolean(label: 'Behavior · Toggle / Enabled')
+          ? context.knobs.boolean(label: 'Behavior · Toggle / Value')
+          : null,
+      shortcut: context.knobs.boolean(label: 'Content · Shortcut badge')
+          ? const SingleActivator(LogicalKeyboardKey.keyA, meta: true)
+          : null,
       label: label,
       icon: showIcon ? icon.data : null,
       iconPosition: iconPosition,

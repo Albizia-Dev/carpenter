@@ -242,6 +242,13 @@ Widget _expander(BuildContext context) {
       width: width,
       child: CarpenterExpander(
         key: ValueKey(expanded),
+        onOpen:
+            context.knobs.boolean(
+              label: 'Separate open action',
+              initialValue: true,
+            )
+            ? () {}
+            : null,
         initiallyExpanded: expanded,
         header: CarpenterText.label(
           header,

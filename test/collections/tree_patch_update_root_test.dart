@@ -9,7 +9,7 @@ void main() {
     const replacement = CarpenterTreeNode(
       id: 'root',
       value: 'new',
-      label: 'New',
+      label: 'Новое',
     );
     final next = roots.applyCarpenterTreePatch(
       const CarpenterTreeUpdated(replacement),

@@ -142,7 +142,7 @@ final class _CarpenterPageSectionState extends State<CarpenterPageSection> {
       ...widget.actions,
       if (widget.collapsible)
         CarpenterButton(
-          label: _expanded ? 'Collapse' : 'Expand',
+          label: _expanded ? 'Свернуть' : 'Развернуть',
           size: ControlSize.small,
           prominence: ActionProminence.ghost,
           onInvoke: () => setState(() => _expanded = !_expanded),
@@ -173,30 +173,19 @@ final class _CarpenterPageSectionState extends State<CarpenterPageSection> {
     final header = LayoutBuilder(
       builder: (context, constraints) {
         if (actions.isEmpty) return heading;
-        if (constraints.maxWidth < context.units(32.5.rem)) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              heading,
-              SizedBox(height: chromeGap),
-              Wrap(
-                spacing: chromeGap,
-                runSpacing: chromeGap,
-                children: actions,
-              ),
-            ],
-          );
-        }
         return Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(child: heading),
             SizedBox(width: contentGap),
-            Wrap(
-              spacing: chromeGap,
-              runSpacing: chromeGap,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: actions,
+            Flexible(
+              child: Wrap(
+                alignment: WrapAlignment.end,
+                spacing: chromeGap,
+                runSpacing: chromeGap,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: actions,
+              ),
             ),
           ],
         );
@@ -242,9 +231,7 @@ final class _CarpenterPageSectionState extends State<CarpenterPageSection> {
               ..add(widget.attention!);
           }
           children.add(SizedBox(height: contentGap));
-          children.add(
-            canFill ? Expanded(child: widget.child) : widget.child,
-          );
+          children.add(canFill ? Expanded(child: widget.child) : widget.child);
           if (widget.footer != null) {
             children
               ..add(SizedBox(height: contentGap))
@@ -269,16 +256,16 @@ final class _CarpenterPageSectionState extends State<CarpenterPageSection> {
     final panelPadding = EdgeInsets.all(contentGap);
     section = switch (effectivePresentation) {
       CarpenterPageSectionPresentation.panel => CarpenterCard(
-          padding: panelPadding,
-          surfaceRole: CarpenterCardSurfaceRole.overlay,
-          child: section,
-        ),
+        padding: panelPadding,
+        surfaceRole: CarpenterCardSurfaceRole.overlay,
+        child: section,
+      ),
       CarpenterPageSectionPresentation.subtle => CarpenterCard(
-          padding: panelPadding,
-          surfaceRole: CarpenterCardSurfaceRole.subtle,
-          bordered: false,
-          child: section,
-        ),
+        padding: panelPadding,
+        surfaceRole: CarpenterCardSurfaceRole.subtle,
+        bordered: false,
+        child: section,
+      ),
       CarpenterPageSectionPresentation.flat ||
       CarpenterPageSectionPresentation.automatic => section,
     };

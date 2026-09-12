@@ -49,13 +49,14 @@ final class CarpenterToolbarItem {
 
 /// Semantic toolbar projection over the shared adaptive action-strip behaviour.
 final class CarpenterToolbar extends StatelessWidget {
+  /// Presents actions with Russian overflow guidance and preserves caller-owned action state.
   const CarpenterToolbar({
     super.key,
     required this.items,
     this.alignment = AlignmentDirectional.centerEnd,
-    this.overflowLabel = 'More actions',
+    this.overflowLabel = 'Действия',
     this.overflowSize = ControlSize.medium,
-    this.semanticLabel = 'Toolbar',
+    this.semanticLabel = 'Панель действий',
   });
 
   final List<CarpenterToolbarItem> items;

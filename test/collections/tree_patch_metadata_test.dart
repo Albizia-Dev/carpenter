@@ -18,7 +18,7 @@ void main() {
     ];
     final next = roots.applyCarpenterTreePatch(
       const CarpenterTreeUpdated(
-        CarpenterTreeNode(id: 'child', value: 'new', label: 'New'),
+        CarpenterTreeNode(id: 'child', value: 'new', label: 'Новое'),
       ),
     );
     expect(next.single.hasChildren, isTrue);

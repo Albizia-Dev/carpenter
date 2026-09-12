@@ -1,3 +1,4 @@
+import 'use_cases/samples/messenger/catalog.dart';
 import 'use_cases/samples/projects_plus/catalog.dart';
 import 'package:widgetbook/widgetbook.dart';
 
@@ -60,6 +61,10 @@ import 'use_cases/patterns/page_states.dart';
 import 'use_cases/samples/payment_list.dart';
 import 'use_cases/samples/project_page.dart';
 import 'use_cases/samples/dsktp_layouts.dart';
+import 'use_cases/samples/work_items/inbox.dart';
+import 'use_cases/samples/work_items/rsp_acceptance.dart';
+import 'use_cases/samples/work_items/rsp_detail.dart';
+import 'use_cases/samples/work_items/rsp_recovery.dart';
 import 'use_cases/samples/dsktp_collections.dart';
 import 'use_cases/samples/treasury/catalog.dart';
 
@@ -309,8 +314,13 @@ final List<WidgetbookNode> carpenterCatalog = [
         name: 'Business workflows',
         children: [
           paymentListSampleComponent,
+          workInboxComponent,
+          rspAcceptanceComponent,
+          rspDetailComponent,
+          rspRecoveryComponent,
           projectPageSampleComponent,
           dsktpLayoutsComponent,
+          WidgetbookFolder(name: 'Messenger', children: messengerComponents),
           dsktpCollectionsComponent,
           WidgetbookFolder(
             name: 'Treasury · dsktp',

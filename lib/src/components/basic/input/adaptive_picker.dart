@@ -31,7 +31,7 @@ final class CarpenterDateWheel extends StatefulWidget {
     required this.onChanged,
     this.firstDate,
     this.lastDate,
-    this.semanticLabel = 'Date picker',
+    this.semanticLabel = 'Выбор даты',
   });
 
   final DateTime value;
@@ -181,7 +181,7 @@ final class CarpenterTimeWheel extends StatefulWidget {
     required this.minute,
     required this.onChanged,
     this.minuteStep = 1,
-    this.semanticLabel = 'Time picker',
+    this.semanticLabel = 'Выбор времени',
   }) : assert(minuteStep > 0 && minuteStep <= 30 && 60 % minuteStep == 0);
 
   final int hour;
@@ -319,7 +319,7 @@ final class _CarpenterTimeSelectState extends State<CarpenterTimeSelect> {
               },
               open: _hourOpen,
               onOpenChanged: (value) => setState(() => _hourOpen = value),
-              label: 'Hour',
+              label: 'Час',
               options: [
                 for (var hour = 0; hour < 24; hour++)
                   CarpenterOption<int>(
@@ -340,7 +340,7 @@ final class _CarpenterTimeSelectState extends State<CarpenterTimeSelect> {
               },
               open: _minuteOpen,
               onOpenChanged: (value) => setState(() => _minuteOpen = value),
-              label: 'Minute',
+              label: 'Минута',
               options: [
                 for (var value = 0; value < 60; value += widget.minuteStep)
                   CarpenterOption<int>(

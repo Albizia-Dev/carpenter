@@ -7,6 +7,7 @@ import '../../basic/button/button.dart';
 
 @immutable
 final class CarpenterToastDescriptor {
+  /// Describes a dismissible notification with a Russian default close label.
   const CarpenterToastDescriptor({
     required this.id,
     required this.message,
@@ -14,7 +15,7 @@ final class CarpenterToastDescriptor {
     this.role = FeedbackColorRole.info,
     this.action,
     this.duration = ToastDuration.short,
-    this.dismissLabel = 'Dismiss notification',
+    this.dismissLabel = 'Закрыть уведомление',
   });
 
   final Object id;

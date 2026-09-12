@@ -72,7 +72,7 @@ final class _TimeChoicesState extends State<TimeChoices> {
             height: extent * 5,
             child: ListView.builder(
               key: ValueKey('$label-${widget.minuteStep}'),
-              controller: label == 'Hour' ? _hours : _minutes,
+              controller: label == 'Час' ? _hours : _minutes,
               itemCount: count,
               itemExtent: extent,
               itemBuilder: (_, index) {
@@ -97,10 +97,10 @@ final class _TimeChoicesState extends State<TimeChoices> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        column('Hour', 24, _hour, 1, (value) => setState(() => _hour = value)),
+        column('Час', 24, _hour, 1, (value) => setState(() => _hour = value)),
         SizedBox(width: context.units(theme.spacing.medium)),
         column(
-          'Minute',
+          'Минута',
           60 ~/ widget.minuteStep,
           widget.minute,
           widget.minuteStep,

@@ -39,7 +39,7 @@ final class CarpenterEditableTable<T> extends StatelessWidget {
     this.minimumWidth = const Rem(48),
     this.emptyMessage = 'No rows',
     this.freezeFirstColumn = false,
-    this.semanticLabel = 'Editable table',
+    this.semanticLabel = 'Редактируемая таблица',
   });
 
   /// Rows displayed in list order and passed together to footer builders.

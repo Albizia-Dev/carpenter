@@ -8,11 +8,12 @@ import '../../foundation/theme.dart';
 
 /// Indeterminate circular activity indicator without Material dependency.
 final class CarpenterLoader extends StatefulWidget {
+  /// Announces loading with a Russian default semantic label and theme-resolved motion.
   const CarpenterLoader({
     super.key,
     this.size = const Rem(1.5),
     this.strokeWidth = const Rem(.15625),
-    this.semanticLabel = 'Loading',
+    this.semanticLabel = 'Загрузка…',
   });
 
   final LengthUnit size;

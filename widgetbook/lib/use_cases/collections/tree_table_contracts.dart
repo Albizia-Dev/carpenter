@@ -123,6 +123,7 @@ final class _ProjectStructurePreview extends StatefulWidget {
 
 final class _ProjectStructurePreviewState
     extends State<_ProjectStructurePreview> {
+  final TextEditingController _focusProbe = TextEditingController();
   final CarpenterTreeController _treeController = CarpenterTreeController();
   Set<Object> _expanded = {'project'};
   Set<Object> _selected = const {};
@@ -131,6 +132,7 @@ final class _ProjectStructurePreviewState
 
   @override
   void dispose() {
+    _focusProbe.dispose();
     _treeController.dispose();
     super.dispose();
   }
@@ -154,6 +156,11 @@ final class _ProjectStructurePreviewState
       ),
       body: CarpenterPageBody(
         children: [
+          CarpenterInput(
+            controller: _focusProbe,
+            label: 'Проверка фокуса',
+            placeholder: 'Введите текст, затем выберите строку дерева',
+          ),
           Wrap(
             spacing: context.units(.5.rem),
             runSpacing: context.units(.5.rem),
@@ -179,7 +186,8 @@ final class _ProjectStructurePreviewState
             title: 'Structure',
             description:
                 'Drag the visible header dividers to resize columns. '
-                'Click selects, Ctrl/Cmd toggles, Shift selects a range. '
+                'Click selects and moves keyboard focus into the tree. '
+                'Ctrl/Cmd toggles, Shift selects a range. '
                 'Double-click or Enter activates. The trailing action lane '
                 'stays pinned while data scrolls underneath it; right-click '
                 'or long-press a row to open the same actions contextually. '

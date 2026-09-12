@@ -6,17 +6,20 @@ import '../../foundation/theme.dart';
 import '../../internal/rendering/interactive_region.dart';
 import '../basic/gravity_icons.g.dart';
 import '../basic/icon.dart';
+import '../basic/button/icon_button.dart';
 import '../basic/card.dart';
 
 /// Collapsible content surface with a keyboard-accessible disclosure header.
 /// Header actions remain independently interactive; content is removed when closed.
 final class CarpenterExpander extends StatefulWidget {
+  /// Creates a disclosure surface. The header toggles content; optional onOpen invokes independent navigation.
   const CarpenterExpander({
     super.key,
     required this.header,
     required this.content,
     this.initiallyExpanded = false,
     this.onChanged,
+    this.onOpen,
   }) : _listGroup = false;
 
   /// Groups homogeneous list rows without adding a card or content insets.
@@ -29,7 +32,11 @@ final class CarpenterExpander extends StatefulWidget {
     required this.content,
     this.initiallyExpanded = false,
     this.onChanged,
+    this.onOpen,
   }) : _listGroup = true;
+
+  /// Optional navigation action, independent of header disclosure.
+  final VoidCallback? onOpen;
 
   final bool _listGroup;
   final Widget header;
@@ -137,6 +144,16 @@ final class _CarpenterExpanderState extends State<CarpenterExpander> {
                           child: widget.header,
                         ),
                       ),
+                      if (widget.onOpen != null) ...[
+                        SizedBox(width: gap),
+                        CarpenterIconButton(
+                          icon: GravityIcons.arrowUpRightFromSquare,
+                          semanticLabel: 'Открыть',
+                          prominence: ActionProminence.ghost,
+                          colorRole: ActionColorRole.neutral,
+                          onInvoke: widget.onOpen,
+                        ),
+                      ],
                     ],
                   ),
                 ),

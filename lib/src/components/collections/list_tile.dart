@@ -6,7 +6,13 @@ import '../../foundation/roles.dart';
 import '../../internal/rendering/interactive_region.dart';
 import 'table_metrics.dart';
 
-enum CarpenterListTilePresentation { standard, tableRow }
+enum CarpenterListTilePresentation {
+  standard,
+  tableRow,
+
+  /// Variable-height row in a contiguous collection; the parent owns corners.
+  collectionRow,
+}
 
 /// Interactive semantic row used by collection and navigation patterns.
 final class CarpenterListTile extends StatelessWidget {
@@ -61,7 +67,7 @@ final class CarpenterListTile extends StatelessWidget {
     final gap = tableRow
         ? metrics.horizontalPadding
         : context.units(theme.spacing.medium);
-    final radius = tableRow
+    final radius = presentation != CarpenterListTilePresentation.standard
         ? BorderRadius.zero
         : BorderRadius.circular(context.units(.5.rem));
     final rowHeight = metrics.rowHeight;

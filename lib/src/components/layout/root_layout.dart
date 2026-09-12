@@ -37,6 +37,7 @@ typedef CarpenterRootHeaderBuilder =
 /// while the expanded sidebar overlays content. Mobile reserves no navigation
 /// width and uses the expanded sidebar as a drawer.
 final class CarpenterRootLayout extends StatelessWidget {
+  /// Composes the application navigation and content; navigation defaults are Russian.
   const CarpenterRootLayout({
     super.key,
     required this.sidebar,
@@ -48,7 +49,7 @@ final class CarpenterRootLayout extends StatelessWidget {
     this.onSidebarOpenChanged,
     this.viewportPolicy = const CarpenterViewportPolicy(),
     this.closeOverlayOnSelection = true,
-    this.semanticLabel = 'Application',
+    this.semanticLabel = 'Приложение',
   });
 
   final CarpenterSidebarData sidebar;

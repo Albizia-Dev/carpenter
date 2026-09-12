@@ -79,7 +79,7 @@ void main() {
           tester.widget<EditableText>(find.byType(EditableText)).keyboardType,
           TextInputType.number,
         );
-        await tester.tap(action('Open date picker'));
+        await tester.tap(action('Открыть календарь'));
         await tester.pumpAndSettle();
         expect(find.byType(CarpenterDialog), findsNothing);
         expect(find.byType(CarpenterCalendar), findsOneWidget);
@@ -116,20 +116,20 @@ void main() {
         ),
       ),
     );
-    await tester.tap(action('Open date range picker'));
+    await tester.tap(action('Открыть выбор периода'));
     await tester.pumpAndSettle();
     await tester.tap(day('20.09.2026'));
     await tester.pump();
     expect(value, isNull);
-    expect(find.text('Choose end date'), findsOneWidget);
+    expect(find.text('Выберите конечную дату'), findsOneWidget);
     await tester.tap(day('10.09.2026'));
     await tester.pumpAndSettle();
     expect(value!.start, DateTime(2026, 9, 10));
     expect(value!.end, DateTime(2026, 9, 20));
     expect(find.byType(CarpenterCalendar), findsNothing);
-    await tester.tap(action('Open date range picker'));
+    await tester.tap(action('Открыть выбор периода'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Clear'));
+    await tester.tap(find.text('Очистить'));
     await tester.pumpAndSettle();
     expect(value, isNull);
   });
@@ -151,18 +151,17 @@ void main() {
         ),
       ),
     );
-    await tester.tap(action('Open time picker'));
+    await tester.tap(action('Открыть выбор времени'));
     await tester.pumpAndSettle();
     final hour = find.byWidgetPredicate(
-      (widget) =>
-          widget is CarpenterButton && widget.semanticLabel == 'Hour 15',
+      (widget) => widget is CarpenterButton && widget.semanticLabel == 'Час 15',
     );
     await tester.tap(hour);
     await tester.pump();
     expect(value!.hour, 14);
     final minute = find.byWidgetPredicate(
       (widget) =>
-          widget is CarpenterButton && widget.semanticLabel == 'Minute 35',
+          widget is CarpenterButton && widget.semanticLabel == 'Минута 35',
     );
     await tester.tap(minute);
     await tester.pumpAndSettle();
@@ -198,7 +197,7 @@ void main() {
           ),
         ),
       );
-      await tester.tap(action('Open date range picker'));
+      await tester.tap(action('Открыть выбор периода'));
       await tester.pumpAndSettle();
       await tester.tap(day('10.09.2026'));
       await tester.pump();
@@ -206,7 +205,7 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(CarpenterCalendar), findsNothing);
       expect(callbacks, 0);
-      await tester.tap(action('Open date range picker'));
+      await tester.tap(action('Открыть выбор периода'));
       await tester.pumpAndSettle();
       update(() => enabled = false);
       await tester.pumpAndSettle();
@@ -285,11 +284,11 @@ void main() {
       final header = find.byWidgetPredicate(
         (widget) =>
             widget is CarpenterButton &&
-            widget.semanticLabel == 'Choose month and year',
+            widget.semanticLabel == 'Выбрать месяц и год',
       );
       await tester.tap(header);
       await tester.pump();
-      expect(find.text('January'), findsOneWidget);
+      expect(find.text('Январь'), findsOneWidget);
       await tester.tap(header);
       await tester.pump();
       expect(find.text('2026'), findsOneWidget);

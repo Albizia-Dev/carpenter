@@ -69,7 +69,7 @@ void main() {
       ),
     );
     expect(find.text('Existing payment'), findsOneWidget);
-    expect(find.text('Refreshing data'), findsOneWidget);
+    expect(find.text('Обновление данных…'), findsOneWidget);
 
     await tester.pumpWidget(
       subject(

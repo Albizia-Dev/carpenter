@@ -9,6 +9,7 @@ import '../regions/region_role.dart';
 import 'header_actions.dart';
 
 final class CarpenterFormPage extends StatelessWidget {
+  /// Composes caller-owned form state and actions; unsaved state is labelled in Russian by default.
   const CarpenterFormPage({
     super.key,
     required this.title,
@@ -21,7 +22,7 @@ final class CarpenterFormPage extends StatelessWidget {
     this.secondaryActions = const [],
     this.destructiveActions = const [],
     this.saveExecutionPhase = ActionExecutionPhase.idle,
-    this.dirtyLabel = 'Unsaved changes',
+    this.dirtyLabel = 'Несохранённые изменения',
     this.headerBehavior = CarpenterPageHeaderBehavior.sticky,
     this.semanticLabel,
   });

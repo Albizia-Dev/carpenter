@@ -186,7 +186,7 @@ final class CarpenterTreeTableColumn<T> {
         const CarpenterTableColumnWidth.actionLane(),
     bool resizable = false,
     String? semanticLabel,
-    String overflowLabel = 'More actions',
+    String overflowLabel = 'Действия',
   }) => CarpenterTreeTableColumn<T>.custom(
     id: id,
     header: header,
@@ -274,12 +274,12 @@ final class CarpenterTreeTable<T> extends StatefulWidget {
     this.actions,
     this.secondaryActions,
     this.actionsHeader = '',
-    this.actionsOverflowLabel = 'More actions',
+    this.actionsOverflowLabel = 'Действия',
     this.iconBuilder,
     this.dragActivation = CarpenterDragActivation.immediate,
     this.dragOperations = const {CarpenterDragOperation.move},
     this.framed = true,
-    this.semanticLabel = 'Tree table',
+    this.semanticLabel = 'Древовидная таблица',
   }) : assert(treeFlex > 0);
 
   final List<CarpenterTreeNode<T>> nodes;
@@ -365,7 +365,7 @@ final class _CarpenterTreeTableState<T> extends State<CarpenterTreeTable<T>> {
       CarpenterTreeTableColumn<T>.actions(
         id: _legacyActionColumnId,
         header: widget.actionsHeader,
-        semanticLabel: 'Actions',
+        semanticLabel: 'Действия со строкой',
         actions: widget.actions ?? (_) => const <CarpenterActionDescriptor>[],
         secondaryActions: widget.secondaryActions,
         overflowLabel: widget.actionsOverflowLabel,

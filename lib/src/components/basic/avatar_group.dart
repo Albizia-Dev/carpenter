@@ -33,7 +33,7 @@ final class CarpenterAvatarGroup extends StatelessWidget {
     required this.items,
     this.maxVisible = 4,
     this.size = const Rem(2.5),
-    this.semanticLabel = 'People',
+    this.semanticLabel = 'Люди',
   }) : assert(maxVisible > 0);
 
   /// Identities in logical display order; only the first [maxVisible] are

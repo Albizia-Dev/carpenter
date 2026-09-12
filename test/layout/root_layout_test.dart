@@ -46,7 +46,7 @@ void main() {
     expect(find.text('⌘P'), findsOneWidget);
     expect(
       tester.getSemantics(find.byType(CarpenterSidebar)),
-      matchesSemantics(label: 'Primary navigation'),
+      matchesSemantics(label: 'Основная навигация'),
     );
   });
 

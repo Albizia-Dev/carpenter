@@ -20,7 +20,7 @@ void main() {
             return CarpenterDropdown(
               open: open,
               onOpenChanged: (value) => update(() => open = value),
-              label: 'Actions',
+              label: 'Действия',
               items: [
                 CarpenterMenuItem(
                   action: CarpenterActionDescriptor(
@@ -35,7 +35,7 @@ void main() {
         ),
       ),
     );
-    await tester.tap(find.text('Actions'));
+    await tester.tap(find.text('Действия'));
     await tester.pumpAndSettle();
     expect(open, isTrue);
     expect(find.text('Run'), findsOneWidget);
@@ -60,7 +60,7 @@ void main() {
             return CarpenterDropdown(
               open: open,
               onOpenChanged: (value) => update(() => open = value),
-              label: 'Actions',
+              label: 'Действия',
               focusNode: focusNode,
               autofocus: true,
               items: const [
@@ -78,14 +78,14 @@ void main() {
       ),
     );
     await tester.pump();
-    await tester.tap(find.text('Actions'));
+    await tester.tap(find.text('Действия'));
     await tester.pumpAndSettle();
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pumpAndSettle();
     expect(open, isFalse);
     expect(focusNode.hasFocus, isTrue);
 
-    await tester.tap(find.text('Actions'));
+    await tester.tap(find.text('Действия'));
     await tester.pumpAndSettle();
     await tester.tapAt(const Offset(700, 500));
     await tester.pumpAndSettle();

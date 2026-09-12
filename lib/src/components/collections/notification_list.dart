@@ -31,12 +31,13 @@ final class CarpenterNotification {
 
 /// Persistent notification surface. Items remain until caller state removes them.
 final class CarpenterNotificationList extends StatelessWidget {
+  /// Renders notifications with caller-owned dismissal and Russian accessibility defaults.
   const CarpenterNotificationList({
     super.key,
     required this.items,
     this.onDismiss,
     this.emptyMessage = 'No notifications',
-    this.semanticLabel = 'Notifications',
+    this.semanticLabel = 'Уведомления',
   });
 
   final List<CarpenterNotification> items;
@@ -98,7 +99,7 @@ final class _NotificationCard extends StatelessWidget {
         ),
       if (onDismiss != null)
         CarpenterButton(
-          label: 'Dismiss',
+          label: 'Закрыть',
           size: ControlSize.small,
           prominence: ActionProminence.ghost,
           onInvoke: onDismiss,
@@ -123,7 +124,7 @@ final class _NotificationCard extends StatelessWidget {
               if (notification.unread) ...[
                 SizedBox(width: gap),
                 const CarpenterBadge(
-                  label: 'New',
+                  label: 'Новое',
                   role: FeedbackColorRole.info,
                 ),
               ],

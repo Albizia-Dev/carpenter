@@ -70,6 +70,7 @@ final class CarpenterFileIntakeController<T> extends ChangeNotifier {
 
 /// Input-shaped file selector that is also a typed Carpenter drop target.
 final class CarpenterFileInput<T> extends StatefulWidget {
+  /// Displays a controlled file value with a separate browse request and Russian default labels.
   const CarpenterFileInput({
     super.key,
     required this.value,
@@ -79,7 +80,7 @@ final class CarpenterFileInput<T> extends StatefulWidget {
     this.accepts,
     this.multiple = true,
     this.label,
-    this.placeholder = 'Choose or drop files',
+    this.placeholder = 'Выберите или перетащите файлы',
     this.description,
     this.feedback,
     this.errorText,
@@ -193,14 +194,14 @@ final class _CarpenterFileInputState<T> extends State<CarpenterFileInput<T>> {
           liveRegion: dropState.hovering,
           value: dropState.hovering
               ? dropState.accepts
-                    ? 'Drop files here'
+                    ? 'Перетащите файлы сюда'
                     : 'Files not accepted'
               : null,
           child: CarpenterInput(
             controller: _textController,
             label: widget.label,
             placeholder: dropState.hovering && dropState.accepts
-                ? 'Drop files here'
+                ? 'Перетащите файлы сюда'
                 : widget.placeholder,
             description: widget.description,
             feedback: widget.feedback,
@@ -215,8 +216,8 @@ final class _CarpenterFileInputState<T> extends State<CarpenterFileInput<T>> {
             leadingIcon: GravityIcons.file,
             trailingAction: CarpenterActionDescriptor(
               id: 'file.browse',
-              label: 'Choose files',
-              semanticLabel: 'Choose files',
+              label: 'Выбрать файлы',
+              semanticLabel: 'Выбрать файлы',
               icon: GravityIcons.folderOpen,
               onInvoke: widget.availability == FieldAvailability.enabled
                   ? widget.onBrowseRequested
@@ -230,14 +231,15 @@ final class _CarpenterFileInputState<T> extends State<CarpenterFileInput<T>> {
 /// Standalone file drop surface. Link it to a [CarpenterFileInput] by giving
 /// both widgets the same [CarpenterFileIntakeController].
 final class CarpenterFileDropZone<T> extends StatelessWidget {
+  /// Accepts platform-provided drop events with Russian default guidance; the caller owns file persistence.
   const CarpenterFileDropZone({
     super.key,
     this.onAccepted,
     this.intakeController,
     this.accepts,
-    this.title = 'Drop files here',
+    this.title = 'Перетащите файлы сюда',
     this.description = 'Drag files onto this area',
-    this.semanticLabel = 'File drop zone',
+    this.semanticLabel = 'Область загрузки файлов',
   }) : assert(onAccepted != null || intakeController != null);
 
   final CarpenterFilesChanged<T>? onAccepted;
@@ -363,7 +365,7 @@ final class CarpenterUploadProgress extends StatelessWidget {
   const CarpenterUploadProgress({
     super.key,
     this.value,
-    this.semanticLabel = 'Upload progress',
+    this.semanticLabel = 'Ход загрузки',
   });
 
   /// Completed fraction, or null while work is in progress with no known
@@ -383,13 +385,14 @@ final class CarpenterUploadProgress extends StatelessWidget {
 }
 
 final class CarpenterAttachmentList<T> extends StatelessWidget {
+  /// Renders controlled attachments with Russian default empty text; callbacks own retry and removal.
   const CarpenterAttachmentList({
     super.key,
     required this.items,
     this.onOpen,
     this.onRemove,
     this.onRetry,
-    this.semanticLabel = 'Attachments',
+    this.semanticLabel = 'Вложения',
   });
 
   final List<CarpenterAttachment<T>> items;

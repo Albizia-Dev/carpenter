@@ -19,9 +19,10 @@ final class CarpenterPageStatePresentation extends StatelessWidget {
     this.semanticLabel,
   });
 
+  /// Displays initial loading with Russian default text and no action.
   const CarpenterPageStatePresentation.loading({
     super.key,
-    this.title = 'Loading',
+    this.title = 'Загрузка…',
     this.description,
     this.semanticLabel,
   }) : kind = CarpenterPageStateKind.initialLoading,

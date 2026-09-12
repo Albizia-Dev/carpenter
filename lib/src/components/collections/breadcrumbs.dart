@@ -39,8 +39,8 @@ final class CarpenterBreadcrumbs extends StatefulWidget {
     super.key,
     required this.items,
     this.maxVisibleItems = 4,
-    this.semanticLabel = 'Breadcrumbs',
-    this.overflowLabel = 'More breadcrumb items',
+    this.semanticLabel = 'Навигация',
+    this.overflowLabel = 'Другие разделы',
   }) : assert(maxVisibleItems >= 2);
 
   final List<CarpenterBreadcrumb> items;

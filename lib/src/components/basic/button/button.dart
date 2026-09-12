@@ -1,5 +1,8 @@
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
+import '../../../foundation/hotkey_formatter.dart';
 
 import '../../../foundation/icon_data.dart';
 import '../../../foundation/roles.dart';
@@ -36,6 +39,8 @@ final class CarpenterButton extends StatelessWidget {
     this.focusNode,
     this.autofocus = false,
     this.semanticLabel,
+    this.toggled,
+    this.shortcut,
   }) : _visible = true,
        _semanticHint = null,
        assert(
@@ -59,6 +64,8 @@ final class CarpenterButton extends StatelessWidget {
     this.focusNode,
     this.autofocus = false,
     this.semanticLabel,
+    this.toggled,
+    this.shortcut,
   }) : prominence = ActionProminence.filled,
        _visible = true,
        _semanticHint = null,
@@ -83,6 +90,8 @@ final class CarpenterButton extends StatelessWidget {
     this.focusNode,
     this.autofocus = false,
     this.semanticLabel,
+    this.toggled,
+    this.shortcut,
   }) : prominence = ActionProminence.outlined,
        _visible = true,
        _semanticHint = null,
@@ -107,6 +116,8 @@ final class CarpenterButton extends StatelessWidget {
     this.focusNode,
     this.autofocus = false,
     this.semanticLabel,
+    this.toggled,
+    this.shortcut,
   }) : prominence = ActionProminence.ghost,
        _visible = true,
        _semanticHint = null,
@@ -134,12 +145,17 @@ final class CarpenterButton extends StatelessWidget {
        icon = action.icon,
        semanticLabel = action.semanticLabel,
        colorRole = action.colorRole,
+       toggled = action.toggled,
+       shortcut = action.shortcut,
        _visible = action.visible,
        _semanticHint = action.disabledReason;
 
   /// Visible text naming the control or choice; keep it meaningful without
   /// relying on an icon.
   final String label;
+
+  /// Optional shortcut badge; the caller owns shortcut registration.
+  final ShortcutActivator? shortcut;
 
   /// Invoked when the enabled action is activated. Null disables the action
   /// unless the compatibility callback is supplied.
@@ -158,6 +174,10 @@ final class CarpenterButton extends StatelessWidget {
   /// Semantic action or selection color resolved from the current Carpenter
   /// theme.
   final ActionColorRole colorRole;
+
+  /// Controlled switch state. Null keeps ordinary action semantics; false
+  /// renders neutral and true renders [colorRole]. The callback owns updates.
+  final bool? toggled;
 
   /// Visual emphasis of the action, independently of its semantic color role.
   final ActionProminence prominence;
@@ -198,6 +218,7 @@ final class CarpenterButton extends StatelessWidget {
       semanticHint: _semanticHint,
       onInvoke: _effectiveOnPressed,
       colorRole: colorRole,
+      toggled: toggled,
       prominence: prominence,
       size: size,
       shape: shape,
@@ -207,6 +228,7 @@ final class CarpenterButton extends StatelessWidget {
       autofocus: autofocus,
       childBuilder: (context, style, iconDimension) => _ButtonContent(
         label: label,
+        shortcut: shortcut,
         icon: icon,
         iconPosition: iconPosition,
         style: style,
@@ -220,6 +242,7 @@ final class CarpenterButton extends StatelessWidget {
 final class _ButtonContent extends StatelessWidget {
   const _ButtonContent({
     required this.label,
+    required this.shortcut,
     required this.icon,
     required this.iconPosition,
     required this.style,
@@ -228,6 +251,9 @@ final class _ButtonContent extends StatelessWidget {
   });
 
   final String label;
+
+  /// Optional shortcut badge; the caller owns shortcut registration.
+  final ShortcutActivator? shortcut;
   final CarpenterIconSource? icon;
   final CarpenterActionIconPosition iconPosition;
   final CarpenterActionStyle style;
@@ -242,6 +268,11 @@ final class _ButtonContent extends StatelessWidget {
         .action(context, size, TypographyEmphasis.medium)
         .copyWith(color: style.foreground);
 
+    final keys = shortcut == null
+        ? null
+        : CarpenterHotkeyFormatter(
+            platform: defaultTargetPlatform,
+          ).formatActivator(shortcut!);
     final glyph = icon == null
         ? null
         : IconRenderer(
@@ -267,6 +298,34 @@ final class _ButtonContent extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
         ),
+        if (keys != null) ...[
+          SizedBox(width: gap),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: style.foreground.withValues(alpha: .12),
+              borderRadius: BorderRadius.circular(
+                context.units(theme.shapes.radius(ShapeRole.rounded)) / 2,
+              ),
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.units(theme.spacing.small) / 2,
+                vertical: context.units(theme.spacing.small) / 4,
+              ),
+              child: Text(
+                keys,
+                style: theme.typography
+                    .resolve(
+                      context,
+                      TypographyRole.caption,
+                      TypographyEmphasis.regular,
+                    )
+                    .copyWith(color: style.foreground),
+                maxLines: 1,
+              ),
+            ),
+          ),
+        ],
         if (glyph != null &&
             iconPosition == CarpenterActionIconPosition.trailing) ...[
           SizedBox(width: gap),

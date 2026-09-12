@@ -10,6 +10,7 @@ import 'regions/primary_region.dart';
 import 'regions/region_role.dart';
 
 final class CarpenterApplicationShell extends StatelessWidget {
+  /// Composes navigation and page regions; default accessibility labels are Russian.
   const CarpenterApplicationShell({
     super.key,
     required this.navigation,
@@ -22,7 +23,7 @@ final class CarpenterApplicationShell extends StatelessWidget {
     this.secondarySplitPosition = 0.72,
     this.onSecondarySplitPositionChanged,
     this.viewportPolicy = const CarpenterViewportPolicy(),
-    this.semanticLabel = 'Application',
+    this.semanticLabel = 'Приложение',
   });
 
   final CarpenterNavigationRegion navigation;

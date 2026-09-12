@@ -50,7 +50,7 @@ void main() {
       _overlayHarness(width: 260, child: CarpenterToolbar(items: items)),
     );
 
-    final overflowTrigger = find.bySemanticsLabel('More actions');
+    final overflowTrigger = find.bySemanticsLabel('Действия');
     expect(overflowTrigger, findsOneWidget);
     await tester.tap(overflowTrigger);
     await tester.pumpAndSettle();
@@ -80,7 +80,7 @@ void main() {
       ),
     );
 
-    final divider = find.bySemanticsLabel('Resize regions');
+    final divider = find.bySemanticsLabel('Изменить размеры областей');
     await tester.drag(divider, const Offset(500, 0));
     expect(changed, 0.6);
 
@@ -236,7 +236,7 @@ void main() {
       ),
     );
     await tester.drag(
-      find.bySemanticsLabel('Resize regions'),
+      find.bySemanticsLabel('Изменить размеры областей'),
       const Offset(1, 0),
     );
     expect(tester.takeException(), isNull);

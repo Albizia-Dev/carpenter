@@ -221,7 +221,7 @@ final class CarpenterSelectionBar<T> extends StatelessWidget {
       final all = [
         ...actions,
         CarpenterButton(
-          label: 'Clear selection',
+          label: 'Снять выделение',
           prominence: ActionProminence.outlined,
           onInvoke: controller.clear,
         ),
@@ -510,6 +510,7 @@ final class CarpenterTextFieldDescriptor {
 }
 
 final class CarpenterTextFieldsDialog extends StatefulWidget {
+  /// Collects field values with Russian default save and cancel actions.
   const CarpenterTextFieldsDialog({
     super.key,
     required this.open,
@@ -519,8 +520,8 @@ final class CarpenterTextFieldsDialog extends StatefulWidget {
     required this.fields,
     required this.onSubmit,
     this.header,
-    this.confirmLabel = 'Save',
-    this.cancelLabel = 'Cancel',
+    this.confirmLabel = 'Сохранить',
+    this.cancelLabel = 'Отмена',
   });
   final bool open;
   final ValueChanged<bool> onOpenChanged;
@@ -597,6 +598,7 @@ final class _CarpenterTextFieldsDialogState
 
 /// Convenience single-field variant of [CarpenterTextFieldsDialog].
 final class CarpenterTextPromptDialog extends StatelessWidget {
+  /// Collects text with Russian default confirmation and cancellation labels.
   const CarpenterTextPromptDialog({
     super.key,
     required this.open,
@@ -609,8 +611,8 @@ final class CarpenterTextPromptDialog extends StatelessWidget {
     this.header,
     this.placeholder,
     this.maxLines = 1,
-    this.confirmLabel = 'Save',
-    this.cancelLabel = 'Cancel',
+    this.confirmLabel = 'Сохранить',
+    this.cancelLabel = 'Отмена',
   });
   final bool open;
   final ValueChanged<bool> onOpenChanged;

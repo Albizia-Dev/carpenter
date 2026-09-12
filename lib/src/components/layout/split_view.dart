@@ -7,6 +7,7 @@ import '../../foundation/theme.dart';
 enum CarpenterSplitOrientation { horizontal, vertical }
 
 final class CarpenterSplitView extends StatelessWidget {
+  /// Displays controlled resizable regions with Russian default resize guidance.
   const CarpenterSplitView({
     super.key,
     required this.primary,
@@ -16,7 +17,7 @@ final class CarpenterSplitView extends StatelessWidget {
     this.orientation = CarpenterSplitOrientation.horizontal,
     this.minimumPosition = 0.2,
     this.maximumPosition = 0.8,
-    this.dividerSemanticLabel = 'Resize regions',
+    this.dividerSemanticLabel = 'Изменить размеры областей',
   }) : assert(position >= 0 && position <= 1),
        assert(minimumPosition >= 0 && minimumPosition <= 1),
        assert(maximumPosition >= 0 && maximumPosition <= 1),

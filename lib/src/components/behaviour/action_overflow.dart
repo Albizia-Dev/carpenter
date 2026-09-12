@@ -129,6 +129,7 @@ final class ActionOverflowLayout extends MultiChildRenderObjectWidget {
     required Widget actions,
     required this.gap,
     required this.minimumInlineActionWidth,
+    this.keepInline = false,
   }) : assert(gap >= 0),
        assert(minimumInlineActionWidth >= 0),
        super(children: [content, actions]);
@@ -136,10 +137,14 @@ final class ActionOverflowLayout extends MultiChildRenderObjectWidget {
   final double gap;
   final double minimumInlineActionWidth;
 
+  /// Reserve an action slot beside content instead of moving actions below it.
+  final bool keepInline;
+
   @override
   RenderObject createRenderObject(BuildContext context) =>
       _RenderActionOverflow(
         gap: gap,
+        keepInline: keepInline,
         minimumInlineActionWidth: minimumInlineActionWidth,
         textDirection: Directionality.maybeOf(context) ?? TextDirection.ltr,
       );
@@ -148,6 +153,7 @@ final class ActionOverflowLayout extends MultiChildRenderObjectWidget {
   void updateRenderObject(BuildContext context, RenderObject renderObject) {
     final target = renderObject as _RenderActionOverflow;
     target
+      ..keepInline = keepInline
       ..gap = gap
       ..minimumInlineActionWidth = minimumInlineActionWidth
       ..textDirection = Directionality.maybeOf(context) ?? TextDirection.ltr;
@@ -163,11 +169,20 @@ final class _RenderActionOverflow extends RenderBox
         RenderBoxContainerDefaultsMixin<RenderBox, _ActionOverflowParentData> {
   _RenderActionOverflow({
     required double gap,
+    required bool keepInline,
     required double minimumInlineActionWidth,
     required TextDirection textDirection,
-  }) : _gap = gap,
+  }) : _keepInline = keepInline,
+       _gap = gap,
        _minimumInlineActionWidth = minimumInlineActionWidth,
        _textDirection = textDirection;
+
+  bool _keepInline;
+  set keepInline(bool value) {
+    if (_keepInline == value) return;
+    _keepInline = value;
+    markNeedsLayout();
+  }
 
   double _gap;
   double _minimumInlineActionWidth;
@@ -211,9 +226,20 @@ final class _RenderActionOverflow extends RenderBox
     final maxWidth = constraints.maxWidth;
     final loose = constraints.loosen();
 
-    content.layout(loose, parentUsesSize: true);
+    content.layout(
+      _keepInline && maxWidth.isFinite
+          ? loose.copyWith(
+              maxWidth: (maxWidth - gap - minimumInlineActionWidth).clamp(
+                0.0,
+                double.infinity,
+              ),
+            )
+          : loose,
+      parentUsesSize: true,
+    );
 
     final inline =
+        _keepInline ||
         !maxWidth.isFinite ||
         maxWidth - content.size.width - gap >= minimumInlineActionWidth;
     double actionMaxWidth;

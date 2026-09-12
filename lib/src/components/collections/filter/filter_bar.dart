@@ -13,7 +13,7 @@ final class CarpenterFilterBar extends StatelessWidget {
     super.key,
     required this.searchController,
     this.onSearchChanged,
-    this.searchLabel = 'Search',
+    this.searchLabel = 'Поиск',
     this.searchPlaceholder,
     this.searchAvailability = FieldAvailability.enabled,
     this.filterControls = const [],
@@ -21,12 +21,12 @@ final class CarpenterFilterBar extends StatelessWidget {
     this.advancedFilters,
     this.filtersExpanded = false,
     this.onFiltersExpandedChanged,
-    this.filterToggleLabel = 'Filters',
+    this.filterToggleLabel = 'Фильтры',
     this.activeFilterSummary = const [],
     this.activeFilterLabelBuilder,
     this.clearAction,
     this.actions = const [],
-    this.semanticLabel = 'Filters',
+    this.semanticLabel = 'Фильтры',
   }) : assert(activeFilterCount >= 0);
 
   final TextEditingController searchController;

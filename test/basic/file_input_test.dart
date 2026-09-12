@@ -48,7 +48,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.bySemanticsLabel('Choose files'));
+    await tester.tap(find.bySemanticsLabel('Выбрать файлы'));
     expect(browsed, isTrue);
   });
 

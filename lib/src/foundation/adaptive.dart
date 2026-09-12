@@ -22,9 +22,18 @@ final class CarpenterAdaptiveContext {
 }
 
 final class CarpenterViewportPolicy {
-  const CarpenterViewportPolicy();
+  /// By default physical width preserves existing layouts. Enable text-scale
+  /// adjustment for dense workspaces that need readable adjacent regions.
+  const CarpenterViewportPolicy({this.accountForTextScale = false});
+
+  /// Classify logical room for content rather than raw width at enlarged text.
+  final bool accountForTextScale;
 
   CarpenterViewportClass resolve(BuildContext context, double width) {
+    if (accountForTextScale) {
+      final scale = MediaQuery.textScalerOf(context).scale(16) / 16;
+      if (scale > 1) width /= scale;
+    }
     final sizes = CarpenterTheme.of(context).sizes;
     final narrowEnd = context.units(sizes.layoutNarrowEnd);
     final mediumEnd = context.units(sizes.layoutMediumEnd);

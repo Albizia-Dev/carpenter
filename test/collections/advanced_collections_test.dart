@@ -224,7 +224,7 @@ void main() {
     final chevron = find.byWidgetPredicate(
       (widget) =>
           widget is CarpenterIconButton &&
-          widget.icon == GravityIcons.arrowChevronRight,
+          widget.icon == GravityIcons.chevronRight,
     );
     expect(chevron, findsOneWidget);
     expect(
@@ -469,7 +469,7 @@ void main() {
       ),
     );
 
-    expect(find.text('No cards'), findsOneWidget);
+    expect(find.text('Нет карточек'), findsOneWidget);
     await tester.tap(find.bySemanticsLabel('Collapse Sprint'));
     expect(laneId, 'lane');
     expect(expanded, isFalse);

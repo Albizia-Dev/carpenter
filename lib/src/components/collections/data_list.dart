@@ -15,15 +15,17 @@ typedef CarpenterDataListItemBuilder<T> =
 
 @immutable
 final class CarpenterDataListMessages {
+  /// Overrides Russian loading, empty, and failure messages without changing collection lifecycle.
   const CarpenterDataListMessages({
-    this.initialLoading = 'Loading data',
-    this.refreshing = 'Refreshing data',
-    this.loadingMore = 'Loading more',
-    this.zero = 'No data yet',
-    this.emptyResult = 'No matching results',
-    this.initialError = 'Data could not be loaded',
-    this.refreshError = 'Refresh failed. Existing data may be stale.',
-    this.loadMore = 'Load more',
+    this.initialLoading = 'Загрузка данных…',
+    this.refreshing = 'Обновление данных…',
+    this.loadingMore = 'Загрузка…',
+    this.zero = 'Пока нет данных',
+    this.emptyResult = 'Ничего не найдено',
+    this.initialError = 'Не удалось загрузить данные',
+    this.refreshError =
+        'Не удалось обновить данные. Показаны предыдущие значения.',
+    this.loadMore = 'Загрузить ещё',
   });
 
   final String initialLoading;
@@ -42,6 +44,8 @@ final class CarpenterDataListMessages {
 /// item content only; list interaction, focus, selection and transient
 /// collection states remain consistent across consumers.
 final class CarpenterDataList<T, K> extends StatefulWidget {
+  /// Creates a controlled collection viewport. Set [shrinkWrap] under loose
+  /// height constraints to wrap short lists while retaining bounded scrolling.
   const CarpenterDataList({
     super.key,
     required this.snapshot,
@@ -54,7 +58,9 @@ final class CarpenterDataList<T, K> extends StatefulWidget {
     this.retryAction,
     this.messages = const CarpenterDataListMessages(),
     this.colorRole = SelectionColorRole.primary,
-    this.semanticLabel = 'Data list',
+    this.semanticLabel = 'Список',
+    this.shrinkWrap = false,
+    this.itemPadding = true,
   });
 
   final CollectionSnapshot<T> snapshot;
@@ -68,6 +74,14 @@ final class CarpenterDataList<T, K> extends StatefulWidget {
   final CarpenterDataListMessages messages;
   final SelectionColorRole colorRole;
   final String semanticLabel;
+
+  /// Sizes the scroll viewport to its contents up to the parent height limit.
+  /// Defaults to false for a viewport that fills available space. Supply loose
+  /// constraints (for example with Align) to let short lists wrap their rows.
+  final bool shrinkWrap;
+
+  /// Disable when the item builder supplies an already padded interactive row.
+  final bool itemPadding;
 
   @override
   State<CarpenterDataList<T, K>> createState() =>
@@ -127,9 +141,12 @@ final class _CarpenterDataListState<T, K>
       container: true,
       explicitChildNodes: true,
       label: widget.semanticLabel,
-      child: DecoratedBox(
+      child: Container(
         decoration: BoxDecoration(
           color: theme.overlay.background,
+          borderRadius: BorderRadius.circular(radius),
+        ),
+        foregroundDecoration: BoxDecoration(
           border: Border.all(
             color: theme.overlay.border,
             width: context.units(theme.shapes.borderWidth),
@@ -139,6 +156,7 @@ final class _CarpenterDataListState<T, K>
         child: ClipRRect(
           borderRadius: BorderRadius.circular(radius),
           child: ListView.builder(
+            shrinkWrap: widget.shrinkWrap,
             itemCount: itemCount,
             itemBuilder: (context, index) {
               if (state != null) return state;
@@ -161,6 +179,7 @@ final class _CarpenterDataListState<T, K>
                   colorRole: widget.colorRole,
                   focusNode: _focusNodes.putIfAbsent(key, FocusNode.new),
                   itemBuilder: widget.itemBuilder,
+                  padded: widget.itemPadding,
                   onSelect: () => _select(key),
                   onPrevious: () => _moveFocus(contentIndex - 1),
                   onNext: () => _moveFocus(contentIndex + 1),
@@ -243,6 +262,7 @@ final class _DataListItem<T> extends StatefulWidget {
     required this.colorRole,
     required this.focusNode,
     required this.itemBuilder,
+    required this.padded,
     required this.onSelect,
     required this.onPrevious,
     required this.onNext,
@@ -257,6 +277,7 @@ final class _DataListItem<T> extends StatefulWidget {
   final SelectionColorRole colorRole;
   final FocusNode focusNode;
   final CarpenterDataListItemBuilder<T> itemBuilder;
+  final bool padded;
   final VoidCallback onSelect;
   final VoidCallback onPrevious;
   final VoidCallback onNext;
@@ -332,9 +353,9 @@ final class _DataListItemState<T> extends State<_DataListItem<T>> {
                     widget.onSelect();
                   }
                 : null,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                color: style.background,
+            child: Container(
+              decoration: BoxDecoration(color: style.background),
+              foregroundDecoration: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
                     color: theme.overlay.border,
@@ -343,7 +364,9 @@ final class _DataListItemState<T> extends State<_DataListItem<T>> {
                 ),
               ),
               child: Padding(
-                padding: EdgeInsets.all(context.units(theme.spacing.medium)),
+                padding: widget.padded
+                    ? EdgeInsets.all(context.units(theme.spacing.medium))
+                    : EdgeInsets.zero,
                 child: DefaultTextStyle.merge(
                   style: TextStyle(color: style.foreground),
                   child: widget.itemBuilder(context, widget.item),
