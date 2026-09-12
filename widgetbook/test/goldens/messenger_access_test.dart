@@ -65,6 +65,53 @@ void main() {
       );
     });
   }
+  for (final dark in [false, true]) {
+    testWidgets('browser account confirmation ${dark ? "dark" : "light"}', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        host(
+          const MessengerAccessScenario(browserAccount: true),
+          dark: dark,
+          scale: dark ? 2 : 1,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      expect(find.text('Продолжить вход'), findsOneWidget);
+      final change = find.text('Войти в другой аккаунт');
+      await tester.ensureVisible(change);
+      await tester.pumpAndSettle();
+      await expectLater(
+        find.byType(CarpenterMessengerAccess),
+        matchesGoldenFile(
+          'messenger_access_account_${dark ? "dark" : "light"}.png',
+        ),
+      );
+      await tester.tap(change);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    });
+  }
+  testWidgets('browser consent may omit account switch independently', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      host(
+        const MessengerAccessScenario(
+          browserAccount: true,
+          showSecondary: false,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Продолжить вход'), findsOneWidget);
+    expect(find.text('Войти в другой аккаунт'), findsNothing);
+  });
   testWidgets(
     'form requires both values; password is obscured and Enter submits once',
     (tester) async {

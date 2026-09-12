@@ -25,6 +25,13 @@ final messengerAccessComponent = WidgetbookComponent(
               CarpenterAccessStage.signingOut => 'Выход',
             },
           ),
+          browserAccount: context.knobs.boolean(
+            label: 'Подтверждение браузерного аккаунта',
+          ),
+          accountLabel: context.knobs.string(
+            label: 'Аккаунт',
+            initialValue: 'Александра Константинопольская (alexandra.work)',
+          ),
           error: context.knobs.boolean(label: 'Ошибка входа'),
           longText: context.knobs.boolean(label: 'Длинное описание'),
           customTitle: context.knobs.string(label: 'Заголовок'),
@@ -44,6 +51,8 @@ class MessengerAccessScenario extends StatefulWidget {
   const MessengerAccessScenario({
     super.key,
     this.stage = CarpenterAccessStage.credentials,
+    this.browserAccount = false,
+    this.accountLabel = 'Александра Константинопольская (alexandra.work)',
     this.error = false,
     this.longText = false,
     this.customTitle = '',
@@ -52,7 +61,8 @@ class MessengerAccessScenario extends StatefulWidget {
     this.showSecondary = true,
   });
   final CarpenterAccessStage stage;
-  final bool error, longText;
+  final bool error, longText, browserAccount;
+  final String accountLabel;
   final String customTitle, customDescription, customAction;
   final bool showSecondary;
   @override
@@ -74,10 +84,13 @@ class _MessengerAccessScenarioState extends State<MessengerAccessScenario> {
 
   @override
   Widget build(BuildContext context) {
+    final stage = widget.browserAccount
+        ? CarpenterAccessStage.external
+        : widget.stage;
     final form =
-        widget.stage == CarpenterAccessStage.credentials ||
-        widget.stage == CarpenterAccessStage.submitting;
-    final (title, description, action) = switch (widget.stage) {
+        stage == CarpenterAccessStage.credentials ||
+        stage == CarpenterAccessStage.submitting;
+    final (title, description, action) = switch (stage) {
       CarpenterAccessStage.credentials || CarpenterAccessStage.submitting => (
         'Добро пожаловать',
         'Все рабочие процессы — в одном месте.',
@@ -115,18 +128,24 @@ class _MessengerAccessScenarioState extends State<MessengerAccessScenario> {
       ),
     };
     return CarpenterMessengerAccess(
-      stage: widget.stage,
+      stage: stage,
       title: submitted
           ? 'Действие получено'
           : (widget.customTitle.isEmpty ? title : widget.customTitle),
       description: widget.customDescription.isNotEmpty
           ? widget.customDescription
+          : widget.browserAccount
+          ? widget.accountLabel
           : widget.longText
           ? '$description Рабочие обсуждения, личные сообщения и звонки останутся в одном месте — на компьютере и телефоне.'
           : description,
       identifier: identifier,
       password: password,
-      primaryLabel: widget.customAction.isEmpty ? action : widget.customAction,
+      primaryLabel: widget.customAction.isNotEmpty
+          ? widget.customAction
+          : widget.browserAccount
+          ? 'Продолжить вход'
+          : action,
       onPrimary: () => setState(() {
         submitted = true;
         password.clear();
@@ -134,8 +153,12 @@ class _MessengerAccessScenarioState extends State<MessengerAccessScenario> {
       errorText: widget.error
           ? 'Неверный логин или пароль. Проверьте данные и попробуйте снова.'
           : null,
-      secondaryLabel: form ? null : 'Выйти',
-      onSecondary: form ? null : () => setState(() => submitted = false),
+      secondaryLabel: widget.browserAccount
+          ? 'Войти в другой аккаунт'
+          : 'Выйти',
+      onSecondary: form || !widget.showSecondary
+          ? null
+          : () => setState(() => submitted = false),
       passwordVisible: visible,
       onPasswordVisibilityChanged: (value) => setState(() => visible = value),
     );
