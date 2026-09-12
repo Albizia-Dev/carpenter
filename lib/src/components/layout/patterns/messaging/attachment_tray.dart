@@ -66,6 +66,7 @@ class CarpenterAttachmentTray extends StatelessWidget {
     this.onAdd,
     this.onRetry,
     this.onCancel,
+    this.onRemove,
   });
 
   /// Only uploads belonging to the selected, authorized account and room.
@@ -79,6 +80,10 @@ class CarpenterAttachmentTray extends StatelessWidget {
 
   /// Cancels queued/uploading/verifying items without claiming server deletion.
   final ValueChanged<String>? onCancel;
+
+  /// Removes a ready, failed or cancelled local attachment. This never implies
+  /// deleting its remote media object or an already submitted message.
+  final ValueChanged<String>? onRemove;
 
   /// Builds a bounded lazy list; long names wrap and actions keep their labels.
   @override
@@ -170,28 +175,33 @@ class CarpenterAttachmentTray extends StatelessWidget {
                             semanticLabel: '$status: ${item.name}',
                           ),
                         ],
-                        if ((item.phase ==
+                        Wrap(
+                          spacing: gap,
+                          children: [
+                            if (item.phase ==
                                     CarpenterMessengerUploadPhase.failed &&
-                                onRetry != null) ||
-                            (cancellable && onCancel != null))
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child:
-                                item.phase ==
-                                    CarpenterMessengerUploadPhase.failed
-                                ? CarpenterButton.text(
-                                    label: 'Повторить',
-                                    semanticLabel:
-                                        'Повторить загрузку: ${item.name}',
-                                    onPressed: () => onRetry!(item.id),
-                                  )
-                                : CarpenterButton.text(
-                                    label: 'Отменить',
-                                    semanticLabel:
-                                        'Отменить загрузку: ${item.name}',
-                                    onPressed: () => onCancel!(item.id),
-                                  ),
-                          ),
+                                onRetry != null)
+                              CarpenterButton.text(
+                                label: 'Повторить',
+                                semanticLabel:
+                                    'Повторить загрузку: ${item.name}',
+                                onPressed: () => onRetry!(item.id),
+                              ),
+                            if (cancellable && onCancel != null)
+                              CarpenterButton.text(
+                                label: 'Отменить',
+                                semanticLabel:
+                                    'Отменить загрузку: ${item.name}',
+                                onPressed: () => onCancel!(item.id),
+                              ),
+                            if (!cancellable && onRemove != null)
+                              CarpenterButton.text(
+                                label: 'Убрать',
+                                semanticLabel: 'Убрать вложение: ${item.name}',
+                                onPressed: () => onRemove!(item.id),
+                              ),
+                          ],
+                        ),
                       ],
                     ),
                   );

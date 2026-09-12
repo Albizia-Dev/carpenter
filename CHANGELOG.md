@@ -1,3 +1,7 @@
+## Unreleased — Messenger Plus host
+
+- Added experimental CarpenterMessengerHost with wrapping account header, explicit logout and host error announcement; canonical Widgetbook composition included.
+
 ## Unreleased — Messenger access cancellation
 
 - Add optional controlled cancelLabel/onCancel to messenger access, independently of account switching; defaults preserve existing callers.

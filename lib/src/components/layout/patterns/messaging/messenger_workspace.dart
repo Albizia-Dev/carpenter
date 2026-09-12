@@ -66,6 +66,7 @@ class CarpenterMessageItem {
     this.canReply = false,
     this.replyTargetId,
     this.attachmentLabels = const [],
+    this.relatedObjectLabel,
   });
 
   /// Resolved quotation or an unavailable-target label; never fetched by Carpenter.
@@ -99,6 +100,9 @@ class CarpenterMessageItem {
   /// The caller must keep this list immutable for the lifetime of the item.
   final List<String> attachmentLabels;
 
+  /// Human-readable related entity; the host owns identity and permissions.
+  final String? relatedObjectLabel;
+
   /// Localized delivery state or timestamp supplied by the caller.
   final String status;
 
@@ -123,6 +127,8 @@ class CarpenterMessageBubble extends StatefulWidget {
     this.groupWithPrevious = false,
     this.onReply,
     this.onOpenReply,
+    this.onAttachment,
+    this.onRelatedObject,
   });
 
   /// Immutable display state owned by the caller.
@@ -133,6 +139,12 @@ class CarpenterMessageBubble extends StatefulWidget {
 
   /// Opens the quoted original; the workspace resolves its loaded row key.
   final VoidCallback? onOpenReply;
+
+  /// Receives an index into the displayed immutable attachment labels.
+  final ValueChanged<int>? onAttachment;
+
+  /// Opens the related entity through the host, which must recheck access.
+  final VoidCallback? onRelatedObject;
 
   /// Null disables retry even if the model permits it.
   final VoidCallback? onRetry;
@@ -235,11 +247,31 @@ class _MessageBubbleState extends State<CarpenterMessageBubble> {
                               text: message.replyPreview!,
                               onOpen: widget.onOpenReply,
                             ),
-                          for (final label in message.attachmentLabels)
+                          for (
+                            var i = 0;
+                            i < message.attachmentLabels.length;
+                            i++
+                          )
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: gap / 2),
-                              child: CarpenterText.label(label),
+                              child: widget.onAttachment == null
+                                  ? CarpenterText.label(
+                                      message.attachmentLabels[i],
+                                    )
+                                  : CarpenterButton.text(
+                                      label: message.attachmentLabels[i],
+                                      onPressed: () => widget.onAttachment!(i),
+                                    ),
                             ),
+                          if (message.relatedObjectLabel != null)
+                            widget.onRelatedObject == null
+                                ? CarpenterText.caption(
+                                    message.relatedObjectLabel!,
+                                  )
+                                : CarpenterButton.text(
+                                    label: message.relatedObjectLabel!,
+                                    onPressed: widget.onRelatedObject,
+                                  ),
                           if (message.text.isNotEmpty)
                             CarpenterText.body(message.text),
                           if (message.needAnswer)
@@ -472,6 +504,7 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
     this.onFilesRequested,
     this.onUploadRetried,
     this.onUploadCancelled,
+    this.onUploadRemoved,
     this.historyLoading = false,
     this.historyProblem,
     this.onHistoryRequested,
@@ -485,7 +518,15 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
     this.onCancelReplyLookup,
     this.onReply,
     this.onCancelReply,
+    this.onMessageAttachment,
+    this.onRelatedObject,
   });
+
+  /// Requests a displayed attachment by stable message key and label index.
+  final void Function(String messageId, int index)? onMessageAttachment;
+
+  /// Requests the entity associated with a stable message key.
+  final ValueChanged<String>? onRelatedObject;
 
   /// Quotation associated with the selected room's draft, supplied by the host.
   final String? replyPreview;
@@ -591,6 +632,9 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
 
   /// Cancels a queued or active upload; also available after write revocation.
   final ValueChanged<String>? onUploadCancelled;
+
+  /// Removes local ready/failed/cancelled items without deleting remote media.
+  final ValueChanged<String>? onUploadRemoved;
 
   /// Builds the controlled messenger presentation using semantic theme roles.
   @override
@@ -820,6 +864,10 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
                                             : _MessageTimeline(
                                                 key: ValueKey(room.id),
                                                 messages: messages,
+                                                onMessageAttachment:
+                                                    onMessageAttachment,
+                                                onRelatedObject:
+                                                    onRelatedObject,
                                                 onRetry: onRetry,
                                                 onUnavailableReply:
                                                     onUnavailableReply,
@@ -849,6 +897,7 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
                                               ? onUploadRetried
                                               : null,
                                           onCancel: onUploadCancelled,
+                                          onRemove: onUploadRemoved,
                                         ),
                                       ),
                                   ],
@@ -1033,7 +1082,11 @@ class _MessageTimeline extends StatefulWidget {
     this.failedReplyMessageId,
     this.onCancelReplyLookup,
     this.onReply,
+    this.onMessageAttachment,
+    this.onRelatedObject,
   });
+  final void Function(String, int)? onMessageAttachment;
+  final ValueChanged<String>? onRelatedObject;
   final String? failedReplyMessageId;
   final ValueChanged<String>? onCancelReplyLookup;
   final List<CarpenterMessageItem> messages;
@@ -1127,6 +1180,12 @@ class _MessageTimelineState extends State<_MessageTimeline> {
               key: ValueKey(message.id),
               message: message,
               groupWithPrevious: _groupsWithPrevious(widget.messages, index),
+              onAttachment: widget.onMessageAttachment == null
+                  ? null
+                  : (i) => widget.onMessageAttachment!(message.id, i),
+              onRelatedObject: widget.onRelatedObject == null
+                  ? null
+                  : () => widget.onRelatedObject!(message.id),
               onRetry: () => widget.onRetry(message.id),
               onReply: widget.onReply == null
                   ? null

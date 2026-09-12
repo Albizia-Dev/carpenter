@@ -7,6 +7,24 @@ final messengerAccessComponent = WidgetbookComponent(
   name: 'Messenger access',
   useCases: [
     WidgetbookUseCase(
+      name: 'Messenger Plus host',
+      builder: (context) => layoutViewportPreview(
+        context,
+        child: CarpenterMessengerHost(
+          title: 'Мессенджер+',
+          accountLabel: context.knobs.string(
+            label: 'Аккаунт оболочки',
+            initialValue: 'Александра Константинопольская',
+          ),
+          problem: context.knobs.boolean(label: 'Ошибка выбора файла')
+              ? 'Не удалось добавить файл. Повторите выбор.'
+              : null,
+          onLogout: () {},
+          child: Center(child: CarpenterMessageBubble(message: const CarpenterMessageItem(id: 'imported', author: 'Анна', text: 'Проверьте смету', status: '', attachmentLabels: ['Смета.pdf'], relatedObjectLabel: 'Заказ №42', needAnswer: true), onAttachment: (_) {}, onRelatedObject: () {})),
+        ),
+      ),
+    ),
+    WidgetbookUseCase(
       name: 'Playground',
       builder: (context) => layoutViewportPreview(
         context,

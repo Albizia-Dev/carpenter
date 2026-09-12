@@ -200,3 +200,5 @@ export 'src/components/layout/patterns/messaging/attachment_tray.dart';
 // Contextual workspace composition.
 export 'src/components/layout/patterns/workspace/workspace_shell.dart';
 export 'src/components/layout/patterns/workspace/navigation_palette.dart';
+
+export 'src/components/layout/patterns/messaging/messenger_host.dart';
