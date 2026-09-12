@@ -1,3 +1,8 @@
+## Unreleased — Messenger access cancellation
+
+- Add optional controlled cancelLabel/onCancel to messenger access, independently of account switching; defaults preserve existing callers.
+- Keep cancellation disabled during busy stages; extend the canonical Playground and narrow-screen form/confirmation golden checks.
+
 ## Unreleased — Messenger access
 
 - Add experimental controlled CarpenterMessengerAccess: credential form, connection, account preparation, browser handoff, failure and exit stages.

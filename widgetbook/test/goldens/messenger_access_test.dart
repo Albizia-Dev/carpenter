@@ -112,6 +112,68 @@ void main() {
     expect(find.text('Продолжить вход'), findsOneWidget);
     expect(find.text('Войти в другой аккаунт'), findsNothing);
   });
+
+  for (final browser in [true, false]) {
+    testWidgets('cancel action ${browser ? "confirmation" : "credentials"}', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(390, 844);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      await tester.pumpWidget(
+        host(
+          MessengerAccessScenario(browserAccount: browser, showCancel: true),
+          dark: browser,
+          scale: browser ? 1.3 : 1,
+        ),
+      );
+      await tester.pumpAndSettle();
+      final cancel = find.widgetWithText(CarpenterButton, 'Отменить вход');
+      await tester.ensureVisible(cancel);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await expectLater(
+        find.byType(CarpenterMessengerAccess),
+        matchesGoldenFile(
+          'messenger_access_cancel_${browser ? "confirmation" : "credentials"}.png',
+        ),
+      );
+      await tester.tap(cancel);
+      await tester.pumpAndSettle();
+      expect(find.text('Вход отменён'), findsOneWidget);
+    });
+  }
+  testWidgets(
+    'busy stage disables cancellation and account switching together',
+    (tester) async {
+      await tester.pumpWidget(
+        host(
+          const MessengerAccessScenario(
+            stage: CarpenterAccessStage.connecting,
+            showCancel: true,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<CarpenterButton>(
+              find.widgetWithText(CarpenterButton, 'Отменить вход'),
+            )
+            .onPressed,
+        isNull,
+      );
+      expect(
+        tester
+            .widget<CarpenterButton>(
+              find.widgetWithText(CarpenterButton, 'Выйти'),
+            )
+            .onPressed,
+        isNull,
+      );
+    },
+  );
   testWidgets(
     'form requires both values; password is obscured and Enter submits once',
     (tester) async {

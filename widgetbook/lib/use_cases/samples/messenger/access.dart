@@ -37,6 +37,7 @@ final messengerAccessComponent = WidgetbookComponent(
           customTitle: context.knobs.string(label: 'Заголовок'),
           customDescription: context.knobs.string(label: 'Описание'),
           customAction: context.knobs.string(label: 'Основное действие'),
+          showCancel: context.knobs.boolean(label: 'Отмена входа'),
           showSecondary: context.knobs.boolean(
             label: 'Дополнительное действие',
             initialValue: true,
@@ -59,12 +60,13 @@ class MessengerAccessScenario extends StatefulWidget {
     this.customDescription = '',
     this.customAction = '',
     this.showSecondary = true,
+    this.showCancel = false,
   });
   final CarpenterAccessStage stage;
   final bool error, longText, browserAccount;
   final String accountLabel;
   final String customTitle, customDescription, customAction;
-  final bool showSecondary;
+  final bool showSecondary, showCancel;
   @override
   State<MessengerAccessScenario> createState() =>
       _MessengerAccessScenarioState();
@@ -74,7 +76,7 @@ class _MessengerAccessScenarioState extends State<MessengerAccessScenario> {
   final identifier = TextEditingController();
   final password = TextEditingController();
   bool visible = false;
-  bool submitted = false;
+  bool submitted = false, cancelled = false;
   @override
   void dispose() {
     identifier.dispose();
@@ -129,7 +131,9 @@ class _MessengerAccessScenarioState extends State<MessengerAccessScenario> {
     };
     return CarpenterMessengerAccess(
       stage: stage,
-      title: submitted
+      title: cancelled
+          ? 'Вход отменён'
+          : submitted
           ? 'Действие получено'
           : (widget.customTitle.isEmpty ? title : widget.customTitle),
       description: widget.customDescription.isNotEmpty
@@ -159,6 +163,14 @@ class _MessengerAccessScenarioState extends State<MessengerAccessScenario> {
       onSecondary: form || !widget.showSecondary
           ? null
           : () => setState(() => submitted = false),
+      cancelLabel: 'Отменить вход',
+      onCancel: !widget.showCancel
+          ? null
+          : () => setState(() {
+              cancelled = true;
+              identifier.clear();
+              password.clear();
+            }),
       passwordVisible: visible,
       onPasswordVisibilityChanged: (value) => setState(() => visible = value),
     );

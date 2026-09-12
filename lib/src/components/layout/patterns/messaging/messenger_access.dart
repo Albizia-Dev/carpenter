@@ -58,6 +58,8 @@ class CarpenterMessengerAccess extends StatelessWidget {
     this.errorText,
     this.secondaryLabel,
     this.onSecondary,
+    this.cancelLabel,
+    this.onCancel,
     this.passwordVisible = false,
     this.onPasswordVisibilityChanged,
   });
@@ -91,6 +93,14 @@ class CarpenterMessengerAccess extends StatelessWidget {
 
   /// Null omits the secondary action rather than showing a dead control.
   final VoidCallback? onSecondary;
+
+  /// Optional cancellation action, independent of switching account/recovery.
+  /// Both label and callback are required to render it; busy stages disable it.
+  final String? cancelLabel;
+
+  /// Requests cancellation; the host owns provider cleanup and navigation.
+  /// Carpenter never turns cancellation into a successful authentication state.
+  final VoidCallback? onCancel;
 
   /// Whether the host currently reveals the password. Defaults to obscured.
   final bool passwordVisible;
@@ -258,6 +268,14 @@ class CarpenterMessengerAccess extends StatelessWidget {
                                   CarpenterButton.text(
                                     label: secondaryLabel!,
                                     onPressed: busy ? null : onSecondary,
+                                  ),
+                                ],
+                                if (onCancel != null &&
+                                    cancelLabel != null) ...[
+                                  SizedBox(height: gap),
+                                  CarpenterButton.text(
+                                    label: cancelLabel!,
+                                    onPressed: busy ? null : onCancel,
                                   ),
                                 ],
                               ],
