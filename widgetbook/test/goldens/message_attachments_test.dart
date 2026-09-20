@@ -1,6 +1,7 @@
 import 'package:carpenter/carpenter.dart';
 import 'package:carpenter_widgetbook/use_cases/samples/messenger/catalog.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import '../../../test/helpers/golden_fonts.dart';
 import 'messenger_workspace_test.dart' show host, composerInput;
@@ -50,6 +51,70 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Отправлено'), findsOneWidget);
     expect(find.text('Спецификация оборудования.pdf · 540 КБ'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+  testWidgets('remove by keyboard preserves caption and answer', (
+    tester,
+  ) async {
+    await tester.pumpWidget(host(const AttachmentMessageScenario()));
+    await tester.pumpAndSettle();
+    await tester.enterText(composerInput, 'Только подпись');
+    await tester.tap(find.text('Нужен ответ'));
+    await tester.pumpAndSettle();
+    Focus.of(tester.element(find.text('Убрать'))).requestFocus();
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(find.byType(CarpenterAttachmentTray), findsNothing);
+    expect(
+      tester.widget<EditableText>(composerInput).controller.text,
+      'Только подпись',
+    );
+    expect(
+      tester
+          .widget<CarpenterMessageComposer>(
+            find.byType(CarpenterMessageComposer),
+          )
+          .needAnswer,
+      isTrue,
+    );
+    await tester.tap(composerInput);
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pumpAndSettle();
+    expect(find.text('Спецификация оборудования.pdf · 540 КБ'), findsNothing);
+    expect(find.text('Только подпись'), findsWidgets);
+  });
+  testWidgets('failed and cancelled files expose distinct remove actions', (
+    tester,
+  ) async {
+    final removed = <String>[];
+    await tester.pumpWidget(
+      host(
+        CarpenterAttachmentTray(
+          items: const [
+            CarpenterAttachmentItem(
+              id: 'failed',
+              name: 'Смета.pdf',
+              phase: CarpenterMessengerUploadPhase.failed,
+              detail: 'Нет подтверждения',
+            ),
+            CarpenterAttachmentItem(
+              id: 'cancelled',
+              name: 'План.pdf',
+              phase: CarpenterMessengerUploadPhase.cancelled,
+              detail: '',
+            ),
+          ],
+          onRetry: (_) {},
+          onRemove: removed.add,
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Повторить'), findsOneWidget);
+    expect(find.text('Убрать'), findsNWidgets(2));
+    await tester.tap(find.text('Убрать').last);
+    expect(removed, ['cancelled']);
     expect(tester.takeException(), isNull);
   });
   testWidgets('empty composer without files still cannot send', (tester) async {

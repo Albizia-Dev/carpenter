@@ -4,6 +4,11 @@
 - Keep page editors mounted while navigation collapses, changes breakpoint or opens as a modal drawer; share Escape, focus trapping and focus restoration with other overlays.
 - Add a canonical Widgetbook Playground with 55 named scenarios and wide/narrow behavioral coverage; document application-owned routing, permissions and persistence.
 
+## Unreleased — Attachment removal
+
+- Add controlled removal of ready, failed and cancelled messenger attachments, distinct from upload cancellation and retry.
+- Extend the canonical Widgetbook scenario with keyboard removal that preserves the caption and NeedAnswer; update wide and narrow dark goldens.
+
 ## Unreleased — Messenger attachment messages
 
 - Add controlled file labels to message bubbles and captionless composer submission for persisted attachments.

@@ -472,6 +472,7 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
     this.onFilesRequested,
     this.onUploadRetried,
     this.onUploadCancelled,
+    this.onUploadRemoved,
     this.historyLoading = false,
     this.historyProblem,
     this.onHistoryRequested,
@@ -591,6 +592,9 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
 
   /// Cancels a queued or active upload; also available after write revocation.
   final ValueChanged<String>? onUploadCancelled;
+
+  /// Removes local ready/failed/cancelled items without deleting remote media.
+  final ValueChanged<String>? onUploadRemoved;
 
   /// Builds the controlled messenger presentation using semantic theme roles.
   @override
@@ -849,6 +853,7 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
                                               ? onUploadRetried
                                               : null,
                                           onCancel: onUploadCancelled,
+                                          onRemove: onUploadRemoved,
                                         ),
                                       ),
                                   ],

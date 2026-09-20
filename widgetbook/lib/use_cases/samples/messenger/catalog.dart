@@ -551,6 +551,7 @@ class _AttachmentMessageScenarioState extends State<AttachmentMessageScenario> {
   String caption = '';
   bool needAnswer = false;
   bool submitted = false;
+  bool removed = false;
   bool confirmed = false;
   @override
   Widget build(BuildContext context) => CarpenterMessengerWorkspace(
@@ -581,11 +582,14 @@ class _AttachmentMessageScenarioState extends State<AttachmentMessageScenario> {
           own: true,
           needAnswer: needAnswer,
           canRetry: !confirmed,
-          attachmentLabels: const ['Спецификация оборудования.pdf · 540 КБ'],
+          attachmentLabels: removed
+              ? const []
+              : const ['Спецификация оборудования.pdf · 540 КБ'],
           status: confirmed ? 'Отправлено' : 'Нет подтверждения',
         ),
     ],
-    attachments: submitted
+    onUploadRemoved: (_) => setState(() => removed = true),
+    attachments: submitted || removed
         ? const []
         : const [
             CarpenterAttachmentItem(
@@ -595,7 +599,7 @@ class _AttachmentMessageScenarioState extends State<AttachmentMessageScenario> {
               detail: '540 КБ',
             ),
           ],
-    hasDraftAttachments: !submitted,
+    hasDraftAttachments: !submitted && !removed,
     draft: submitted ? '' : caption,
     needAnswer: !submitted && needAnswer,
     onDraftChanged: (text) => setState(() => caption = text),
