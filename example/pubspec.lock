@@ -71,7 +71,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "0.4.10"
+    version: "0.5.0"
   carpenter_mordant:
     dependency: transitive
     description:
