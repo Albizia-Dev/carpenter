@@ -15,6 +15,7 @@ import '../button/button.dart';
 /// Arrow keys and Enter choose a result, Escape closes results, and each value
 /// has a keyboard-accessible removal action. Free text is only a query.
 final class CarpenterMultiSelect<T> extends StatefulWidget {
+  /// Creates a controlled multi-value selection field.
   const CarpenterMultiSelect({
     super.key,
     required this.values,
@@ -45,22 +46,39 @@ final class CarpenterMultiSelect<T> extends StatefulWidget {
   /// Receives query edits and an empty query after selection. Remote sources
   /// own debounce, cancellation and protection against stale responses.
   final ValueChanged<String> onQueryChanged;
+
+  /// Optional visible label above the field.
   final String? label;
+
+  /// Accessibility label used when the visible label is insufficient.
   final String? semanticLabel;
+
+  /// Hint shown while the query is empty.
   final String placeholder;
+
+  /// Whether the field accepts input or is disabled/read-only.
   final FieldAvailability availability;
+
+  /// Current state of the externally loaded suggestions.
   final OptionsLoadState loadState;
 
   /// Upper bound on rendered results. Ask users to refine broad searches.
   final int maximumSuggestions;
+
+  /// Message shown while suggestions are loading.
   final String loadingText;
+
+  /// Message shown when a completed query has no suggestions.
   final String emptyText;
+
+  /// Message shown when suggestions could not be loaded.
   final String failedText;
 
   /// Localized removal verb, combined with the selected option label.
   final String removeLabel;
 
   @override
+  /// Creates the state that owns the ephemeral query and overlay state.
   State<CarpenterMultiSelect<T>> createState() => _MultiSelectState<T>();
 }
 

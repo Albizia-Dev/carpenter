@@ -135,7 +135,7 @@ class CarpenterEditorControllerBase<TRecord>
     required Future<TRecord> Function(Map<CarpenterFieldId, Object?> values)
     onSave,
     this.onCancel,
-  }) : _onSave = onSave,
+  }) : _onSave = (value: onSave).value,
        super(const CarpenterEditorReady(dirty: false)) {
     for (final field in fields) {
       field.addListener(_fieldChanged);

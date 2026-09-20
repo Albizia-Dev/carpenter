@@ -11,6 +11,10 @@ enum CarpenterToolbarPresentation { label, icon }
 
 @immutable
 final class CarpenterToolbarItem {
+  /// Creates a toolbar presentation for one semantic action.
+  // The deprecated public compatibility name intentionally differs from the
+  // private storage field.
+  // ignore: prefer_initializing_formals
   const CarpenterToolbarItem({
     required this.action,
     this.group = CarpenterToolbarGroup.secondary,
@@ -20,6 +24,7 @@ final class CarpenterToolbarItem {
     this.prominence = ActionProminence.ghost,
     this.size = ControlSize.medium,
     this.executionPhase = ActionExecutionPhase.idle,
+    // ignore: prefer_initializing_formals
   }) : _priority = priority;
 
   final CarpenterActionDescriptor action;

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../../lib/src/components/behaviour/action_overflow.dart';
+import 'package:carpenter/src/components/behaviour/action_overflow.dart';
 
 void main() {
   test('overflow policy degrades whole action groups', () {

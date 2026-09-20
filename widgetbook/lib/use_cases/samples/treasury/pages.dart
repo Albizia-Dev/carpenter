@@ -268,8 +268,9 @@ class _TreasuryPreviewState extends State<TreasuryPagePreview> {
               '${row.title} ${row.detail}'.toLowerCase().contains(query),
         )
         .toList();
-    if (filtered.isEmpty)
+    if (filtered.isEmpty) {
       return text('По текущим фильтрам ничего не найдено', secondary: true);
+    }
     return CarpenterCard(
       padded: false,
       child: Column(
@@ -409,12 +410,13 @@ class _TreasuryPreviewState extends State<TreasuryPagePreview> {
       'Комментарий',
       'Юридический адрес',
       'Адрес',
-    ].contains(label))
+    ].contains(label)) {
       return CarpenterTextArea(
         controller: controller,
         minLines: 2,
         maxLines: 4,
       );
+    }
     return CarpenterInput(
       controller: controller,
       placeholder: label,

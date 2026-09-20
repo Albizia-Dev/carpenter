@@ -56,8 +56,9 @@ final class _CarpenterSurfaceHostState extends State<CarpenterSurfaceHost>
   @override
   Future<T?> openPage<T>(Object destination) async {
     final opener = widget.openPage;
-    if (opener == null)
+    if (opener == null) {
       throw StateError('CarpenterSurfaceHost.openPage is not configured.');
+    }
     return await opener(destination) as T?;
   }
 
@@ -135,8 +136,9 @@ final class _CarpenterSurfaceHostState extends State<CarpenterSurfaceHost>
   @override
   void dispose() {
     final request = _request;
-    if (request != null && !request.completer.isCompleted)
+    if (request != null && !request.completer.isCompleted) {
       request.completer.complete();
+    }
     super.dispose();
   }
 }

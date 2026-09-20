@@ -701,7 +701,7 @@ class _PreviewState extends State<ProjectsPlusPreview> {
       );
     }
 
-    if (e.key == 'Дата')
+    if (e.key == 'Дата') {
       return CarpenterDateInput(
         value: DateTime.tryParse(c.text.split('.').reversed.join('-')),
         availability: availability,
@@ -711,18 +711,20 @@ class _PreviewState extends State<ProjectsPlusPreview> {
               : '${v.day.toString().padLeft(2, '0')}.${v.month.toString().padLeft(2, '0')}.${v.year}',
         ),
       );
+    }
     if ([
       'Комментарий',
       'Описание работ',
       'Полное название',
       'Тема',
-    ].contains(e.key))
+    ].contains(e.key)) {
       return CarpenterTextArea(
         controller: c,
         minLines: 2,
         maxLines: 4,
         availability: availability,
       );
+    }
     return CarpenterInput(
       controller: c,
       semanticLabel: e.key,

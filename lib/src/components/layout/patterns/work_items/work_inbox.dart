@@ -16,13 +16,33 @@ import '../../page_header.dart';
 import '../../regions/primary_region.dart';
 
 /// Caller-owned read phase. Refreshing preserves data; failed refresh is stale.
-enum CarpenterWorkInboxPhase { loading, ready, refreshing, failure, stale }
+enum CarpenterWorkInboxPhase {
+  /// The initial queue is loading without usable items.
+  loading,
+
+  /// Current queue data is ready.
+  ready,
+
+  /// Existing queue data remains visible while it refreshes.
+  refreshing,
+
+  /// No usable queue data could be loaded.
+  failure,
+
+  /// Existing data remains visible after a failed refresh.
+  stale,
+}
 
 /// UI filter only; the application maps its identity into a domain query.
 @immutable
 final class CarpenterWorkInboxFilter {
+  /// Creates a domain-neutral filter descriptor.
   const CarpenterWorkInboxFilter({required this.id, required this.label});
+
+  /// Stable filter identity mapped by the application.
   final String id;
+
+  /// Human-readable filter label.
   final String label;
 }
 
@@ -31,6 +51,7 @@ final class CarpenterWorkInboxFilter {
 /// the obligation: different obligations may refer to the same task.
 @immutable
 final class CarpenterWorkInboxItem {
+  /// Creates immutable presentation data for one obligation.
   const CarpenterWorkInboxItem({
     required this.id,
     required this.reference,
@@ -44,16 +65,38 @@ final class CarpenterWorkInboxItem {
     this.deadline,
     this.requestedDeadline,
   });
+
+  /// Stable obligation identity used for selection.
   final String id;
+
+  /// Human-readable task or execution reference.
   final String reference;
+
+  /// Primary obligation title.
   final String title;
+
+  /// Supporting description shown in detail.
   final String description;
+
+  /// Formatted current status.
   final String status;
+
+  /// Explanation of why this obligation is in the queue.
   final String reason;
+
+  /// Human-readable next step.
   final String nextAction;
+
+  /// Formatted creator identity.
   final String creator;
+
+  /// Formatted assignee identity.
   final String assignee;
+
+  /// Optional formatted established deadline.
   final String? deadline;
+
+  /// Optional formatted proposed deadline.
   final String? requestedDeadline;
 }
 
@@ -70,6 +113,7 @@ final class CarpenterWorkInboxItem {
 /// Rows support the underlying ListTile keyboard invocation. Search and filter
 /// controls stay available after errors. All text uses Carpenter theme roles.
 final class CarpenterWorkInbox extends StatefulWidget {
+  /// Creates a controlled adaptive personal-work queue.
   const CarpenterWorkInbox({
     super.key,
     required this.items,
@@ -87,21 +131,47 @@ final class CarpenterWorkInbox extends StatefulWidget {
     this.onOpenItem,
   });
 
+  /// Obligations currently visible for the host-owned query.
   final List<CarpenterWorkInboxItem> items;
+
+  /// Available host-defined filter descriptors.
   final List<CarpenterWorkInboxFilter> filters;
+
+  /// Id of the currently selected filter.
   final String selectedFilter;
+
+  /// Current host-owned search query.
   final String search;
+
+  /// Id of the selected obligation, or null for list-only presentation.
   final String? selectedId;
+
+  /// Reports search edits without filtering [items] locally.
   final ValueChanged<String> onSearchChanged;
+
+  /// Reports selection of a host-defined filter id.
   final ValueChanged<String> onFilterChanged;
+
+  /// Reports obligation selection and detail dismissal.
   final ValueChanged<String?> onSelectionChanged;
+
+  /// Requests a refresh of the host-owned queue.
   final VoidCallback onRefresh;
+
+  /// Optionally opens the selected obligation in its owning application.
   final ValueChanged<String>? onOpenItem;
+
+  /// Current host-owned read phase.
   final CarpenterWorkInboxPhase phase;
+
+  /// Optional explanation for failure or stale data.
   final String? errorMessage;
+
+  /// Whether the queue displays demonstration rather than live data.
   final bool preview;
 
   @override
+  /// Creates state for the local search editor and adaptive detail focus.
   State<CarpenterWorkInbox> createState() => _WorkInboxState();
 }
 

@@ -74,6 +74,7 @@ final class _CarpenterExampleAppState extends State<CarpenterExampleApp> {
         title: 'Overview',
         subtitle: 'Carpenter example workspace',
         child: child,
+        scrollOwnership: CarpenterRegionScrollOwnership.region,
       ),
       page: (context) => DashboardPage(
         navigator: _navigator,
@@ -98,6 +99,7 @@ final class _CarpenterExampleAppState extends State<CarpenterExampleApp> {
         title: context.arguments['id'] ?? 'Project',
         subtitle: 'Record composition',
         child: child,
+        scrollOwnership: CarpenterRegionScrollOwnership.region,
       ),
       page: (context) => ProjectPage(
         projectId: context.arguments['id'] ?? 'CP-1042',
@@ -112,6 +114,7 @@ final class _CarpenterExampleAppState extends State<CarpenterExampleApp> {
         title: 'Planning',
         subtitle: 'Controlled Kanban and drag-and-drop',
         child: child,
+        scrollOwnership: CarpenterRegionScrollOwnership.region,
       ),
       page: (context) => PlanningPage(toaster: _toaster),
     ),
@@ -122,6 +125,7 @@ final class _CarpenterExampleAppState extends State<CarpenterExampleApp> {
         title: 'Explorer',
         subtitle: 'Hierarchical data and keyboard navigation',
         child: child,
+        scrollOwnership: CarpenterRegionScrollOwnership.region,
       ),
       page: (context) => ExplorerPage(toaster: _toaster),
     ),
@@ -142,6 +146,7 @@ final class _CarpenterExampleAppState extends State<CarpenterExampleApp> {
         title: 'Settings',
         subtitle: 'Controlled forms and typed fields',
         child: child,
+        scrollOwnership: CarpenterRegionScrollOwnership.region,
       ),
       page: (context) => SettingsPage(toaster: _toaster),
     ),
@@ -152,12 +157,15 @@ final class _CarpenterExampleAppState extends State<CarpenterExampleApp> {
     required String title,
     required String subtitle,
     required Widget child,
+    CarpenterRegionScrollOwnership scrollOwnership =
+        CarpenterRegionScrollOwnership.child,
   }) => DemoShell(
     selectedId: selectedId,
     title: title,
     subtitle: subtitle,
     commands: _commands,
     toaster: _toaster,
+    scrollOwnership: scrollOwnership,
     child: child,
   );
 

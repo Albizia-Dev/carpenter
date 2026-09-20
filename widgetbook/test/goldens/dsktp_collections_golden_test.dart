@@ -110,8 +110,9 @@ void main() {
             ),
             findsNothing,
           );
-          if (scene == 'accounts')
+          if (scene == 'accounts') {
             expect(find.text('Т-Банк · Операционный'), findsOneWidget);
+          }
           await expectLater(
             find.byKey(const ValueKey('scene')),
             matchesGoldenFile('images/${scene}_wide_collapsed.png'),

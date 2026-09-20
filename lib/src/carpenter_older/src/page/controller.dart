@@ -18,7 +18,7 @@ class CarpenterPageControllerBase extends ValueNotifier<CarpenterPageState>
     List<CarpenterCommand<dynamic>> commands = const [],
     Future<void> Function()? onRefresh,
   }) : pageCommands = commands,
-       _onRefresh = onRefresh,
+       _onRefresh = (value: onRefresh).value,
        super(initialState);
 
   @override

@@ -50,13 +50,7 @@ void main() {
     expect(find.text('INV-2026-0412'), findsOneWidget);
 
     if (find.text('Simulate timeout').evaluate().isEmpty) {
-      await tester.tap(
-        find.byWidgetPredicate(
-          (widget) =>
-              widget is CarpenterIconButton &&
-              widget.semanticLabel == 'More actions',
-        ),
-      );
+      await tester.tap(find.bySemanticsLabel('Действия'));
       await tester.pumpAndSettle();
     }
     await tester.tap(find.text('Simulate timeout').last);

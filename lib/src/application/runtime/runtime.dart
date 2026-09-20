@@ -26,8 +26,9 @@ final class CarpenterRuntime {
   /// absent.
   T read<T extends Object>() {
     final value = _values[T];
-    if (value == null)
+    if (value == null) {
       throw StateError('CarpenterRuntime: capability $T is not registered.');
+    }
     return value as T;
   }
 

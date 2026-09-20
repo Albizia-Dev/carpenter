@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart' show protected;
 import 'package:flutter/widgets.dart';
 
 import '../application/command.dart';
@@ -40,10 +39,11 @@ typedef CarpenterResourceLoader<T> =
 /// Extensible resource lifecycle base for application-specific controllers.
 class CarpenterResourceController<T> extends ValueNotifier<CarpenterPageState>
     implements CarpenterPageController {
+  /// Creates a resource controller backed by the supplied asynchronous loader.
   CarpenterResourceController({
     required CarpenterResourceLoader<T> load,
     this.errorMessage,
-  }) : _load = load,
+  }) : _load = (value: load).value,
        super(const CarpenterPageInitialLoading()) {
     refreshCommand = CarpenterCommandController<void>(
       id: 'resource.refresh',

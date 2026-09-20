@@ -1,7 +1,7 @@
 /// Carpenter is a semantic and adaptive UI platform for Flutter.
 library;
-export 'src/components/layout/patterns/work_items/rsp_recovery.dart';
 
+export 'src/components/layout/patterns/work_items/rsp_recovery.dart';
 
 export 'src/components/layout/patterns/work_items/work_inbox.dart';
 export 'src/components/layout/patterns/work_items/rsp_acceptance.dart';

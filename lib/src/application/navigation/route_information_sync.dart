@@ -49,8 +49,9 @@ final class CarpenterRouteInformationSync with WidgetsBindingObserver {
   /// history.
   void attach() {
     WidgetsBinding.instance.addObserver(this);
-    if (useMultiEntryHistory)
+    if (useMultiEntryHistory) {
       unawaited(SystemNavigator.selectMultiEntryHistory());
+    }
     _reportRouteInformation(navigation.state, replace: true);
     _subscription = navigation.stream.listen(_onRouteChanged);
   }

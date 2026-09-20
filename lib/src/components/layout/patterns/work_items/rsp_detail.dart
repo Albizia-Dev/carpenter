@@ -7,12 +7,26 @@ import '../../../basic/progress.dart';
 import '../../../basic/text.dart';
 import '../../../behaviour/notice.dart';
 
-enum CarpenterRspDetailPhase { initial, loading, ready, failure }
+/// Host-owned phase for loading an RSP result detail.
+enum CarpenterRspDetailPhase {
+  /// No execution has been selected yet.
+  initial,
+
+  /// The current execution result is loading.
+  loading,
+
+  /// Fresh [CarpenterRspDetail.content] is available.
+  ready,
+
+  /// The result failed to load.
+  failure,
+}
 
 /// Controlled result-loading composition. [content] is mounted only in ready;
 /// a stale acceptance panel is never left interactive behind a loading overlay.
 /// Caller supplies the current execution label and owns retry/state transitions.
 class CarpenterRspDetail extends StatelessWidget {
+  /// Creates a controlled result-detail loading surface.
   const CarpenterRspDetail({
     super.key,
     required this.phase,
@@ -22,14 +36,27 @@ class CarpenterRspDetail extends StatelessWidget {
     this.message,
     this.onRetry,
   }) : assert(phase != CarpenterRspDetailPhase.ready || content != null);
+
+  /// Current result-loading phase.
   final CarpenterRspDetailPhase phase;
+
+  /// Formatted execution reference displayed above transient states.
   final String reference;
+
+  /// Whether the surface displays demonstration rather than live data.
   final bool preview;
+
+  /// Ready-state content owned by the host.
   final Widget? content;
+
+  /// Optional host-provided failure explanation.
   final String? message;
+
+  /// Requests another load after failure.
   final VoidCallback? onRetry;
 
   @override
+  /// Builds ready content or the current loading/empty/failure state.
   Widget build(BuildContext context) {
     if (phase == CarpenterRspDetailPhase.ready && content != null) {
       return content!;

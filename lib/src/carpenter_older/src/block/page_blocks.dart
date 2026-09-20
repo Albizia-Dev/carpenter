@@ -2,12 +2,6 @@
 import 'dart:async';
 import 'package:carpenter/gravity_icons.dart';
 
-import 'package:carpenter/src/carpenter_older/src/component/button/carpenter_button.dart';
-import 'package:carpenter/src/carpenter_older/src/component/card/carpenter_card.dart';
-import 'package:carpenter/src/carpenter_older/src/component/checkbox/carpenter_checkbox.dart';
-import 'package:carpenter/src/carpenter_older/src/component/input/carpenter_input.dart';
-import 'package:carpenter/src/carpenter_older/src/component/loader/carpenter_loader.dart';
-import 'package:carpenter/src/carpenter_older/src/component/workbench/carpenter_workbench.dart';
 import 'package:carpenter/src/carpenter_older/src/page/capability.dart';
 import 'package:carpenter/src/carpenter_older/src/page/command.dart';
 import 'package:carpenter/src/carpenter_older/src/page/state.dart';
@@ -159,7 +153,7 @@ class CarpenterFilterBar extends StatelessWidget {
     spacing: 10,
     runSpacing: 10,
     crossAxisAlignment: WrapCrossAlignment.center,
-    children: [if (query != null) query!, ...filters, ...actions],
+    children: [?query, ...filters, ...actions],
   );
 }
 
@@ -218,7 +212,7 @@ class CarpenterCollectionGroupHeader extends StatelessWidget {
                     .copyWith(color: context.face.color('text.primary')),
                 child: title,
               ),
-              if (subtitle != null) subtitle!,
+              ?subtitle,
               if (metadata.isNotEmpty)
                 Wrap(spacing: 6, runSpacing: 6, children: metadata),
             ],
@@ -278,7 +272,7 @@ class CarpenterTrailingActions extends StatelessWidget {
     spacing: 6,
     runSpacing: 6,
     crossAxisAlignment: WrapCrossAlignment.center,
-    children: [...actions, if (indicator != null) indicator!],
+    children: [...actions, ?indicator],
   );
 }
 

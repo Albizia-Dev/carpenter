@@ -126,15 +126,18 @@ abstract interface class CarpenterEditorController<TRecord>
 final class CarpenterEditorControllerBase<TRecord>
     extends ValueNotifier<CarpenterEditorState>
     implements CarpenterEditorController<TRecord> {
+  /// Creates a controlled editor lifecycle for the supplied field bindings.
   CarpenterEditorControllerBase({
     required this.mode,
     required this.fields,
     required Future<TRecord> Function(Map<CarpenterFieldId, Object?> values)
     onSave,
     this.onCancel,
-  }) : _onSave = onSave,
+  }) : _onSave = (value: onSave).value,
        super(const CarpenterEditorReady(dirty: false)) {
-    for (final field in fields) field.addListener(_fieldChanged);
+    for (final field in fields) {
+      field.addListener(_fieldChanged);
+    }
   }
   @override
   final CarpenterEditorMode mode;
@@ -177,13 +180,17 @@ final class CarpenterEditorControllerBase<TRecord>
 
   @override
   void cancel() {
-    for (final field in fields) field.reset();
+    for (final field in fields) {
+      field.reset();
+    }
     onCancel?.call();
   }
 
   @override
   void dispose() {
-    for (final field in fields) field.removeListener(_fieldChanged);
+    for (final field in fields) {
+      field.removeListener(_fieldChanged);
+    }
     super.dispose();
   }
 }
@@ -353,7 +360,7 @@ final class CarpenterEditorPage<TRecord> extends StatelessWidget {
           body ??
           CarpenterPageBody(
             children: [
-              if (summary != null) summary!,
+              ?summary,
               if (editorState case CarpenterEditorValidationFailure(
                 :final errors,
               ))
@@ -364,7 +371,7 @@ final class CarpenterEditorPage<TRecord> extends StatelessWidget {
                   message: error.toString(),
                   tone: CarpenterNoticeTone.danger,
                 ),
-              if (attention != null) attention!,
+              ?attention,
               ...sections,
             ],
           ),

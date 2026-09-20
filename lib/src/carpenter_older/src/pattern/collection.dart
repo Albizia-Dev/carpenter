@@ -180,10 +180,10 @@ class CarpenterDataCollectionControllerBase<T, TFilter, TSort>
     queryForPage,
     this.searchDebounce = const Duration(milliseconds: 350),
     this.errorMessage,
-  }) : _loadRequest = loadRequest,
-       _loadNext = loadNext,
-       _queryForSearch = queryForSearch,
-       _queryForPage = queryForPage,
+  }) : _loadRequest = (value: loadRequest).value,
+       _loadNext = (value: loadNext).value,
+       _queryForSearch = (value: queryForSearch).value,
+       _queryForPage = (value: queryForPage).value,
        super(initialState ?? CarpenterCollectionInitialLoading<T>());
 
   @override
@@ -873,10 +873,7 @@ class CarpenterCollectionPage<T, TFilter, TSort> extends StatelessWidget {
           if (summary != null) ...[summary!, const SizedBox(height: 12)],
           if (queryBar != null || filterBar != null) ...[
             CarpenterCollectionToolbar(
-              child: CarpenterFilterBar(
-                query: queryBar,
-                filters: [if (filterBar != null) filterBar!],
-              ),
+              child: CarpenterFilterBar(query: queryBar, filters: [?filterBar]),
             ),
           ],
           if (selectionBar != null) ...[

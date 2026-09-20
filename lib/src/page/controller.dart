@@ -11,12 +11,13 @@ abstract interface class CarpenterPageController
 
 class CarpenterPageControllerBase extends ValueNotifier<CarpenterPageState>
     implements CarpenterPageController {
+  /// Creates a page controller with caller-owned commands and refresh logic.
   CarpenterPageControllerBase({
     CarpenterPageState initialState = const CarpenterPageReady(),
     List<CarpenterCommand<dynamic>> commands = const [],
     Future<void> Function()? onRefresh,
   }) : pageCommands = commands,
-       _onRefresh = onRefresh,
+       _onRefresh = (value: onRefresh).value,
        super(initialState);
 
   @override

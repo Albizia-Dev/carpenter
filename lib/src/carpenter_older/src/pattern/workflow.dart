@@ -73,9 +73,9 @@ class CarpenterWorkflowControllerBase<TState, TContext> extends ChangeNotifier
     reduce,
     Future<void> Function()? onCancel,
   }) : _state = initialState,
-       _transitions = transitions,
-       _reduce = reduce,
-       _onCancel = onCancel;
+       _transitions = (value: transitions).value,
+       _reduce = (value: reduce).value,
+       _onCancel = (value: onCancel).value;
 
   TState _state;
 
@@ -155,10 +155,10 @@ class CarpenterWorkflowDelegateController<TState, TContext>
     transitions,
     bool Function(TState state, TContext context)? isCompleted,
     Future<void> Function()? onCancel,
-  }) : _readState = readState,
-       _transitions = transitions,
-       _isCompleted = isCompleted,
-       _onCancel = onCancel;
+  }) : _readState = (value: readState).value,
+       _transitions = (value: transitions).value,
+       _isCompleted = (value: isCompleted).value,
+       _onCancel = (value: onCancel).value;
 
   final TState Function() _readState;
   @override

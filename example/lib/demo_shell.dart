@@ -12,6 +12,7 @@ final class DemoShell extends StatefulWidget {
     required this.commands,
     required this.toaster,
     required this.child,
+    this.scrollOwnership = CarpenterRegionScrollOwnership.child,
   });
 
   final String selectedId;
@@ -20,6 +21,7 @@ final class DemoShell extends StatefulWidget {
   final DemoCommands commands;
   final CarpenterToasterController toaster;
   final Widget child;
+  final CarpenterRegionScrollOwnership scrollOwnership;
 
   @override
   State<DemoShell> createState() => _DemoShellState();
@@ -145,7 +147,14 @@ final class _DemoShellState extends State<DemoShell> {
               ],
             ),
           ),
-          body: SafeArea(top: false, child: page),
+          body: SafeArea(
+            top: false,
+            child: CarpenterPrimaryRegion(
+              scrollOwnership: widget.scrollOwnership,
+              semanticLabel: 'Workspace content',
+              child: page,
+            ),
+          ),
         ),
       ),
     );

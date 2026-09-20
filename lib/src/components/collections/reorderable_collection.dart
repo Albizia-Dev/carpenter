@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 import '../behaviour/drag_and_drop/drag_operation.dart';
@@ -179,7 +178,7 @@ final class _CarpenterReorderableCollectionState<T>
         onDragCompleted: () {
           if (mounted) setState(() => _draggingKey = null);
         },
-        onDragCanceled: (_, __) {
+        onDragCanceled: (_, _) {
           if (mounted) setState(() => _draggingKey = null);
         },
         child: normal,

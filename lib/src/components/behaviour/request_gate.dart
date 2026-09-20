@@ -53,7 +53,7 @@ final class CarpenterRequestGate<C extends CarpenterCancellationSignal> {
   /// Creates a request gate. [createCancellation] must return a fresh signal
   /// for each admitted request.
   CarpenterRequestGate({required C Function() createCancellation})
-    : _createCancellation = createCancellation;
+    : _createCancellation = (value: createCancellation).value;
 
   final C Function() _createCancellation;
   final Set<CarpenterRequestLease<C>> _live = {};

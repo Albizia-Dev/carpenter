@@ -1,5 +1,4 @@
 import 'package:carpenter_units/carpenter_units.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -49,6 +48,7 @@ abstract interface class CarpenterWorkflowController<TState, TContext>
 final class CarpenterWorkflowControllerBase<TState, TContext>
     extends ChangeNotifier
     implements CarpenterWorkflowController<TState, TContext> {
+  /// Creates an in-memory workflow controller with declarative transitions.
   CarpenterWorkflowControllerBase({
     required TState initialState,
     required this.context,
@@ -64,9 +64,9 @@ final class CarpenterWorkflowControllerBase<TState, TContext>
     reduce,
     Future<void> Function()? onCancel,
   }) : _state = initialState,
-       _transitions = transitions,
-       _reduce = reduce,
-       _onCancel = onCancel;
+       _transitions = (value: transitions).value,
+       _reduce = (value: reduce).value,
+       _onCancel = (value: onCancel).value;
   TState _state;
   @override
   TState get state => _state;
@@ -126,6 +126,7 @@ final class CarpenterWorkflowControllerBase<TState, TContext>
 final class CarpenterWorkflowDelegateController<TState, TContext>
     extends ChangeNotifier
     implements CarpenterWorkflowController<TState, TContext> {
+  /// Creates a workflow controller that reads state from an external owner.
   CarpenterWorkflowDelegateController({
     required TState Function() readState,
     required this.context,
@@ -136,10 +137,10 @@ final class CarpenterWorkflowDelegateController<TState, TContext>
     transitions,
     bool Function(TState state, TContext context)? isCompleted,
     Future<void> Function()? onCancel,
-  }) : _readState = readState,
-       _transitions = transitions,
-       _isCompleted = isCompleted,
-       _onCancel = onCancel;
+  }) : _readState = (value: readState).value,
+       _transitions = (value: transitions).value,
+       _isCompleted = (value: isCompleted).value,
+       _onCancel = (value: onCancel).value;
   final TState Function() _readState;
   @override
   final TContext context;
@@ -348,7 +349,7 @@ final class CarpenterWorkflowPage<TState, TContext> extends StatelessWidget {
           header: header ?? CarpenterPageHeader(title: descriptor.title),
           body: CarpenterPageBody(
             children: [
-              if (progress != null) progress!,
+              ?progress,
               if (stage != null)
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -376,7 +377,7 @@ final class CarpenterWorkflowPage<TState, TContext> extends StatelessWidget {
                     onInvoke: controller.retry,
                   ),
                 ),
-              if (history != null) history!,
+              ?history,
             ],
           ),
           footer: CarpenterActionBar(
@@ -430,8 +431,9 @@ final class CarpenterWorkflowPage<TState, TContext> extends StatelessWidget {
           bindings: {
             const SingleActivator(LogicalKeyboardKey.enter, meta: true): () {
               if (!controller.executing &&
-                  submit.canExecute(controller.state, controller.context))
+                  submit.canExecute(controller.state, controller.context)) {
                 controller.transition(submit);
+              }
             },
           },
           child: Focus(autofocus: true, child: page),

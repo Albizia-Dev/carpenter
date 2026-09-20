@@ -8,7 +8,7 @@ final messengerComponents = [
     name: 'Message attachments',
     useCases: [
       WidgetbookUseCase(
-        name: 'Ready draft and retry',
+        name: 'Playground',
         builder: (context) => layoutViewportPreview(
           context,
           child: const AttachmentMessageScenario(),
@@ -77,7 +77,7 @@ final messengerComponents = [
         ),
       ),
       WidgetbookUseCase(
-        name: 'State · Failed send',
+        name: 'States · Failed send',
         builder: (context) => layoutViewportPreview(
           context,
           child: const MessengerScenario(failSend: true, showFailure: true),

@@ -10,11 +10,22 @@ import '../../../behaviour/notice.dart';
 /// Host-owned command phase. Uncertain means the write may already be saved;
 /// retry must reconcile the original command, never create a second mutation.
 enum CarpenterRspAcceptancePhase {
+  /// The result can be reviewed and accepted.
   ready,
+
+  /// An acceptance command is currently running.
   submitting,
+
+  /// The result was accepted successfully.
   accepted,
+
+  /// The acceptance command definitively failed.
   rejected,
+
+  /// The command outcome is unknown and must be reconciled.
   uncertain,
+
+  /// The result must be reloaded and reviewed before another command.
   reviewRequired,
 }
 
@@ -24,6 +35,7 @@ enum CarpenterRspAcceptancePhase {
 /// [onRetry] must retry the original request. [onReload] reloads a definitively
 /// rejected result for review, never silently retries its old command.
 class CarpenterRspAcceptance extends StatelessWidget {
+  /// Creates a controlled result-acceptance panel.
   const CarpenterRspAcceptance({
     super.key,
     required this.reference,
@@ -36,13 +48,36 @@ class CarpenterRspAcceptance extends StatelessWidget {
     this.onRetry,
     this.onReload,
   });
-  final String reference, executor, resultText;
+
+  /// Formatted reference for the execution being reviewed.
+  final String reference;
+
+  /// Formatted executor identity.
+  final String executor;
+
+  /// Human-readable result supplied by the executor.
+  final String resultText;
+
+  /// Current acceptance command phase.
   final CarpenterRspAcceptancePhase phase;
+
+  /// Whether the panel displays demonstration rather than live data.
   final bool preview;
+
+  /// Optional host-provided failure or reconciliation explanation.
   final String? message;
-  final VoidCallback? onAccept, onRetry, onReload;
+
+  /// Requests acceptance of the current result.
+  final VoidCallback? onAccept;
+
+  /// Reconciles the original command after an uncertain outcome.
+  final VoidCallback? onRetry;
+
+  /// Reloads the result after a definitive failure or review request.
+  final VoidCallback? onReload;
 
   @override
+  /// Builds the phase-appropriate acceptance content and actions.
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.medium);

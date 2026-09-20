@@ -27,9 +27,9 @@ final class _CarpenterTooltipState extends State<CarpenterTooltip> {
   @override
   Widget build(BuildContext context) => ActionTooltip(
     text: widget.text,
-    child: widget.child,
     placement: widget.placement,
     showDelay: widget.showDelay,
     hideDelay: widget.hideDelay,
+    child: widget.child,
   );
 }

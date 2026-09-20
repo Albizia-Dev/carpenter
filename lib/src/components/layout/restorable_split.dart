@@ -53,8 +53,9 @@ final class _CarpenterAdaptiveSplitLayoutState
 
   Future<void> _restore() async {
     final value = await widget.restoration?.read<double>(widget.restorationKey);
-    if (mounted && value != null)
+    if (mounted && value != null) {
       setState(() => _ratio = value.clamp(.1, .9).toDouble());
+    }
   }
 
   void _changed(double value) {

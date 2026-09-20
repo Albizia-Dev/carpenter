@@ -1,5 +1,4 @@
 import 'package:carpenter/carpenter.dart';
-import 'package:flutter/semantics.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -86,6 +85,6 @@ void main() {
       find.bySemanticsLabel('Archive record'),
     );
     expect(semantics.hint, 'Select a record first');
-    expect(semantics.hasFlag(SemanticsFlag.isEnabled), isFalse);
+    expect(semantics.flagsCollection.isEnabled.toBoolOrNull(), isFalse);
   });
 }

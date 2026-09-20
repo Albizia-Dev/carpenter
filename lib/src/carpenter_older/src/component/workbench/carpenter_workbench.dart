@@ -421,7 +421,7 @@ class CarpenterNotice extends StatelessWidget {
       ],
     );
     final actions = <Widget>[
-      if (action != null) action!,
+      ?action,
       if (onClose != null)
         CarpenterIconButton(
           icon: const Text('×'),
