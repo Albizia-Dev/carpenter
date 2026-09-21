@@ -1,3 +1,10 @@
+## 0.5.1
+
+### Messenger attachment activation
+
+- Add typed message attachments with stable opaque IDs and host-owned activation callbacks.
+- Keep legacy attachment labels display-only for source compatibility while letting applications own authorization, URL resolution and failure handling.
+
 ## 0.5.0
 
 ### Contextual workspace shell

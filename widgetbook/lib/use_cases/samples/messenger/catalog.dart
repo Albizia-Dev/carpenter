@@ -553,6 +553,7 @@ class _AttachmentMessageScenarioState extends State<AttachmentMessageScenario> {
   bool submitted = false;
   bool removed = false;
   bool confirmed = false;
+  String? openedAttachment;
   @override
   Widget build(BuildContext context) => CarpenterMessengerWorkspace(
     conversations: const [
@@ -566,12 +567,17 @@ class _AttachmentMessageScenarioState extends State<AttachmentMessageScenario> {
     selectedId: 'project',
     onSelected: (_) {},
     messages: [
-      const CarpenterMessageItem(
+      CarpenterMessageItem(
         id: 'incoming',
         author: 'Анна Смирнова',
         text: 'Для проверки',
-        attachmentLabels: ['План работ.pdf · 2 МБ'],
-        status: '',
+        attachments: const [
+          CarpenterMessageAttachment(
+            id: 'plan',
+            label: 'План работ.pdf · 2 МБ',
+          ),
+        ],
+        status: openedAttachment == 'plan' ? 'Файл выбран' : '',
         timeLabel: '10:24',
       ),
       if (submitted)
@@ -582,9 +588,14 @@ class _AttachmentMessageScenarioState extends State<AttachmentMessageScenario> {
           own: true,
           needAnswer: needAnswer,
           canRetry: !confirmed,
-          attachmentLabels: removed
+          attachments: removed
               ? const []
-              : const ['Спецификация оборудования.pdf · 540 КБ'],
+              : const [
+                  CarpenterMessageAttachment(
+                    id: 'specification',
+                    label: 'Спецификация оборудования.pdf · 540 КБ',
+                  ),
+                ],
           status: confirmed ? 'Отправлено' : 'Нет подтверждения',
         ),
     ],
@@ -606,5 +617,7 @@ class _AttachmentMessageScenarioState extends State<AttachmentMessageScenario> {
     onNeedAnswerChanged: (value) => setState(() => needAnswer = value),
     onSend: submitted ? null : () => setState(() => submitted = true),
     onRetry: (_) => setState(() => confirmed = true),
+    onMessageAttachmentSelected: (_, attachmentId) =>
+        setState(() => openedAttachment = attachmentId),
   );
 }

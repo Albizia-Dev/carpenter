@@ -48,6 +48,22 @@ class CarpenterConversationItem {
   final bool canSend;
 }
 
+/// Display identity for one attachment already belonging to a message.
+///
+/// [id] is opaque and stable within the message. Carpenter never interprets it
+/// as a URL or storage key; the host resolves activation through its own
+/// authorization and transport rules.
+class CarpenterMessageAttachment {
+  /// Creates a host-resolved attachment descriptor.
+  const CarpenterMessageAttachment({required this.id, required this.label});
+
+  /// Opaque identity reported back to the host on activation.
+  final String id;
+
+  /// User-visible file description; it may include size or type details.
+  final String label;
+}
+
 /// Display-only message. Delivery wording must reflect observed transport state.
 class CarpenterMessageItem {
   /// [status] is readable delivery text, never an inferred recipient receipt.
@@ -66,6 +82,7 @@ class CarpenterMessageItem {
     this.canReply = false,
     this.replyTargetId,
     this.attachmentLabels = const [],
+    this.attachments = const [],
   });
 
   /// Resolved quotation or an unavailable-target label; never fetched by Carpenter.
@@ -99,6 +116,10 @@ class CarpenterMessageItem {
   /// The caller must keep this list immutable for the lifetime of the item.
   final List<String> attachmentLabels;
 
+  /// Stable, host-resolved message attachments. These become interactive only
+  /// when the containing bubble or workspace receives an activation callback.
+  final List<CarpenterMessageAttachment> attachments;
+
   /// Localized delivery state or timestamp supplied by the caller.
   final String status;
 
@@ -123,6 +144,7 @@ class CarpenterMessageBubble extends StatefulWidget {
     this.groupWithPrevious = false,
     this.onReply,
     this.onOpenReply,
+    this.onAttachmentSelected,
   });
 
   /// Immutable display state owned by the caller.
@@ -133,6 +155,10 @@ class CarpenterMessageBubble extends StatefulWidget {
 
   /// Opens the quoted original; the workspace resolves its loaded row key.
   final VoidCallback? onOpenReply;
+
+  /// Reports the stable attachment ID. The host owns authorization, opening,
+  /// download progress and failures; Carpenter never handles a URL directly.
+  final ValueChanged<String>? onAttachmentSelected;
 
   /// Null disables retry even if the model permits it.
   final VoidCallback? onRetry;
@@ -200,6 +226,9 @@ class _MessageBubbleState extends State<CarpenterMessageBubble> {
                               text: [
                                 message.text,
                                 ...message.attachmentLabels,
+                                ...message.attachments.map(
+                                  (attachment) => attachment.label,
+                                ),
                               ].where((s) => s.isNotEmpty).join('\n'),
                             ),
                           ),
@@ -239,6 +268,22 @@ class _MessageBubbleState extends State<CarpenterMessageBubble> {
                             Padding(
                               padding: EdgeInsets.symmetric(vertical: gap / 2),
                               child: CarpenterText.label(label),
+                            ),
+                          for (final attachment in message.attachments)
+                            Padding(
+                              key: ValueKey(attachment.id),
+                              padding: EdgeInsets.symmetric(vertical: gap / 2),
+                              child: CarpenterButton.text(
+                                label: attachment.label,
+                                semanticLabel:
+                                    'Открыть файл ${attachment.label}',
+                                size: ControlSize.small,
+                                onPressed: widget.onAttachmentSelected == null
+                                    ? null
+                                    : () => widget.onAttachmentSelected!(
+                                        attachment.id,
+                                      ),
+                              ),
                             ),
                           if (message.text.isNotEmpty)
                             CarpenterText.body(message.text),
@@ -486,6 +531,7 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
     this.onCancelReplyLookup,
     this.onReply,
     this.onCancelReply,
+    this.onMessageAttachmentSelected,
   });
 
   /// Quotation associated with the selected room's draft, supplied by the host.
@@ -509,6 +555,11 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
 
   /// Receives a stable message row key to start a reply.
   final ValueChanged<String>? onReply;
+
+  /// Reports the message and attachment identities selected by the user.
+  /// Storage lookup, access control and failure presentation remain host-owned.
+  final void Function(String messageId, String attachmentId)?
+  onMessageAttachmentSelected;
 
   /// Clears the selected draft's reply relation only.
   final VoidCallback? onCancelReply;
@@ -834,6 +885,8 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
                                                 onReply: room.canSend
                                                     ? onReply
                                                     : null,
+                                                onMessageAttachmentSelected:
+                                                    onMessageAttachmentSelected,
                                               ),
                                       ),
                                     ),
@@ -1038,6 +1091,7 @@ class _MessageTimeline extends StatefulWidget {
     this.failedReplyMessageId,
     this.onCancelReplyLookup,
     this.onReply,
+    this.onMessageAttachmentSelected,
   });
   final String? failedReplyMessageId;
   final ValueChanged<String>? onCancelReplyLookup;
@@ -1045,6 +1099,8 @@ class _MessageTimeline extends StatefulWidget {
   final ValueChanged<String> onRetry;
   final ValueChanged<String>? onUnavailableReply;
   final ValueChanged<String>? onReply;
+  final void Function(String messageId, String attachmentId)?
+  onMessageAttachmentSelected;
   @override
   State<_MessageTimeline> createState() => _MessageTimelineState();
 }
@@ -1139,6 +1195,12 @@ class _MessageTimelineState extends State<_MessageTimeline> {
               onOpenReply: message.replyPreview == null
                   ? null
                   : () => _open(message),
+              onAttachmentSelected: widget.onMessageAttachmentSelected == null
+                  ? null
+                  : (attachmentId) => widget.onMessageAttachmentSelected!(
+                      message.id,
+                      attachmentId,
+                    ),
             ),
           ],
         ),
