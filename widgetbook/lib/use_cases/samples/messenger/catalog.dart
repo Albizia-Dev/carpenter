@@ -66,6 +66,10 @@ final messengerComponents = [
             ),
             failSend: context.knobs.boolean(label: 'Ошибка отправки'),
             readOnly: context.knobs.boolean(label: 'Только чтение'),
+            showNewConversation: context.knobs.boolean(
+              label: 'Новый разговор',
+              initialValue: true,
+            ),
             historyLoading: context.knobs.boolean(label: 'Загрузка истории'),
             historyFailure: context.knobs.boolean(label: 'Ошибка истории'),
             hasOlder: context.knobs.boolean(label: 'Есть ранние сообщения'),
@@ -137,6 +141,7 @@ class MessengerScenario extends StatefulWidget {
     this.showFailure = false,
     this.showAttachments = false,
     this.readOnly = false,
+    this.showNewConversation = true,
     this.historyLoading = false,
     this.historyFailure = false,
     this.hasOlder = false,
@@ -151,6 +156,7 @@ class MessengerScenario extends StatefulWidget {
   final bool showFailure;
   final bool showAttachments;
   final bool readOnly;
+  final bool showNewConversation;
   final bool historyLoading;
   final bool historyFailure;
   final bool hasOlder;
@@ -311,6 +317,7 @@ class _MessengerScenarioState extends State<MessengerScenario> {
 
   @override
   Widget build(BuildContext context) => CarpenterMessengerWorkspace(
+    onNewConversation: widget.showNewConversation ? () {} : null,
     attachments: widget.showAttachments
         ? const [
             CarpenterAttachmentItem(

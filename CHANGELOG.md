@@ -1,3 +1,9 @@
+## 0.5.2
+
+### Messenger conversation action
+
+- Add an optional, accessible new-conversation action to the messenger workspace while preserving the existing header when the callback is absent.
+
 ## 0.5.1
 
 ### Messenger attachment activation

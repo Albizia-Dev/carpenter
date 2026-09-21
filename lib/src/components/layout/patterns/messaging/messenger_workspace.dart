@@ -523,6 +523,7 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
     this.onHistoryRequested,
     this.conversationQuery = '',
     this.onConversationQueryChanged,
+    this.onNewConversation,
     this.visibleConversationIds,
     this.replyPreview,
     this.onUnavailableReply,
@@ -569,6 +570,10 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
 
   /// Null hides search for hosts that do not offer directory filtering.
   final ValueChanged<String>? onConversationQueryChanged;
+
+  /// Requests a new conversation flow owned entirely by the host.
+  /// Null keeps the conversation header unchanged and hides the action.
+  final VoidCallback? onNewConversation;
 
   /// Host-filtered IDs. Null shows all authorized [conversations]. Unknown IDs
   /// never add rooms. Filtering leaves [selectedId] and its detail intact.
@@ -711,9 +716,22 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
                     children: [
                       Padding(
                         padding: EdgeInsets.all(gap),
-                        child: const CarpenterText.title(
-                          'Сообщения',
-                          emphasis: TypographyEmphasis.strong,
+                        child: Row(
+                          children: [
+                            const Expanded(
+                              child: CarpenterText.title(
+                                'Сообщения',
+                                emphasis: TypographyEmphasis.strong,
+                              ),
+                            ),
+                            if (onNewConversation != null)
+                              CarpenterIconButton(
+                                icon: GravityIcons.plus,
+                                semanticLabel: 'Новый разговор',
+                                prominence: ActionProminence.ghost,
+                                onPressed: onNewConversation,
+                              ),
+                          ],
                         ),
                       ),
                       if (onConversationQueryChanged != null)
