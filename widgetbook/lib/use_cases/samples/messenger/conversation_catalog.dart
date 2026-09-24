@@ -65,7 +65,7 @@ final conversationComponents = [
           readOnly: context.knobs.boolean(label: 'Только чтение'),
           withReply: context.knobs.boolean(label: 'Ответ'),
           withAttachment: context.knobs.boolean(label: 'Вложение'),
-          recording: context.knobs.boolean(label: 'Запись закреплена'),
+          recording: context.knobs.boolean(label: 'Lock записи'),
         ),
       ),
       WidgetbookUseCase(
@@ -87,6 +87,24 @@ final conversationComponents = [
           ),
           large: context.knobs.boolean(label: 'Большой файл'),
         ),
+      ),
+      WidgetbookUseCase(
+        name: 'States · Video circle focused',
+        builder: (_) => const _MediaScenario(
+          kind: CarpenterMediaKind.videoCircle,
+          large: false,
+          initialFocused: true,
+        ),
+      ),
+      WidgetbookUseCase(
+        name: 'States · Voice waveform',
+        builder: (_) =>
+            const _MediaScenario(kind: CarpenterMediaKind.voice, large: false),
+      ),
+      WidgetbookUseCase(
+        name: 'States · Rich file',
+        builder: (_) =>
+            const _MediaScenario(kind: CarpenterMediaKind.file, large: false),
       ),
     ],
   ),
@@ -196,15 +214,20 @@ class _ComposerScenarioState extends State<_ComposerScenario> {
 }
 
 class _MediaScenario extends StatefulWidget {
-  const _MediaScenario({required this.kind, required this.large});
+  const _MediaScenario({
+    required this.kind,
+    required this.large,
+    this.initialFocused = false,
+  });
   final CarpenterMediaKind kind;
   final bool large;
+  final bool initialFocused;
   @override
   State<_MediaScenario> createState() => _MediaScenarioState();
 }
 
 class _MediaScenarioState extends State<_MediaScenario> {
-  bool focused = false;
+  late bool focused = widget.initialFocused;
   bool playing = false;
   double speed = 1;
   @override
@@ -212,7 +235,9 @@ class _MediaScenarioState extends State<_MediaScenario> {
     view: CarpenterMediaView(
       id: 'media',
       kind: widget.kind,
-      label: 'Медиа',
+      label: widget.kind == CarpenterMediaKind.file
+          ? 'Смета строительства.pdf'
+          : 'Медиа',
       byteLength: widget.large ? carpenterEagerMediaLimitBytes + 1 : 1024,
       loadState: widget.large
           ? CarpenterMediaLoadState.previewReady

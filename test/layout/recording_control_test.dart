@@ -60,6 +60,48 @@ void main() {
     await tester.tap(find.byType(CarpenterRecordingControl));
     expect(modes, isEmpty);
   });
+
+  testWidgets('drag lock is an icon state without visible status prose', (
+    tester,
+  ) async {
+    var phase = CarpenterRecordingPhase.idle;
+    late StateSetter update;
+    await tester.pumpWidget(
+      _host(
+        StatefulBuilder(
+          builder: (context, setState) {
+            update = setState;
+            return CarpenterRecordingControl(
+              view: CarpenterRecordingView(
+                kind: CarpenterRecordingKind.voice,
+                phase: phase,
+              ),
+              onStart: (_) =>
+                  update(() => phase = CarpenterRecordingPhase.recording),
+              onLock: (_) =>
+                  update(() => phase = CarpenterRecordingPhase.locked),
+              onStop: (_) {},
+            );
+          },
+        ),
+      ),
+    );
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byType(CarpenterRecordingControl)),
+    );
+    await tester.pump(kLongPressTimeout + const Duration(milliseconds: 1));
+    await gesture.moveBy(const Offset(0, -80));
+    await tester.pump();
+
+    expect(
+      find.byKey(const ValueKey('recording-lock-indicator')),
+      findsOneWidget,
+    );
+    expect(find.text('Запись закреплена'), findsNothing);
+    expect(find.text('Идёт запись'), findsNothing);
+    await gesture.up();
+  });
 }
 
 Widget _host(Widget child) => UnitsRoot(
@@ -70,7 +112,13 @@ Widget _host(Widget child) => UnitsRoot(
       data: const MediaQueryData(),
       child: Directionality(
         textDirection: TextDirection.ltr,
-        child: FocusScope(child: Center(child: child)),
+        child: FocusScope(
+          child: Overlay(
+            initialEntries: [
+              OverlayEntry(builder: (_) => Center(child: child)),
+            ],
+          ),
+        ),
       ),
     ),
   ),

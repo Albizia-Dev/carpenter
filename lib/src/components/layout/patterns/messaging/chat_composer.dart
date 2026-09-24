@@ -205,6 +205,7 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
             action: CarpenterActionDescriptor(
               id: 'send-ordinary',
               label: 'Обычное',
+              icon: GravityIcons.paperPlane,
               onInvoke: () => _send(CarpenterSendMode.ordinary),
             ),
           ),
@@ -212,6 +213,7 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
             action: CarpenterActionDescriptor(
               id: 'send-important',
               label: 'Важное',
+              icon: GravityIcons.exclamationShape,
               colorRole: ActionColorRole.danger,
               onInvoke: () => _send(CarpenterSendMode.important),
             ),
@@ -220,6 +222,7 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
             action: CarpenterActionDescriptor(
               id: 'send-requires-answer',
               label: 'Требует ответа',
+              icon: GravityIcons.circleQuestion,
               colorRole: ActionColorRole.danger,
               onInvoke: () => _send(CarpenterSendMode.requiresAnswer),
             ),

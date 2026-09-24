@@ -3,6 +3,15 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  testWidgets('older-history loading is icon-only timeline chrome', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_host(const CarpenterMessageHistoryLoading()));
+
+    expect(find.byType(CarpenterLoader), findsOneWidget);
+    expect(find.textContaining('Загрузка'), findsNothing);
+  });
+
   test('group breaks at twenty minutes, date and system events', () {
     final first = _message('first', DateTime(2026, 9, 24, 10));
     final nineteenMinutesLater = _message(
@@ -188,6 +197,87 @@ void main() {
       find.byKey(const ValueKey('message-bubble-intrinsic')),
       findsOneWidget,
     );
+  });
+
+  testWidgets(
+    'selection tints each directional surface without flattening their identity',
+    (tester) async {
+      final sentAt = DateTime(2026, 9, 24, 10);
+      await tester.pumpWidget(
+        _host(
+          Column(
+            children: [
+              for (final entry in const [
+                (id: 'incoming-rest', own: false, selected: false),
+                (id: 'incoming-selected', own: false, selected: true),
+                (id: 'own-rest', own: true, selected: false),
+                (id: 'own-selected', own: true, selected: true),
+              ])
+                CarpenterMessageBubble(
+                  message: CarpenterMessageView(
+                    id: entry.id,
+                    authorId: entry.own ? 'me' : 'anna',
+                    authorLabel: entry.own ? 'Вы' : 'Анна',
+                    body: entry.id,
+                    own: entry.own,
+                    sentAt: sentAt,
+                  ),
+                  selected: entry.selected,
+                  selectionMode: entry.selected,
+                  onSelectionChanged: (_) {},
+                ),
+            ],
+          ),
+        ),
+      );
+
+      Color color(String id) =>
+          (tester
+                      .widget<DecoratedBox>(
+                        find.byKey(ValueKey('message-bubble-$id')),
+                      )
+                      .decoration
+                  as BoxDecoration)
+              .color!;
+      expect(color('incoming-rest'), isNot(color('own-rest')));
+      expect(color('incoming-selected'), isNot(color('incoming-rest')));
+      expect(color('own-selected'), isNot(color('own-rest')));
+      expect(color('incoming-selected'), isNot(color('own-selected')));
+      expect(
+        color('incoming-selected'),
+        isNot(CarpenterThemeData.light().overlay.selected),
+      );
+    },
+  );
+
+  testWidgets('selection control hugs the opposite bubble edge', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        CarpenterMessageBubble(
+          message: CarpenterMessageView(
+            id: 'incoming-selected',
+            authorId: 'anna',
+            authorLabel: 'Анна',
+            body: 'Проверьте',
+            own: false,
+            sentAt: DateTime(2026, 9, 24, 10),
+          ),
+          selected: true,
+          selectionMode: true,
+          onSelectionChanged: (_) {},
+        ),
+      ),
+    );
+
+    final bubble = tester.getRect(
+      find.byKey(const ValueKey('message-bubble-incoming-selected')),
+    );
+    final selection = tester.getRect(
+      find.byKey(const ValueKey('message-selection-incoming-selected')),
+    );
+    expect(selection.left - bubble.right, lessThanOrEqualTo(4));
   });
 }
 

@@ -78,7 +78,7 @@ void main() {
     await gesture.up();
     expect(events, containsAllInOrder(['start', 'lock']));
     expect(events, isNot(contains('stop')));
-    await tester.tap(find.bySemanticsLabel('Увеличить видеосообщение'));
+    await tester.tap(find.byKey(const ValueKey('inline-media-circle-circle')));
     expect(focused, isTrue);
   });
 }

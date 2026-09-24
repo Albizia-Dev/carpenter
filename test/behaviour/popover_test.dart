@@ -37,6 +37,42 @@ void main() {
     expect(find.text('Popover content'), findsNothing);
   });
 
+  testWidgets('menu popover owns exactly one framed surface', (tester) async {
+    final theme = CarpenterThemeData.light();
+    await tester.pumpWidget(
+      carpenterOverlayHarness(
+        CarpenterPopover(
+          open: true,
+          onOpenChanged: _ignore,
+          anchor: const SizedBox(width: 80, height: 32),
+          content: CarpenterMenu(
+            items: [
+              CarpenterMenuItem(
+                action: CarpenterActionDescriptor(
+                  id: 'reply',
+                  label: 'Ответить',
+                  onInvoke: () {},
+                ),
+              ),
+            ],
+          ),
+        ),
+        theme: theme,
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final framedSurfaces = tester
+        .widgetList<DecoratedBox>(find.byType(DecoratedBox))
+        .where((box) {
+          final decoration = box.decoration;
+          return decoration is BoxDecoration &&
+              decoration.color == theme.overlay.background &&
+              decoration.border != null;
+        });
+    expect(framedSurfaces, hasLength(1));
+  });
+
   testWidgets('outside click and Escape request dismissal and restore focus', (
     tester,
   ) async {

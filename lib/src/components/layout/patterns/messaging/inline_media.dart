@@ -1,15 +1,19 @@
 import 'dart:ui';
+import 'dart:math' as math;
 
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 
 import '../../../../foundation/roles.dart';
 import '../../../../foundation/theme.dart';
+import '../../../../foundation/icon_data.dart';
 import '../../../basic/button/button.dart';
 import '../../../basic/button/icon_button.dart';
 import '../../../basic/gravity_icons.g.dart';
 import '../../../basic/icon.dart';
+import '../../../basic/loader.dart';
 import '../../../basic/text.dart';
+import '../../../behaviour/popover.dart';
 import 'messaging_models.dart';
 
 typedef CarpenterMediaPreviewBuilder =
@@ -74,22 +78,13 @@ final class CarpenterInlineMedia extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _presentation(context),
-                if (view.loadState == CarpenterMediaLoadState.originalLoading)
-                  const CarpenterText.caption('Загружаем оригинал…'),
-                if (view.loadState == CarpenterMediaLoadState.failed)
-                  const CarpenterText.feedback(
-                    'Не удалось загрузить медиа.',
-                    feedbackRole: FeedbackColorRole.danger,
-                  ),
-                if (view.requiresExplicitOriginalLoad)
-                  CarpenterButton(
-                    label: 'Загрузить оригинал',
-                    semanticLabel: 'Загрузить оригинал: ${view.label}',
-                    onPressed: onLoadRequested,
-                    prominence: ActionProminence.ghost,
-                    size: ControlSize.small,
-                  ),
+                Stack(
+                  children: [
+                    _presentation(context),
+                    if (_loadAction(context) case final action?)
+                      PositionedDirectional(top: 0, end: 0, child: action),
+                  ],
+                ),
               ],
             ),
           ),
@@ -105,8 +100,7 @@ final class CarpenterInlineMedia extends StatelessWidget {
   bool get _hasPlayback =>
       view.kind == CarpenterMediaKind.video ||
       view.kind == CarpenterMediaKind.audio ||
-      view.kind == CarpenterMediaKind.voice ||
-      view.kind == CarpenterMediaKind.videoCircle;
+      view.kind == CarpenterMediaKind.voice;
 
   Widget _presentation(BuildContext context) => switch (view.kind) {
     CarpenterMediaKind.image => _visualPreview(context, blurred: true),
@@ -116,6 +110,35 @@ final class CarpenterInlineMedia extends StatelessWidget {
     CarpenterMediaKind.videoCircle => _videoCircle(context),
     CarpenterMediaKind.file => _filePreview(context),
   };
+
+  Widget? _loadAction(BuildContext context) {
+    if (view.loadState == CarpenterMediaLoadState.originalLoading) {
+      return CarpenterLoader(
+        semanticLabel: 'Загрузка оригинала: ${view.label}',
+      );
+    }
+    if (view.loadState == CarpenterMediaLoadState.failed) {
+      return CarpenterIconButton(
+        icon: GravityIcons.arrowRotateRight,
+        semanticLabel: 'Повторить загрузку: ${view.label}',
+        onPressed: onLoadRequested,
+        colorRole: ActionColorRole.warning,
+        prominence: ActionProminence.high,
+        size: ControlSize.small,
+      );
+    }
+    if (view.requiresExplicitOriginalLoad) {
+      return CarpenterIconButton(
+        icon: GravityIcons.arrowDownToLine,
+        semanticLabel: 'Загрузить оригинал: ${view.label}',
+        onPressed: onLoadRequested,
+        colorRole: ActionColorRole.primary,
+        prominence: ActionProminence.high,
+        size: ControlSize.small,
+      );
+    }
+    return null;
+  }
 
   Widget _visualPreview(BuildContext context, {required bool blurred}) {
     final theme = CarpenterTheme.of(context);
@@ -161,7 +184,10 @@ final class CarpenterInlineMedia extends StatelessWidget {
         height: context.units(theme.sizes.tableColumn),
         child: shouldBlur
             ? ImageFiltered(
-                imageFilter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                imageFilter: ImageFilter.blur(
+                  sigmaX: context.units(theme.spacing.medium),
+                  sigmaY: context.units(theme.spacing.medium),
+                ),
                 child: content,
               )
             : content,
@@ -170,7 +196,7 @@ final class CarpenterInlineMedia extends StatelessWidget {
   }
 
   Widget _videoPreview(BuildContext context) => Stack(
-    alignment: AlignmentDirectional.bottomEnd,
+    alignment: AlignmentDirectional.topStart,
     children: [
       _visualPreview(context, blurred: false),
       if (view.duration case final duration?)
@@ -189,6 +215,9 @@ final class CarpenterInlineMedia extends StatelessWidget {
 
   Widget _audioPreview(BuildContext context) {
     final theme = CarpenterTheme.of(context);
+    final waveformHeight = context.units(
+      theme.sizes.control(ControlSize.medium),
+    );
     return SizedBox(
       width: context.units(theme.sizes.layoutSecondary),
       child: Row(
@@ -204,21 +233,57 @@ final class CarpenterInlineMedia extends StatelessWidget {
           ),
           SizedBox(width: context.units(theme.spacing.small)),
           Expanded(
-            child: SizedBox(
-              height: context.units(theme.sizes.control(ControlSize.large)),
-              child: CustomPaint(
-                key: ValueKey('media-waveform-${view.id}'),
-                painter: _WaveformPainter(
-                  samples: view.waveform,
-                  color: theme.content.resolve(ContentColorRole.secondary),
-                  playedColor: theme.actions.primary.state,
-                  progress:
-                      view.duration == null || view.duration == Duration.zero
-                      ? 0
-                      : view.position.inMilliseconds /
-                            view.duration!.inMilliseconds,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (view.kind == CarpenterMediaKind.audio)
+                  CarpenterText.label(
+                    view.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                LayoutBuilder(
+                  builder: (context, constraints) => Listener(
+                    behavior: HitTestBehavior.opaque,
+                    onPointerDown: onSeekRequested == null
+                        ? null
+                        : (details) => _seek(
+                            details.localPosition.dx,
+                            constraints.maxWidth,
+                          ),
+                    onPointerMove: onSeekRequested == null
+                        ? null
+                        : (details) => _seek(
+                            details.localPosition.dx,
+                            constraints.maxWidth,
+                          ),
+                    child: SizedBox(
+                      width: constraints.maxWidth,
+                      height: waveformHeight,
+                      child: CustomPaint(
+                        key: ValueKey('media-waveform-${view.id}'),
+                        painter: _WaveformPainter(
+                          samples: view.waveform,
+                          color: theme.content.resolve(
+                            ContentColorRole.secondary,
+                          ),
+                          playedColor: theme.actions.primary.normal,
+                          strokeWidth: context.units(
+                            theme.shapes.fieldBorderWidth,
+                          ),
+                          progress:
+                              view.duration == null ||
+                                  view.duration == Duration.zero
+                              ? 0
+                              : view.position.inMilliseconds /
+                                    view.duration!.inMilliseconds,
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ],
@@ -228,53 +293,117 @@ final class CarpenterInlineMedia extends StatelessWidget {
 
   Widget _videoCircle(BuildContext context) {
     final theme = CarpenterTheme.of(context);
-    final extent = context.units(
-      view.focused ? theme.sizes.layoutNavigationSide : theme.sizes.tableColumn,
+    final compactExtent = context.units(theme.sizes.tableColumn);
+    final focusedExtent = context.units(theme.sizes.layoutNavigationSide);
+    final compact = view.focused
+        ? SizedBox.square(dimension: compactExtent)
+        : _circleVisual(context, compactExtent);
+    return CarpenterPopover(
+      open: view.focused,
+      onOpenChanged: (focused) => onFocusChanged?.call(focused),
+      anchorActivates: false,
+      presentation: CarpenterPopoverPresentation.bare,
+      anchor: compact,
+      content: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onPlayPauseRequested,
+        child: _circleVisual(context, focusedExtent),
+      ),
     );
+  }
+
+  Widget _circleVisual(BuildContext context, double extent) {
+    final theme = CarpenterTheme.of(context);
+    final progress = view.duration == null || view.duration == Duration.zero
+        ? 0.0
+        : (view.position.inMilliseconds / view.duration!.inMilliseconds).clamp(
+            0.0,
+            1.0,
+          );
     final content = preview ?? ColoredBox(color: theme.surface.base);
-    return Stack(
-      alignment: AlignmentDirectional.bottomEnd,
-      children: [
-        SizedBox.square(
-          key: ValueKey('inline-media-circle-${view.id}'),
-          dimension: extent,
-          child: ClipOval(child: content),
+    return Semantics(
+      button: onPlayPauseRequested != null || onFocusChanged != null,
+      label: '${view.label}, ${_duration(view.position)}',
+      onTap: () {
+        onPlayPauseRequested?.call();
+        if (!view.focused) onFocusChanged?.call(true);
+      },
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          onPlayPauseRequested?.call();
+          if (!view.focused) onFocusChanged?.call(true);
+        },
+        child: CustomPaint(
+          key: ValueKey('inline-media-circle-progress-${view.id}'),
+          foregroundPainter: _CircularProgressPainter(
+            progress: progress,
+            color: theme.actions.primary.normal,
+            trackColor: theme.overlay.border,
+            strokeWidth: context.units(theme.shapes.fieldBorderWidth) * 2,
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(
+              context.units(theme.shapes.fieldBorderWidth) * 2,
+            ),
+            child: SizedBox.square(
+              key: ValueKey('inline-media-circle-${view.id}'),
+              dimension: extent,
+              child: ClipOval(child: content),
+            ),
+          ),
         ),
-        CarpenterIconButton(
-          icon: view.focused
-              ? GravityIcons.arrowsOppositeToDots
-              : GravityIcons.arrowsExpand,
-          semanticLabel: view.focused
-              ? 'Уменьшить видеосообщение'
-              : 'Увеличить видеосообщение',
-          onPressed: onFocusChanged == null
-              ? null
-              : () => onFocusChanged!(!view.focused),
-          prominence: ActionProminence.high,
-          size: ControlSize.small,
+      ),
+    );
+  }
+
+  Widget _filePreview(BuildContext context) {
+    final theme = CarpenterTheme.of(context);
+    final extension = _extension(view.label);
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CarpenterIcon(
+          _fileIcon(extension),
+          semanticLabel: extension.isEmpty ? 'Файл' : 'Файл $extension',
+          size: IconSize.large,
+        ),
+        SizedBox(width: context.units(theme.spacing.small)),
+        Flexible(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CarpenterText.label(
+                view.label,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (extension.isNotEmpty) ...[
+                    CarpenterText.caption(extension),
+                    SizedBox(width: context.units(theme.spacing.xsmall)),
+                  ],
+                  CarpenterText.caption(_bytes(view.byteLength)),
+                ],
+              ),
+            ],
+          ),
         ),
       ],
     );
   }
 
-  Widget _filePreview(BuildContext context) => Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      const CarpenterIcon(
-        GravityIcons.file,
-        semanticLabel: 'Файл',
-        size: IconSize.large,
-      ),
-      SizedBox(width: context.units(CarpenterTheme.of(context).spacing.small)),
-      Flexible(
-        child: CarpenterText.label(
-          view.label,
-          maxLines: 2,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ),
-    ],
-  );
+  void _seek(double localX, double width) {
+    final duration = view.duration;
+    if (duration == null || duration == Duration.zero || width <= 0) return;
+    final fraction = (localX / width).clamp(0.0, 1.0);
+    onSeekRequested?.call(
+      Duration(milliseconds: (duration.inMilliseconds * fraction).round()),
+    );
+  }
 
   Widget _playbackControls(BuildContext context) {
     final gap = context.units(CarpenterTheme.of(context).spacing.small);
@@ -325,17 +454,21 @@ final class _WaveformPainter extends CustomPainter {
     required this.samples,
     required this.color,
     required this.playedColor,
+    required this.strokeWidth,
     required this.progress,
   });
 
   final List<int> samples;
   final Color color;
   final Color playedColor;
+  final double strokeWidth;
   final double progress;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final values = samples.isEmpty ? const [2, 5, 3, 7, 4, 8] : samples;
+    final values = samples.isEmpty
+        ? List<int>.generate(32, (index) => 2 + (index * 5) % 7)
+        : samples;
     final slot = size.width / values.length;
     final maximum = values.fold<int>(
       1,
@@ -346,7 +479,7 @@ final class _WaveformPainter extends CustomPainter {
       final x = slot * index + slot / 2;
       final paint = Paint()
         ..color = x / size.width <= progress ? playedColor : color
-        ..strokeWidth = slot * .35
+        ..strokeWidth = math.min(strokeWidth * 2, slot * .5)
         ..strokeCap = StrokeCap.round;
       canvas.drawLine(
         Offset(x, (size.height - height) / 2),
@@ -358,5 +491,84 @@ final class _WaveformPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_WaveformPainter oldDelegate) =>
-      oldDelegate.samples != samples || oldDelegate.progress != progress;
+      oldDelegate.samples != samples ||
+      oldDelegate.progress != progress ||
+      oldDelegate.color != color ||
+      oldDelegate.playedColor != playedColor ||
+      oldDelegate.strokeWidth != strokeWidth;
+}
+
+final class _CircularProgressPainter extends CustomPainter {
+  const _CircularProgressPainter({
+    required this.progress,
+    required this.color,
+    required this.trackColor,
+    required this.strokeWidth,
+  });
+
+  final double progress;
+  final Color color;
+  final Color trackColor;
+  final double strokeWidth;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final inset = strokeWidth / 2;
+    final bounds = Rect.fromLTWH(
+      inset,
+      inset,
+      size.width - strokeWidth,
+      size.height - strokeWidth,
+    );
+    canvas.drawOval(
+      bounds,
+      Paint()
+        ..color = trackColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = strokeWidth,
+    );
+    canvas.drawArc(
+      bounds,
+      -math.pi / 2,
+      math.pi * 2 * progress,
+      false,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = strokeWidth,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_CircularProgressPainter oldDelegate) =>
+      oldDelegate.progress != progress ||
+      oldDelegate.color != color ||
+      oldDelegate.trackColor != trackColor ||
+      oldDelegate.strokeWidth != strokeWidth;
+}
+
+String _extension(String label) {
+  final dot = label.lastIndexOf('.');
+  if (dot < 0 || dot == label.length - 1) return '';
+  return label.substring(dot + 1).toUpperCase();
+}
+
+CarpenterIconSource _fileIcon(String extension) => switch (extension) {
+  'PDF' => GravityIcons.fileLetterP,
+  'DOC' || 'DOCX' => GravityIcons.fileLetterW,
+  'XLS' || 'XLSX' => GravityIcons.fileLetterX,
+  'ZIP' || 'RAR' || '7Z' => GravityIcons.fileZipper,
+  'TXT' || 'RTF' => GravityIcons.fileText,
+  _ => GravityIcons.file,
+};
+
+String _bytes(int value) {
+  if (value < 1024) return '$value Б';
+  final kilobytes = value / 1024;
+  if (kilobytes < 1024) {
+    return '${kilobytes == kilobytes.roundToDouble() ? kilobytes.toInt() : kilobytes.toStringAsFixed(1)} КБ';
+  }
+  final megabytes = kilobytes / 1024;
+  return '${megabytes == megabytes.roundToDouble() ? megabytes.toInt() : megabytes.toStringAsFixed(1)} МБ';
 }

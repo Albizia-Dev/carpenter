@@ -110,6 +110,42 @@ void main() {
     await tester.pump();
     expect(selected, contains('second'));
   });
+
+  testWidgets('every message menu action has an icon and semantic role', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        CarpenterMessageBubble(
+          message: CarpenterMessageView(
+            id: 'failed',
+            authorId: 'me',
+            authorLabel: 'Вы',
+            body: 'Не отправилось',
+            own: true,
+            sentAt: DateTime(2026, 9, 24, 10),
+            canRetry: true,
+          ),
+          selected: false,
+          selectionMode: false,
+          onSelectionChanged: (_) {},
+          onReplyRequested: () {},
+          onRetryRequested: () {},
+        ),
+      ),
+    );
+
+    await tester.longPress(find.text('Не отправилось'));
+    await tester.pumpAndSettle();
+    final menu = find.byType(CarpenterMenu);
+    final icons = find.descendant(
+      of: menu,
+      matching: find.byWidgetPredicate(
+        (widget) => widget.runtimeType.toString() == 'IconRenderer',
+      ),
+    );
+    expect(icons, findsNWidgets(4));
+  });
 }
 
 Widget _host(Widget child) => UnitsRoot(

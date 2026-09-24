@@ -7,6 +7,7 @@ import '../../../basic/button/button.dart';
 import '../../../basic/button/icon_button.dart';
 import '../../../basic/gravity_icons.g.dart';
 import '../../../basic/text.dart';
+import '../../../basic/loader.dart';
 
 /// Compact in-flow marker for an older-history page request.
 final class CarpenterMessageHistoryLoading extends StatelessWidget {
@@ -18,10 +19,7 @@ final class CarpenterMessageHistoryLoading extends StatelessWidget {
     return Padding(
       padding: EdgeInsets.all(gap),
       child: const Center(
-        child: CarpenterText.caption(
-          'Загрузка ранних сообщений…',
-          colorRole: ContentColorRole.secondary,
-        ),
+        child: CarpenterLoader(semanticLabel: 'Загрузка истории'),
       ),
     );
   }

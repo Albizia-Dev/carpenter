@@ -8,6 +8,7 @@ import '../../../../foundation/roles.dart';
 import '../../../../foundation/theme.dart';
 import '../../../basic/button/icon_button.dart';
 import '../../../basic/gravity_icons.g.dart';
+import '../../../basic/icon.dart';
 import '../../../basic/text.dart';
 import 'messaging_models.dart';
 
@@ -135,13 +136,26 @@ final class _CarpenterRecordingControlState
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (view.phase == CarpenterRecordingPhase.recording ||
-            view.phase == CarpenterRecordingPhase.locked)
-          CarpenterText.caption(
-            view.phase == CarpenterRecordingPhase.locked
-                ? 'Запись закреплена'
-                : 'Идёт запись',
-          ),
+        AnimatedSwitcher(
+          duration: theme.motion.transitionDuration(context),
+          switchInCurve: theme.motion.stateCurve,
+          switchOutCurve: theme.motion.stateCurve,
+          child: switch (view.phase) {
+            CarpenterRecordingPhase.recording => const CarpenterIcon(
+              GravityIcons.arrowUp,
+              key: ValueKey('recording-lock-affordance'),
+              semanticLabel: 'Потяните вверх, чтобы зафиксировать запись',
+              size: IconSize.small,
+            ),
+            CarpenterRecordingPhase.locked => const CarpenterIcon(
+              GravityIcons.lockFill,
+              key: ValueKey('recording-lock-indicator'),
+              semanticLabel: 'Запись зафиксирована',
+              size: IconSize.small,
+            ),
+            _ => const SizedBox.shrink(key: ValueKey('recording-lock-hidden')),
+          },
+        ),
         if (view.failureLabel case final failure?)
           CarpenterText.feedback(
             failure,

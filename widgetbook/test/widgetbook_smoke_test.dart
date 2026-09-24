@@ -80,7 +80,7 @@ void main() {
     );
     // Includes shared desktop project/materials golden scenarios.
     expect(componentNames, hasLength(173));
-    expect(caseBuilders, hasLength(290));
+    expect(caseBuilders, hasLength(293));
   });
 
   test(

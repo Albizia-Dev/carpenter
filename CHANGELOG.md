@@ -1,3 +1,12 @@
+## 0.6.3
+
+### Messenger tactile media and interaction polish
+
+- Keep own, incoming, important and selected message identities distinct with token-resolved animated surfaces, packed selection controls and consistently placed metadata.
+- Remove nested menu framing, give every Messenger action a semantic icon and role, and replace verbose history/media loading chrome with compact accessible controls.
+- Add precise waveform seeking, rich file metadata, tap-to-focus video circles with perimeter progress, and token-backed recording lock affordances.
+- Expand Messenger Widgetbook states and interaction tests for media focus, recording lock, menu actions and selection behavior.
+
 ## 0.6.2
 
 ### Messenger intrinsic layout compatibility

@@ -7,6 +7,10 @@ import '../../internal/overlay/anchored_overlay_host.dart';
 import '../../internal/overlay/overlay_surface.dart';
 import '../../internal/rendering/focus_ring.dart';
 import '../../internal/rendering/interactive_region.dart';
+import 'menu/menu.dart';
+
+/// Visual ownership for an anchored popover's content surface.
+enum CarpenterPopoverPresentation { standard, bare }
 
 /// A controlled, interactive container attached to an anchor.
 final class CarpenterPopover extends StatelessWidget {
@@ -20,6 +24,7 @@ final class CarpenterPopover extends StatelessWidget {
     this.fallbackPlacements = const [],
     this.semanticLabel,
     this.anchorActivates = true,
+    this.presentation = CarpenterPopoverPresentation.standard,
   });
 
   final bool open;
@@ -30,6 +35,7 @@ final class CarpenterPopover extends StatelessWidget {
   final List<OverlayPlacement> fallbackPlacements;
   final String? semanticLabel;
   final bool anchorActivates;
+  final CarpenterPopoverPresentation presentation;
 
   @override
   Widget build(BuildContext context) => AnchoredOverlayHost(
@@ -57,6 +63,10 @@ final class CarpenterPopover extends StatelessWidget {
         },
       ),
     ),
-    overlayBuilder: (context) => OverlaySurface(child: content),
+    overlayBuilder: (context) =>
+        content is CarpenterMenu ||
+            presentation == CarpenterPopoverPresentation.bare
+        ? content
+        : OverlaySurface(child: content),
   );
 }
