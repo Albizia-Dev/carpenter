@@ -12,9 +12,7 @@ import '../../../behaviour/menu/menu.dart';
 import '../../../behaviour/menu/menu_entry.dart';
 import '../../../behaviour/popover.dart';
 import '../../../collections/list_tile.dart';
-
-/// The shape communicates whether an identity is a person or a shared room.
-enum CarpenterConversationAvatarShape { person, room }
+import 'messaging_models.dart';
 
 /// Delivery state supplied by the host; Carpenter never infers read receipts.
 enum CarpenterMessageDelivery { sending, sent, read }

@@ -200,6 +200,7 @@ export 'src/components/layout/patterns/messaging/conversation_components.dart';
 export 'src/components/layout/patterns/messaging/conversation_split_view.dart';
 export 'src/components/layout/patterns/messaging/chat_composer.dart';
 export 'src/components/layout/patterns/messaging/message_timeline_chrome.dart';
+export 'src/components/layout/patterns/messaging/messaging_models.dart';
 export 'src/components/layout/patterns/messaging/voice_controls.dart';
 
 // Contextual workspace composition.
