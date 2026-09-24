@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'messenger_recovery.dart';
 import 'attachment_tray.dart';
+import 'conversation_components.dart';
 import '../../../../foundation/roles.dart';
 import '../../../../foundation/adaptive.dart';
 import '../../../basic/gravity_icons.g.dart';
@@ -149,9 +150,6 @@ class CarpenterMessageItem {
   /// Observed transport state. Null does not imply a receipt.
   final CarpenterMessageDelivery? delivery;
 }
-
-/// Delivery state supplied by the host; Carpenter never infers read receipts.
-enum CarpenterMessageDelivery { sending, sent, read }
 
 /// A semantic message surface with clipboard access and explicit recovery.
 /// Requires an Overlay ancestor for the keyboard/pointer action menu.
@@ -903,8 +901,15 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
                         ),
                       Expanded(
                         child: ListView.builder(
-                          itemCount: visible.length,
+                          itemCount: loading && visible.isEmpty
+                              ? CarpenterConversationSkeleton.initialCount
+                              : visible.length,
                           itemBuilder: (context, index) {
+                            if (loading && visible.isEmpty) {
+                              return CarpenterConversationSkeleton(
+                                key: ValueKey('conversation-skeleton-$index'),
+                              );
+                            }
                             final item = visible[index];
                             return CarpenterListTile(
                               key: ValueKey(item.id),
@@ -1113,7 +1118,7 @@ bool _groupsWithPrevious(List<CarpenterMessageItem> messages, int index) {
   }
   final delta = time.difference(prior);
   return !delta.isNegative &&
-      delta <= const Duration(minutes: 5) &&
+      delta <= const Duration(minutes: 20) &&
       time.year == prior.year &&
       time.month == prior.month &&
       time.day == prior.day;

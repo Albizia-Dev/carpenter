@@ -148,6 +148,28 @@ final class CarpenterTheme extends InheritedWidget {
   bool updateShouldNotify(CarpenterTheme oldWidget) => data != oldWidget.data;
 }
 
+/// Installs Carpenter's unit scale and semantic theme inside an existing app.
+/// Hosts that already own WidgetsApp or MaterialApp can use this boundary
+/// without adding a second application root.
+final class CarpenterThemeRoot extends StatelessWidget {
+  const CarpenterThemeRoot({
+    super.key,
+    required this.data,
+    required this.child,
+    this.rem = const Px(16),
+  });
+
+  final CarpenterThemeData data;
+  final Widget child;
+  final Px rem;
+
+  @override
+  Widget build(BuildContext context) => UnitsRoot(
+    rem: rem,
+    child: CarpenterTheme(data: data, child: child),
+  );
+}
+
 /// Resolves semantic Carpenter typography roles and component text treatments into Flutter [TextStyle] values using the active unit scale.
 @immutable
 final class CarpenterTypographyTheme {

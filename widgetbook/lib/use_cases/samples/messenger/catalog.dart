@@ -2,8 +2,10 @@ import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 import '../../../helpers/layout_viewport.dart';
+import 'conversation_catalog.dart';
 
 final messengerComponents = [
+  ...conversationComponents,
   WidgetbookComponent(
     name: 'Message attachments',
     useCases: [
@@ -85,6 +87,51 @@ final messengerComponents = [
         builder: (context) => layoutViewportPreview(
           context,
           child: const MessengerScenario(failSend: true, showFailure: true),
+        ),
+      ),
+      WidgetbookUseCase(
+        name: 'States · Initial loading',
+        builder: (context) => layoutViewportPreview(
+          context,
+          child: const MessengerScenario(initialRoom: null, loading: true),
+        ),
+      ),
+      WidgetbookUseCase(
+        name: 'States · Empty conversations',
+        builder: (context) => layoutViewportPreview(
+          context,
+          child: const MessengerScenario(initialRoom: null, emptyRooms: true),
+        ),
+      ),
+      WidgetbookUseCase(
+        name: 'States · Search without matches',
+        builder: (context) => layoutViewportPreview(
+          context,
+          child: const MessengerScenario(
+            initialRoom: null,
+            initialQuery: 'Нет такого чата',
+          ),
+        ),
+      ),
+      WidgetbookUseCase(
+        name: 'States · History error',
+        builder: (context) => layoutViewportPreview(
+          context,
+          child: const MessengerScenario(historyFailure: true),
+        ),
+      ),
+      WidgetbookUseCase(
+        name: 'States · Reply lookup',
+        builder: (context) => layoutViewportPreview(
+          context,
+          child: const MessengerScenario(missingOriginal: true),
+        ),
+      ),
+      WidgetbookUseCase(
+        name: 'States · Read only',
+        builder: (context) => layoutViewportPreview(
+          context,
+          child: const MessengerScenario(readOnly: true),
         ),
       ),
     ],
@@ -184,6 +231,8 @@ class MessengerScenario extends StatefulWidget {
     this.distantReply = false,
     this.missingOriginal = false,
     this.originalFailure = false,
+    this.loading = false,
+    this.emptyRooms = false,
   });
   final String? initialRoom;
   final bool failSend;
@@ -198,6 +247,8 @@ class MessengerScenario extends StatefulWidget {
   final bool distantReply;
   final bool missingOriginal;
   final bool originalFailure;
+  final bool loading;
+  final bool emptyRooms;
   final String initialQuery;
   @override
   State<MessengerScenario> createState() => _MessengerScenarioState();
@@ -383,7 +434,8 @@ class _MessengerScenarioState extends State<MessengerScenario> {
         (widget.historyFailure || widget.hasOlder) && !historyResolved
         ? () => setState(() => historyResolved = true)
         : null,
-    conversations: _rooms,
+    loading: widget.loading,
+    conversations: widget.emptyRooms ? const [] : _rooms,
     conversationQuery: query,
     onConversationQueryChanged: (value) => setState(() => query = value),
     visibleConversationIds: _rooms
