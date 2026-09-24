@@ -3,6 +3,56 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  testWidgets('message bubble renders explicit delivery and edit metadata', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _harness(
+        const CarpenterMessageBubble(
+          message: CarpenterMessageItem(
+            id: 'own',
+            author: 'Вы',
+            text: 'Обновлённый текст',
+            status: '',
+            own: true,
+            edited: true,
+            delivery: CarpenterMessageDelivery.read,
+            timeLabel: '12:30',
+          ),
+        ),
+      ),
+    );
+    expect(find.bySemanticsLabel('Изменено'), findsOneWidget);
+    expect(find.bySemanticsLabel('Прочитано'), findsOneWidget);
+    expect(find.text('12:30'), findsOneWidget);
+  });
+
+  testWidgets('message menu starts controlled multi selection', (tester) async {
+    var selected = false;
+    await tester.pumpWidget(
+      _harness(
+        StatefulBuilder(
+          builder: (context, setState) => CarpenterMessageBubble(
+            message: const CarpenterMessageItem(
+              id: 'one',
+              author: 'Анна',
+              text: 'Первое',
+              status: '',
+            ),
+            selecting: selected,
+            selected: selected,
+            onSelect: () => setState(() => selected = !selected),
+          ),
+        ),
+      ),
+    );
+    await tester.longPress(find.text('Первое'));
+    await tester.pump();
+    await tester.tap(find.text('Выбрать'));
+    await tester.pumpAndSettle();
+    expect(selected, isTrue);
+  });
+
   testWidgets('message attachment reports its stable id by pointer', (
     tester,
   ) async {

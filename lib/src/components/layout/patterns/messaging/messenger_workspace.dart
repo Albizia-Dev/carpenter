@@ -7,6 +7,7 @@ import '../../../../foundation/roles.dart';
 import '../../../../foundation/adaptive.dart';
 import '../../../basic/gravity_icons.g.dart';
 import '../../../basic/button/icon_button.dart';
+import '../../../basic/icon.dart';
 import '../../../../foundation/theme.dart';
 import '../../../basic/avatar.dart';
 import '../../../basic/button/button.dart';
@@ -75,6 +76,10 @@ class CarpenterMessageItem {
     this.own = false,
     this.needAnswer = false,
     this.canRetry = false,
+    this.edited = false,
+    this.important = false,
+    this.forwardedFrom,
+    this.delivery,
     this.authorKey,
     this.sentAt,
     this.timeLabel,
@@ -131,7 +136,22 @@ class CarpenterMessageItem {
 
   /// Shows a retry action when the host can safely repeat this intent.
   final bool canRetry;
+
+  /// Whether this visible revision differs from the original message.
+  final bool edited;
+
+  /// Uses the danger feedback palette for a host-classified important message.
+  final bool important;
+
+  /// Resolved sender label for a forwarded message; null hides the marker.
+  final String? forwardedFrom;
+
+  /// Observed transport state. Null does not imply a receipt.
+  final CarpenterMessageDelivery? delivery;
 }
+
+/// Delivery state supplied by the host; Carpenter never infers read receipts.
+enum CarpenterMessageDelivery { sending, sent, read }
 
 /// A semantic message surface with clipboard access and explicit recovery.
 /// Requires an Overlay ancestor for the keyboard/pointer action menu.
@@ -145,7 +165,11 @@ class CarpenterMessageBubble extends StatefulWidget {
     this.onReply,
     this.onOpenReply,
     this.onAttachmentSelected,
-  });
+    this.showAuthor = true,
+    this.selecting = false,
+    this.selected = false,
+    this.onSelect,
+  }) : assert(!selecting || onSelect != null);
 
   /// Immutable display state owned by the caller.
   final CarpenterMessageItem message;
@@ -160,6 +184,18 @@ class CarpenterMessageBubble extends StatefulWidget {
   /// download progress and failures; Carpenter never handles a URL directly.
   final ValueChanged<String>? onAttachmentSelected;
 
+  /// Whether a non-own first message in a block displays its author.
+  final bool showAuthor;
+
+  /// Host-owned multi-selection mode. Taps call [onSelect] when true.
+  final bool selecting;
+
+  /// Host-owned selected state, rendered with Carpenter's selection surface.
+  final bool selected;
+
+  /// Adds a selection menu action and handles taps during [selecting].
+  final VoidCallback? onSelect;
+
   /// Null disables retry even if the model permits it.
   final VoidCallback? onRetry;
 
@@ -173,12 +209,19 @@ class CarpenterMessageBubble extends StatefulWidget {
 
 class _MessageBubbleState extends State<CarpenterMessageBubble> {
   bool _menuOpen = false;
+
+  void _invokeAndClose(VoidCallback action) {
+    setState(() => _menuOpen = false);
+    action();
+  }
+
   @override
   Widget build(BuildContext context) {
     final message = widget.message;
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.small);
     final radius = context.units(theme.shapes.radius(ShapeRole.rounded));
+    final inverse = message.own && !widget.selected && !message.important;
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxWidth = context.units(theme.sizes.layoutNarrowEnd);
@@ -201,124 +244,224 @@ class _MessageBubbleState extends State<CarpenterMessageBubble> {
               child: GestureDetector(
                 onSecondaryTap: () => setState(() => _menuOpen = true),
                 onLongPress: () => setState(() => _menuOpen = true),
-                child: CarpenterPopover(
-                  open: _menuOpen,
-                  onOpenChanged: (open) => setState(() => _menuOpen = open),
-                  content: CarpenterMenu(
-                    semanticLabel: 'Действия с сообщением',
-                    onDismissRequested: () => setState(() => _menuOpen = false),
-                    items: [
-                      if (message.canReply && widget.onReply != null)
+                onTap: widget.selecting ? widget.onSelect : null,
+                child: AbsorbPointer(
+                  absorbing: widget.selecting,
+                  child: CarpenterPopover(
+                    open: _menuOpen,
+                    onOpenChanged: (open) => setState(() => _menuOpen = open),
+                    content: CarpenterMenu(
+                      semanticLabel: 'Действия с сообщением',
+                      onDismissRequested: () =>
+                          setState(() => _menuOpen = false),
+                      items: [
+                        if (message.canReply && widget.onReply != null)
+                          CarpenterMenuItem(
+                            action: CarpenterActionDescriptor(
+                              id: 'reply-message',
+                              label: 'Ответить',
+                              onInvoke: () => _invokeAndClose(widget.onReply!),
+                            ),
+                          ),
+                        if (widget.onSelect != null)
+                          CarpenterMenuItem(
+                            action: CarpenterActionDescriptor(
+                              id: 'select-message',
+                              label: widget.selected
+                                  ? 'Снять выбор'
+                                  : 'Выбрать',
+                              onInvoke: () => _invokeAndClose(widget.onSelect!),
+                            ),
+                          ),
                         CarpenterMenuItem(
                           action: CarpenterActionDescriptor(
-                            id: 'reply-message',
-                            label: 'Ответить',
-                            onInvoke: widget.onReply,
-                          ),
-                        ),
-                      CarpenterMenuItem(
-                        action: CarpenterActionDescriptor(
-                          id: 'copy-message',
-                          label: 'Скопировать сообщение',
-                          icon: GravityIcons.copy,
-                          onInvoke: () => Clipboard.setData(
-                            ClipboardData(
-                              text: [
-                                message.text,
-                                ...message.attachmentLabels,
-                                ...message.attachments.map(
-                                  (attachment) => attachment.label,
+                            id: 'copy-message',
+                            label: 'Скопировать сообщение',
+                            icon: GravityIcons.copy,
+                            onInvoke: () => _invokeAndClose(
+                              () => Clipboard.setData(
+                                ClipboardData(
+                                  text: [
+                                    message.text,
+                                    ...message.attachmentLabels,
+                                    ...message.attachments.map(
+                                      (attachment) => attachment.label,
+                                    ),
+                                  ].where((s) => s.isNotEmpty).join('\n'),
                                 ),
-                              ].where((s) => s.isNotEmpty).join('\n'),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  anchor: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: message.own
-                          ? theme.actions.primary.state
-                          : theme.surface.base,
-                      borderRadius: BorderRadius.circular(radius),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: gap * 1.5,
-                        vertical: gap,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (!message.own && !widget.groupWithPrevious) ...[
-                            CarpenterText.label(
-                              message.author,
-                              emphasis: TypographyEmphasis.strong,
-                            ),
-                            SizedBox(height: gap / 2),
-                          ],
-                          if (message.replyPreview != null)
-                            _ReplyPreview(
-                              text: message.replyPreview!,
-                              onOpen: widget.onOpenReply,
-                            ),
-                          for (final label in message.attachmentLabels)
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: gap / 2),
-                              child: CarpenterText.label(label),
-                            ),
-                          for (final attachment in message.attachments)
-                            Padding(
-                              key: ValueKey(attachment.id),
-                              padding: EdgeInsets.symmetric(vertical: gap / 2),
-                              child: CarpenterButton.text(
-                                label: attachment.label,
-                                semanticLabel:
-                                    'Открыть файл ${attachment.label}',
-                                size: ControlSize.small,
-                                onPressed: widget.onAttachmentSelected == null
-                                    ? null
-                                    : () => widget.onAttachmentSelected!(
-                                        attachment.id,
-                                      ),
                               ),
                             ),
-                          if (message.text.isNotEmpty)
-                            CarpenterText.body(message.text),
-                          if (message.needAnswer)
-                            Padding(
-                              padding: EdgeInsets.only(top: gap / 2),
-                              child: const CarpenterText.caption(
-                                'Нужен ответ',
+                          ),
+                        ),
+                        if (message.canRetry && widget.onRetry != null)
+                          CarpenterMenuItem(
+                            action: CarpenterActionDescriptor(
+                              id: 'retry-message',
+                              label: 'Повторить отправку',
+                              onInvoke: () => _invokeAndClose(widget.onRetry!),
+                            ),
+                          ),
+                      ],
+                    ),
+                    anchor: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: widget.selected
+                            ? theme.overlay.selected
+                            : message.important
+                            ? theme.feedback
+                                  .resolve(FeedbackColorRole.danger)
+                                  .background
+                            : message.own
+                            ? theme.actions.primary.state
+                            : theme.surface.base,
+                        borderRadius: BorderRadius.circular(radius),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: gap * 1.5,
+                          vertical: gap,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (widget.showAuthor &&
+                                !message.own &&
+                                !widget.groupWithPrevious) ...[
+                              CarpenterText.label(
+                                message.author,
                                 emphasis: TypographyEmphasis.strong,
                               ),
-                            ),
-                          SizedBox(height: gap / 2),
-                          Wrap(
-                            spacing: gap,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              if (message.timeLabel != null)
-                                CarpenterText.caption(
-                                  message.timeLabel!,
-                                  colorRole: ContentColorRole.secondary,
-                                ),
-                              if (message.status.isNotEmpty)
-                                CarpenterText.caption(
-                                  message.status,
-                                  colorRole: ContentColorRole.secondary,
-                                ),
-                              if (message.canRetry)
-                                CarpenterButton.text(
-                                  label: 'Повторить',
-                                  size: ControlSize.small,
-                                  onPressed: widget.onRetry,
-                                ),
+                              SizedBox(height: gap / 2),
                             ],
-                          ),
-                        ],
+                            if (message.replyPreview != null)
+                              _ReplyPreview(
+                                text: message.replyPreview!,
+                                onOpen: widget.onOpenReply,
+                              ),
+                            if (message.forwardedFrom case final author?)
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const CarpenterIcon(
+                                    GravityIcons.forwardStep,
+                                    size: IconSize.small,
+                                    semanticLabel: 'Переслано',
+                                  ),
+                                  SizedBox(width: gap / 2),
+                                  CarpenterText.caption('Переслано от $author'),
+                                ],
+                              ),
+                            for (final label in message.attachmentLabels)
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: gap / 2,
+                                ),
+                                child: CarpenterText.label(label),
+                              ),
+                            for (final attachment in message.attachments)
+                              Padding(
+                                key: ValueKey(attachment.id),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: gap / 2,
+                                ),
+                                child: CarpenterButton.text(
+                                  label: attachment.label,
+                                  semanticLabel:
+                                      'Открыть файл ${attachment.label}',
+                                  size: ControlSize.small,
+                                  onPressed: widget.onAttachmentSelected == null
+                                      ? null
+                                      : () => widget.onAttachmentSelected!(
+                                          attachment.id,
+                                        ),
+                                ),
+                              ),
+                            if (message.text.isNotEmpty)
+                              CarpenterText.body(
+                                message.text,
+                                colorRole: inverse
+                                    ? ContentColorRole.inverse
+                                    : ContentColorRole.primary,
+                              ),
+                            if (message.needAnswer)
+                              Padding(
+                                padding: EdgeInsets.only(top: gap / 2),
+                                child: const CarpenterText.caption(
+                                  'Нужен ответ',
+                                  emphasis: TypographyEmphasis.strong,
+                                ),
+                              ),
+                            SizedBox(height: gap / 2),
+                            Wrap(
+                              spacing: gap,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                if (message.important) ...[
+                                  const CarpenterIcon.feedback(
+                                    GravityIcons.exclamationShape,
+                                    feedbackRole: FeedbackColorRole.danger,
+                                    size: IconSize.small,
+                                    semanticLabel: 'Важное',
+                                  ),
+                                  SizedBox(width: gap / 2),
+                                ],
+                                if (message.edited) ...[
+                                  CarpenterIcon(
+                                    GravityIcons.pencil,
+                                    size: IconSize.small,
+                                    semanticLabel: 'Изменено',
+                                    colorRole: inverse
+                                        ? ContentColorRole.inverse
+                                        : ContentColorRole.secondary,
+                                  ),
+                                  SizedBox(width: gap / 2),
+                                ],
+                                if (message.timeLabel != null)
+                                  CarpenterText.caption(
+                                    message.timeLabel!,
+                                    colorRole: inverse
+                                        ? ContentColorRole.inverse
+                                        : ContentColorRole.secondary,
+                                  ),
+                                if (message.own && message.delivery != null)
+                                  CarpenterIcon(
+                                    switch (message.delivery!) {
+                                      CarpenterMessageDelivery.sending =>
+                                        GravityIcons.clock,
+                                      CarpenterMessageDelivery.sent =>
+                                        GravityIcons.check,
+                                      CarpenterMessageDelivery.read =>
+                                        GravityIcons.checkDouble,
+                                    },
+                                    size: IconSize.small,
+                                    semanticLabel: switch (message.delivery!) {
+                                      CarpenterMessageDelivery.sending =>
+                                        'Отправляется',
+                                      CarpenterMessageDelivery.sent =>
+                                        'Отправлено',
+                                      CarpenterMessageDelivery.read =>
+                                        'Прочитано',
+                                    },
+                                    colorRole: inverse
+                                        ? ContentColorRole.inverse
+                                        : ContentColorRole.secondary,
+                                  ),
+                                if (message.status.isNotEmpty)
+                                  CarpenterText.caption(
+                                    message.status,
+                                    colorRole: ContentColorRole.secondary,
+                                  ),
+                                if (message.canRetry)
+                                  CarpenterButton.text(
+                                    label: 'Повторить',
+                                    size: ControlSize.small,
+                                    onPressed: widget.onRetry,
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

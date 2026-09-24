@@ -94,28 +94,7 @@ final messengerComponents = [
     useCases: [
       WidgetbookUseCase(
         name: 'Playground',
-        builder: (context) => CarpenterMessageBubble(
-          message: CarpenterMessageItem(
-            id: 'example',
-            author: context.knobs.string(
-              label: 'Автор',
-              initialValue: 'Анна Смирнова',
-            ),
-            text: context.knobs.string(
-              label: 'Текст',
-              initialValue: 'Проверьте, пожалуйста, документ.',
-            ),
-            status: context.knobs.string(
-              label: 'Статус',
-              initialValue: '10:24',
-            ),
-            own: context.knobs.boolean(label: 'Собственное сообщение'),
-            needAnswer: context.knobs.boolean(label: 'Нужен ответ'),
-            canRetry: context.knobs.boolean(label: 'Можно повторить'),
-          ),
-          groupWithPrevious: context.knobs.boolean(label: 'Продолжение группы'),
-          onRetry: () {},
-        ),
+        builder: (context) => const MessageBubbleScenario(),
       ),
     ],
   ),
@@ -131,6 +110,61 @@ final messengerComponents = [
     ],
   ),
 ];
+
+class MessageBubbleScenario extends StatefulWidget {
+  const MessageBubbleScenario({super.key});
+
+  @override
+  State<MessageBubbleScenario> createState() => _MessageBubbleScenarioState();
+}
+
+class _MessageBubbleScenarioState extends State<MessageBubbleScenario> {
+  bool _selected = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final own = context.knobs.boolean(label: 'Собственное сообщение');
+    return CarpenterMessageBubble(
+      message: CarpenterMessageItem(
+        id: 'example',
+        author: context.knobs.string(
+          label: 'Автор',
+          initialValue: 'Анна Смирнова',
+        ),
+        text: context.knobs.string(
+          label: 'Текст',
+          initialValue: 'Проверьте, пожалуйста, документ.',
+        ),
+        status: '',
+        timeLabel: '10:24',
+        own: own,
+        edited: context.knobs.boolean(label: 'Изменено'),
+        important: context.knobs.boolean(label: 'Важное'),
+        forwardedFrom: context.knobs.boolean(label: 'Переслано')
+            ? 'Борис'
+            : null,
+        delivery: own
+            ? context.knobs.object.dropdown(
+                label: 'Доставка',
+                options: CarpenterMessageDelivery.values,
+                initialOption: CarpenterMessageDelivery.sent,
+              )
+            : null,
+        needAnswer: context.knobs.boolean(label: 'Нужен ответ'),
+        canRetry: context.knobs.boolean(label: 'Можно повторить'),
+      ),
+      groupWithPrevious: context.knobs.boolean(label: 'Продолжение группы'),
+      showAuthor: context.knobs.boolean(
+        label: 'Показать автора',
+        initialValue: true,
+      ),
+      selecting: context.knobs.boolean(label: 'Режим выбора'),
+      selected: _selected,
+      onSelect: () => setState(() => _selected = !_selected),
+      onRetry: () {},
+    );
+  }
+}
 
 /// UI-only fixture harness. Does not import the Desktop, Bloc or transport.
 class MessengerScenario extends StatefulWidget {
