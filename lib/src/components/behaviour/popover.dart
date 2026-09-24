@@ -19,6 +19,7 @@ final class CarpenterPopover extends StatelessWidget {
     this.placement = OverlayPlacement.bottomStart,
     this.fallbackPlacements = const [],
     this.semanticLabel,
+    this.anchorActivates = true,
   });
 
   final bool open;
@@ -28,6 +29,7 @@ final class CarpenterPopover extends StatelessWidget {
   final OverlayPlacement placement;
   final List<OverlayPlacement> fallbackPlacements;
   final String? semanticLabel;
+  final bool anchorActivates;
 
   @override
   Widget build(BuildContext context) => AnchoredOverlayHost(
@@ -36,13 +38,13 @@ final class CarpenterPopover extends StatelessWidget {
     placement: placement,
     fallbackPlacements: fallbackPlacements,
     anchor: Semantics(
-      button: true,
+      button: anchorActivates,
       expanded: open,
       label: semanticLabel,
-      onTap: () => onOpenChanged(!open),
+      onTap: anchorActivates ? () => onOpenChanged(!open) : null,
       excludeSemantics: semanticLabel != null,
       child: InteractiveRegion(
-        onActivate: () => onOpenChanged(!open),
+        onActivate: anchorActivates ? () => onOpenChanged(!open) : null,
         builder: (context, states, showFocusHighlight) {
           final theme = CarpenterTheme.of(context);
           return FocusRing(

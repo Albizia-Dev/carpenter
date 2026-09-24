@@ -43,7 +43,7 @@ final class CarpenterConversationDirectory extends StatelessWidget {
   final String? selectedId;
   final ValueChanged<String> onConversationSelected;
   final ValueChanged<String> onSearchChanged;
-  final VoidCallback onCreateConversation;
+  final VoidCallback? onCreateConversation;
   final bool initialLoading;
   final String? failureLabel;
   final String emptyLabel;
@@ -138,6 +138,7 @@ final class CarpenterConversationDirectory extends StatelessWidget {
           selected: selectedId == conversation.id,
           onSelected: () => onConversationSelected(conversation.id),
           unreadCount: conversation.unreadCount,
+          markedUnread: conversation.markedUnread,
           previewDelivery: conversation.effectivePreviewDelivery,
           actions: actionsBuilder?.call(conversation) ?? const [],
         );

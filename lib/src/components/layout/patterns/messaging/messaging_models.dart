@@ -58,6 +58,7 @@ final class CarpenterConversationView {
     this.previewDelivery,
     this.draft,
     this.unreadCount = 0,
+    this.markedUnread = false,
     this.muted = false,
     this.pinned = false,
     this.selected = false,
@@ -72,6 +73,7 @@ final class CarpenterConversationView {
   final CarpenterDeliveryState? previewDelivery;
   final String? draft;
   final int unreadCount;
+  final bool markedUnread;
   final bool muted;
   final bool pinned;
   final bool selected;

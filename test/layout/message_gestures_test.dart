@@ -70,6 +70,46 @@ void main() {
     await tester.pump();
     expect(replies, 0);
   });
+
+  testWidgets('tap adds another message while selection mode is active', (
+    tester,
+  ) async {
+    var selected = <String>{'first'};
+    late StateSetter rebuild;
+    await tester.pumpWidget(
+      _host(
+        StatefulBuilder(
+          builder: (context, setState) {
+            rebuild = setState;
+            return CarpenterMessageBubble(
+              message: CarpenterMessageView(
+                id: 'second',
+                authorId: 'anna',
+                authorLabel: 'Анна',
+                body: 'Второе',
+                own: false,
+                sentAt: DateTime(2026, 9, 24, 10),
+              ),
+              selected: selected.contains('second'),
+              selectionMode: selected.isNotEmpty,
+              onSelectionChanged: (value) => rebuild(() {
+                selected = {...selected};
+                if (value) {
+                  selected.add('second');
+                } else {
+                  selected.remove('second');
+                }
+              }),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Второе'));
+    await tester.pump();
+    expect(selected, contains('second'));
+  });
 }
 
 Widget _host(Widget child) => UnitsRoot(

@@ -143,21 +143,23 @@ final class _CarpenterMessageBubbleState extends State<CarpenterMessageBubble> {
             _pointerDelta = Offset.zero;
           },
           onPointerUp: (_) => _completePointerGesture(context),
-          child: GestureDetector(
-            onSecondaryTap: () => setState(() => _menuOpen = true),
-            onLongPress: () => setState(() => _menuOpen = true),
-            onTap: widget.selectionMode && widget.onSelectionChanged != null
-                ? () => widget.onSelectionChanged!(!widget.selected)
-                : null,
-            child: CarpenterPopover(
-              open: _menuOpen,
-              onOpenChanged: (open) => setState(() => _menuOpen = open),
-              content: CarpenterMenu(
-                semanticLabel: 'Действия с сообщением',
-                onDismissRequested: () => setState(() => _menuOpen = false),
-                items: _menuItems(),
-              ),
-              anchor: DecoratedBox(
+          child: CarpenterPopover(
+            open: _menuOpen,
+            onOpenChanged: (open) => setState(() => _menuOpen = open),
+            anchorActivates: false,
+            content: CarpenterMenu(
+              semanticLabel: 'Действия с сообщением',
+              onDismissRequested: () => setState(() => _menuOpen = false),
+              items: _menuItems(),
+            ),
+            anchor: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onSecondaryTap: () => setState(() => _menuOpen = true),
+              onLongPress: () => setState(() => _menuOpen = true),
+              onTap: widget.selectionMode && widget.onSelectionChanged != null
+                  ? () => widget.onSelectionChanged!(!widget.selected)
+                  : null,
+              child: DecoratedBox(
                 key: ValueKey('message-bubble-${message.id}'),
                 decoration: BoxDecoration(
                   color: widget.selected
