@@ -171,7 +171,7 @@ class _MessageBubbleScenarioState extends State<MessageBubbleScenario> {
   @override
   Widget build(BuildContext context) {
     final own = context.knobs.boolean(label: 'Собственное сообщение');
-    return CarpenterMessageBubble(
+    return CarpenterLegacyMessageBubble(
       message: CarpenterMessageItem(
         id: 'example',
         author: context.knobs.string(

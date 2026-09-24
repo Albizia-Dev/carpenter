@@ -137,8 +137,8 @@ void main() {
         ),
       ),
     );
-    final bubbles = tester.widgetList<CarpenterMessageBubble>(
-      find.byType(CarpenterMessageBubble),
+    final bubbles = tester.widgetList<CarpenterLegacyMessageBubble>(
+      find.byType(CarpenterLegacyMessageBubble),
     );
     final grouped = {
       for (final bubble in bubbles) bubble.message.id: bubble.groupWithPrevious,

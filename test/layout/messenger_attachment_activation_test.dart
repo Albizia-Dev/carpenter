@@ -8,7 +8,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       _harness(
-        const CarpenterMessageBubble(
+        const CarpenterLegacyMessageBubble(
           message: CarpenterMessageItem(
             id: 'own',
             author: 'Вы',
@@ -32,7 +32,7 @@ void main() {
     await tester.pumpWidget(
       _harness(
         StatefulBuilder(
-          builder: (context, setState) => CarpenterMessageBubble(
+          builder: (context, setState) => CarpenterLegacyMessageBubble(
             message: const CarpenterMessageItem(
               id: 'one',
               author: 'Анна',
@@ -59,7 +59,7 @@ void main() {
     final selected = <String>[];
     await tester.pumpWidget(
       _harness(
-        CarpenterMessageBubble(
+        CarpenterLegacyMessageBubble(
           message: const CarpenterMessageItem(
             id: 'message-7',
             author: 'Анна',
@@ -89,7 +89,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       _harness(
-        CarpenterMessageBubble(
+        CarpenterLegacyMessageBubble(
           message: const CarpenterMessageItem(
             id: 'message-7',
             author: 'Анна',
@@ -168,7 +168,7 @@ void main() {
   testWidgets('legacy attachment labels remain display only', (tester) async {
     await tester.pumpWidget(
       _harness(
-        const CarpenterMessageBubble(
+        const CarpenterLegacyMessageBubble(
           message: CarpenterMessageItem(
             id: 'message-7',
             author: 'Анна',

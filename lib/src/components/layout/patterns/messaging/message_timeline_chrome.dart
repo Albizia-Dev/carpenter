@@ -8,6 +8,25 @@ import '../../../basic/button/icon_button.dart';
 import '../../../basic/gravity_icons.g.dart';
 import '../../../basic/text.dart';
 
+/// Compact in-flow marker for an older-history page request.
+final class CarpenterMessageHistoryLoading extends StatelessWidget {
+  const CarpenterMessageHistoryLoading({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final gap = context.units(CarpenterTheme.of(context).spacing.small);
+    return Padding(
+      padding: EdgeInsets.all(gap),
+      child: const Center(
+        child: CarpenterText.caption(
+          'Загрузка ранних сообщений…',
+          colorRole: ContentColorRole.secondary,
+        ),
+      ),
+    );
+  }
+}
+
 /// A centered boundary between local calendar days in a message timeline.
 final class CarpenterMessageDateDivider extends StatelessWidget {
   const CarpenterMessageDateDivider({super.key, required this.label});

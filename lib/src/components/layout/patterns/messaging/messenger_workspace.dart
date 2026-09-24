@@ -153,9 +153,9 @@ class CarpenterMessageItem {
 
 /// A semantic message surface with clipboard access and explicit recovery.
 /// Requires an Overlay ancestor for the keyboard/pointer action menu.
-class CarpenterMessageBubble extends StatefulWidget {
+class CarpenterLegacyMessageBubble extends StatefulWidget {
   /// [onRetry] must repeat the same logical intent, not compose a new message.
-  const CarpenterMessageBubble({
+  const CarpenterLegacyMessageBubble({
     super.key,
     required this.message,
     this.onRetry,
@@ -202,10 +202,11 @@ class CarpenterMessageBubble extends StatefulWidget {
 
   /// Owns the transient action menu, never message or delivery state.
   @override
-  State<CarpenterMessageBubble> createState() => _MessageBubbleState();
+  State<CarpenterLegacyMessageBubble> createState() =>
+      _LegacyMessageBubbleState();
 }
 
-class _MessageBubbleState extends State<CarpenterMessageBubble> {
+class _LegacyMessageBubbleState extends State<CarpenterLegacyMessageBubble> {
   bool _menuOpen = false;
 
   void _invokeAndClose(VoidCallback action) {
@@ -1350,7 +1351,7 @@ class _MessageTimelineState extends State<_MessageTimeline> {
           children: [
             if (message.id == _anchor)
               const Center(child: CarpenterText.caption('Исходное сообщение')),
-            CarpenterMessageBubble(
+            CarpenterLegacyMessageBubble(
               key: ValueKey(message.id),
               message: message,
               groupWithPrevious: _groupsWithPrevious(widget.messages, index),

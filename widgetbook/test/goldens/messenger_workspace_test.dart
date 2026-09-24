@@ -119,7 +119,9 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pumpAndSettle();
     final bubble = tester
-        .widgetList<CarpenterMessageBubble>(find.byType(CarpenterMessageBubble))
+        .widgetList<CarpenterLegacyMessageBubble>(
+          find.byType(CarpenterLegacyMessageBubble),
+        )
         .singleWhere((b) => b.message.text == 'Проверю раздел сегодня');
     expect(bubble.message.replyPreview, contains('Ответ напишу здесь'));
     expect(tester.takeException(), isNull);
@@ -516,8 +518,8 @@ void main() {
       );
       await tester.pumpAndSettle();
       final bubbles = tester
-          .widgetList<CarpenterMessageBubble>(
-            find.byType(CarpenterMessageBubble),
+          .widgetList<CarpenterLegacyMessageBubble>(
+            find.byType(CarpenterLegacyMessageBubble),
           )
           .toList();
       expect(
@@ -592,8 +594,8 @@ void main() {
       await tester.pumpAndSettle();
       expect(
         tester
-            .widgetList<CarpenterMessageBubble>(
-              find.byType(CarpenterMessageBubble),
+            .widgetList<CarpenterLegacyMessageBubble>(
+              find.byType(CarpenterLegacyMessageBubble),
             )
             .every((b) => !b.groupWithPrevious),
         isTrue,
