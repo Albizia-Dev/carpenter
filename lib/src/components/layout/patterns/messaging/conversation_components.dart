@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 import '../../../../foundation/roles.dart';
 import '../../../../foundation/theme.dart';
 import '../../../basic/avatar.dart';
-import '../../../basic/button/icon_button.dart';
+import '../../../basic/badge.dart';
 import '../../../basic/gravity_icons.g.dart';
 import '../../../basic/icon.dart';
 import '../../../basic/text.dart';
@@ -26,12 +26,14 @@ final class CarpenterConversationAvatar extends StatelessWidget {
     required this.shape,
     this.image,
     this.muted = false,
+    this.colorRole = ActionColorRole.primary,
   });
 
   final String name;
   final CarpenterConversationAvatarShape shape;
   final ImageProvider<Object>? image;
   final bool muted;
+  final ActionColorRole colorRole;
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +59,9 @@ final class CarpenterConversationAvatar extends StatelessWidget {
               child: SizedBox.square(
                 dimension: extent,
                 child: ColoredBox(
-                  color: theme.actions.primary.state,
+                  color: theme.actions
+                      .resolve(colorRole, ActionProminence.filled, const {})
+                      .background,
                   child: image == null
                       ? fallback
                       : Image(
@@ -112,6 +116,7 @@ final class CarpenterConversationTile extends StatefulWidget {
     this.unreadCount = 0,
     this.markedUnread = false,
     this.previewDelivery,
+    this.previewContent,
     this.actions = const [],
   });
 
@@ -123,6 +128,7 @@ final class CarpenterConversationTile extends StatefulWidget {
   final int unreadCount;
   final bool markedUnread;
   final CarpenterMessageDelivery? previewDelivery;
+  final Widget? previewContent;
   final List<CarpenterMenuItem> actions;
 
   @override
@@ -140,43 +146,55 @@ class _CarpenterConversationTileState extends State<CarpenterConversationTile> {
       selected: widget.selected,
       onInvoke: widget.onSelected,
       leading: widget.avatar,
-      title: CarpenterText.label(
-        widget.title,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        emphasis: TypographyEmphasis.strong,
-      ),
-      subtitle: Row(
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: CarpenterText.caption(
-              widget.preview,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              colorRole: ContentColorRole.secondary,
-            ),
+          CarpenterText.label(
+            widget.title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            emphasis: TypographyEmphasis.strong,
           ),
-          if (widget.previewDelivery case final delivery?)
-            CarpenterIcon(
-              switch (delivery) {
-                CarpenterMessageDelivery.sending => GravityIcons.clock,
-                CarpenterMessageDelivery.sent => GravityIcons.check,
-                CarpenterMessageDelivery.read => GravityIcons.checkDouble,
-              },
-              size: IconSize.small,
-              semanticLabel: switch (delivery) {
-                CarpenterMessageDelivery.sending => 'Отправляется',
-                CarpenterMessageDelivery.sent => 'Отправлено',
-                CarpenterMessageDelivery.read => 'Прочитано',
-              },
-            ),
+          Row(
+            children: [
+              Expanded(
+                child:
+                    widget.previewContent ??
+                    CarpenterText.caption(
+                      widget.preview,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      colorRole: ContentColorRole.secondary,
+                    ),
+              ),
+              if (widget.previewDelivery case final delivery?)
+                CarpenterIcon(
+                  switch (delivery) {
+                    CarpenterMessageDelivery.sending => GravityIcons.clock,
+                    CarpenterMessageDelivery.sent => GravityIcons.check,
+                    CarpenterMessageDelivery.read => GravityIcons.checkDouble,
+                  },
+                  size: IconSize.small,
+                  semanticLabel: switch (delivery) {
+                    CarpenterMessageDelivery.sending => 'Отправляется',
+                    CarpenterMessageDelivery.sent => 'Отправлено',
+                    CarpenterMessageDelivery.read => 'Прочитано',
+                  },
+                ),
+            ],
+          ),
         ],
       ),
       trailing: widget.unreadCount > 0 || widget.markedUnread
-          ? CarpenterText.caption(
-              widget.unreadCount > 0 ? '${widget.unreadCount}' : '•',
-              emphasis: TypographyEmphasis.strong,
-            )
+          ? widget.unreadCount > 0
+                ? CarpenterBadge.count(
+                    widget.unreadCount,
+                    semanticLabel: '${widget.unreadCount} непрочитанных',
+                  )
+                : const CarpenterText.caption(
+                    '•',
+                    emphasis: TypographyEmphasis.strong,
+                  )
           : null,
     );
     if (widget.actions.isEmpty) return tile;
@@ -236,66 +254,6 @@ final class CarpenterConversationSkeleton extends StatelessWidget {
               ],
             ),
           ),
-        ],
-      ),
-    );
-  }
-}
-
-/// Header geometry shared by conversation detail and standalone previews.
-final class CarpenterConversationHeader extends StatelessWidget {
-  const CarpenterConversationHeader({
-    super.key,
-    required this.title,
-    required this.status,
-    required this.avatar,
-    this.onBack,
-    this.actions,
-  });
-
-  final String title;
-  final String status;
-  final Widget avatar;
-  final VoidCallback? onBack;
-  final Widget? actions;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = CarpenterTheme.of(context);
-    final gap = context.units(theme.spacing.medium);
-    return Padding(
-      padding: EdgeInsets.all(gap),
-      child: Row(
-        children: [
-          if (onBack != null)
-            CarpenterIconButton(
-              icon: GravityIcons.arrowLeft,
-              semanticLabel: 'К разговорам',
-              onPressed: onBack,
-              prominence: ActionProminence.ghost,
-            ),
-          avatar,
-          SizedBox(width: gap),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                CarpenterText.label(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  emphasis: TypographyEmphasis.strong,
-                ),
-                CarpenterText.caption(
-                  status,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  colorRole: ContentColorRole.secondary,
-                ),
-              ],
-            ),
-          ),
-          ?actions,
         ],
       ),
     );
