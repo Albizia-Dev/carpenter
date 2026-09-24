@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,20 +16,23 @@ void main() {
     await tester.pumpWidget(
       _host(
         CarpenterInlineMedia(
-          view: const CarpenterMediaView(
+          view: CarpenterMediaView(
             id: 'image',
             kind: CarpenterMediaKind.image,
             label: 'Фото',
             byteLength: carpenterEagerMediaLimitBytes + 1,
             loadState: CarpenterMediaLoadState.previewReady,
+            previewBytes: base64Decode(
+              'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+            ),
           ),
-          preview: const ColoredBox(color: Color(0xff112233)),
           onLoadRequested: () => loads++,
         ),
       ),
     );
 
     expect(find.byType(ImageFiltered), findsOneWidget);
+    expect(find.byType(Image), findsOneWidget);
     await tester.tap(find.bySemanticsLabel('Загрузить оригинал: Фото'));
     expect(loads, 1);
   });

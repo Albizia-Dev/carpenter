@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 /// Shape of an identity avatar in a conversation surface.
 enum CarpenterConversationAvatarShape { person, room }
 
@@ -113,6 +115,8 @@ final class CarpenterMediaView {
     this.playbackRate = 1,
     this.waveform = const [],
     this.focused = false,
+    this.previewBytes,
+    this.originalBytes,
   });
 
   final String id;
@@ -126,6 +130,8 @@ final class CarpenterMediaView {
   final double playbackRate;
   final List<int> waveform;
   final bool focused;
+  final Uint8List? previewBytes;
+  final Uint8List? originalBytes;
 
   bool get requiresExplicitOriginalLoad =>
       byteLength > carpenterEagerMediaLimitBytes &&

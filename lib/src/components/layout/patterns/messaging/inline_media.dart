@@ -110,8 +110,25 @@ final class CarpenterInlineMedia extends StatelessWidget {
 
   Widget _visualPreview(BuildContext context, {required bool blurred}) {
     final theme = CarpenterTheme.of(context);
+    final bytes = view.originalBytes ?? view.previewBytes;
     final content =
         preview ??
+        (bytes == null
+            ? null
+            : Image.memory(
+                bytes,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => ColoredBox(
+                  color: theme.surface.base,
+                  child: const Center(
+                    child: CarpenterIcon(
+                      GravityIcons.picture,
+                      semanticLabel: 'Превью недоступно',
+                      size: IconSize.large,
+                    ),
+                  ),
+                ),
+              )) ??
         ColoredBox(
           color: theme.surface.base,
           child: const Center(
