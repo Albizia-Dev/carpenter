@@ -164,6 +164,31 @@ void main() {
       expect((avatarBottom - secondBottom).abs(), lessThanOrEqualTo(2));
     },
   );
+
+  testWidgets('message bubble supports intrinsic-height collection rows', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        SizedBox(
+          width: 600,
+          child: IntrinsicHeight(
+            child: CarpenterMessageBubble(
+              message: _message('intrinsic', DateTime(2026, 9, 24, 10)),
+              selected: false,
+              selectionMode: false,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
+    expect(
+      find.byKey(const ValueKey('message-bubble-intrinsic')),
+      findsOneWidget,
+    );
+  });
 }
 
 CarpenterMessageView _message(String id, DateTime sentAt) =>

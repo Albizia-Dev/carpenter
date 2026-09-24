@@ -1,3 +1,10 @@
+## 0.6.2
+
+### Messenger intrinsic layout compatibility
+
+- Keep content-packed text bubbles while avoiding intrinsic measurement across media controls that use constraint-aware layout.
+- Preserve the token-based media bubble width in collection rows used by Messenger+.
+
 ## 0.6.1
 
 ### Messenger visual refinement
