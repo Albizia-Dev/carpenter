@@ -9,6 +9,7 @@ import '../../basic/input/input.dart';
 import '../../basic/status_indicator.dart';
 
 final class CarpenterFilterBar extends StatelessWidget {
+  /// Creates a controlled search and filter toolbar.
   const CarpenterFilterBar({
     super.key,
     required this.searchController,

@@ -165,7 +165,7 @@ final class CarpenterTrailingActions extends StatelessWidget {
       spacing: gap,
       runSpacing: gap,
       crossAxisAlignment: WrapCrossAlignment.center,
-      children: [...actions, if (indicator != null) indicator!],
+      children: [...actions, ?indicator],
     );
   }
 }
@@ -292,13 +292,14 @@ final class CarpenterBlockList<T> extends StatelessWidget {
   final String emptyMessage;
   @override
   Widget build(BuildContext context) {
-    if (items.isEmpty)
+    if (items.isEmpty) {
       return Center(
         child: CarpenterText.body(
           emptyMessage,
           colorRole: ContentColorRole.secondary,
         ),
       );
+    }
     final gap = context.units(CarpenterTheme.of(context).spacing.medium);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -545,7 +546,9 @@ final class _CarpenterTextFieldsDialogState
   };
   @override
   void dispose() {
-    for (final controller in _controllers.values) controller.dispose();
+    for (final controller in _controllers.values) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -553,7 +556,6 @@ final class _CarpenterTextFieldsDialogState
   Widget build(BuildContext context) => CarpenterDialog(
     open: widget.open,
     onOpenChanged: widget.onOpenChanged,
-    child: widget.child,
     title: widget.title,
     content: CarpenterBlockGroup(
       children: [
@@ -593,6 +595,7 @@ final class _CarpenterTextFieldsDialogState
         },
       ),
     ],
+    child: widget.child,
   );
 }
 
@@ -630,7 +633,6 @@ final class CarpenterTextPromptDialog extends StatelessWidget {
   Widget build(BuildContext context) => CarpenterTextFieldsDialog(
     open: open,
     onOpenChanged: onOpenChanged,
-    child: child,
     title: title,
     header: header,
     confirmLabel: confirmLabel,
@@ -645,5 +647,6 @@ final class CarpenterTextPromptDialog extends StatelessWidget {
       ),
     ],
     onSubmit: (values) => onSubmit(values['value'] ?? ''),
+    child: child,
   );
 }

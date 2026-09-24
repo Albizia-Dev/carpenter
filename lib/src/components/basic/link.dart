@@ -50,6 +50,9 @@ final class CarpenterLink extends StatelessWidget {
   /// action color without an underline in any state. Set [underline] to
   /// [CarpenterLinkUnderline.auto] to opt into role-based decoration, or
   /// [CarpenterLinkUnderline.always] for underlined prose links.
+  // The public compatibility name intentionally differs from the private
+  // storage field.
+  // ignore: prefer_initializing_formals
   const CarpenterLink({
     super.key,
     required this.label,
@@ -61,6 +64,7 @@ final class CarpenterLink extends StatelessWidget {
     ActionColorRole? colorRole,
     this.focusNode,
     this.autofocus = false,
+    // ignore: prefer_initializing_formals
   }) : _colorRole = colorRole;
 
   /// Visible link label.

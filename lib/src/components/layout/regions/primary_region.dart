@@ -163,7 +163,7 @@ final class _PageRegionLayout extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: bounded ? MainAxisSize.max : MainAxisSize.min,
         children: [
-          if (header != null) header!,
+          ?header,
           if (toolbar != null) ...[
             if (header != null) SizedBox(height: gap),
             toolbar!,

@@ -136,15 +136,17 @@ final class _CarpenterAsyncAutosuggestState<T>
     });
     try {
       final result = await widget.load(query, cancellation);
-      if (!mounted || generation != _generation || cancellation.isCancelled)
+      if (!mounted || generation != _generation || cancellation.isCancelled) {
         return;
+      }
       setState(() {
         _suggestions = result;
         _loadState = OptionsLoadState.ready;
       });
     } catch (_) {
-      if (!mounted || generation != _generation || cancellation.isCancelled)
+      if (!mounted || generation != _generation || cancellation.isCancelled) {
         return;
+      }
       setState(() => _loadState = OptionsLoadState.failed);
     }
   }

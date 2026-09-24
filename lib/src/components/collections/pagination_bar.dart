@@ -37,6 +37,7 @@ final class CarpenterPaginationBar extends StatelessWidget {
 
   /// Accessible labels for the previous/next navigation actions.
   final String previousPageLabel;
+
   /// Accessible next-page label; defaults to Russian.
   final String nextPageLabel;
 

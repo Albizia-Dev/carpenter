@@ -88,20 +88,22 @@ final class CarpenterHost extends StatelessWidget {
       final missing = shell.requires
           .where((type) => !runtime.contains(type))
           .toList();
-      if (missing.isNotEmpty)
+      if (missing.isNotEmpty) {
         throw StateError(
           'Carpenter shell "${shell.id}" requires missing capabilities: ${missing.join(', ')}.',
         );
+      }
       runtime = shell.configure(
         CarpenterShellConfigureContext(runtime: runtime),
       );
       final absent = shell.provides
           .where((type) => !runtime.contains(type))
           .toList();
-      if (absent.isNotEmpty)
+      if (absent.isNotEmpty) {
         throw StateError(
           'Carpenter shell "${shell.id}" declared but did not provide: ${absent.join(', ')}.',
         );
+      }
     }
     return runtime;
   }
@@ -111,10 +113,11 @@ final class CarpenterHost extends StatelessWidget {
       final missing = module.requires
           .where((type) => !runtime.contains(type))
           .toList();
-      if (missing.isNotEmpty)
+      if (missing.isNotEmpty) {
         throw StateError(
           'Carpenter module "${module.id}" requires missing capabilities: ${missing.join(', ')}.',
         );
+      }
     }
   }
 }

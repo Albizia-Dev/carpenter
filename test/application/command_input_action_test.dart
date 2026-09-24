@@ -42,8 +42,9 @@ void main() {
       action.onInvoke!();
       action.onInvoke!();
       expect(collections, 1);
-      if (outcome == 'unmount')
+      if (outcome == 'unmount') {
         await tester.pumpWidget(const SizedBox.shrink());
+      }
       if (outcome == 'disable') command.setAvailability(enabled: false);
       input.complete(outcome == 'cancel' ? null : 42);
       await tester.pump();

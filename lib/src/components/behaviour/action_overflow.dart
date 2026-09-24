@@ -168,14 +168,11 @@ final class _RenderActionOverflow extends RenderBox
         ContainerRenderObjectMixin<RenderBox, _ActionOverflowParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _ActionOverflowParentData> {
   _RenderActionOverflow({
-    required double gap,
-    required bool keepInline,
-    required double minimumInlineActionWidth,
-    required TextDirection textDirection,
-  }) : _keepInline = keepInline,
-       _gap = gap,
-       _minimumInlineActionWidth = minimumInlineActionWidth,
-       _textDirection = textDirection;
+    required this._gap,
+    required this._keepInline,
+    required this._minimumInlineActionWidth,
+    required this._textDirection,
+  });
 
   bool _keepInline;
   set keepInline(bool value) {
@@ -293,7 +290,12 @@ final class _RenderActionOverflow extends RenderBox
   @override
   void applyPaintTransform(RenderBox child, Matrix4 transform) {
     final parentData = child.parentData! as _ActionOverflowParentData;
-    transform.translate(parentData.offset.dx, parentData.offset.dy);
+    transform.translateByDouble(
+      parentData.offset.dx,
+      parentData.offset.dy,
+      0,
+      1,
+    );
   }
 
   @override

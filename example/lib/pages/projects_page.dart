@@ -1,7 +1,6 @@
 import 'dart:math' as math;
 
 import 'package:carpenter/carpenter.dart';
-import 'package:carpenter/gravity_icons.dart';
 
 import 'package:flutter/widgets.dart';
 

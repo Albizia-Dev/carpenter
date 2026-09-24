@@ -39,7 +39,7 @@ class CarpenterResourceController<T> extends ValueNotifier<CarpenterPageState>
   CarpenterResourceController({
     required CarpenterResourceLoader<T> load,
     this.errorMessage,
-  }) : _load = load,
+  }) : _load = (value: load).value,
        super(const CarpenterPageInitialLoading()) {
     refreshCommand = CarpenterCommandController<void>(
       id: 'resource.refresh',

@@ -9,7 +9,10 @@ Widget harness(Widget child) => UnitsRoot(
     data: CarpenterThemeData.light(),
     child: Directionality(
       textDirection: TextDirection.ltr,
-      child: MediaQuery(data: const MediaQueryData(), child: child),
+      child: MediaQuery(
+        data: const MediaQueryData(),
+        child: Overlay.wrap(child: child),
+      ),
     ),
   ),
 );
@@ -17,6 +20,10 @@ Widget harness(Widget child) => UnitsRoot(
 void main() {
   testWidgets('project example saves edited metadata', (tester) async {
     await tester.pumpWidget(harness(const DsktpProjectLayout()));
+    if (find.bySemanticsLabel('Редактировать').evaluate().isEmpty) {
+      await tester.tap(find.bySemanticsLabel('Ещё'));
+      await tester.pumpAndSettle();
+    }
     await tester.tap(find.bySemanticsLabel('Редактировать'));
     await tester.pump();
     await tester.enterText(find.byType(EditableText).first, 'Новое название');

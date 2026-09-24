@@ -79,8 +79,8 @@ void main() {
       containsAll(['Tree table', 'Payment list', 'Project page']),
     );
     // Includes shared desktop project/materials golden scenarios.
-    expect(componentNames, hasLength(162));
-    expect(caseBuilders, hasLength(266));
+    expect(componentNames, hasLength(181));
+    expect(caseBuilders, hasLength(303));
   });
 
   test(

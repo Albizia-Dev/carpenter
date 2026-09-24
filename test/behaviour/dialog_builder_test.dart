@@ -29,7 +29,6 @@ void main() {
                         onOpenChanged: (open) {
                           if (!open) Navigator.of(context).pop();
                         },
-                        child: const SizedBox.shrink(),
                         title: 'Edit quantity',
                         content: CarpenterButton(
                           label: 'Quantity $count',
@@ -42,6 +41,7 @@ void main() {
                             onInvoke: () => Navigator.of(context).pop(count),
                           ),
                         ],
+                        child: const SizedBox.shrink(),
                       ),
                     );
                   },

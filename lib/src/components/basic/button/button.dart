@@ -1,7 +1,6 @@
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import '../../../foundation/hotkey_formatter.dart';
 
 import '../../../foundation/icon_data.dart';

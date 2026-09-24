@@ -3,10 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'messenger_recovery.dart';
 import 'attachment_tray.dart';
+import 'conversation_components.dart';
 import '../../../../foundation/roles.dart';
 import '../../../../foundation/adaptive.dart';
 import '../../../basic/gravity_icons.g.dart';
 import '../../../basic/button/icon_button.dart';
+import '../../../basic/icon.dart';
 import '../../../../foundation/theme.dart';
 import '../../../basic/avatar.dart';
 import '../../../basic/button/button.dart';
@@ -48,6 +50,22 @@ class CarpenterConversationItem {
   final bool canSend;
 }
 
+/// Display identity for one attachment already belonging to a message.
+///
+/// [id] is opaque and stable within the message. Carpenter never interprets it
+/// as a URL or storage key; the host resolves activation through its own
+/// authorization and transport rules.
+class CarpenterMessageAttachment {
+  /// Creates a host-resolved attachment descriptor.
+  const CarpenterMessageAttachment({required this.id, required this.label});
+
+  /// Opaque identity reported back to the host on activation.
+  final String id;
+
+  /// User-visible file description; it may include size or type details.
+  final String label;
+}
+
 /// Display-only message. Delivery wording must reflect observed transport state.
 class CarpenterMessageItem {
   /// [status] is readable delivery text, never an inferred recipient receipt.
@@ -59,6 +77,10 @@ class CarpenterMessageItem {
     this.own = false,
     this.needAnswer = false,
     this.canRetry = false,
+    this.edited = false,
+    this.important = false,
+    this.forwardedFrom,
+    this.delivery,
     this.authorKey,
     this.sentAt,
     this.timeLabel,
@@ -66,6 +88,7 @@ class CarpenterMessageItem {
     this.canReply = false,
     this.replyTargetId,
     this.attachmentLabels = const [],
+    this.attachments = const [],
   });
 
   /// Resolved quotation or an unavailable-target label; never fetched by Carpenter.
@@ -99,6 +122,10 @@ class CarpenterMessageItem {
   /// The caller must keep this list immutable for the lifetime of the item.
   final List<String> attachmentLabels;
 
+  /// Stable, host-resolved message attachments. These become interactive only
+  /// when the containing bubble or workspace receives an activation callback.
+  final List<CarpenterMessageAttachment> attachments;
+
   /// Localized delivery state or timestamp supplied by the caller.
   final String status;
 
@@ -110,6 +137,18 @@ class CarpenterMessageItem {
 
   /// Shows a retry action when the host can safely repeat this intent.
   final bool canRetry;
+
+  /// Whether this visible revision differs from the original message.
+  final bool edited;
+
+  /// Uses the danger feedback palette for a host-classified important message.
+  final bool important;
+
+  /// Resolved sender label for a forwarded message; null hides the marker.
+  final String? forwardedFrom;
+
+  /// Observed transport state. Null does not imply a receipt.
+  final CarpenterMessageDelivery? delivery;
 }
 
 /// A semantic message surface with clipboard access and explicit recovery.
@@ -123,7 +162,12 @@ class CarpenterMessageBubble extends StatefulWidget {
     this.groupWithPrevious = false,
     this.onReply,
     this.onOpenReply,
-  });
+    this.onAttachmentSelected,
+    this.showAuthor = true,
+    this.selecting = false,
+    this.selected = false,
+    this.onSelect,
+  }) : assert(!selecting || onSelect != null);
 
   /// Immutable display state owned by the caller.
   final CarpenterMessageItem message;
@@ -133,6 +177,22 @@ class CarpenterMessageBubble extends StatefulWidget {
 
   /// Opens the quoted original; the workspace resolves its loaded row key.
   final VoidCallback? onOpenReply;
+
+  /// Reports the stable attachment ID. The host owns authorization, opening,
+  /// download progress and failures; Carpenter never handles a URL directly.
+  final ValueChanged<String>? onAttachmentSelected;
+
+  /// Whether a non-own first message in a block displays its author.
+  final bool showAuthor;
+
+  /// Host-owned multi-selection mode. Taps call [onSelect] when true.
+  final bool selecting;
+
+  /// Host-owned selected state, rendered with Carpenter's selection surface.
+  final bool selected;
+
+  /// Adds a selection menu action and handles taps during [selecting].
+  final VoidCallback? onSelect;
 
   /// Null disables retry even if the model permits it.
   final VoidCallback? onRetry;
@@ -147,12 +207,19 @@ class CarpenterMessageBubble extends StatefulWidget {
 
 class _MessageBubbleState extends State<CarpenterMessageBubble> {
   bool _menuOpen = false;
+
+  void _invokeAndClose(VoidCallback action) {
+    setState(() => _menuOpen = false);
+    action();
+  }
+
   @override
   Widget build(BuildContext context) {
     final message = widget.message;
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.small);
     final radius = context.units(theme.shapes.radius(ShapeRole.rounded));
+    final inverse = message.own && !widget.selected && !message.important;
     return LayoutBuilder(
       builder: (context, constraints) {
         final maxWidth = context.units(theme.sizes.layoutNarrowEnd);
@@ -175,105 +242,224 @@ class _MessageBubbleState extends State<CarpenterMessageBubble> {
               child: GestureDetector(
                 onSecondaryTap: () => setState(() => _menuOpen = true),
                 onLongPress: () => setState(() => _menuOpen = true),
-                child: CarpenterPopover(
-                  open: _menuOpen,
-                  onOpenChanged: (open) => setState(() => _menuOpen = open),
-                  content: CarpenterMenu(
-                    semanticLabel: 'Действия с сообщением',
-                    onDismissRequested: () => setState(() => _menuOpen = false),
-                    items: [
-                      if (message.canReply && widget.onReply != null)
+                onTap: widget.selecting ? widget.onSelect : null,
+                child: AbsorbPointer(
+                  absorbing: widget.selecting,
+                  child: CarpenterPopover(
+                    open: _menuOpen,
+                    onOpenChanged: (open) => setState(() => _menuOpen = open),
+                    content: CarpenterMenu(
+                      semanticLabel: 'Действия с сообщением',
+                      onDismissRequested: () =>
+                          setState(() => _menuOpen = false),
+                      items: [
+                        if (message.canReply && widget.onReply != null)
+                          CarpenterMenuItem(
+                            action: CarpenterActionDescriptor(
+                              id: 'reply-message',
+                              label: 'Ответить',
+                              onInvoke: () => _invokeAndClose(widget.onReply!),
+                            ),
+                          ),
+                        if (widget.onSelect != null)
+                          CarpenterMenuItem(
+                            action: CarpenterActionDescriptor(
+                              id: 'select-message',
+                              label: widget.selected
+                                  ? 'Снять выбор'
+                                  : 'Выбрать',
+                              onInvoke: () => _invokeAndClose(widget.onSelect!),
+                            ),
+                          ),
                         CarpenterMenuItem(
                           action: CarpenterActionDescriptor(
-                            id: 'reply-message',
-                            label: 'Ответить',
-                            onInvoke: widget.onReply,
-                          ),
-                        ),
-                      CarpenterMenuItem(
-                        action: CarpenterActionDescriptor(
-                          id: 'copy-message',
-                          label: 'Скопировать сообщение',
-                          icon: GravityIcons.copy,
-                          onInvoke: () => Clipboard.setData(
-                            ClipboardData(
-                              text: [
-                                message.text,
-                                ...message.attachmentLabels,
-                              ].where((s) => s.isNotEmpty).join('\n'),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  anchor: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: message.own
-                          ? theme.actions.primary.state
-                          : theme.surface.base,
-                      borderRadius: BorderRadius.circular(radius),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: gap * 1.5,
-                        vertical: gap,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (!message.own && !widget.groupWithPrevious) ...[
-                            CarpenterText.label(
-                              message.author,
-                              emphasis: TypographyEmphasis.strong,
-                            ),
-                            SizedBox(height: gap / 2),
-                          ],
-                          if (message.replyPreview != null)
-                            _ReplyPreview(
-                              text: message.replyPreview!,
-                              onOpen: widget.onOpenReply,
-                            ),
-                          for (final label in message.attachmentLabels)
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: gap / 2),
-                              child: CarpenterText.label(label),
-                            ),
-                          if (message.text.isNotEmpty)
-                            CarpenterText.body(message.text),
-                          if (message.needAnswer)
-                            Padding(
-                              padding: EdgeInsets.only(top: gap / 2),
-                              child: const CarpenterText.caption(
-                                'Нужен ответ',
-                                emphasis: TypographyEmphasis.strong,
+                            id: 'copy-message',
+                            label: 'Скопировать сообщение',
+                            icon: GravityIcons.copy,
+                            onInvoke: () => _invokeAndClose(
+                              () => Clipboard.setData(
+                                ClipboardData(
+                                  text: [
+                                    message.text,
+                                    ...message.attachmentLabels,
+                                    ...message.attachments.map(
+                                      (attachment) => attachment.label,
+                                    ),
+                                  ].where((s) => s.isNotEmpty).join('\n'),
+                                ),
                               ),
                             ),
-                          SizedBox(height: gap / 2),
-                          Wrap(
-                            spacing: gap,
-                            crossAxisAlignment: WrapCrossAlignment.center,
-                            children: [
-                              if (message.timeLabel != null)
-                                CarpenterText.caption(
-                                  message.timeLabel!,
-                                  colorRole: ContentColorRole.secondary,
-                                ),
-                              if (message.status.isNotEmpty)
-                                CarpenterText.caption(
-                                  message.status,
-                                  colorRole: ContentColorRole.secondary,
-                                ),
-                              if (message.canRetry)
-                                CarpenterButton.text(
-                                  label: 'Повторить',
-                                  size: ControlSize.small,
-                                  onPressed: widget.onRetry,
-                                ),
-                            ],
                           ),
-                        ],
+                        ),
+                        if (message.canRetry && widget.onRetry != null)
+                          CarpenterMenuItem(
+                            action: CarpenterActionDescriptor(
+                              id: 'retry-message',
+                              label: 'Повторить отправку',
+                              onInvoke: () => _invokeAndClose(widget.onRetry!),
+                            ),
+                          ),
+                      ],
+                    ),
+                    anchor: DecoratedBox(
+                      decoration: BoxDecoration(
+                        color: widget.selected
+                            ? theme.overlay.selected
+                            : message.important
+                            ? theme.feedback
+                                  .resolve(FeedbackColorRole.danger)
+                                  .background
+                            : message.own
+                            ? theme.actions.primary.state
+                            : theme.surface.base,
+                        borderRadius: BorderRadius.circular(radius),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: gap * 1.5,
+                          vertical: gap,
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (widget.showAuthor &&
+                                !message.own &&
+                                !widget.groupWithPrevious) ...[
+                              CarpenterText.label(
+                                message.author,
+                                emphasis: TypographyEmphasis.strong,
+                              ),
+                              SizedBox(height: gap / 2),
+                            ],
+                            if (message.replyPreview != null)
+                              _ReplyPreview(
+                                text: message.replyPreview!,
+                                onOpen: widget.onOpenReply,
+                              ),
+                            if (message.forwardedFrom case final author?)
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const CarpenterIcon(
+                                    GravityIcons.forwardStep,
+                                    size: IconSize.small,
+                                    semanticLabel: 'Переслано',
+                                  ),
+                                  SizedBox(width: gap / 2),
+                                  CarpenterText.caption('Переслано от $author'),
+                                ],
+                              ),
+                            for (final label in message.attachmentLabels)
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                  vertical: gap / 2,
+                                ),
+                                child: CarpenterText.label(label),
+                              ),
+                            for (final attachment in message.attachments)
+                              Padding(
+                                key: ValueKey(attachment.id),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: gap / 2,
+                                ),
+                                child: CarpenterButton.text(
+                                  label: attachment.label,
+                                  semanticLabel:
+                                      'Открыть файл ${attachment.label}',
+                                  size: ControlSize.small,
+                                  onPressed: widget.onAttachmentSelected == null
+                                      ? null
+                                      : () => widget.onAttachmentSelected!(
+                                          attachment.id,
+                                        ),
+                                ),
+                              ),
+                            if (message.text.isNotEmpty)
+                              CarpenterText.body(
+                                message.text,
+                                colorRole: inverse
+                                    ? ContentColorRole.inverse
+                                    : ContentColorRole.primary,
+                              ),
+                            if (message.needAnswer)
+                              Padding(
+                                padding: EdgeInsets.only(top: gap / 2),
+                                child: const CarpenterText.caption(
+                                  'Нужен ответ',
+                                  emphasis: TypographyEmphasis.strong,
+                                ),
+                              ),
+                            SizedBox(height: gap / 2),
+                            Wrap(
+                              spacing: gap,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                if (message.important) ...[
+                                  const CarpenterIcon.feedback(
+                                    GravityIcons.exclamationShape,
+                                    feedbackRole: FeedbackColorRole.danger,
+                                    size: IconSize.small,
+                                    semanticLabel: 'Важное',
+                                  ),
+                                  SizedBox(width: gap / 2),
+                                ],
+                                if (message.edited) ...[
+                                  CarpenterIcon(
+                                    GravityIcons.pencil,
+                                    size: IconSize.small,
+                                    semanticLabel: 'Изменено',
+                                    colorRole: inverse
+                                        ? ContentColorRole.inverse
+                                        : ContentColorRole.secondary,
+                                  ),
+                                  SizedBox(width: gap / 2),
+                                ],
+                                if (message.timeLabel != null)
+                                  CarpenterText.caption(
+                                    message.timeLabel!,
+                                    colorRole: inverse
+                                        ? ContentColorRole.inverse
+                                        : ContentColorRole.secondary,
+                                  ),
+                                if (message.own && message.delivery != null)
+                                  CarpenterIcon(
+                                    switch (message.delivery!) {
+                                      CarpenterMessageDelivery.sending =>
+                                        GravityIcons.clock,
+                                      CarpenterMessageDelivery.sent =>
+                                        GravityIcons.check,
+                                      CarpenterMessageDelivery.read =>
+                                        GravityIcons.checkDouble,
+                                    },
+                                    size: IconSize.small,
+                                    semanticLabel: switch (message.delivery!) {
+                                      CarpenterMessageDelivery.sending =>
+                                        'Отправляется',
+                                      CarpenterMessageDelivery.sent =>
+                                        'Отправлено',
+                                      CarpenterMessageDelivery.read =>
+                                        'Прочитано',
+                                    },
+                                    colorRole: inverse
+                                        ? ContentColorRole.inverse
+                                        : ContentColorRole.secondary,
+                                  ),
+                                if (message.status.isNotEmpty)
+                                  CarpenterText.caption(
+                                    message.status,
+                                    colorRole: ContentColorRole.secondary,
+                                  ),
+                                if (message.canRetry)
+                                  CarpenterButton.text(
+                                    label: 'Повторить',
+                                    size: ControlSize.small,
+                                    onPressed: widget.onRetry,
+                                  ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -472,11 +658,13 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
     this.onFilesRequested,
     this.onUploadRetried,
     this.onUploadCancelled,
+    this.onUploadRemoved,
     this.historyLoading = false,
     this.historyProblem,
     this.onHistoryRequested,
     this.conversationQuery = '',
     this.onConversationQueryChanged,
+    this.onNewConversation,
     this.visibleConversationIds,
     this.replyPreview,
     this.onUnavailableReply,
@@ -485,6 +673,7 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
     this.onCancelReplyLookup,
     this.onReply,
     this.onCancelReply,
+    this.onMessageAttachmentSelected,
   });
 
   /// Quotation associated with the selected room's draft, supplied by the host.
@@ -509,6 +698,11 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
   /// Receives a stable message row key to start a reply.
   final ValueChanged<String>? onReply;
 
+  /// Reports the message and attachment identities selected by the user.
+  /// Storage lookup, access control and failure presentation remain host-owned.
+  final void Function(String messageId, String attachmentId)?
+  onMessageAttachmentSelected;
+
   /// Clears the selected draft's reply relation only.
   final VoidCallback? onCancelReply;
 
@@ -517,6 +711,10 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
 
   /// Null hides search for hosts that do not offer directory filtering.
   final ValueChanged<String>? onConversationQueryChanged;
+
+  /// Requests a new conversation flow owned entirely by the host.
+  /// Null keeps the conversation header unchanged and hides the action.
+  final VoidCallback? onNewConversation;
 
   /// Host-filtered IDs. Null shows all authorized [conversations]. Unknown IDs
   /// never add rooms. Filtering leaves [selectedId] and its detail intact.
@@ -592,6 +790,9 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
   /// Cancels a queued or active upload; also available after write revocation.
   final ValueChanged<String>? onUploadCancelled;
 
+  /// Removes local ready/failed/cancelled items without deleting remote media.
+  final ValueChanged<String>? onUploadRemoved;
+
   /// Builds the controlled messenger presentation using semantic theme roles.
   @override
   Widget build(BuildContext context) {
@@ -656,9 +857,22 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
                     children: [
                       Padding(
                         padding: EdgeInsets.all(gap),
-                        child: const CarpenterText.title(
-                          'Сообщения',
-                          emphasis: TypographyEmphasis.strong,
+                        child: Row(
+                          children: [
+                            const Expanded(
+                              child: CarpenterText.title(
+                                'Сообщения',
+                                emphasis: TypographyEmphasis.strong,
+                              ),
+                            ),
+                            if (onNewConversation != null)
+                              CarpenterIconButton(
+                                icon: GravityIcons.plus,
+                                semanticLabel: 'Новый разговор',
+                                prominence: ActionProminence.ghost,
+                                onPressed: onNewConversation,
+                              ),
+                          ],
                         ),
                       ),
                       if (onConversationQueryChanged != null)
@@ -687,8 +901,15 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
                         ),
                       Expanded(
                         child: ListView.builder(
-                          itemCount: visible.length,
+                          itemCount: loading && visible.isEmpty
+                              ? CarpenterConversationSkeleton.initialCount
+                              : visible.length,
                           itemBuilder: (context, index) {
+                            if (loading && visible.isEmpty) {
+                              return CarpenterConversationSkeleton(
+                                key: ValueKey('conversation-skeleton-$index'),
+                              );
+                            }
                             final item = visible[index];
                             return CarpenterListTile(
                               key: ValueKey(item.id),
@@ -830,6 +1051,8 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
                                                 onReply: room.canSend
                                                     ? onReply
                                                     : null,
+                                                onMessageAttachmentSelected:
+                                                    onMessageAttachmentSelected,
                                               ),
                                       ),
                                     ),
@@ -849,6 +1072,7 @@ class CarpenterMessengerWorkspace extends StatelessWidget {
                                               ? onUploadRetried
                                               : null,
                                           onCancel: onUploadCancelled,
+                                          onRemove: onUploadRemoved,
                                         ),
                                       ),
                                   ],
@@ -894,7 +1118,7 @@ bool _groupsWithPrevious(List<CarpenterMessageItem> messages, int index) {
   }
   final delta = time.difference(prior);
   return !delta.isNegative &&
-      delta <= const Duration(minutes: 5) &&
+      delta <= const Duration(minutes: 20) &&
       time.year == prior.year &&
       time.month == prior.month &&
       time.day == prior.day;
@@ -1033,6 +1257,7 @@ class _MessageTimeline extends StatefulWidget {
     this.failedReplyMessageId,
     this.onCancelReplyLookup,
     this.onReply,
+    this.onMessageAttachmentSelected,
   });
   final String? failedReplyMessageId;
   final ValueChanged<String>? onCancelReplyLookup;
@@ -1040,6 +1265,8 @@ class _MessageTimeline extends StatefulWidget {
   final ValueChanged<String> onRetry;
   final ValueChanged<String>? onUnavailableReply;
   final ValueChanged<String>? onReply;
+  final void Function(String messageId, String attachmentId)?
+  onMessageAttachmentSelected;
   @override
   State<_MessageTimeline> createState() => _MessageTimelineState();
 }
@@ -1134,6 +1361,12 @@ class _MessageTimelineState extends State<_MessageTimeline> {
               onOpenReply: message.replyPreview == null
                   ? null
                   : () => _open(message),
+              onAttachmentSelected: widget.onMessageAttachmentSelected == null
+                  ? null
+                  : (attachmentId) => widget.onMessageAttachmentSelected!(
+                      message.id,
+                      attachmentId,
+                    ),
             ),
           ],
         ),

@@ -28,13 +28,14 @@ final class CarpenterDropdown extends StatelessWidget {
     this.semanticLabel,
   }) : _iconOnly = false;
 
+  /// Creates an icon-only action-menu trigger with an accessible [label].
   const CarpenterDropdown.icon({
     super.key,
     required this.open,
     required this.onOpenChanged,
     required this.label,
     required this.items,
-    required CarpenterIconSource icon,
+    required CarpenterIconSource this.icon,
     this.colorRole = ActionColorRole.neutral,
     this.prominence = ActionProminence.normal,
     this.size = ControlSize.medium,
@@ -44,8 +45,7 @@ final class CarpenterDropdown extends StatelessWidget {
     this.focusNode,
     this.autofocus = false,
     this.semanticLabel,
-  }) : icon = icon,
-       _iconOnly = true;
+  }) : _iconOnly = true;
 
   final bool open;
   final ValueChanged<bool> onOpenChanged;

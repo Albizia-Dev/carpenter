@@ -251,7 +251,7 @@ final class CarpenterRelatedCollection extends StatelessWidget {
   Widget build(BuildContext context) => CarpenterRecordSection(
     id: CarpenterPageSectionId('related.$title'),
     title: title,
-    actions: [if (action != null) action!],
+    actions: [?action],
     child: child,
   );
 }
@@ -432,12 +432,12 @@ final class CarpenterRecordPage<T> extends StatelessWidget {
           body ??
           CarpenterPageBody(
             children: [
-              if (summary != null) summary!,
-              if (attention != null) attention!,
+              ?summary,
+              ?attention,
               ...sections,
-              if (tabs != null) tabs!,
+              ?tabs,
               ...related,
-              if (timeline != null) timeline!,
+              ?timeline,
             ],
           ),
     );

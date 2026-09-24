@@ -60,7 +60,7 @@ final class CarpenterAppFrame extends StatelessWidget {
     Widget content = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        if (panel != null) panel,
+        ?panel,
         Expanded(child: child),
       ],
     );

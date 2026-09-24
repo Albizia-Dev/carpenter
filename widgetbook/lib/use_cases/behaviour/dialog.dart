@@ -177,7 +177,6 @@ class _DialogFormState extends State<_DialogForm> {
     onOpenChanged: (open) {
       if (!open) Navigator.of(context).pop();
     },
-    child: const SizedBox.shrink(),
     title: 'Название',
     content: CarpenterInput(
       controller: _name,
@@ -199,5 +198,6 @@ class _DialogFormState extends State<_DialogForm> {
             : () => Navigator.of(context).pop(_name.text.trim()),
       ),
     ],
+    child: const SizedBox.shrink(),
   );
 }

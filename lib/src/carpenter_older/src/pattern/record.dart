@@ -60,11 +60,8 @@ class CarpenterEntityHeader extends StatelessWidget {
             overflowAction == null
         ? null
         : CarpenterActionBar(
-            primary: [if (primaryAction != null) primaryAction!],
-            secondary: [
-              ...secondaryActions,
-              if (overflowAction != null) overflowAction!,
-            ],
+            primary: [?primaryAction],
+            secondary: [...secondaryActions, ?overflowAction],
           ),
   );
 }
@@ -267,7 +264,7 @@ class CarpenterRelatedCollection extends StatelessWidget {
   Widget build(BuildContext context) => CarpenterRecordSection(
     id: CarpenterPageSectionId('related.$title'),
     title: title,
-    commands: [if (action != null) action!],
+    commands: [?action],
     child: child,
   );
 }
@@ -469,7 +466,7 @@ class CarpenterRecordPage<T> extends StatelessWidget {
                 collection,
                 const SizedBox(height: 12),
               ],
-              if (timeline != null) timeline!,
+              ?timeline,
             ],
           ),
     );

@@ -16,7 +16,7 @@ final class CarpenterBadge extends StatelessWidget {
 
   /// Formats a nonnegative [count], replacing values above positive [max]
   /// with "max+". Defaults to a danger-colored count badge.
-  CarpenterBadge.count(
+  const CarpenterBadge.count(
     int count, {
     super.key,
     int max = 99,

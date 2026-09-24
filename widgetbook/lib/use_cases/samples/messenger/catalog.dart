@@ -2,13 +2,15 @@ import 'package:carpenter/carpenter.dart';
 import 'package:flutter/widgets.dart';
 import 'package:widgetbook/widgetbook.dart';
 import '../../../helpers/layout_viewport.dart';
+import 'conversation_catalog.dart';
 
 final messengerComponents = [
+  ...conversationComponents,
   WidgetbookComponent(
     name: 'Message attachments',
     useCases: [
       WidgetbookUseCase(
-        name: 'Ready draft and retry',
+        name: 'Playground',
         builder: (context) => layoutViewportPreview(
           context,
           child: const AttachmentMessageScenario(),
@@ -66,6 +68,10 @@ final messengerComponents = [
             ),
             failSend: context.knobs.boolean(label: 'Ошибка отправки'),
             readOnly: context.knobs.boolean(label: 'Только чтение'),
+            showNewConversation: context.knobs.boolean(
+              label: 'Новый разговор',
+              initialValue: true,
+            ),
             historyLoading: context.knobs.boolean(label: 'Загрузка истории'),
             historyFailure: context.knobs.boolean(label: 'Ошибка истории'),
             hasOlder: context.knobs.boolean(label: 'Есть ранние сообщения'),
@@ -77,10 +83,55 @@ final messengerComponents = [
         ),
       ),
       WidgetbookUseCase(
-        name: 'State · Failed send',
+        name: 'States · Failed send',
         builder: (context) => layoutViewportPreview(
           context,
           child: const MessengerScenario(failSend: true, showFailure: true),
+        ),
+      ),
+      WidgetbookUseCase(
+        name: 'States · Initial loading',
+        builder: (context) => layoutViewportPreview(
+          context,
+          child: const MessengerScenario(initialRoom: null, loading: true),
+        ),
+      ),
+      WidgetbookUseCase(
+        name: 'States · Empty conversations',
+        builder: (context) => layoutViewportPreview(
+          context,
+          child: const MessengerScenario(initialRoom: null, emptyRooms: true),
+        ),
+      ),
+      WidgetbookUseCase(
+        name: 'States · Search without matches',
+        builder: (context) => layoutViewportPreview(
+          context,
+          child: const MessengerScenario(
+            initialRoom: null,
+            initialQuery: 'Нет такого чата',
+          ),
+        ),
+      ),
+      WidgetbookUseCase(
+        name: 'States · History error',
+        builder: (context) => layoutViewportPreview(
+          context,
+          child: const MessengerScenario(historyFailure: true),
+        ),
+      ),
+      WidgetbookUseCase(
+        name: 'States · Reply lookup',
+        builder: (context) => layoutViewportPreview(
+          context,
+          child: const MessengerScenario(missingOriginal: true),
+        ),
+      ),
+      WidgetbookUseCase(
+        name: 'States · Read only',
+        builder: (context) => layoutViewportPreview(
+          context,
+          child: const MessengerScenario(readOnly: true),
         ),
       ),
     ],
@@ -90,28 +141,7 @@ final messengerComponents = [
     useCases: [
       WidgetbookUseCase(
         name: 'Playground',
-        builder: (context) => CarpenterMessageBubble(
-          message: CarpenterMessageItem(
-            id: 'example',
-            author: context.knobs.string(
-              label: 'Автор',
-              initialValue: 'Анна Смирнова',
-            ),
-            text: context.knobs.string(
-              label: 'Текст',
-              initialValue: 'Проверьте, пожалуйста, документ.',
-            ),
-            status: context.knobs.string(
-              label: 'Статус',
-              initialValue: '10:24',
-            ),
-            own: context.knobs.boolean(label: 'Собственное сообщение'),
-            needAnswer: context.knobs.boolean(label: 'Нужен ответ'),
-            canRetry: context.knobs.boolean(label: 'Можно повторить'),
-          ),
-          groupWithPrevious: context.knobs.boolean(label: 'Продолжение группы'),
-          onRetry: () {},
-        ),
+        builder: (context) => const MessageBubbleScenario(),
       ),
     ],
   ),
@@ -128,6 +158,61 @@ final messengerComponents = [
   ),
 ];
 
+class MessageBubbleScenario extends StatefulWidget {
+  const MessageBubbleScenario({super.key});
+
+  @override
+  State<MessageBubbleScenario> createState() => _MessageBubbleScenarioState();
+}
+
+class _MessageBubbleScenarioState extends State<MessageBubbleScenario> {
+  bool _selected = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final own = context.knobs.boolean(label: 'Собственное сообщение');
+    return CarpenterMessageBubble(
+      message: CarpenterMessageItem(
+        id: 'example',
+        author: context.knobs.string(
+          label: 'Автор',
+          initialValue: 'Анна Смирнова',
+        ),
+        text: context.knobs.string(
+          label: 'Текст',
+          initialValue: 'Проверьте, пожалуйста, документ.',
+        ),
+        status: '',
+        timeLabel: '10:24',
+        own: own,
+        edited: context.knobs.boolean(label: 'Изменено'),
+        important: context.knobs.boolean(label: 'Важное'),
+        forwardedFrom: context.knobs.boolean(label: 'Переслано')
+            ? 'Борис'
+            : null,
+        delivery: own
+            ? context.knobs.object.dropdown(
+                label: 'Доставка',
+                options: CarpenterMessageDelivery.values,
+                initialOption: CarpenterMessageDelivery.sent,
+              )
+            : null,
+        needAnswer: context.knobs.boolean(label: 'Нужен ответ'),
+        canRetry: context.knobs.boolean(label: 'Можно повторить'),
+      ),
+      groupWithPrevious: context.knobs.boolean(label: 'Продолжение группы'),
+      showAuthor: context.knobs.boolean(
+        label: 'Показать автора',
+        initialValue: true,
+      ),
+      selecting: context.knobs.boolean(label: 'Режим выбора'),
+      selected: _selected,
+      onSelect: () => setState(() => _selected = !_selected),
+      onRetry: () {},
+    );
+  }
+}
+
 /// UI-only fixture harness. Does not import the Desktop, Bloc or transport.
 class MessengerScenario extends StatefulWidget {
   const MessengerScenario({
@@ -137,6 +222,7 @@ class MessengerScenario extends StatefulWidget {
     this.showFailure = false,
     this.showAttachments = false,
     this.readOnly = false,
+    this.showNewConversation = true,
     this.historyLoading = false,
     this.historyFailure = false,
     this.hasOlder = false,
@@ -145,12 +231,15 @@ class MessengerScenario extends StatefulWidget {
     this.distantReply = false,
     this.missingOriginal = false,
     this.originalFailure = false,
+    this.loading = false,
+    this.emptyRooms = false,
   });
   final String? initialRoom;
   final bool failSend;
   final bool showFailure;
   final bool showAttachments;
   final bool readOnly;
+  final bool showNewConversation;
   final bool historyLoading;
   final bool historyFailure;
   final bool hasOlder;
@@ -158,6 +247,8 @@ class MessengerScenario extends StatefulWidget {
   final bool distantReply;
   final bool missingOriginal;
   final bool originalFailure;
+  final bool loading;
+  final bool emptyRooms;
   final String initialQuery;
   @override
   State<MessengerScenario> createState() => _MessengerScenarioState();
@@ -311,6 +402,7 @@ class _MessengerScenarioState extends State<MessengerScenario> {
 
   @override
   Widget build(BuildContext context) => CarpenterMessengerWorkspace(
+    onNewConversation: widget.showNewConversation ? () {} : null,
     attachments: widget.showAttachments
         ? const [
             CarpenterAttachmentItem(
@@ -342,7 +434,8 @@ class _MessengerScenarioState extends State<MessengerScenario> {
         (widget.historyFailure || widget.hasOlder) && !historyResolved
         ? () => setState(() => historyResolved = true)
         : null,
-    conversations: _rooms,
+    loading: widget.loading,
+    conversations: widget.emptyRooms ? const [] : _rooms,
     conversationQuery: query,
     onConversationQueryChanged: (value) => setState(() => query = value),
     visibleConversationIds: _rooms
@@ -551,7 +644,9 @@ class _AttachmentMessageScenarioState extends State<AttachmentMessageScenario> {
   String caption = '';
   bool needAnswer = false;
   bool submitted = false;
+  bool removed = false;
   bool confirmed = false;
+  String? openedAttachment;
   @override
   Widget build(BuildContext context) => CarpenterMessengerWorkspace(
     conversations: const [
@@ -565,12 +660,17 @@ class _AttachmentMessageScenarioState extends State<AttachmentMessageScenario> {
     selectedId: 'project',
     onSelected: (_) {},
     messages: [
-      const CarpenterMessageItem(
+      CarpenterMessageItem(
         id: 'incoming',
         author: 'Анна Смирнова',
         text: 'Для проверки',
-        attachmentLabels: ['План работ.pdf · 2 МБ'],
-        status: '',
+        attachments: const [
+          CarpenterMessageAttachment(
+            id: 'plan',
+            label: 'План работ.pdf · 2 МБ',
+          ),
+        ],
+        status: openedAttachment == 'plan' ? 'Файл выбран' : '',
         timeLabel: '10:24',
       ),
       if (submitted)
@@ -581,11 +681,19 @@ class _AttachmentMessageScenarioState extends State<AttachmentMessageScenario> {
           own: true,
           needAnswer: needAnswer,
           canRetry: !confirmed,
-          attachmentLabels: const ['Спецификация оборудования.pdf · 540 КБ'],
+          attachments: removed
+              ? const []
+              : const [
+                  CarpenterMessageAttachment(
+                    id: 'specification',
+                    label: 'Спецификация оборудования.pdf · 540 КБ',
+                  ),
+                ],
           status: confirmed ? 'Отправлено' : 'Нет подтверждения',
         ),
     ],
-    attachments: submitted
+    onUploadRemoved: (_) => setState(() => removed = true),
+    attachments: submitted || removed
         ? const []
         : const [
             CarpenterAttachmentItem(
@@ -595,12 +703,14 @@ class _AttachmentMessageScenarioState extends State<AttachmentMessageScenario> {
               detail: '540 КБ',
             ),
           ],
-    hasDraftAttachments: !submitted,
+    hasDraftAttachments: !submitted && !removed,
     draft: submitted ? '' : caption,
     needAnswer: !submitted && needAnswer,
     onDraftChanged: (text) => setState(() => caption = text),
     onNeedAnswerChanged: (value) => setState(() => needAnswer = value),
     onSend: submitted ? null : () => setState(() => submitted = true),
     onRetry: (_) => setState(() => confirmed = true),
+    onMessageAttachmentSelected: (_, attachmentId) =>
+        setState(() => openedAttachment = attachmentId),
   );
 }

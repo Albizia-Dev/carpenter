@@ -54,8 +54,9 @@ final class _CarpenterExpanderState extends State<CarpenterExpander> {
   @override
   void didUpdateWidget(CarpenterExpander oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.initiallyExpanded != widget.initiallyExpanded)
+    if (oldWidget.initiallyExpanded != widget.initiallyExpanded) {
       _expanded = widget.initiallyExpanded;
+    }
   }
 
   void _toggle() {

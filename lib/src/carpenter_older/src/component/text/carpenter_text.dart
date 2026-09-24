@@ -94,7 +94,7 @@ class CarpenterText extends widgets.Text {
       'Use of textScaleFactor was deprecated in preparation for the upcoming '
       'nonlinear text scaling support.',
     )
-    super.textScaleFactor,
+    double? textScaleFactor,
     super.textScaler,
     super.maxLines,
     super.semanticsLabel,
@@ -104,7 +104,7 @@ class CarpenterText extends widgets.Text {
     super.selectionColor,
     this.variant = CarpenterTextVariant.body,
     this.tone = CarpenterTextTone.primary,
-  });
+  }) : _legacyScale = (value: textScaleFactor);
 
   /// Создает текстовый primitive из [widgets.InlineSpan].
   const CarpenterText.rich(
@@ -122,7 +122,7 @@ class CarpenterText extends widgets.Text {
       'Use of textScaleFactor was deprecated in preparation for the upcoming '
       'nonlinear text scaling support.',
     )
-    super.textScaleFactor,
+    double? textScaleFactor,
     super.textScaler,
     super.maxLines,
     super.semanticsLabel,
@@ -132,7 +132,8 @@ class CarpenterText extends widgets.Text {
     super.selectionColor,
     this.variant = CarpenterTextVariant.body,
     this.tone = CarpenterTextTone.primary,
-  }) : super.rich();
+  }) : _legacyScale = (value: textScaleFactor),
+       super.rich();
 
   /// Типографическая роль текста.
   final CarpenterTextVariant variant;
@@ -140,10 +141,21 @@ class CarpenterText extends widgets.Text {
   /// Семантический цвет текста.
   final CarpenterTextTone tone;
 
+  /// Legacy linear scaling input retained for source compatibility.
+  final ({double? value}) _legacyScale;
+
+  @override
+  double? get textScaleFactor => _legacyScale.value;
+
   @override
   widgets.Widget build(widgets.BuildContext context) {
     final carpenterStyle = _resolveStyle(context);
     final effectiveStyle = carpenterStyle.merge(style);
+    final effectiveTextScaler =
+        textScaler ??
+        (textScaleFactor == null
+            ? null
+            : widgets.TextScaler.linear(textScaleFactor!));
 
     if (textSpan case final textSpan?) {
       return widgets.Text.rich(
@@ -155,8 +167,7 @@ class CarpenterText extends widgets.Text {
         locale: locale,
         softWrap: softWrap,
         overflow: overflow,
-        textScaleFactor: textScaleFactor,
-        textScaler: textScaler,
+        textScaler: effectiveTextScaler,
         maxLines: maxLines,
         semanticsLabel: semanticsLabel,
         semanticsIdentifier: semanticsIdentifier,
@@ -175,8 +186,7 @@ class CarpenterText extends widgets.Text {
       locale: locale,
       softWrap: softWrap,
       overflow: overflow,
-      textScaleFactor: textScaleFactor,
-      textScaler: textScaler,
+      textScaler: effectiveTextScaler,
       maxLines: maxLines,
       semanticsLabel: semanticsLabel,
       semanticsIdentifier: semanticsIdentifier,

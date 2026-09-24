@@ -24,8 +24,9 @@ extension CarpenterCommandPlatformShortcuts on CarpenterCommand<dynamic> {
       TargetPlatform.android => androidShortcuts ?? shortcuts,
       TargetPlatform.fuchsia => fuchsiaShortcuts ?? shortcuts,
     };
-    if (platform != TargetPlatform.macOS && platform != TargetPlatform.iOS)
+    if (platform != TargetPlatform.macOS && platform != TargetPlatform.iOS) {
       return selected;
+    }
     return selected.map(_macOSActivator).toList(growable: false);
   }
 }
@@ -258,8 +259,9 @@ final class _CarpenterHotkeyScopeState extends State<CarpenterHotkeyScope> {
       final state = command.state.value;
       if (!widget.enabled ||
           !state.enabled ||
-          state.visibility == CarpenterCommandVisibility.hidden)
+          state.visibility == CarpenterCommandVisibility.hidden) {
         continue;
+      }
       for (final activator in command.shortcutsFor(_platform)) {
         shortcuts[activator] = _HotkeyIntent(command);
       }

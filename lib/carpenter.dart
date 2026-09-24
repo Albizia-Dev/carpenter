@@ -1,7 +1,7 @@
 /// Carpenter is a semantic and adaptive UI platform for Flutter.
 library;
-export 'src/components/layout/patterns/work_items/rsp_recovery.dart';
 
+export 'src/components/layout/patterns/work_items/rsp_recovery.dart';
 
 export 'src/components/layout/patterns/work_items/work_inbox.dart';
 export 'src/components/layout/patterns/work_items/rsp_acceptance.dart';
@@ -195,6 +195,12 @@ export 'src/foundation/tokens/carpenter.mordant.g.dart'
 export 'src/components/layout/patterns/messaging/messenger_workspace.dart';
 export 'src/components/layout/patterns/messaging/messenger_recovery.dart';
 export 'src/components/layout/patterns/messaging/attachment_tray.dart';
+export 'src/components/layout/patterns/messaging/attachment_strip.dart';
+export 'src/components/layout/patterns/messaging/conversation_components.dart';
+export 'src/components/layout/patterns/messaging/conversation_split_view.dart';
+export 'src/components/layout/patterns/messaging/chat_composer.dart';
+export 'src/components/layout/patterns/messaging/message_timeline_chrome.dart';
+export 'src/components/layout/patterns/messaging/voice_controls.dart';
 
 // Contextual workspace composition.
 export 'src/components/layout/patterns/workspace/workspace_shell.dart';

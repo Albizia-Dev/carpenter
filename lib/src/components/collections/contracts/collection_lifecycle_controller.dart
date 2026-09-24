@@ -91,11 +91,11 @@ final class CollectionLifecycleController<T, K, F> extends ChangeNotifier {
     this.searchDebounce = const Duration(milliseconds: 350),
     CollectionQuery<F> Function(CollectionQuery<F> current, String search)?
     queryForSearch,
-  }) : _queryForSearch = queryForSearch,
-       _load = load,
-       _loadMore = loadMore,
-       _query = query,
-       _keyOf = keyOf,
+  }) : _queryForSearch = (value: queryForSearch).value,
+       _load = (value: load).value,
+       _loadMore = (value: loadMore).value,
+       _query = (value: query).value,
+       _keyOf = (value: keyOf).value,
        _snapshot = initialSnapshot ?? CollectionSnapshot<T>.initialLoading();
 
   final CollectionQuery<F> Function(CollectionQuery<F> current, String search)?
