@@ -88,6 +88,32 @@ void main() {
     expect(find.bySemanticsLabel('Прикрепить файлы'), findsNothing);
     expect(find.byType(CarpenterRecordingControl), findsNothing);
   });
+
+  testWidgets('composer controls form one seamless surface', (tester) async {
+    await tester.pumpWidget(
+      _host(
+        CarpenterChatComposer(
+          view: const CarpenterComposerView(text: ''),
+          recording: const CarpenterRecordingView(
+            kind: CarpenterRecordingKind.voice,
+            phase: CarpenterRecordingPhase.recording,
+            level: .5,
+          ),
+          onTextChanged: (_) {},
+          onSendRequested: (_) {},
+        ),
+      ),
+    );
+
+    expect(
+      find.byKey(const ValueKey('composer-input-surface')),
+      findsOneWidget,
+    );
+    final record = tester.getSize(
+      find.byKey(const ValueKey('recording-control-button')),
+    );
+    expect(record.width, greaterThan(record.height));
+  });
 }
 
 Widget _host(Widget child) => UnitsRoot(

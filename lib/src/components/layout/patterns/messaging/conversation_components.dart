@@ -113,6 +113,7 @@ final class CarpenterConversationTile extends StatefulWidget {
     this.unreadCount = 0,
     this.markedUnread = false,
     this.previewDelivery,
+    this.timestampLabel,
     this.previewContent,
     this.actions = const [],
   });
@@ -125,6 +126,7 @@ final class CarpenterConversationTile extends StatefulWidget {
   final int unreadCount;
   final bool markedUnread;
   final CarpenterDeliveryState? previewDelivery;
+  final String? timestampLabel;
   final Widget? previewContent;
   final List<CarpenterMenuItem> actions;
 
@@ -139,7 +141,7 @@ class _CarpenterConversationTileState extends State<CarpenterConversationTile> {
   @override
   Widget build(BuildContext context) {
     final tile = CarpenterListTile(
-      presentation: CarpenterListTilePresentation.collectionRow,
+      presentation: CarpenterListTilePresentation.standard,
       selected: widget.selected,
       onInvoke: widget.onSelected,
       leading: widget.avatar,
@@ -164,37 +166,72 @@ class _CarpenterConversationTileState extends State<CarpenterConversationTile> {
                       colorRole: ContentColorRole.secondary,
                     ),
               ),
-              if (widget.previewDelivery case final delivery?)
-                CarpenterIcon(
-                  switch (delivery) {
-                    CarpenterDeliveryState.sending => GravityIcons.clock,
-                    CarpenterDeliveryState.sent => GravityIcons.check,
-                    CarpenterDeliveryState.read => GravityIcons.checkDouble,
-                    CarpenterDeliveryState.failed =>
-                      GravityIcons.exclamationShape,
-                  },
-                  size: IconSize.small,
-                  semanticLabel: switch (delivery) {
-                    CarpenterDeliveryState.sending => 'Отправляется',
-                    CarpenterDeliveryState.sent => 'Отправлено',
-                    CarpenterDeliveryState.read => 'Прочитано',
-                    CarpenterDeliveryState.failed => 'Ошибка отправки',
-                  },
-                ),
             ],
           ),
         ],
       ),
-      trailing: widget.unreadCount > 0 || widget.markedUnread
-          ? widget.unreadCount > 0
-                ? CarpenterBadge.count(
-                    widget.unreadCount,
-                    semanticLabel: '${widget.unreadCount} непрочитанных',
-                  )
-                : const CarpenterText.caption(
-                    '•',
-                    emphasis: TypographyEmphasis.strong,
-                  )
+      trailing:
+          widget.timestampLabel != null ||
+              widget.previewDelivery != null ||
+              widget.unreadCount > 0 ||
+              widget.markedUnread
+          ? Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.previewDelivery case final delivery?)
+                      CarpenterIcon(
+                        switch (delivery) {
+                          CarpenterDeliveryState.sending => GravityIcons.clock,
+                          CarpenterDeliveryState.sent => GravityIcons.check,
+                          CarpenterDeliveryState.read =>
+                            GravityIcons.checkDouble,
+                          CarpenterDeliveryState.failed =>
+                            GravityIcons.exclamationShape,
+                        },
+                        size: IconSize.small,
+                        semanticLabel: switch (delivery) {
+                          CarpenterDeliveryState.sending => 'Отправляется',
+                          CarpenterDeliveryState.sent => 'Отправлено',
+                          CarpenterDeliveryState.read => 'Прочитано',
+                          CarpenterDeliveryState.failed => 'Ошибка отправки',
+                        },
+                      ),
+                    if (widget.timestampLabel case final timestamp?) ...[
+                      SizedBox(
+                        width: context.units(
+                          CarpenterTheme.of(context).spacing.xsmall,
+                        ),
+                      ),
+                      CarpenterText.caption(
+                        timestamp,
+                        colorRole: ContentColorRole.secondary,
+                      ),
+                    ],
+                  ],
+                ),
+                if (widget.unreadCount > 0 || widget.markedUnread) ...[
+                  SizedBox(
+                    height: context.units(
+                      CarpenterTheme.of(context).spacing.xsmall,
+                    ),
+                  ),
+                  if (widget.unreadCount > 0)
+                    CarpenterBadge.count(
+                      widget.unreadCount,
+                      semanticLabel: '${widget.unreadCount} непрочитанных',
+                    )
+                  else
+                    const CarpenterText.caption(
+                      '•',
+                      emphasis: TypographyEmphasis.strong,
+                    ),
+                ],
+              ],
+            )
           : null,
     );
     if (widget.actions.isEmpty) return tile;

@@ -57,39 +57,48 @@ final class CarpenterInlineMedia extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.small);
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        color: theme.surface.subtle,
-        borderRadius: BorderRadius.circular(
-          context.units(theme.shapes.radius(ShapeRole.rounded)),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: theme.surface.subtle,
+            borderRadius: BorderRadius.circular(
+              context.units(theme.shapes.radius(ShapeRole.rounded)),
+            ),
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(gap),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _presentation(context),
+                if (view.loadState == CarpenterMediaLoadState.originalLoading)
+                  const CarpenterText.caption('Загружаем оригинал…'),
+                if (view.loadState == CarpenterMediaLoadState.failed)
+                  const CarpenterText.feedback(
+                    'Не удалось загрузить медиа.',
+                    feedbackRole: FeedbackColorRole.danger,
+                  ),
+                if (view.requiresExplicitOriginalLoad)
+                  CarpenterButton(
+                    label: 'Загрузить оригинал',
+                    semanticLabel: 'Загрузить оригинал: ${view.label}',
+                    onPressed: onLoadRequested,
+                    prominence: ActionProminence.ghost,
+                    size: ControlSize.small,
+                  ),
+              ],
+            ),
+          ),
         ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(gap),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _presentation(context),
-            if (view.loadState == CarpenterMediaLoadState.originalLoading)
-              const CarpenterText.caption('Загружаем оригинал…'),
-            if (view.loadState == CarpenterMediaLoadState.failed)
-              const CarpenterText.feedback(
-                'Не удалось загрузить медиа.',
-                feedbackRole: FeedbackColorRole.danger,
-              ),
-            if (view.requiresExplicitOriginalLoad)
-              CarpenterButton(
-                label: 'Загрузить оригинал',
-                semanticLabel: 'Загрузить оригинал: ${view.label}',
-                onPressed: onLoadRequested,
-                prominence: ActionProminence.ghost,
-                size: ControlSize.small,
-              ),
-            if (_hasPlayback) _playbackControls(context),
-          ],
-        ),
-      ),
+        if (_hasPlayback) ...[
+          SizedBox(height: context.units(theme.spacing.xsmall)),
+          _playbackControls(context),
+        ],
+      ],
     );
   }
 
@@ -181,18 +190,38 @@ final class CarpenterInlineMedia extends StatelessWidget {
   Widget _audioPreview(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     return SizedBox(
-      height: context.units(theme.sizes.control(ControlSize.large)),
       width: context.units(theme.sizes.layoutSecondary),
-      child: CustomPaint(
-        key: ValueKey('media-waveform-${view.id}'),
-        painter: _WaveformPainter(
-          samples: view.waveform,
-          color: theme.content.resolve(ContentColorRole.secondary),
-          playedColor: theme.actions.primary.state,
-          progress: view.duration == null || view.duration == Duration.zero
-              ? 0
-              : view.position.inMilliseconds / view.duration!.inMilliseconds,
-        ),
+      child: Row(
+        children: [
+          CarpenterIconButton(
+            icon: view.playing ? GravityIcons.pause : GravityIcons.play,
+            semanticLabel: view.playing
+                ? 'Пауза: ${view.label}'
+                : 'Воспроизвести: ${view.label}',
+            onPressed: onPlayPauseRequested,
+            colorRole: ActionColorRole.primary,
+            prominence: ActionProminence.high,
+          ),
+          SizedBox(width: context.units(theme.spacing.small)),
+          Expanded(
+            child: SizedBox(
+              height: context.units(theme.sizes.control(ControlSize.large)),
+              child: CustomPaint(
+                key: ValueKey('media-waveform-${view.id}'),
+                painter: _WaveformPainter(
+                  samples: view.waveform,
+                  color: theme.content.resolve(ContentColorRole.secondary),
+                  playedColor: theme.actions.primary.state,
+                  progress:
+                      view.duration == null || view.duration == Duration.zero
+                      ? 0
+                      : view.position.inMilliseconds /
+                            view.duration!.inMilliseconds,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -249,55 +278,39 @@ final class CarpenterInlineMedia extends StatelessWidget {
 
   Widget _playbackControls(BuildContext context) {
     final gap = context.units(CarpenterTheme.of(context).spacing.small);
-    return Wrap(
-      spacing: gap,
-      runSpacing: gap,
-      crossAxisAlignment: WrapCrossAlignment.center,
+    final audioLike =
+        view.kind == CarpenterMediaKind.audio ||
+        view.kind == CarpenterMediaKind.voice;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        CarpenterIconButton(
-          icon: view.playing ? GravityIcons.pause : GravityIcons.play,
-          semanticLabel: view.playing
-              ? 'Пауза: ${view.label}'
-              : 'Воспроизвести: ${view.label}',
-          onPressed: onPlayPauseRequested,
-          prominence: ActionProminence.ghost,
-          size: ControlSize.small,
-        ),
+        if (!audioLike) ...[
+          CarpenterIconButton(
+            icon: view.playing ? GravityIcons.pause : GravityIcons.play,
+            semanticLabel: view.playing
+                ? 'Пауза: ${view.label}'
+                : 'Воспроизвести: ${view.label}',
+            onPressed: onPlayPauseRequested,
+            prominence: ActionProminence.ghost,
+            size: ControlSize.small,
+          ),
+          SizedBox(width: gap),
+        ],
         CarpenterText.caption(
           '${_duration(view.position)} / ${_duration(view.duration ?? Duration.zero)}',
         ),
-        CarpenterButton.text(
-          label: '−15 с',
-          size: ControlSize.small,
-          onPressed: onSeekRequested == null
-              ? null
-              : () => onSeekRequested!(_seek(const Duration(seconds: -15))),
-        ),
-        CarpenterButton.text(
-          label: '+15 с',
-          size: ControlSize.small,
-          onPressed: onSeekRequested == null
-              ? null
-              : () => onSeekRequested!(_seek(const Duration(seconds: 15))),
-        ),
-        CarpenterButton.text(
-          label: '${view.playbackRate.toStringAsFixed(1)}×',
-          size: ControlSize.small,
-          onPressed: onSpeedChanged == null
-              ? null
-              : () => onSpeedChanged!(
-                  CarpenterPlaybackSpeeds.next(view.playbackRate),
-                ),
-        ),
+        if (onSpeedChanged != null) ...[
+          SizedBox(width: gap),
+          CarpenterButton.text(
+            label: '${view.playbackRate.toStringAsFixed(1)}×',
+            size: ControlSize.small,
+            onPressed: () => onSpeedChanged!(
+              CarpenterPlaybackSpeeds.next(view.playbackRate),
+            ),
+          ),
+        ],
       ],
     );
-  }
-
-  Duration _seek(Duration delta) {
-    final total = view.duration ?? Duration.zero;
-    final milliseconds = (view.position.inMilliseconds + delta.inMilliseconds)
-        .clamp(0, total.inMilliseconds);
-    return Duration(milliseconds: milliseconds);
   }
 }
 

@@ -58,6 +58,7 @@ final class CarpenterConversationView {
     this.previewAuthor,
     this.previewOwn = false,
     this.previewDelivery,
+    this.lastEventAt,
     this.draft,
     this.unreadCount = 0,
     this.markedUnread = false,
@@ -73,6 +74,7 @@ final class CarpenterConversationView {
   final String? previewAuthor;
   final bool previewOwn;
   final CarpenterDeliveryState? previewDelivery;
+  final DateTime? lastEventAt;
   final String? draft;
   final int unreadCount;
   final bool markedUnread;

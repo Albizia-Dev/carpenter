@@ -3,6 +3,33 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  testWidgets('count badge never becomes narrower than its height', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(const Center(child: CarpenterBadge.count(3))),
+    );
+
+    final size = tester.getSize(find.byType(CarpenterBadge));
+    expect(size.width, greaterThanOrEqualTo(size.height));
+  });
+
+  testWidgets('count badge stays square at increased text scale', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        const MediaQuery(
+          data: MediaQueryData(textScaler: TextScaler.linear(2)),
+          child: Center(child: CarpenterBadge.count(3)),
+        ),
+      ),
+    );
+
+    final size = tester.getSize(find.byType(CarpenterBadge));
+    expect(size.width, greaterThanOrEqualTo(size.height));
+  });
+
   testWidgets('room avatars are square and show mute state', (tester) async {
     await tester.pumpWidget(
       _host(
@@ -31,6 +58,7 @@ void main() {
           selected: false,
           onSelected: () {},
           unreadCount: 2,
+          timestampLabel: '01:59',
           previewDelivery: CarpenterDeliveryState.read,
           actions: [
             CarpenterMenuItem(
@@ -45,7 +73,18 @@ void main() {
       ),
     );
     expect(find.text('2'), findsOneWidget);
+    expect(
+      tester
+          .widget<CarpenterListTile>(find.byType(CarpenterListTile))
+          .presentation,
+      CarpenterListTilePresentation.standard,
+    );
+    expect(find.text('01:59'), findsOneWidget);
     expect(find.bySemanticsLabel('Прочитано'), findsOneWidget);
+    expect(
+      tester.getCenter(find.text('01:59')).dy,
+      lessThan(tester.getCenter(find.text('2')).dy),
+    );
     await tester.longPress(find.text('Анна').first);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Без звука').last);

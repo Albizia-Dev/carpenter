@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:carpenter_units/carpenter_units.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
@@ -32,6 +34,8 @@ final class CarpenterMessageBubble extends StatefulWidget {
     this.onMediaSeekRequested,
     this.onMediaSpeedChanged,
     this.onMediaFocusChanged,
+    this.metadataLeading = const [],
+    this.metadataTrailing = const [],
   });
 
   final CarpenterMessageView message;
@@ -48,6 +52,8 @@ final class CarpenterMessageBubble extends StatefulWidget {
   final CarpenterMediaSeekRequested? onMediaSeekRequested;
   final CarpenterMediaSpeedChanged? onMediaSpeedChanged;
   final CarpenterMediaFocusChanged? onMediaFocusChanged;
+  final List<Widget> metadataLeading;
+  final List<Widget> metadataTrailing;
 
   @override
   State<CarpenterMessageBubble> createState() => _CarpenterMessageBubbleState();
@@ -123,160 +129,196 @@ final class _CarpenterMessageBubbleState extends State<CarpenterMessageBubble> {
         !widget.selected &&
         !message.meta.important &&
         !message.meta.requiresAnswer;
-    return Align(
-      alignment: message.own
-          ? AlignmentDirectional.centerEnd
-          : AlignmentDirectional.centerStart,
-      child: FractionallySizedBox(
-        widthFactor: .88,
-        child: Listener(
-          onPointerDown: (event) {
-            _pointerOrigin = event.position;
-            _pointerDelta = Offset.zero;
-          },
-          onPointerMove: (event) {
-            final origin = _pointerOrigin;
-            if (origin != null) _pointerDelta = event.position - origin;
-          },
-          onPointerCancel: (_) {
-            _pointerOrigin = null;
-            _pointerDelta = Offset.zero;
-          },
-          onPointerUp: (_) => _completePointerGesture(context),
-          child: CarpenterPopover(
-            open: _menuOpen,
-            onOpenChanged: (open) => setState(() => _menuOpen = open),
-            anchorActivates: false,
-            content: CarpenterMenu(
-              semanticLabel: 'Действия с сообщением',
-              onDismissRequested: () => setState(() => _menuOpen = false),
-              items: _menuItems(),
-            ),
-            anchor: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onSecondaryTap: () => setState(() => _menuOpen = true),
-              onLongPress: () => setState(() => _menuOpen = true),
-              onTap: widget.selectionMode && widget.onSelectionChanged != null
-                  ? () => widget.onSelectionChanged!(!widget.selected)
-                  : null,
-              child: DecoratedBox(
-                key: ValueKey('message-bubble-${message.id}'),
-                decoration: BoxDecoration(
-                  color: widget.selected
-                      ? theme.overlay.selected
-                      : message.meta.important || message.meta.requiresAnswer
-                      ? theme.feedback
-                            .resolve(FeedbackColorRole.danger)
-                            .background
-                      : message.own
-                      ? theme.actions.primary.state
-                      : theme.surface.base,
-                  borderRadius: BorderRadius.circular(
-                    context.units(theme.shapes.radius(ShapeRole.rounded)),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final maximum = math.min(
+          constraints.maxWidth,
+          context.units(theme.sizes.layoutSecondary),
+        );
+        final preferredMinimum = context.units(theme.sizes.tableColumn);
+        final minimum = preferredMinimum > maximum ? maximum : preferredMinimum;
+        return Align(
+          heightFactor: 1,
+          alignment: message.own
+              ? AlignmentDirectional.centerEnd
+              : AlignmentDirectional.centerStart,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: minimum, maxWidth: maximum),
+            child: IntrinsicWidth(
+              child: Listener(
+                onPointerDown: (event) {
+                  _pointerOrigin = event.position;
+                  _pointerDelta = Offset.zero;
+                },
+                onPointerMove: (event) {
+                  final origin = _pointerOrigin;
+                  if (origin != null) _pointerDelta = event.position - origin;
+                },
+                onPointerCancel: (_) {
+                  _pointerOrigin = null;
+                  _pointerDelta = Offset.zero;
+                },
+                onPointerUp: (_) => _completePointerGesture(context),
+                child: CarpenterPopover(
+                  open: _menuOpen,
+                  onOpenChanged: (open) => setState(() => _menuOpen = open),
+                  anchorActivates: false,
+                  content: CarpenterMenu(
+                    semanticLabel: 'Действия с сообщением',
+                    onDismissRequested: () => setState(() => _menuOpen = false),
+                    items: _menuItems(),
                   ),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: gap * 1.5,
-                    vertical: gap,
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (widget.showAuthor && !message.own)
-                        CarpenterText.label(
-                          message.authorLabel,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          emphasis: TypographyEmphasis.strong,
+                  anchor: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onSecondaryTap: () => setState(() => _menuOpen = true),
+                    onLongPress: () => setState(() => _menuOpen = true),
+                    onTap:
+                        widget.selectionMode &&
+                            widget.onSelectionChanged != null
+                        ? () => widget.onSelectionChanged!(!widget.selected)
+                        : null,
+                    child: DecoratedBox(
+                      key: ValueKey('message-bubble-${message.id}'),
+                      decoration: BoxDecoration(
+                        color: widget.selected
+                            ? theme.overlay.selected
+                            : message.meta.important ||
+                                  message.meta.requiresAnswer
+                            ? theme.feedback
+                                  .resolve(FeedbackColorRole.danger)
+                                  .background
+                            : message.own
+                            ? theme.actions.primary.state
+                            : theme.surface.base,
+                        borderRadius: BorderRadius.circular(
+                          context.units(theme.shapes.radius(ShapeRole.rounded)),
                         ),
-                      if (message.replyPreview case final preview?)
-                        _ReplyPreview(
-                          preview: preview,
-                          onPressed: widget.onReplyPreviewInvoked,
+                        border: Border.all(
+                          color: theme.overlay.border,
+                          width: context.units(theme.shapes.fieldBorderWidth),
                         ),
-                      if (message.meta.forwardedFrom case final author?)
-                        Row(
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.units(theme.spacing.medium),
+                          vertical: gap,
+                        ),
+                        child: Column(
                           mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const CarpenterIcon(
-                              GravityIcons.forwardStep,
-                              size: IconSize.small,
-                              semanticLabel: 'Переслано',
-                            ),
-                            SizedBox(width: gap / 2),
-                            Flexible(
-                              child: CarpenterText.caption(
-                                'Переслано от $author',
+                            if (widget.showAuthor && !message.own)
+                              CarpenterText.label(
+                                message.authorLabel,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
+                                emphasis: TypographyEmphasis.strong,
+                              ),
+                            if (message.replyPreview case final preview?)
+                              _ReplyPreview(
+                                preview: preview,
+                                onPressed: widget.onReplyPreviewInvoked,
+                              ),
+                            if (message.meta.forwardedFrom case final author?)
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const CarpenterIcon(
+                                    GravityIcons.forwardStep,
+                                    size: IconSize.small,
+                                    semanticLabel: 'Переслано',
+                                  ),
+                                  SizedBox(
+                                    width: context.units(theme.spacing.xsmall),
+                                  ),
+                                  Flexible(
+                                    child: CarpenterText.caption(
+                                      'Переслано от $author',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            for (final media in message.media)
+                              Padding(
+                                key: ValueKey('message-media-${media.id}'),
+                                padding: EdgeInsets.symmetric(
+                                  vertical: context.units(theme.spacing.xsmall),
+                                ),
+                                child: CarpenterInlineMedia(
+                                  view: media,
+                                  preview: widget.mediaPreviewBuilder?.call(
+                                    context,
+                                    media,
+                                  ),
+                                  onLoadRequested:
+                                      widget.onMediaLoadRequested == null
+                                      ? null
+                                      : () => widget.onMediaLoadRequested!(
+                                          media.id,
+                                        ),
+                                  onPlayPauseRequested:
+                                      widget.onMediaPlayPauseRequested == null
+                                      ? null
+                                      : () => widget.onMediaPlayPauseRequested!(
+                                          media.id,
+                                        ),
+                                  onSeekRequested:
+                                      widget.onMediaSeekRequested == null
+                                      ? null
+                                      : (position) =>
+                                            widget.onMediaSeekRequested!(
+                                              media.id,
+                                              position,
+                                            ),
+                                  onSpeedChanged:
+                                      widget.onMediaSpeedChanged == null
+                                      ? null
+                                      : (speed) => widget.onMediaSpeedChanged!(
+                                          media.id,
+                                          speed,
+                                        ),
+                                  onFocusChanged:
+                                      widget.onMediaFocusChanged == null
+                                      ? null
+                                      : (focused) =>
+                                            widget.onMediaFocusChanged!(
+                                              media.id,
+                                              focused,
+                                            ),
+                                ),
+                              ),
+                            if (message.body.isNotEmpty)
+                              CarpenterText.body(
+                                message.body,
+                                colorRole: inverse
+                                    ? ContentColorRole.inverse
+                                    : ContentColorRole.primary,
+                              ),
+                            SizedBox(
+                              height: context.units(theme.spacing.xsmall),
+                            ),
+                            Align(
+                              alignment: AlignmentDirectional.centerEnd,
+                              child: _MessageMetadata(
+                                message: message,
+                                inverse: inverse,
+                                leading: widget.metadataLeading,
+                                trailing: widget.metadataTrailing,
                               ),
                             ),
                           ],
                         ),
-                      for (final media in message.media)
-                        Padding(
-                          key: ValueKey('message-media-${media.id}'),
-                          padding: EdgeInsets.symmetric(vertical: gap / 2),
-                          child: CarpenterInlineMedia(
-                            view: media,
-                            preview: widget.mediaPreviewBuilder?.call(
-                              context,
-                              media,
-                            ),
-                            onLoadRequested: widget.onMediaLoadRequested == null
-                                ? null
-                                : () => widget.onMediaLoadRequested!(media.id),
-                            onPlayPauseRequested:
-                                widget.onMediaPlayPauseRequested == null
-                                ? null
-                                : () => widget.onMediaPlayPauseRequested!(
-                                    media.id,
-                                  ),
-                            onSeekRequested: widget.onMediaSeekRequested == null
-                                ? null
-                                : (position) => widget.onMediaSeekRequested!(
-                                    media.id,
-                                    position,
-                                  ),
-                            onSpeedChanged: widget.onMediaSpeedChanged == null
-                                ? null
-                                : (speed) => widget.onMediaSpeedChanged!(
-                                    media.id,
-                                    speed,
-                                  ),
-                            onFocusChanged: widget.onMediaFocusChanged == null
-                                ? null
-                                : (focused) => widget.onMediaFocusChanged!(
-                                    media.id,
-                                    focused,
-                                  ),
-                          ),
-                        ),
-                      if (message.body.isNotEmpty)
-                        CarpenterText.body(
-                          message.body,
-                          colorRole: inverse
-                              ? ContentColorRole.inverse
-                              : ContentColorRole.primary,
-                        ),
-                      SizedBox(height: gap / 2),
-                      Align(
-                        alignment: AlignmentDirectional.centerEnd,
-                        child: _MessageMetadata(
-                          message: message,
-                          inverse: inverse,
-                        ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -329,35 +371,94 @@ final class _ReplyPreview extends StatelessWidget {
   final VoidCallback? onPressed;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-    onTap: onPressed,
-    child: Semantics(
-      button: onPressed != null,
-      label: 'Перейти к исходному сообщению',
-      child: CarpenterText.caption(
-        preview,
-        maxLines: 2,
-        overflow: TextOverflow.ellipsis,
-        emphasis: TypographyEmphasis.medium,
+  Widget build(BuildContext context) {
+    final theme = CarpenterTheme.of(context);
+    final gap = context.units(theme.spacing.small);
+    final separator = preview.indexOf(':');
+    final author = separator > 0 ? preview.substring(0, separator) : null;
+    final body = separator > 0
+        ? preview.substring(separator + 1).trimLeft()
+        : preview;
+    return GestureDetector(
+      onTap: onPressed,
+      child: Semantics(
+        button: onPressed != null,
+        label: 'Перейти к исходному сообщению',
+        child: DecoratedBox(
+          key: const ValueKey('message-reply-preview'),
+          decoration: BoxDecoration(
+            color: theme.surface.subtle,
+            borderRadius: BorderRadius.circular(
+              context.units(theme.shapes.radius(ShapeRole.rounded)),
+            ),
+          ),
+          child: IntrinsicHeight(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  width: context.units(theme.shapes.fieldBorderWidth) * 2,
+                  child: ColoredBox(color: theme.actions.primary.state),
+                ),
+                SizedBox(width: gap),
+                Expanded(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: context.units(theme.spacing.xsmall),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (author != null)
+                          CarpenterText.caption(
+                            author,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            emphasis: TypographyEmphasis.strong,
+                          ),
+                        CarpenterText.caption(
+                          body,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          emphasis: TypographyEmphasis.medium,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(width: gap),
+              ],
+            ),
+          ),
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 final class _MessageMetadata extends StatelessWidget {
-  const _MessageMetadata({required this.message, required this.inverse});
+  const _MessageMetadata({
+    required this.message,
+    required this.inverse,
+    required this.leading,
+    required this.trailing,
+  });
 
   final CarpenterMessageView message;
   final bool inverse;
+  final List<Widget> leading;
+  final List<Widget> trailing;
 
   @override
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
-    final gap = context.units(theme.spacing.small) / 2;
+    final gap = context.units(theme.spacing.xsmall);
     final meta = message.meta;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        for (final modifier in leading) ...[modifier, SizedBox(width: gap)],
         if (meta.important) ...[
           const CarpenterIcon.feedback(
             GravityIcons.exclamationShape,
@@ -414,6 +515,7 @@ final class _MessageMetadata extends StatelessWidget {
                 : ContentColorRole.secondary,
           ),
         ],
+        for (final modifier in trailing) ...[SizedBox(width: gap), modifier],
       ],
     );
   }

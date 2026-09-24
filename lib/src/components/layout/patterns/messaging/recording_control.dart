@@ -129,6 +129,9 @@ final class _CarpenterRecordingControlState
         ? 'Записать голосовое сообщение'
         : 'Записать видеосообщение';
     final level = view.level.clamp(0.0, 1.0);
+    final theme = CarpenterTheme.of(context);
+    final controlExtent = context.units(theme.sizes.control(ControlSize.large));
+    final pulseExtent = context.units(theme.spacing.small);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -151,30 +154,35 @@ final class _CarpenterRecordingControlState
           onPointerUp: (_) => _finishPointer(),
           onPointerCancel: (_) => _finishPointer(),
           child: TweenAnimationBuilder<double>(
-            duration: CarpenterTheme.of(
-              context,
-            ).motion.transitionDuration(context),
-            curve: CarpenterTheme.of(context).motion.stateCurve,
+            duration: theme.motion.transitionDuration(context),
+            curve: theme.motion.stateCurve,
             tween: Tween(end: level),
-            builder: (context, value, child) =>
-                Transform.scale(scale: 1 + value * .15, child: child),
-            child: CarpenterIconButton(
-              icon: icon,
-              semanticLabel: label,
-              onPressed:
-                  _currentAvailable &&
-                      view.phase != CarpenterRecordingPhase.unavailable &&
-                      view.phase != CarpenterRecordingPhase.failed
-                  ? _tap
-                  : null,
-              prominence:
-                  view.phase == CarpenterRecordingPhase.recording ||
-                      view.phase == CarpenterRecordingPhase.locked
-                  ? ActionProminence.high
-                  : ActionProminence.ghost,
-              toggled:
-                  view.phase == CarpenterRecordingPhase.recording ||
-                  view.phase == CarpenterRecordingPhase.locked,
+            builder: (context, value, child) => Transform.scale(
+              scale: 1 + value * pulseExtent / controlExtent,
+              child: child,
+            ),
+            child: SizedBox(
+              key: const ValueKey('recording-control-button'),
+              width: controlExtent + context.units(theme.spacing.medium),
+              child: CarpenterIconButton(
+                icon: icon,
+                semanticLabel: label,
+                onPressed:
+                    _currentAvailable &&
+                        view.phase != CarpenterRecordingPhase.unavailable &&
+                        view.phase != CarpenterRecordingPhase.failed
+                    ? _tap
+                    : null,
+                colorRole: ActionColorRole.primary,
+                prominence:
+                    view.phase == CarpenterRecordingPhase.recording ||
+                        view.phase == CarpenterRecordingPhase.locked
+                    ? ActionProminence.high
+                    : ActionProminence.normal,
+                toggled:
+                    view.phase == CarpenterRecordingPhase.recording ||
+                    view.phase == CarpenterRecordingPhase.locked,
+              ),
             ),
           ),
         ),

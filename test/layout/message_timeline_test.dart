@@ -69,6 +69,12 @@ void main() {
           ],
           selectedIds: const {'incoming', 'own'},
           groupChat: true,
+          metadataLeadingBuilder: (_, message) => [
+            SizedBox(key: ValueKey('leading-${message.id}')),
+          ],
+          metadataTrailingBuilder: (_, message) => [
+            SizedBox(key: ValueKey('trailing-${message.id}')),
+          ],
           onSelectionChanged: (_, _) {},
         ),
       ),
@@ -85,6 +91,22 @@ void main() {
     expect(answerX, lessThan(editedX));
     expect(editedX, lessThan(timeX));
     expect(timeX, lessThan(readX));
+    final leadingX = tester
+        .getCenter(find.byKey(const ValueKey('leading-own')))
+        .dx;
+    final trailingX = tester
+        .getCenter(find.byKey(const ValueKey('trailing-own')))
+        .dx;
+    expect(leadingX, lessThan(importantX));
+    expect(readX, lessThan(trailingX));
+    final ownDecoration =
+        tester
+                .widget<DecoratedBox>(
+                  find.byKey(const ValueKey('message-bubble-own')),
+                )
+                .decoration
+            as BoxDecoration;
+    expect(ownDecoration.border, isNotNull);
 
     final incomingCheck = tester.getCenter(
       find.byKey(const ValueKey('message-selection-incoming')),
@@ -101,6 +123,47 @@ void main() {
     expect(incomingCheck.dx, greaterThan(incomingBubble.dx));
     expect(ownCheck.dx, lessThan(ownBubble.dx));
   });
+
+  testWidgets(
+    'own bubbles pack to content and grouped avatar sits at block end',
+    (tester) async {
+      await tester.pumpWidget(
+        _host(
+          SizedBox(
+            width: 600,
+            child: CarpenterMessageTimeline(
+              messages: [
+                _message('first', DateTime(2026, 9, 24, 10)),
+                _message('second', DateTime(2026, 9, 24, 10, 1)),
+                CarpenterMessageView(
+                  id: 'own-short',
+                  authorId: 'me',
+                  authorLabel: 'Вы',
+                  body: 'Да',
+                  own: true,
+                  sentAt: DateTime(2026, 9, 24, 10, 2),
+                ),
+              ],
+              selectedIds: const {},
+              groupChat: true,
+            ),
+          ),
+        ),
+      );
+
+      final ownWidth = tester
+          .getSize(find.byKey(const ValueKey('message-bubble-own-short')))
+          .width;
+      expect(ownWidth, lessThan(300));
+      final avatarBottom = tester
+          .getBottomLeft(find.byType(CarpenterConversationAvatar))
+          .dy;
+      final secondBottom = tester
+          .getBottomLeft(find.byKey(const ValueKey('message-bubble-second')))
+          .dy;
+      expect((avatarBottom - secondBottom).abs(), lessThanOrEqualTo(2));
+    },
+  );
 }
 
 CarpenterMessageView _message(String id, DateTime sentAt) =>

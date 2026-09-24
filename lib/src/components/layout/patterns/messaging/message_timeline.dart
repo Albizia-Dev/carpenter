@@ -14,6 +14,8 @@ typedef CarpenterMessageSelectionChanged =
 
 typedef CarpenterMessageAvatarBuilder =
     Widget Function(BuildContext context, CarpenterMessageView message);
+typedef CarpenterMessageMetadataBuilder =
+    List<Widget> Function(BuildContext context, CarpenterMessageView message);
 
 /// Controlled timeline presentation. Pagination and viewport anchoring belong
 /// to the host-facing viewport component.
@@ -35,6 +37,8 @@ final class CarpenterMessageTimeline extends StatelessWidget {
     this.onMediaSeekRequested,
     this.onMediaSpeedChanged,
     this.onMediaFocusChanged,
+    this.metadataLeadingBuilder,
+    this.metadataTrailingBuilder,
   });
 
   final List<CarpenterMessageView> messages;
@@ -52,6 +56,8 @@ final class CarpenterMessageTimeline extends StatelessWidget {
   final CarpenterMediaSeekRequested? onMediaSeekRequested;
   final CarpenterMediaSpeedChanged? onMediaSpeedChanged;
   final CarpenterMediaFocusChanged? onMediaFocusChanged;
+  final CarpenterMessageMetadataBuilder? metadataLeadingBuilder;
+  final CarpenterMessageMetadataBuilder? metadataTrailingBuilder;
 
   @override
   Widget build(BuildContext context) {
@@ -156,6 +162,12 @@ final class CarpenterMessageTimeline extends StatelessWidget {
             onMediaSeekRequested: onMediaSeekRequested,
             onMediaSpeedChanged: onMediaSpeedChanged,
             onMediaFocusChanged: onMediaFocusChanged,
+            metadataLeading:
+                metadataLeadingBuilder?.call(context, cluster[index]) ??
+                const [],
+            metadataTrailing:
+                metadataTrailingBuilder?.call(context, cluster[index]) ??
+                const [],
           ),
       ],
     );

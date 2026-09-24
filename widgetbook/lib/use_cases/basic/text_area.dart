@@ -47,6 +47,11 @@ Widget _playground(BuildContext context) {
     options: FieldSize.values,
     labelBuilder: semanticValueLabel,
   );
+  final presentation = context.knobs.object.segmented(
+    label: 'Appearance · Presentation',
+    options: CarpenterFieldPresentation.values,
+    labelBuilder: semanticValueLabel,
+  );
   final minLines = context.knobs.int.slider(
     label: 'Layout · Minimum lines',
     initialValue: 3,
@@ -77,6 +82,7 @@ Widget _playground(BuildContext context) {
       minLines: minLines,
       maxLines: maxLines,
       required: required,
+      presentation: presentation,
     ),
   );
 }
@@ -94,6 +100,7 @@ final class _TextAreaPreview extends StatefulWidget {
     required this.minLines,
     required this.maxLines,
     required this.required,
+    required this.presentation,
   });
 
   final String initialText;
@@ -106,6 +113,7 @@ final class _TextAreaPreview extends StatefulWidget {
   final int minLines;
   final int? maxLines;
   final bool required;
+  final CarpenterFieldPresentation presentation;
 
   @override
   State<_TextAreaPreview> createState() => _TextAreaPreviewState();
@@ -138,6 +146,7 @@ final class _TextAreaPreviewState extends State<_TextAreaPreview> {
     minLines: widget.minLines,
     maxLines: widget.maxLines,
     required: widget.required,
+    presentation: widget.presentation,
   );
 }
 

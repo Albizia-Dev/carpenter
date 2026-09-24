@@ -1,3 +1,11 @@
+## 0.6.1
+
+### Messenger visual refinement
+
+- Keep count badges at least square and align conversation time, delivery and unread state in a stable trailing column.
+- Pack message bubbles to content, add a tactile outline and reply inset, keep grouped avatars pinned to the author block, and expose uniform leading/trailing metadata slots.
+- Move playback state outside media previews, simplify voice controls, and compose attachment, borderless input and a wider primary recording action into one composer surface.
+
 ## 0.6.0
 
 ### Breaking messenger presentation

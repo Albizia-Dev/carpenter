@@ -34,6 +34,7 @@ final class CarpenterTextArea extends StatelessWidget {
     this.autofocus = false,
     this.minLines = 3,
     this.maxLines = 6,
+    this.presentation = CarpenterFieldPresentation.framed,
   }) : assert(minLines > 0),
        assert(maxLines == null || maxLines >= minLines);
 
@@ -58,6 +59,7 @@ final class CarpenterTextArea extends StatelessWidget {
   final bool autofocus;
   final int minLines;
   final int? maxLines;
+  final CarpenterFieldPresentation presentation;
 
   CarpenterFieldFeedback? get _effectiveFeedback =>
       errorText != null ? CarpenterFieldFeedback.danger(errorText!) : feedback;
@@ -116,6 +118,7 @@ final class CarpenterTextArea extends StatelessWidget {
       textInputAction: textInputAction,
       focusNode: focusNode,
       autofocus: autofocus,
+      presentation: presentation,
     );
   }
 }

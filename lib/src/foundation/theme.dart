@@ -1413,6 +1413,7 @@ final class CarpenterSpacingTheme {
   LengthUnit get statusVertical => density == CarpenterDensity.compact
       ? tokens.component.status.compactVerticalPadding
       : tokens.component.status.verticalPadding;
+  LengthUnit get xsmall => tokens.spacing.xsmall;
   LengthUnit get small => tokens.spacing.small;
   LengthUnit get medium => tokens.spacing.medium;
   LengthUnit get large => tokens.spacing.large;

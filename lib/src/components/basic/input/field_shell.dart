@@ -5,6 +5,9 @@ import '../../../foundation/roles.dart';
 import '../../../foundation/theme.dart';
 import '../../../internal/rendering/focus_ring.dart';
 
+/// Visual relationship between a field and its surrounding surface.
+enum CarpenterFieldPresentation { framed, seamless }
+
 /// Semantic supporting feedback for a Carpenter field.
 ///
 /// [errorText] on existing field APIs remains a compatibility shorthand for
@@ -73,6 +76,7 @@ final class CarpenterFieldShell extends StatelessWidget {
     this.required = false,
     this.leading,
     this.trailing,
+    this.presentation = CarpenterFieldPresentation.framed,
   });
 
   /// Availability used to resolve field colors and feedback styling. The
@@ -127,6 +131,9 @@ final class CarpenterFieldShell extends StatelessWidget {
   /// Optional content after the expanding child, separated with the themed
   /// field-content gap.
   final Widget? trailing;
+
+  /// Whether the control draws its own frame or joins a parent-owned surface.
+  final CarpenterFieldPresentation presentation;
 
   CarpenterFieldFeedback? get _effectiveFeedback =>
       errorText != null ? CarpenterFieldFeedback.danger(errorText!) : feedback;
@@ -216,12 +223,16 @@ final class CarpenterFieldShell extends StatelessWidget {
                 vertical: vertical,
               ),
               decoration: BoxDecoration(
-                color: style.background,
+                color: presentation == CarpenterFieldPresentation.framed
+                    ? style.background
+                    : null,
                 borderRadius: borderRadius,
-                border: Border.all(
-                  color: feedbackForeground ?? style.border,
-                  width: context.units(theme.shapes.fieldBorderWidth),
-                ),
+                border: presentation == CarpenterFieldPresentation.framed
+                    ? Border.all(
+                        color: feedbackForeground ?? style.border,
+                        width: context.units(theme.shapes.fieldBorderWidth),
+                      )
+                    : null,
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,

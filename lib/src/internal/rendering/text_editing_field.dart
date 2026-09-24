@@ -34,6 +34,7 @@ final class TextEditingField extends StatefulWidget {
     this.autofocus = false,
     this.obscureText = false,
     this.textCapitalization = TextCapitalization.none,
+    this.presentation = CarpenterFieldPresentation.framed,
   });
 
   final TextEditingController controller;
@@ -61,6 +62,7 @@ final class TextEditingField extends StatefulWidget {
   final bool autofocus;
   final bool obscureText;
   final TextCapitalization textCapitalization;
+  final CarpenterFieldPresentation presentation;
 
   CarpenterFieldFeedback? get effectiveFeedback =>
       errorText != null ? CarpenterFieldFeedback.danger(errorText!) : feedback;
@@ -253,6 +255,7 @@ final class _TextEditingFieldState extends State<TextEditingField>
             widget.selectedValues == null &&
             widget.minLines == 1 &&
             widget.maxLines == 1,
+        presentation: widget.presentation,
         child: widget.selectedValues == null
             ? editor
             : Column(

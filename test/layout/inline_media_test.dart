@@ -37,52 +37,66 @@ void main() {
     expect(loads, 1);
   });
 
-  testWidgets('video shows poster duration and audio shows waveform controls', (
-    tester,
-  ) async {
-    var plays = 0;
-    double? speed;
-    await tester.pumpWidget(
-      _host(
-        Column(
-          children: [
-            CarpenterInlineMedia(
-              view: const CarpenterMediaView(
-                id: 'video',
-                kind: CarpenterMediaKind.video,
-                label: 'Видео',
-                byteLength: 1,
-                loadState: CarpenterMediaLoadState.ready,
-                duration: Duration(minutes: 1, seconds: 30),
+  testWidgets(
+    'video shows poster duration and audio uses compact external controls',
+    (tester) async {
+      var plays = 0;
+      double? speed;
+      await tester.pumpWidget(
+        _host(
+          Column(
+            children: [
+              CarpenterInlineMedia(
+                view: const CarpenterMediaView(
+                  id: 'video',
+                  kind: CarpenterMediaKind.video,
+                  label: 'Видео',
+                  byteLength: 1,
+                  loadState: CarpenterMediaLoadState.ready,
+                  duration: Duration(minutes: 1, seconds: 30),
+                ),
+                preview: const ColoredBox(color: Color(0xff223344)),
+                onPlayPauseRequested: () => plays++,
               ),
-              preview: const ColoredBox(color: Color(0xff223344)),
-              onPlayPauseRequested: () => plays++,
-            ),
-            CarpenterInlineMedia(
-              view: const CarpenterMediaView(
-                id: 'audio',
-                kind: CarpenterMediaKind.audio,
-                label: 'Аудио',
-                byteLength: 1,
-                loadState: CarpenterMediaLoadState.ready,
-                duration: Duration(seconds: 42),
-                waveform: [2, 8, 4, 10],
+              CarpenterInlineMedia(
+                view: const CarpenterMediaView(
+                  id: 'audio',
+                  kind: CarpenterMediaKind.audio,
+                  label: 'Аудио',
+                  byteLength: 1,
+                  loadState: CarpenterMediaLoadState.ready,
+                  duration: Duration(seconds: 42),
+                  waveform: [2, 8, 4, 10],
+                ),
+                onPlayPauseRequested: () => plays++,
+                onSpeedChanged: (value) => speed = value,
               ),
-              onPlayPauseRequested: () => plays++,
-              onSpeedChanged: (value) => speed = value,
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
 
-    expect(find.text('01:30'), findsOneWidget);
-    expect(find.byKey(const ValueKey('media-waveform-audio')), findsOneWidget);
-    await tester.tap(find.bySemanticsLabel('Воспроизвести: Аудио'));
-    await tester.tap(find.text('1.0×').last);
-    expect(plays, 1);
-    expect(speed, 1.25);
-  });
+      expect(find.text('01:30'), findsOneWidget);
+      expect(
+        find.byKey(const ValueKey('media-waveform-audio')),
+        findsOneWidget,
+      );
+      expect(find.text('−15 с'), findsNothing);
+      expect(find.text('+15 с'), findsNothing);
+      expect(
+        tester.getCenter(find.text('1.0×')).dy,
+        greaterThan(
+          tester
+              .getBottomLeft(find.byKey(const ValueKey('media-waveform-audio')))
+              .dy,
+        ),
+      );
+      await tester.tap(find.bySemanticsLabel('Воспроизвести: Аудио'));
+      await tester.tap(find.text('1.0×').last);
+      expect(plays, 1);
+      expect(speed, 1.25);
+    },
+  );
 
   testWidgets('video circle has a controlled focused presentation', (
     tester,

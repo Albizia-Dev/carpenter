@@ -155,6 +155,9 @@ final class CarpenterConversationDirectory extends StatelessWidget {
           unreadCount: conversation.unreadCount,
           markedUnread: conversation.markedUnread,
           previewDelivery: conversation.effectivePreviewDelivery,
+          timestampLabel: conversation.lastEventAt == null
+              ? null
+              : _localTime(conversation.lastEventAt!),
           actions: actionsBuilder?.call(conversation) ?? const [],
         );
       },
@@ -220,4 +223,10 @@ final class CarpenterConversationDirectory extends StatelessWidget {
     ];
     return roles[value % roles.length];
   }
+}
+
+String _localTime(DateTime value) {
+  final local = value.toLocal();
+  String two(int part) => part.toString().padLeft(2, '0');
+  return '${two(local.hour)}:${two(local.minute)}';
 }

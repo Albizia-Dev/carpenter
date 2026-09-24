@@ -129,13 +129,15 @@ class _DirectoryScenarioState extends State<_DirectoryScenario> {
               avatarShape: CarpenterConversationAvatarShape.room,
               unreadCount: 3,
               muted: true,
+              lastEventAt: DateTime(2026, 9, 25, 1, 59),
             ),
-            const CarpenterConversationView(
+            CarpenterConversationView(
               id: 'anna',
               title: 'Анна Смирнова',
               preview: 'Готово',
               previewOwn: true,
               previewDelivery: CarpenterDeliveryState.read,
+              lastEventAt: DateTime(2026, 9, 25, 1, 55),
               avatarShape: CarpenterConversationAvatarShape.person,
             ),
           ],

@@ -10,6 +10,7 @@ import '../../../../foundation/theme.dart';
 import '../../../basic/button/icon_button.dart';
 import '../../../basic/gravity_icons.g.dart';
 import '../../../basic/input/text_area.dart';
+import '../../../basic/input/field_shell.dart';
 import '../../../basic/text.dart';
 import '../../../behaviour/menu/menu.dart';
 import '../../../behaviour/menu/menu_entry.dart';
@@ -127,48 +128,56 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
               items: widget.view.attachments,
               onRemoved: widget.onAttachmentRemoved,
             ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                CarpenterIconButton(
-                  icon: GravityIcons.paperclip,
-                  semanticLabel: 'Прикрепить файлы',
-                  onPressed: widget.view.busy
-                      ? null
-                      : widget.onAttachmentsRequested,
-                  prominence: ActionProminence.ghost,
+            DecoratedBox(
+              key: const ValueKey('composer-input-surface'),
+              decoration: BoxDecoration(
+                color: theme.surface.subtle,
+                borderRadius: BorderRadius.circular(
+                  context.units(theme.shapes.radius(ShapeRole.rounded)),
                 ),
-                SizedBox(width: gap),
-                Expanded(
-                  child: Focus(
-                    onKeyEvent: (_, event) {
-                      if (event is KeyDownEvent &&
-                          event.logicalKey == LogicalKeyboardKey.enter &&
-                          !HardwareKeyboard.instance.isShiftPressed) {
-                        _send(CarpenterSendMode.ordinary);
-                        return KeyEventResult.handled;
-                      }
-                      return KeyEventResult.ignored;
-                    },
-                    child: CarpenterTextArea(
-                      controller: _controller,
-                      placeholder: 'Написать сообщение…',
-                      semanticLabel: 'Сообщение',
-                      minLines: 1,
-                      maxLines: 4,
-                      availability: widget.view.busy
-                          ? FieldAvailability.disabled
-                          : FieldAvailability.enabled,
-                      onChanged: (value) {
-                        setState(() {});
-                        widget.onTextChanged(value);
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  CarpenterIconButton(
+                    icon: GravityIcons.paperclip,
+                    semanticLabel: 'Прикрепить файлы',
+                    onPressed: widget.view.busy
+                        ? null
+                        : widget.onAttachmentsRequested,
+                    prominence: ActionProminence.ghost,
+                  ),
+                  Expanded(
+                    child: Focus(
+                      onKeyEvent: (_, event) {
+                        if (event is KeyDownEvent &&
+                            event.logicalKey == LogicalKeyboardKey.enter &&
+                            !HardwareKeyboard.instance.isShiftPressed) {
+                          _send(CarpenterSendMode.ordinary);
+                          return KeyEventResult.handled;
+                        }
+                        return KeyEventResult.ignored;
                       },
+                      child: CarpenterTextArea(
+                        controller: _controller,
+                        placeholder: 'Написать сообщение…',
+                        semanticLabel: 'Сообщение',
+                        minLines: 1,
+                        maxLines: 4,
+                        presentation: CarpenterFieldPresentation.seamless,
+                        availability: widget.view.busy
+                            ? FieldAvailability.disabled
+                            : FieldAvailability.enabled,
+                        onChanged: (value) {
+                          setState(() {});
+                          widget.onTextChanged(value);
+                        },
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(width: gap),
-                if (_canSend) _sendControl() else _recordingControl(),
-              ],
+                  if (_canSend) _sendControl() else _recordingControl(),
+                ],
+              ),
             ),
           ],
         ),

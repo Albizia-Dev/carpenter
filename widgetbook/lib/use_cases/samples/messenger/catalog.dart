@@ -242,11 +242,23 @@ class _TimelineScenarioState extends State<_TimelineScenario> {
       onMediaFocusChanged: (_, value) => setState(() => focused = value),
       onMediaPlayPauseRequested: (_) {},
       onMediaSpeedChanged: (_, _) {},
+      metadataLeadingBuilder: (_, message) => message.meta.important
+          ? const [
+              CarpenterIcon(
+                GravityIcons.pin,
+                semanticLabel: 'Leading-модификатор',
+                size: IconSize.small,
+              ),
+            ]
+          : const [],
+      metadataTrailingBuilder: (_, message) => message.meta.requiresAnswer
+          ? const [CarpenterBadge(label: 'Ответ')]
+          : const [],
     );
   }
 }
 
-const _conversations = [
+final _conversations = [
   CarpenterConversationView(
     id: 'project',
     title: 'Северный парк',
@@ -254,11 +266,13 @@ const _conversations = [
     previewAuthor: 'Анна',
     avatarShape: CarpenterConversationAvatarShape.room,
     unreadCount: 3,
+    lastEventAt: DateTime(2026, 9, 25, 1, 59),
   ),
   CarpenterConversationView(
     id: 'anna',
     title: 'Анна Смирнова',
     preview: 'Готово',
     avatarShape: CarpenterConversationAvatarShape.person,
+    lastEventAt: DateTime(2026, 9, 25, 1, 55),
   ),
 ];
