@@ -14,9 +14,6 @@ import '../../../behaviour/popover.dart';
 import '../../../collections/list_tile.dart';
 import 'messaging_models.dart';
 
-/// Delivery state supplied by the host; Carpenter never infers read receipts.
-enum CarpenterMessageDelivery { sending, sent, read }
-
 /// Themed avatar with an optional muted marker. Media resolution stays with
 /// the host; an image failure returns to the initials.
 final class CarpenterConversationAvatar extends StatelessWidget {
@@ -127,7 +124,7 @@ final class CarpenterConversationTile extends StatefulWidget {
   final VoidCallback onSelected;
   final int unreadCount;
   final bool markedUnread;
-  final CarpenterMessageDelivery? previewDelivery;
+  final CarpenterDeliveryState? previewDelivery;
   final Widget? previewContent;
   final List<CarpenterMenuItem> actions;
 
@@ -170,15 +167,18 @@ class _CarpenterConversationTileState extends State<CarpenterConversationTile> {
               if (widget.previewDelivery case final delivery?)
                 CarpenterIcon(
                   switch (delivery) {
-                    CarpenterMessageDelivery.sending => GravityIcons.clock,
-                    CarpenterMessageDelivery.sent => GravityIcons.check,
-                    CarpenterMessageDelivery.read => GravityIcons.checkDouble,
+                    CarpenterDeliveryState.sending => GravityIcons.clock,
+                    CarpenterDeliveryState.sent => GravityIcons.check,
+                    CarpenterDeliveryState.read => GravityIcons.checkDouble,
+                    CarpenterDeliveryState.failed =>
+                      GravityIcons.exclamationShape,
                   },
                   size: IconSize.small,
                   semanticLabel: switch (delivery) {
-                    CarpenterMessageDelivery.sending => 'Отправляется',
-                    CarpenterMessageDelivery.sent => 'Отправлено',
-                    CarpenterMessageDelivery.read => 'Прочитано',
+                    CarpenterDeliveryState.sending => 'Отправляется',
+                    CarpenterDeliveryState.sent => 'Отправлено',
+                    CarpenterDeliveryState.read => 'Прочитано',
+                    CarpenterDeliveryState.failed => 'Ошибка отправки',
                   },
                 ),
             ],

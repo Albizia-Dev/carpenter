@@ -1,3 +1,12 @@
+## 0.6.0
+
+### Breaking messenger presentation
+
+- Replace the 0.5.x monolithic messenger workspace with controlled directory, header, adaptive layout, timeline, message, composer, recording and inline-media components.
+- Add stable message/conversation view models, real reply/selection/recording gestures, independent importance and answer-required metadata, lazy media loading and video-circle focus.
+- Remove the superseded workspace, split-view, attachment-strip and voice-control messaging APIs; applications now own state, persistence, transport, recording and playback.
+- Rebuild Messenger Widgetbook cases around the 0.6.0 public facade and interactive state transitions.
+
 ## 0.5.3
 
 ### Messenger presentation

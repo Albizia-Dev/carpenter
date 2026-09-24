@@ -6,21 +6,26 @@ import '../../../helpers/layout_viewport.dart';
 
 final conversationComponents = [
   WidgetbookComponent(
-    name: 'Conversation tile',
+    name: 'Conversation directory',
     useCases: [
       WidgetbookUseCase(
         name: 'Playground',
-        builder: (context) => _TileScenario(
-          group: context.knobs.boolean(label: 'Групповой чат'),
-          unread: context.knobs.boolean(label: 'Непрочитанные'),
-          draft: context.knobs.boolean(label: 'Черновик'),
-          ownPreview: context.knobs.boolean(label: 'Своё сообщение'),
+        builder: (context) => layoutViewportPreview(
+          context,
+          child: _DirectoryScenario(
+            loading: context.knobs.boolean(label: 'Первая загрузка'),
+            failed: context.knobs.boolean(label: 'Ошибка обновления'),
+            draft: context.knobs.boolean(label: 'Черновик', initialValue: true),
+          ),
         ),
       ),
       WidgetbookUseCase(
-        name: 'States · Muted group with unread',
-        builder: (context) =>
-            const _TileScenario(group: true, unread: true, initialMuted: true),
+        name: 'States · Initial loading',
+        builder: (_) => const _DirectoryScenario(loading: true),
+      ),
+      WidgetbookUseCase(
+        name: 'States · Stale after failure',
+        builder: (_) => const _DirectoryScenario(failed: true),
       ),
     ],
   ),
@@ -30,344 +35,204 @@ final conversationComponents = [
       WidgetbookUseCase(
         name: 'Playground',
         builder: (context) => CarpenterConversationHeader(
-          title: context.knobs.string(
-            label: 'Имя',
-            initialValue: 'Северный парк',
-          ),
-          status: context.knobs.string(
-            label: 'Статус',
-            initialValue: 'Анна печатает…',
-          ),
+          title: 'Северный парк',
           avatar: const CarpenterConversationAvatar(
             name: 'Северный парк',
             shape: CarpenterConversationAvatarShape.room,
           ),
-          onBack: context.knobs.boolean(label: 'Узкий экран') ? () {} : null,
-          actions: CarpenterIconButton(
-            icon: GravityIcons.ellipsis,
-            semanticLabel: 'Действия с разговором',
-            onPressed: () {},
+          presence: context.knobs.objectOrNull.dropdown(
+            label: 'Статус',
+            options: CarpenterPresenceKind.values,
+          ),
+          onBack: context.knobs.boolean(label: 'Кнопка назад') ? () {} : null,
+          onCall: () {},
+          onActions: () {},
+          pinnedMessages: CarpenterPinnedMessages(
+            previews: const ['Проверьте смету'],
+            currentIndex: 0,
+            onSelected: (_) {},
           ),
         ),
       ),
     ],
   ),
   WidgetbookComponent(
-    name: 'Conversation loading',
+    name: 'Message composer',
     useCases: [
       WidgetbookUseCase(
         name: 'Playground',
-        builder: (context) => Column(
-          children: List.generate(
-            CarpenterConversationSkeleton.initialCount,
-            (index) => CarpenterConversationSkeleton(key: ValueKey(index)),
+        builder: (context) => _ComposerScenario(
+          readOnly: context.knobs.boolean(label: 'Только чтение'),
+          withReply: context.knobs.boolean(label: 'Ответ'),
+          withAttachment: context.knobs.boolean(label: 'Вложение'),
+          recording: context.knobs.boolean(label: 'Запись закреплена'),
+        ),
+      ),
+      WidgetbookUseCase(
+        name: 'States · Read only',
+        builder: (_) => const _ComposerScenario(readOnly: true),
+      ),
+    ],
+  ),
+  WidgetbookComponent(
+    name: 'Inline media',
+    useCases: [
+      WidgetbookUseCase(
+        name: 'Playground',
+        builder: (context) => _MediaScenario(
+          kind: context.knobs.object.dropdown(
+            label: 'Тип',
+            options: CarpenterMediaKind.values,
+            initialOption: CarpenterMediaKind.videoCircle,
           ),
+          large: context.knobs.boolean(label: 'Большой файл'),
         ),
-      ),
-    ],
-  ),
-  WidgetbookComponent(
-    name: 'Chat composer',
-    useCases: [
-      WidgetbookUseCase(
-        name: 'Playground',
-        builder: (context) => _ChatComposerScenario(
-          hasAttachments: context.knobs.boolean(label: 'Есть вложения'),
-          enabled: !context.knobs.boolean(label: 'Только чтение'),
-        ),
-      ),
-      WidgetbookUseCase(
-        name: 'States · Recording locked',
-        builder: (context) =>
-            const _ChatComposerScenario(initiallyRecording: true),
-      ),
-    ],
-  ),
-  WidgetbookComponent(
-    name: 'Attachment strip',
-    useCases: [
-      WidgetbookUseCase(
-        name: 'Playground',
-        builder: (context) => const _AttachmentStripScenario(),
-      ),
-    ],
-  ),
-  WidgetbookComponent(
-    name: 'Conversation split view',
-    useCases: [
-      WidgetbookUseCase(
-        name: 'Playground',
-        builder: (context) =>
-            layoutViewportPreview(context, child: const _SplitScenario()),
-      ),
-    ],
-  ),
-  WidgetbookComponent(
-    name: 'Message timeline chrome',
-    useCases: [
-      WidgetbookUseCase(
-        name: 'Playground',
-        builder: (context) => Column(
-          children: [
-            const CarpenterMessageDateDivider(label: '24.09.2026'),
-            const CarpenterMessageSystemEvent(text: 'Анна закрепила сообщение'),
-            CarpenterJumpToLatest(
-              newerCount: context.knobs.int.slider(
-                label: 'Новые сообщения',
-                min: 0,
-                max: 20,
-              ),
-              onPressed: () {},
-            ),
-            CarpenterMessageSelectionBar(
-              count: context.knobs.int.slider(
-                label: 'Выбрано',
-                min: 1,
-                max: 10,
-              ),
-              onClear: () {},
-              onActions: () {},
-            ),
-          ],
-        ),
-      ),
-    ],
-  ),
-  WidgetbookComponent(
-    name: 'Voice controls',
-    useCases: [
-      WidgetbookUseCase(
-        name: 'Playground',
-        builder: (context) => _VoiceScenario(
-          phase: context.knobs.object.dropdown(
-            label: 'Запись',
-            options: CarpenterVoicePhase.values,
-            initialOption: CarpenterVoicePhase.preview,
-          ),
-          playingMessage: context.knobs.boolean(label: 'Воспроизведение'),
-        ),
-      ),
-      WidgetbookUseCase(
-        name: 'States · Recording error',
-        builder: (context) =>
-            const _VoiceScenario(phase: CarpenterVoicePhase.failed),
       ),
     ],
   ),
 ];
 
-class _TileScenario extends StatefulWidget {
-  const _TileScenario({
-    this.group = false,
-    this.unread = false,
+class _DirectoryScenario extends StatefulWidget {
+  const _DirectoryScenario({
+    this.loading = false,
+    this.failed = false,
     this.draft = false,
-    this.initialMuted = false,
-    this.ownPreview = false,
   });
-
-  final bool group;
-  final bool unread;
+  final bool loading;
+  final bool failed;
   final bool draft;
-  final bool initialMuted;
-  final bool ownPreview;
-
   @override
-  State<_TileScenario> createState() => _TileScenarioState();
+  State<_DirectoryScenario> createState() => _DirectoryScenarioState();
 }
 
-class _TileScenarioState extends State<_TileScenario> {
-  bool selected = false;
-  late bool muted = widget.initialMuted;
+class _DirectoryScenarioState extends State<_DirectoryScenario> {
+  final search = TextEditingController();
+  String? selected;
+  @override
+  void dispose() {
+    search.dispose();
+    super.dispose();
+  }
 
   @override
-  Widget build(BuildContext context) => CarpenterConversationTile(
-    title: widget.group ? 'Северный парк' : 'Анна Смирнова',
-    preview: widget.draft
-        ? 'Черновик: отправлю документы завтра'
-        : widget.ownPreview
-        ? 'Вы: отправлю документы завтра'
-        : widget.group
-        ? 'Анна: проверьте документы'
-        : 'Проверьте документы',
-    unreadCount: widget.unread ? 3 : 0,
-    previewDelivery: widget.ownPreview ? CarpenterMessageDelivery.read : null,
-    selected: selected,
-    onSelected: () => setState(() => selected = true),
-    avatar: CarpenterConversationAvatar(
-      name: widget.group ? 'Северный парк' : 'Анна Смирнова',
-      shape: widget.group
-          ? CarpenterConversationAvatarShape.room
-          : CarpenterConversationAvatarShape.person,
-      muted: muted,
-    ),
-    actions: [
-      CarpenterMenuItem(
-        action: CarpenterActionDescriptor(
-          id: 'mute',
-          label: muted ? 'Включить уведомления' : 'Без звука',
-          onInvoke: () => setState(() => muted = !muted),
-        ),
-      ),
-    ],
+  Widget build(BuildContext context) => CarpenterConversationDirectory(
+    searchController: search,
+    conversations: widget.loading
+        ? const []
+        : [
+            CarpenterConversationView(
+              id: 'project',
+              title: 'Северный парк',
+              preview: 'Проверьте смету',
+              previewAuthor: 'Анна',
+              draft: widget.draft ? 'отвечу позже' : null,
+              avatarShape: CarpenterConversationAvatarShape.room,
+              unreadCount: 3,
+              muted: true,
+            ),
+            const CarpenterConversationView(
+              id: 'anna',
+              title: 'Анна Смирнова',
+              preview: 'Готово',
+              previewOwn: true,
+              previewDelivery: CarpenterDeliveryState.read,
+              avatarShape: CarpenterConversationAvatarShape.person,
+            ),
+          ],
+    selectedId: selected,
+    initialLoading: widget.loading,
+    failureLabel: widget.failed ? 'Не удалось обновить' : null,
+    onConversationSelected: (id) => setState(() => selected = id),
+    onSearchChanged: (_) {},
+    onCreateConversation: () {},
   );
 }
 
-class _ChatComposerScenario extends StatefulWidget {
-  const _ChatComposerScenario({
-    this.hasAttachments = false,
-    this.enabled = true,
-    this.initiallyRecording = false,
+class _ComposerScenario extends StatefulWidget {
+  const _ComposerScenario({
+    this.readOnly = false,
+    this.withReply = false,
+    this.withAttachment = false,
+    this.recording = false,
   });
-
-  final bool hasAttachments;
-  final bool enabled;
-  final bool initiallyRecording;
-
+  final bool readOnly;
+  final bool withReply;
+  final bool withAttachment;
+  final bool recording;
   @override
-  State<_ChatComposerScenario> createState() => _ChatComposerScenarioState();
+  State<_ComposerScenario> createState() => _ComposerScenarioState();
 }
 
-class _ChatComposerScenarioState extends State<_ChatComposerScenario> {
+class _ComposerScenarioState extends State<_ComposerScenario> {
   String text = '';
-  late bool recording = widget.initiallyRecording;
-
+  CarpenterRecordingKind kind = CarpenterRecordingKind.voice;
   @override
   Widget build(BuildContext context) => CarpenterChatComposer(
     view: CarpenterComposerView(
       text: text,
-      readOnly: !widget.enabled,
-      attachments: widget.hasAttachments
-          ? const [
-              CarpenterMediaView(
-                id: 'draft-photo',
-                kind: CarpenterMediaKind.image,
-                label: 'Фото объекта.jpg',
-                byteLength: 2097152,
-                loadState: CarpenterMediaLoadState.ready,
-              ),
-            ]
-          : const [],
+      readOnly: widget.readOnly,
+      replyPreview: widget.withReply ? 'Анна: Проверьте' : null,
+      attachments: widget.withAttachment ? const [_demoMedia] : const [],
     ),
     recording: CarpenterRecordingView(
-      kind: CarpenterRecordingKind.voice,
-      phase: recording
+      kind: kind,
+      phase: widget.recording
           ? CarpenterRecordingPhase.locked
           : CarpenterRecordingPhase.idle,
+      level: .7,
     ),
     onTextChanged: (value) => setState(() => text = value),
     onSendRequested: (_) => setState(() => text = ''),
     onAttachmentsRequested: () {},
-    onRecordingStart: (_) => setState(() => recording = true),
-    onRecordingStop: (_) => setState(() => recording = false),
+    onAttachmentRemoved: (_) {},
+    onReplyRemoved: () {},
+    onRecordingModeChanged: (value) => setState(() => kind = value),
+    onRecordingStart: (_) {},
+    onRecordingLock: (_) {},
+    onRecordingStop: (_) {},
   );
 }
 
-class _AttachmentStripScenario extends StatefulWidget {
-  const _AttachmentStripScenario();
-
+class _MediaScenario extends StatefulWidget {
+  const _MediaScenario({required this.kind, required this.large});
+  final CarpenterMediaKind kind;
+  final bool large;
   @override
-  State<_AttachmentStripScenario> createState() =>
-      _AttachmentStripScenarioState();
+  State<_MediaScenario> createState() => _MediaScenarioState();
 }
 
-class _AttachmentStripScenarioState extends State<_AttachmentStripScenario> {
-  final removed = <String>{};
-  bool retried = false;
-
-  @override
-  Widget build(BuildContext context) => CarpenterAttachmentStrip(
-    items: [
-      const CarpenterAttachmentItem(
-        id: 'ready',
-        name: 'Фото объекта.jpg',
-        phase: CarpenterMessengerUploadPhase.ready,
-        detail: '2 МБ',
-      ),
-      const CarpenterAttachmentItem(
-        id: 'uploading',
-        name: 'План работ.pdf',
-        phase: CarpenterMessengerUploadPhase.uploading,
-        detail: '512 КБ / 1 МБ',
-        progress: .5,
-      ),
-      CarpenterAttachmentItem(
-        id: 'failed',
-        name: 'Смета.xlsx',
-        phase: retried
-            ? CarpenterMessengerUploadPhase.ready
-            : CarpenterMessengerUploadPhase.failed,
-        detail: retried ? '840 КБ' : 'Не удалось загрузить',
-      ),
-    ].where((item) => !removed.contains(item.id)).toList(),
-    onRetry: (_) => setState(() => retried = true),
-    onCancel: (id) => setState(() => removed.add(id)),
-    onRemove: (id) => setState(() => removed.add(id)),
-  );
-}
-
-class _SplitScenario extends StatefulWidget {
-  const _SplitScenario();
-
-  @override
-  State<_SplitScenario> createState() => _SplitScenarioState();
-}
-
-class _SplitScenarioState extends State<_SplitScenario> {
-  bool selected = false;
-
-  @override
-  Widget build(BuildContext context) => CarpenterConversationSplitView(
-    selected: selected,
-    master: Center(
-      child: CarpenterButton(
-        label: 'Открыть чат',
-        onPressed: () => setState(() => selected = true),
-      ),
-    ),
-    detail: Center(
-      child: CarpenterButton(
-        label: 'К списку',
-        onPressed: () => setState(() => selected = false),
-      ),
-    ),
-    emptyDetail: const Center(child: CarpenterText.body('Выберите чат')),
-  );
-}
-
-class _VoiceScenario extends StatefulWidget {
-  const _VoiceScenario({required this.phase, this.playingMessage = false});
-
-  final CarpenterVoicePhase phase;
-  final bool playingMessage;
-
-  @override
-  State<_VoiceScenario> createState() => _VoiceScenarioState();
-}
-
-class _VoiceScenarioState extends State<_VoiceScenario> {
-  Duration position = const Duration(seconds: 20);
-  double speed = 1;
+class _MediaScenarioState extends State<_MediaScenario> {
+  bool focused = false;
   bool playing = false;
-
+  double speed = 1;
   @override
-  Widget build(BuildContext context) => CarpenterVoiceControls(
-    phase: widget.phase,
-    recordDuration: const Duration(seconds: 42),
-    position: position,
-    duration: const Duration(minutes: 1),
-    speed: speed,
-    playingMessage: widget.playingMessage,
-    playing: playing,
-    onRecord: () {},
-    onPause: () {},
-    onResume: () {},
-    onStop: () {},
-    onCancel: () {},
-    onPreview: () => setState(() => playing = true),
-    onAttach: () {},
-    onRerecord: () {},
-    onPlaybackPause: () => setState(() => playing = !playing),
-    onSeek: (value) => setState(() => position = value),
+  Widget build(BuildContext context) => CarpenterInlineMedia(
+    view: CarpenterMediaView(
+      id: 'media',
+      kind: widget.kind,
+      label: 'Медиа',
+      byteLength: widget.large ? carpenterEagerMediaLimitBytes + 1 : 1024,
+      loadState: widget.large
+          ? CarpenterMediaLoadState.previewReady
+          : CarpenterMediaLoadState.ready,
+      duration: const Duration(seconds: 42),
+      waveform: const [2, 7, 4, 10, 5],
+      focused: focused,
+      playing: playing,
+      playbackRate: speed,
+    ),
+    preview: const ColoredBox(color: Color(0xff7b5cd6)),
+    onLoadRequested: () {},
+    onPlayPauseRequested: () => setState(() => playing = !playing),
     onSpeedChanged: (value) => setState(() => speed = value),
+    onFocusChanged: (value) => setState(() => focused = value),
   );
 }
+
+const _demoMedia = CarpenterMediaView(
+  id: 'photo',
+  kind: CarpenterMediaKind.image,
+  label: 'Фото.jpg',
+  byteLength: 2048,
+  loadState: CarpenterMediaLoadState.ready,
+);

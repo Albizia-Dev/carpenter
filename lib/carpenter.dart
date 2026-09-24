@@ -192,14 +192,11 @@ export 'src/foundation/theme.dart';
 export 'src/foundation/tokens/carpenter.mordant.g.dart'
     show PaletteTokens, palette;
 
-export 'src/components/layout/patterns/messaging/messenger_workspace.dart';
 export 'src/components/layout/patterns/messaging/messenger_recovery.dart';
 export 'src/components/layout/patterns/messaging/attachment_tray.dart';
-export 'src/components/layout/patterns/messaging/attachment_strip.dart';
 export 'src/components/layout/patterns/messaging/conversation_components.dart';
 export 'src/components/layout/patterns/messaging/conversation_directory.dart';
 export 'src/components/layout/patterns/messaging/conversation_header.dart';
-export 'src/components/layout/patterns/messaging/conversation_split_view.dart';
 export 'src/components/layout/patterns/messaging/chat_composer.dart';
 export 'src/components/layout/patterns/messaging/message_timeline_chrome.dart';
 export 'src/components/layout/patterns/messaging/message_bubble.dart';
@@ -209,7 +206,6 @@ export 'src/components/layout/patterns/messaging/message_timeline.dart';
 export 'src/components/layout/patterns/messaging/messaging_models.dart';
 export 'src/components/layout/patterns/messaging/messenger_layout.dart';
 export 'src/components/layout/patterns/messaging/recording_control.dart';
-export 'src/components/layout/patterns/messaging/voice_controls.dart';
 
 // Contextual workspace composition.
 export 'src/components/layout/patterns/workspace/workspace_shell.dart';

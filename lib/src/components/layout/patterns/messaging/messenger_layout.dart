@@ -1,6 +1,8 @@
 import 'package:flutter/widgets.dart';
 
-import 'conversation_split_view.dart';
+import '../../../../foundation/adaptive.dart';
+import '../../master_detail.dart';
+import '../../regions/region_role.dart';
 
 /// Full-extent adaptive messenger shell with host-owned selection.
 ///
@@ -22,23 +24,40 @@ final class CarpenterMessengerLayout extends StatelessWidget {
   final Widget emptyConversation;
 
   @override
-  Widget build(BuildContext context) => SizedBox.expand(
-    child: CarpenterConversationSplitView(
-      selected: selectedConversationId != null,
-      master: KeyedSubtree(
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final viewport = const CarpenterViewportPolicy(accountForTextScale: true);
+      final master = KeyedSubtree(
         key: const ValueKey('carpenter-messenger-directory'),
         child: directory,
-      ),
-      detail: KeyedSubtree(
+      );
+      final detail = KeyedSubtree(
         key: ValueKey(
           'carpenter-messenger-conversation-${selectedConversationId ?? 'none'}',
         ),
         child: conversation,
-      ),
-      emptyDetail: KeyedSubtree(
+      );
+      final empty = KeyedSubtree(
         key: const ValueKey('carpenter-messenger-empty'),
         child: emptyConversation,
-      ),
-    ),
+      );
+      if (viewport.resolve(context, constraints.maxWidth) ==
+          CarpenterViewportClass.narrow) {
+        return SizedBox.expand(
+          child: selectedConversationId == null ? master : detail,
+        );
+      }
+      return SizedBox.expand(
+        child: CarpenterMasterDetail(
+          viewportPolicy: viewport,
+          detailScrollOwnership: CarpenterRegionScrollOwnership.child,
+          masterSemanticLabel: 'Разговоры',
+          detailSemanticLabel: 'Переписка',
+          onDetailVisibilityChanged: null,
+          master: master,
+          detail: selectedConversationId == null ? empty : detail,
+        ),
+      );
+    },
   );
 }

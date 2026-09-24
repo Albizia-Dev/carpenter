@@ -31,7 +31,7 @@ void main() {
           selected: false,
           onSelected: () {},
           unreadCount: 2,
-          previewDelivery: CarpenterMessageDelivery.read,
+          previewDelivery: CarpenterDeliveryState.read,
           actions: [
             CarpenterMenuItem(
               action: CarpenterActionDescriptor(
@@ -80,107 +80,6 @@ void main() {
     );
     await tester.tap(find.bySemanticsLabel('Отправить'));
     expect(sends, 1);
-  });
-
-  testWidgets('voice playback reports seek and next speed', (tester) async {
-    Duration? seek;
-    double? speed;
-    await tester.pumpWidget(
-      _host(
-        CarpenterVoiceControls(
-          phase: CarpenterVoicePhase.idle,
-          recordDuration: Duration.zero,
-          position: const Duration(seconds: 20),
-          duration: const Duration(minutes: 1),
-          speed: 1,
-          playingMessage: true,
-          onSeek: (value) => seek = value,
-          onSpeedChanged: (value) => speed = value,
-        ),
-      ),
-    );
-    await tester.tap(find.text('+15 с'));
-    await tester.tap(find.text('Скорость 1.0×'));
-    expect(seek, const Duration(seconds: 35));
-    expect(speed, 1.25);
-  });
-
-  testWidgets('consecutive author block ends after twenty minutes', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      _host(
-        CarpenterMessengerWorkspace(
-          conversations: const [
-            CarpenterConversationItem(id: 'room', title: 'Чат', subtitle: ''),
-          ],
-          selectedId: 'room',
-          messages: [
-            CarpenterMessageItem(
-              id: 'first',
-              author: 'Анна',
-              authorKey: 'anna',
-              text: 'Первое',
-              status: '',
-              sentAt: DateTime(2026, 9, 24, 10),
-            ),
-            CarpenterMessageItem(
-              id: 'second',
-              author: 'Анна',
-              authorKey: 'anna',
-              text: 'Второе',
-              status: '',
-              sentAt: DateTime(2026, 9, 24, 10, 19),
-            ),
-            CarpenterMessageItem(
-              id: 'third',
-              author: 'Анна',
-              authorKey: 'anna',
-              text: 'Третье',
-              status: '',
-              sentAt: DateTime(2026, 9, 24, 10, 41),
-            ),
-          ],
-          draft: '',
-          needAnswer: false,
-          onSelected: (_) {},
-          onDraftChanged: (_) {},
-          onNeedAnswerChanged: (_) {},
-          onSend: null,
-          onRetry: (_) {},
-        ),
-      ),
-    );
-    final bubbles = tester.widgetList<CarpenterLegacyMessageBubble>(
-      find.byType(CarpenterLegacyMessageBubble),
-    );
-    final grouped = {
-      for (final bubble in bubbles) bubble.message.id: bubble.groupWithPrevious,
-    };
-    expect(grouped['second'], isTrue);
-    expect(grouped['third'], isFalse);
-  });
-
-  testWidgets('split view retains selected detail across viewport changes', (
-    tester,
-  ) async {
-    await tester.binding.setSurfaceSize(const Size(1200, 800));
-    addTearDown(() => tester.binding.setSurfaceSize(null));
-    await tester.pumpWidget(
-      _host(
-        const CarpenterConversationSplitView(
-          selected: true,
-          master: Text('Список'),
-          detail: Text('Чат'),
-          emptyDetail: Text('Выберите чат'),
-        ),
-      ),
-    );
-    expect(find.text('Чат'), findsOneWidget);
-    await tester.binding.setSurfaceSize(const Size(400, 800));
-    await tester.pump();
-    expect(find.text('Чат'), findsOneWidget);
-    expect(find.text('Список'), findsNothing);
   });
 }
 

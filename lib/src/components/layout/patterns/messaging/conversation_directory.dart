@@ -138,7 +138,7 @@ final class CarpenterConversationDirectory extends StatelessWidget {
           selected: selectedId == conversation.id,
           onSelected: () => onConversationSelected(conversation.id),
           unreadCount: conversation.unreadCount,
-          previewDelivery: _delivery(conversation.effectivePreviewDelivery),
+          previewDelivery: conversation.effectivePreviewDelivery,
           actions: actionsBuilder?.call(conversation) ?? const [],
         );
       },
@@ -189,14 +189,6 @@ final class CarpenterConversationDirectory extends StatelessWidget {
       ],
     );
   }
-
-  CarpenterMessageDelivery? _delivery(CarpenterDeliveryState? state) =>
-      switch (state) {
-        CarpenterDeliveryState.sending => CarpenterMessageDelivery.sending,
-        CarpenterDeliveryState.sent => CarpenterMessageDelivery.sent,
-        CarpenterDeliveryState.read => CarpenterMessageDelivery.read,
-        CarpenterDeliveryState.failed || null => null,
-      };
 
   ActionColorRole _stableAvatarRole(String id) {
     var value = 0;
