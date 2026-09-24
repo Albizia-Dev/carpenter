@@ -233,15 +233,32 @@ class _ChatComposerScenarioState extends State<_ChatComposerScenario> {
 
   @override
   Widget build(BuildContext context) => CarpenterChatComposer(
-    text: text,
-    enabled: widget.enabled,
-    hasAttachments: widget.hasAttachments,
-    recording: recording,
+    view: CarpenterComposerView(
+      text: text,
+      readOnly: !widget.enabled,
+      attachments: widget.hasAttachments
+          ? const [
+              CarpenterMediaView(
+                id: 'draft-photo',
+                kind: CarpenterMediaKind.image,
+                label: 'Фото объекта.jpg',
+                byteLength: 2097152,
+                loadState: CarpenterMediaLoadState.ready,
+              ),
+            ]
+          : const [],
+    ),
+    recording: CarpenterRecordingView(
+      kind: CarpenterRecordingKind.voice,
+      phase: recording
+          ? CarpenterRecordingPhase.locked
+          : CarpenterRecordingPhase.idle,
+    ),
     onTextChanged: (value) => setState(() => text = value),
-    onSend: () => setState(() => text = ''),
-    onFilesRequested: () {},
-    onVoiceRecord: () => setState(() => recording = true),
-    onVoiceStop: () => setState(() => recording = false),
+    onSendRequested: (_) => setState(() => text = ''),
+    onAttachmentsRequested: () {},
+    onRecordingStart: (_) => setState(() => recording = true),
+    onRecordingStop: (_) => setState(() => recording = false),
   );
 }
 

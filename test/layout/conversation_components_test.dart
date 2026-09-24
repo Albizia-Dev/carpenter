@@ -57,10 +57,24 @@ void main() {
     await tester.pumpWidget(
       _host(
         CarpenterChatComposer(
-          text: '',
-          hasAttachments: true,
+          view: const CarpenterComposerView(
+            text: '',
+            attachments: [
+              CarpenterMediaView(
+                id: 'attachment',
+                kind: CarpenterMediaKind.file,
+                label: 'Файл',
+                byteLength: 1,
+                loadState: CarpenterMediaLoadState.ready,
+              ),
+            ],
+          ),
+          recording: const CarpenterRecordingView(
+            kind: CarpenterRecordingKind.voice,
+            phase: CarpenterRecordingPhase.idle,
+          ),
           onTextChanged: (_) {},
-          onSend: () => sends++,
+          onSendRequested: (_) => sends++,
         ),
       ),
     );

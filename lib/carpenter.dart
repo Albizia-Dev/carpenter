@@ -207,6 +207,7 @@ export 'src/components/layout/patterns/messaging/message_cluster.dart';
 export 'src/components/layout/patterns/messaging/message_timeline.dart';
 export 'src/components/layout/patterns/messaging/messaging_models.dart';
 export 'src/components/layout/patterns/messaging/messenger_layout.dart';
+export 'src/components/layout/patterns/messaging/recording_control.dart';
 export 'src/components/layout/patterns/messaging/voice_controls.dart';
 
 // Contextual workspace composition.
