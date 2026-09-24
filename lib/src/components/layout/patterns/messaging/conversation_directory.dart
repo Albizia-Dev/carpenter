@@ -33,6 +33,7 @@ final class CarpenterConversationDirectory extends StatelessWidget {
     required this.onCreateConversation,
     this.initialLoading = false,
     this.failureLabel,
+    this.statusLabel,
     this.emptyLabel = 'Нет чатов',
     this.actionsBuilder,
     this.avatarBuilder,
@@ -46,6 +47,7 @@ final class CarpenterConversationDirectory extends StatelessWidget {
   final VoidCallback? onCreateConversation;
   final bool initialLoading;
   final String? failureLabel;
+  final String? statusLabel;
   final String emptyLabel;
   final CarpenterConversationActionsBuilder? actionsBuilder;
   final CarpenterConversationAvatarBuilder? avatarBuilder;
@@ -90,6 +92,19 @@ final class CarpenterConversationDirectory extends StatelessWidget {
                   label,
                   feedbackRole: FeedbackColorRole.danger,
                   role: TypographyRole.caption,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ),
+          if (statusLabel case final label?)
+            Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(gap, 0, gap, gap),
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: CarpenterText.caption(
+                  label,
+                  colorRole: ContentColorRole.secondary,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),

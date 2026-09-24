@@ -85,6 +85,7 @@ void main() {
             ],
             selectedId: null,
             failureLabel: 'Не удалось обновить',
+            statusLabel: 'Синхронизируем разговор…',
             onConversationSelected: (_) {},
             onSearchChanged: (_) {},
             onCreateConversation: () {},
@@ -93,6 +94,7 @@ void main() {
       );
       expect(find.text('Анна'), findsOneWidget);
       expect(find.text('Не удалось обновить'), findsOneWidget);
+      expect(find.text('Синхронизируем разговор…'), findsOneWidget);
     },
   );
 }
