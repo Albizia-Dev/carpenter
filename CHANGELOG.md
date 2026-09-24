@@ -1,3 +1,12 @@
+## 0.5.3
+
+### Messenger presentation
+
+- Add reusable conversation avatars, tiles, headers, skeletons and adaptive split layout.
+- Add chat composer, attachment strip, timeline controls and voice playback controls using Carpenter theme tokens.
+- Expand Widgetbook with conversation states, interaction cases and responsive workspace scenarios.
+- Group consecutive messages by author across gaps shorter than 20 minutes.
+
 ## 0.5.2
 
 ### Messenger conversation action
