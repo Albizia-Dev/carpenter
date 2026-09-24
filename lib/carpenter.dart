@@ -203,6 +203,7 @@ export 'src/components/layout/patterns/messaging/conversation_split_view.dart';
 export 'src/components/layout/patterns/messaging/chat_composer.dart';
 export 'src/components/layout/patterns/messaging/message_timeline_chrome.dart';
 export 'src/components/layout/patterns/messaging/message_bubble.dart';
+export 'src/components/layout/patterns/messaging/inline_media.dart';
 export 'src/components/layout/patterns/messaging/message_cluster.dart';
 export 'src/components/layout/patterns/messaging/message_timeline.dart';
 export 'src/components/layout/patterns/messaging/messaging_models.dart';

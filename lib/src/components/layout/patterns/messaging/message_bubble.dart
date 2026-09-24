@@ -11,6 +11,7 @@ import '../../../basic/text.dart';
 import '../../../behaviour/menu/menu.dart';
 import '../../../behaviour/menu/menu_entry.dart';
 import '../../../behaviour/popover.dart';
+import 'inline_media.dart';
 import 'messaging_models.dart';
 
 /// Controlled message bubble with pointer/touch actions and horizontal reply.
@@ -25,6 +26,12 @@ final class CarpenterMessageBubble extends StatefulWidget {
     this.onReplyRequested,
     this.onRetryRequested,
     this.onReplyPreviewInvoked,
+    this.mediaPreviewBuilder,
+    this.onMediaLoadRequested,
+    this.onMediaPlayPauseRequested,
+    this.onMediaSeekRequested,
+    this.onMediaSpeedChanged,
+    this.onMediaFocusChanged,
   });
 
   final CarpenterMessageView message;
@@ -35,6 +42,12 @@ final class CarpenterMessageBubble extends StatefulWidget {
   final VoidCallback? onReplyRequested;
   final VoidCallback? onRetryRequested;
   final VoidCallback? onReplyPreviewInvoked;
+  final CarpenterMediaPreviewBuilder? mediaPreviewBuilder;
+  final ValueChanged<String>? onMediaLoadRequested;
+  final ValueChanged<String>? onMediaPlayPauseRequested;
+  final CarpenterMediaSeekRequested? onMediaSeekRequested;
+  final CarpenterMediaSpeedChanged? onMediaSpeedChanged;
+  final CarpenterMediaFocusChanged? onMediaFocusChanged;
 
   @override
   State<CarpenterMessageBubble> createState() => _CarpenterMessageBubbleState();
@@ -199,6 +212,45 @@ final class _CarpenterMessageBubbleState extends State<CarpenterMessageBubble> {
                               ),
                             ),
                           ],
+                        ),
+                      for (final media in message.media)
+                        Padding(
+                          key: ValueKey('message-media-${media.id}'),
+                          padding: EdgeInsets.symmetric(vertical: gap / 2),
+                          child: CarpenterInlineMedia(
+                            view: media,
+                            preview: widget.mediaPreviewBuilder?.call(
+                              context,
+                              media,
+                            ),
+                            onLoadRequested: widget.onMediaLoadRequested == null
+                                ? null
+                                : () => widget.onMediaLoadRequested!(media.id),
+                            onPlayPauseRequested:
+                                widget.onMediaPlayPauseRequested == null
+                                ? null
+                                : () => widget.onMediaPlayPauseRequested!(
+                                    media.id,
+                                  ),
+                            onSeekRequested: widget.onMediaSeekRequested == null
+                                ? null
+                                : (position) => widget.onMediaSeekRequested!(
+                                    media.id,
+                                    position,
+                                  ),
+                            onSpeedChanged: widget.onMediaSpeedChanged == null
+                                ? null
+                                : (speed) => widget.onMediaSpeedChanged!(
+                                    media.id,
+                                    speed,
+                                  ),
+                            onFocusChanged: widget.onMediaFocusChanged == null
+                                ? null
+                                : (focused) => widget.onMediaFocusChanged!(
+                                    media.id,
+                                    focused,
+                                  ),
+                          ),
                         ),
                       if (message.body.isNotEmpty)
                         CarpenterText.body(

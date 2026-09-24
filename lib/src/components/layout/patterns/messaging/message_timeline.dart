@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../../../foundation/theme.dart';
 import 'conversation_components.dart';
+import 'inline_media.dart';
 import 'message_bubble.dart';
 import 'message_cluster.dart';
 import 'message_timeline_chrome.dart';
@@ -28,6 +29,12 @@ final class CarpenterMessageTimeline extends StatelessWidget {
     this.onReplyPreviewInvoked,
     this.avatarBuilder,
     this.loadingOlder = false,
+    this.mediaPreviewBuilder,
+    this.onMediaLoadRequested,
+    this.onMediaPlayPauseRequested,
+    this.onMediaSeekRequested,
+    this.onMediaSpeedChanged,
+    this.onMediaFocusChanged,
   });
 
   final List<CarpenterMessageView> messages;
@@ -39,6 +46,12 @@ final class CarpenterMessageTimeline extends StatelessWidget {
   final ValueChanged<String>? onReplyPreviewInvoked;
   final CarpenterMessageAvatarBuilder? avatarBuilder;
   final bool loadingOlder;
+  final CarpenterMediaPreviewBuilder? mediaPreviewBuilder;
+  final ValueChanged<String>? onMediaLoadRequested;
+  final ValueChanged<String>? onMediaPlayPauseRequested;
+  final CarpenterMediaSeekRequested? onMediaSeekRequested;
+  final CarpenterMediaSpeedChanged? onMediaSpeedChanged;
+  final CarpenterMediaFocusChanged? onMediaFocusChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -137,6 +150,12 @@ final class CarpenterMessageTimeline extends StatelessWidget {
                     cluster[index].replyPreview == null
                 ? null
                 : () => onReplyPreviewInvoked!(cluster[index].id),
+            mediaPreviewBuilder: mediaPreviewBuilder,
+            onMediaLoadRequested: onMediaLoadRequested,
+            onMediaPlayPauseRequested: onMediaPlayPauseRequested,
+            onMediaSeekRequested: onMediaSeekRequested,
+            onMediaSpeedChanged: onMediaSpeedChanged,
+            onMediaFocusChanged: onMediaFocusChanged,
           ),
       ],
     );
