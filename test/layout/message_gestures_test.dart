@@ -164,6 +164,36 @@ void main() {
     );
     expect(icons, findsNWidgets(4));
   });
+
+  testWidgets('message URLs are highlighted and invoke the typed URI', (
+    tester,
+  ) async {
+    Uri? invoked;
+    await tester.pumpWidget(
+      _host(
+        CarpenterMessageBubble(
+          message: CarpenterMessageView(
+            id: 'linked',
+            authorId: 'anna',
+            authorLabel: 'Анна',
+            body: 'https://example.com/path',
+            own: false,
+            sentAt: DateTime(2026, 9, 29, 10),
+          ),
+          selected: false,
+          selectionMode: false,
+          onLinkInvoked: (link) => invoked = link,
+        ),
+      ),
+    );
+
+    final link = tester.widget<CarpenterLink>(find.byType(CarpenterLink));
+    expect(link.underline, CarpenterLinkUnderline.always);
+
+    await tester.tap(find.text('https://example.com/path'));
+    await tester.pump();
+    expect(invoked, Uri.parse('https://example.com/path'));
+  });
 }
 
 Widget _host(Widget child) => UnitsRoot(

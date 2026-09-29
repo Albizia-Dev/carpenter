@@ -229,6 +229,35 @@ void main() {
     );
   });
 
+  testWidgets('timeline reports the message id with an invoked link', (
+    tester,
+  ) async {
+    (String, Uri)? invoked;
+    await tester.pumpWidget(
+      _host(
+        CarpenterMessageTimeline(
+          messages: [
+            CarpenterMessageView(
+              id: 'linked-message',
+              authorId: 'anna',
+              authorLabel: 'Анна',
+              body: 'https://example.com',
+              own: false,
+              sentAt: DateTime(2026, 9, 29, 10),
+            ),
+          ],
+          selectedIds: const {},
+          groupChat: false,
+          onLinkInvoked: (messageId, link) => invoked = (messageId, link),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('https://example.com'));
+
+    expect(invoked, ('linked-message', Uri.parse('https://example.com')));
+  });
+
   testWidgets(
     'selection tints each directional surface without flattening their identity',
     (tester) async {

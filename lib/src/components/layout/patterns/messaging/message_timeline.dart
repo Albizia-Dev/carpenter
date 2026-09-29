@@ -11,6 +11,7 @@ import 'messaging_models.dart';
 
 typedef CarpenterMessageSelectionChanged =
     void Function(String messageId, bool selected);
+typedef CarpenterMessageLinkInvoked = void Function(String messageId, Uri link);
 
 typedef CarpenterMessageAvatarBuilder =
     Widget Function(BuildContext context, CarpenterMessageView message);
@@ -29,6 +30,7 @@ final class CarpenterMessageTimeline extends StatelessWidget {
     this.onReplyRequested,
     this.onRetryRequested,
     this.onReplyPreviewInvoked,
+    this.onLinkInvoked,
     this.avatarBuilder,
     this.loadingOlder = false,
     this.mediaPreviewBuilder,
@@ -48,6 +50,9 @@ final class CarpenterMessageTimeline extends StatelessWidget {
   final ValueChanged<String>? onReplyRequested;
   final ValueChanged<String>? onRetryRequested;
   final ValueChanged<String>? onReplyPreviewInvoked;
+
+  /// Opens a URL found in a message body.
+  final CarpenterMessageLinkInvoked? onLinkInvoked;
   final CarpenterMessageAvatarBuilder? avatarBuilder;
   final bool loadingOlder;
   final CarpenterMediaPreviewBuilder? mediaPreviewBuilder;
@@ -156,6 +161,9 @@ final class CarpenterMessageTimeline extends StatelessWidget {
                     cluster[index].replyPreview == null
                 ? null
                 : () => onReplyPreviewInvoked!(cluster[index].id),
+            onLinkInvoked: onLinkInvoked == null
+                ? null
+                : (link) => onLinkInvoked!(cluster[index].id, link),
             mediaPreviewBuilder: mediaPreviewBuilder,
             onMediaLoadRequested: onMediaLoadRequested,
             onMediaPlayPauseRequested: onMediaPlayPauseRequested,

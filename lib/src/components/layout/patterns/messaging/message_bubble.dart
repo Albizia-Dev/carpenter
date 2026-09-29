@@ -7,6 +7,7 @@ import '../../../../foundation/theme.dart';
 import '../../../basic/checkbox.dart';
 import '../../../basic/gravity_icons.g.dart';
 import '../../../basic/icon.dart';
+import '../../../basic/link.dart';
 import '../../../basic/text.dart';
 import '../../../behaviour/menu/menu.dart';
 import '../../../behaviour/menu/menu_entry.dart';
@@ -26,6 +27,7 @@ final class CarpenterMessageBubble extends StatefulWidget {
     this.onReplyRequested,
     this.onRetryRequested,
     this.onReplyPreviewInvoked,
+    this.onLinkInvoked,
     this.mediaPreviewBuilder,
     this.onMediaLoadRequested,
     this.onMediaPlayPauseRequested,
@@ -44,6 +46,9 @@ final class CarpenterMessageBubble extends StatefulWidget {
   final VoidCallback? onReplyRequested;
   final VoidCallback? onRetryRequested;
   final VoidCallback? onReplyPreviewInvoked;
+
+  /// Opens a URL found in the visible message body.
+  final ValueChanged<Uri>? onLinkInvoked;
   final CarpenterMediaPreviewBuilder? mediaPreviewBuilder;
   final ValueChanged<String>? onMediaLoadRequested;
   final ValueChanged<String>? onMediaPlayPauseRequested;
@@ -346,9 +351,9 @@ final class _CarpenterMessageBubbleState extends State<CarpenterMessageBubble> {
                                   ),
                                 ),
                               if (message.body.isNotEmpty)
-                                CarpenterText.body(
-                                  message.body,
-                                  colorRole: ContentColorRole.primary,
+                                _MessageBody(
+                                  body: message.body,
+                                  onLinkInvoked: widget.onLinkInvoked,
                                 ),
                               SizedBox(
                                 height: context.units(theme.spacing.xsmall),
@@ -427,6 +432,79 @@ final class _CarpenterMessageBubbleState extends State<CarpenterMessageBubble> {
           ),
         ),
     ];
+  }
+}
+
+final class _MessageBody extends StatelessWidget {
+  const _MessageBody({required this.body, this.onLinkInvoked});
+
+  final String body;
+  final ValueChanged<Uri>? onLinkInvoked;
+  static final RegExp _urlPattern = RegExp(
+    r'(?:(?:https?|ftp)://|www\.)[^\s<>()]+',
+    caseSensitive: false,
+  );
+  static final RegExp _trailingPunctuation = RegExp(r'[.,!?;:]+$');
+
+  List<({String text, Uri? uri})> _segments() {
+    final segments = <({String text, Uri? uri})>[];
+    var cursor = 0;
+    for (final match in _urlPattern.allMatches(body)) {
+      var label = match.group(0)!;
+      final punctuation = _trailingPunctuation.firstMatch(label)?.group(0);
+      if (punctuation != null) {
+        label = label.substring(0, label.length - punctuation.length);
+      }
+      if (label.isEmpty) continue;
+      if (match.start > cursor) {
+        segments.add((text: body.substring(cursor, match.start), uri: null));
+      }
+      final uri = Uri.tryParse(
+        label.startsWith('www.') ? 'https://$label' : label,
+      );
+      segments.add((text: label, uri: uri));
+      if (punctuation != null) {
+        segments.add((text: punctuation, uri: null));
+      }
+      cursor = match.end;
+    }
+    if (cursor < body.length) {
+      segments.add((text: body.substring(cursor), uri: null));
+    }
+    return segments;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (onLinkInvoked == null) {
+      return CarpenterText.body(body, colorRole: ContentColorRole.primary);
+    }
+    final theme = CarpenterTheme.of(context);
+    final bodyStyle = theme.typography
+        .resolve(context, TypographyRole.body, TypographyEmphasis.regular)
+        .copyWith(color: theme.content.resolve(ContentColorRole.primary));
+    return Text.rich(
+      TextSpan(
+        style: bodyStyle,
+        children: [
+          for (final segment in _segments())
+            if (segment.uri case final uri?)
+              WidgetSpan(
+                alignment: PlaceholderAlignment.baseline,
+                baseline: TextBaseline.alphabetic,
+                child: CarpenterLink(
+                  label: segment.text,
+                  semanticLabel: 'Открыть ссылку ${segment.text}',
+                  role: CarpenterLinkRole.inline,
+                  underline: CarpenterLinkUnderline.always,
+                  onInvoke: () => onLinkInvoked!(uri),
+                ),
+              )
+            else
+              TextSpan(text: segment.text),
+        ],
+      ),
+    );
   }
 }
 

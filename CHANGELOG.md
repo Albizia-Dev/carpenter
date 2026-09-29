@@ -1,3 +1,10 @@
+## 0.6.6
+
+### Messenger links
+
+- Highlight web links in message bodies and expose typed link activation to
+  host applications without coupling Carpenter to external navigation.
+
 ## 0.6.5
 
 ### Messenger alignment
