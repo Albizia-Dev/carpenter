@@ -1,3 +1,11 @@
+## 0.6.5
+
+### Messenger alignment
+
+- Keep short and long incoming bubble surfaces on one leading lane and own
+  bubbles on the trailing edge, independent of intrinsic message width and
+  the minimum bubble constraint.
+
 ## 0.6.4
 
 ### Messenger continuity and discoverability

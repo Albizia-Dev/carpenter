@@ -28,7 +28,8 @@ abstract final class CarpenterMessageClusterPolicy {
 }
 
 /// Keeps an optional group-chat avatar pinned to the bottom of its author
-/// block and never outside the block's vertical bounds.
+/// block and gives every bubble the full remaining lane so its own/incoming
+/// alignment never depends on the bubble's intrinsic width.
 final class CarpenterMessageCluster extends StatelessWidget {
   const CarpenterMessageCluster({
     super.key,
@@ -48,7 +49,12 @@ final class CarpenterMessageCluster extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         if (!own && avatar != null) ...[avatar!, SizedBox(width: gap)],
-        Expanded(child: Column(children: children)),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: children,
+          ),
+        ),
       ],
     );
   }

@@ -182,6 +182,18 @@ void main() {
           .getSize(find.byKey(const ValueKey('message-bubble-own-short')))
           .width;
       expect(ownWidth, lessThan(300));
+      final first = tester.getRect(
+        find.byKey(const ValueKey('message-bubble-first')),
+      );
+      final second = tester.getRect(
+        find.byKey(const ValueKey('message-bubble-second')),
+      );
+      final own = tester.getRect(
+        find.byKey(const ValueKey('message-bubble-own-short')),
+      );
+      final timeline = tester.getRect(find.byType(CarpenterMessageTimeline));
+      expect(first.left, closeTo(second.left, 1));
+      expect(timeline.right - own.right, lessThanOrEqualTo(20));
       final avatarBottom = tester
           .getBottomLeft(find.byType(CarpenterConversationAvatar))
           .dy;

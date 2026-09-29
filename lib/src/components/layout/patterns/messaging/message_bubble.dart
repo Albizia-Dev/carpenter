@@ -175,7 +175,10 @@ final class _CarpenterMessageBubbleState extends State<CarpenterMessageBubble> {
         },
         onPointerUp: (_) => _completePointerGesture(context),
         child: Stack(
-          alignment: AlignmentDirectional.centerEnd,
+          fit: StackFit.passthrough,
+          alignment: message.own
+              ? AlignmentDirectional.centerEnd
+              : AlignmentDirectional.centerStart,
           clipBehavior: Clip.none,
           children: [
             if (_replyOffset != 0)
