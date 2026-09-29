@@ -40,7 +40,7 @@ void main() {
     expect(sends, [CarpenterSendMode.ordinary]);
   });
 
-  testWidgets('long press exposes working important and answer modes', (
+  testWidgets('visible options expose working important and answer modes', (
     tester,
   ) async {
     final sends = <CarpenterSendMode>[];
@@ -58,7 +58,8 @@ void main() {
       ),
     );
 
-    await tester.longPress(find.bySemanticsLabel('Отправить'));
+    expect(find.bySemanticsLabel('Варианты отправки'), findsOneWidget);
+    await tester.tap(find.bySemanticsLabel('Варианты отправки'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Важное'));
     expect(sends, [CarpenterSendMode.important]);

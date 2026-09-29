@@ -88,6 +88,40 @@ void main() {
     expect(find.text('печатает…'), findsNothing);
     expect(find.bySemanticsLabel('Позвонить'), findsNothing);
   });
+
+  testWidgets('wide messenger exposes a controlled resizable split', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(1280, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    var position = 0.42;
+    late StateSetter rebuild;
+    await tester.pumpWidget(
+      _host(
+        StatefulBuilder(
+          builder: (context, setState) {
+            rebuild = setState;
+            return CarpenterMessengerLayout(
+              selectedConversationId: 'room',
+              splitPosition: position,
+              onSplitPositionChanged: (value) =>
+                  rebuild(() => position = value),
+              directory: const Text('Список'),
+              conversation: const Text('Чат'),
+              emptyConversation: const Text('Пусто'),
+            );
+          },
+        ),
+      ),
+    );
+
+    await tester.drag(
+      find.bySemanticsLabel('Изменить размеры областей'),
+      const Offset(100, 0),
+    );
+    await tester.pump();
+    expect(position, greaterThan(0.42));
+  });
 }
 
 Widget _host(Widget child) => UnitsRoot(

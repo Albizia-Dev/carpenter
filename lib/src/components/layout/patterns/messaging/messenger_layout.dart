@@ -16,12 +16,16 @@ final class CarpenterMessengerLayout extends StatelessWidget {
     required this.directory,
     required this.conversation,
     required this.emptyConversation,
+    this.splitPosition = 0.42,
+    this.onSplitPositionChanged,
   });
 
   final String? selectedConversationId;
   final Widget directory;
   final Widget conversation;
   final Widget emptyConversation;
+  final double splitPosition;
+  final ValueChanged<double>? onSplitPositionChanged;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -54,6 +58,8 @@ final class CarpenterMessengerLayout extends StatelessWidget {
           masterSemanticLabel: 'Разговоры',
           detailSemanticLabel: 'Переписка',
           onDetailVisibilityChanged: null,
+          splitPosition: splitPosition,
+          onSplitPositionChanged: onSplitPositionChanged,
           master: master,
           detail: selectedConversationId == null ? empty : detail,
         ),

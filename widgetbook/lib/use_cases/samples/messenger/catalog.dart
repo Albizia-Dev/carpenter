@@ -88,6 +88,7 @@ class _MessengerScenarioState extends State<_MessengerScenario> {
       widget.memory?.selected ?? (widget.initialSelected ? 'project' : null);
   final search = TextEditingController();
   late String draft = widget.memory?.draft ?? '';
+  double splitPosition = 0.42;
   @override
   void dispose() {
     search.dispose();
@@ -97,6 +98,8 @@ class _MessengerScenarioState extends State<_MessengerScenario> {
   @override
   Widget build(BuildContext context) => CarpenterMessengerLayout(
     selectedConversationId: selected,
+    splitPosition: splitPosition,
+    onSplitPositionChanged: (value) => setState(() => splitPosition = value),
     directory: CarpenterConversationDirectory(
       searchController: search,
       conversations: widget.loading ? const [] : _conversations,

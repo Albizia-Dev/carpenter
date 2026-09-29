@@ -37,9 +37,27 @@ void main() {
       tester.getCenter(find.byKey(const ValueKey('message-bubble-message'))),
     );
     await gesture.moveBy(const Offset(-96, 0));
+    await tester.pump();
+    expect(
+      find.byKey(const ValueKey('message-reply-affordance-message')),
+      findsOneWidget,
+    );
+    final translated = tester.widget<Transform>(
+      find
+          .ancestor(
+            of: find.byKey(const ValueKey('message-bubble-message')),
+            matching: find.byType(Transform),
+          )
+          .first,
+    );
+    expect(translated.transform.getTranslation().x, lessThan(0));
     await gesture.up();
     await tester.pump();
     expect(replies, 1);
+    expect(
+      find.byKey(const ValueKey('message-reply-affordance-message')),
+      findsNothing,
+    );
   });
 
   testWidgets('vertical movement does not trigger reply', (tester) async {

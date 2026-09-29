@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../../../foundation/roles.dart';
 import '../../../../foundation/theme.dart';
+import '../../../basic/badge.dart';
 import '../../../basic/button/button.dart';
 import '../../../basic/button/icon_button.dart';
 import '../../../basic/gravity_icons.g.dart';
@@ -81,11 +82,31 @@ final class CarpenterJumpToLatest extends StatelessWidget {
   final int newerCount;
 
   @override
-  Widget build(BuildContext context) => CarpenterButton(
-    label: newerCount > 0 ? 'К последним ($newerCount)' : 'К последним',
-    onPressed: onPressed,
-    prominence: ActionProminence.high,
-  );
+  Widget build(BuildContext context) {
+    final gap = context.units(CarpenterTheme.of(context).spacing.xsmall);
+    final semanticLabel = newerCount > 0
+        ? 'К последним сообщениям, непрочитанных: $newerCount'
+        : 'К последним сообщениям';
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        CarpenterIconButton(
+          icon: GravityIcons.arrowDown,
+          semanticLabel: semanticLabel,
+          onPressed: onPressed,
+          colorRole: ActionColorRole.primary,
+          prominence: ActionProminence.high,
+          shape: CarpenterShape.circular,
+        ),
+        if (newerCount > 0)
+          PositionedDirectional(
+            top: -gap,
+            end: -gap,
+            child: ExcludeSemantics(child: CarpenterBadge.count(newerCount)),
+          ),
+      ],
+    );
+  }
 }
 
 /// Selected-message count and actions, kept in a compact floating surface.

@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:carpenter_units/carpenter_units.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -58,7 +55,6 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
     text: widget.view.text,
   );
   bool _sendMenuOpen = false;
-  Timer? _sendHoldTimer;
 
   @override
   void didUpdateWidget(CarpenterChatComposer oldWidget) {
@@ -74,7 +70,6 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
 
   @override
   void dispose() {
-    _sendHoldTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -185,56 +180,66 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
     );
   }
 
-  Widget _sendControl() => Listener(
-    onPointerDown: (_) {
-      _sendHoldTimer?.cancel();
-      _sendHoldTimer = Timer(kLongPressTimeout, () {
-        if (mounted) setState(() => _sendMenuOpen = true);
-      });
-    },
-    onPointerUp: (_) => _sendHoldTimer?.cancel(),
-    onPointerCancel: (_) => _sendHoldTimer?.cancel(),
-    child: CarpenterPopover(
-      open: _sendMenuOpen,
-      onOpenChanged: (value) => setState(() => _sendMenuOpen = value),
-      content: CarpenterMenu(
-        semanticLabel: 'Варианты отправки',
-        onDismissRequested: () => setState(() => _sendMenuOpen = false),
-        items: [
-          CarpenterMenuItem(
-            action: CarpenterActionDescriptor(
-              id: 'send-ordinary',
-              label: 'Обычное',
-              icon: GravityIcons.paperPlane,
-              onInvoke: () => _send(CarpenterSendMode.ordinary),
-            ),
+  Widget _sendControl() => CarpenterPopover(
+    open: _sendMenuOpen,
+    onOpenChanged: (value) => setState(() => _sendMenuOpen = value),
+    content: CarpenterMenu(
+      semanticLabel: 'Варианты отправки',
+      onDismissRequested: () => setState(() => _sendMenuOpen = false),
+      items: [
+        CarpenterMenuItem(
+          action: CarpenterActionDescriptor(
+            id: 'send-ordinary',
+            label: 'Обычное',
+            icon: GravityIcons.paperPlane,
+            onInvoke: () => _send(CarpenterSendMode.ordinary),
           ),
-          CarpenterMenuItem(
-            action: CarpenterActionDescriptor(
-              id: 'send-important',
-              label: 'Важное',
-              icon: GravityIcons.exclamationShape,
-              colorRole: ActionColorRole.danger,
-              onInvoke: () => _send(CarpenterSendMode.important),
-            ),
+        ),
+        CarpenterMenuItem(
+          action: CarpenterActionDescriptor(
+            id: 'send-important',
+            label: 'Важное',
+            icon: GravityIcons.exclamationShape,
+            colorRole: ActionColorRole.danger,
+            onInvoke: () => _send(CarpenterSendMode.important),
           ),
-          CarpenterMenuItem(
-            action: CarpenterActionDescriptor(
-              id: 'send-requires-answer',
-              label: 'Требует ответа',
-              icon: GravityIcons.circleQuestion,
-              colorRole: ActionColorRole.danger,
-              onInvoke: () => _send(CarpenterSendMode.requiresAnswer),
-            ),
+        ),
+        CarpenterMenuItem(
+          action: CarpenterActionDescriptor(
+            id: 'send-requires-answer',
+            label: 'Требует ответа',
+            icon: GravityIcons.circleQuestion,
+            colorRole: ActionColorRole.danger,
+            onInvoke: () => _send(CarpenterSendMode.requiresAnswer),
           ),
-        ],
-      ),
-      anchor: CarpenterIconButton(
-        icon: GravityIcons.paperPlane,
-        semanticLabel: 'Отправить',
-        onPressed: () => _send(CarpenterSendMode.ordinary),
-        prominence: ActionProminence.high,
-      ),
+        ),
+      ],
+    ),
+    anchorActivates: false,
+    anchor: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        CarpenterIconButton(
+          icon: GravityIcons.paperPlane,
+          semanticLabel: 'Отправить',
+          onPressed: () => _send(CarpenterSendMode.ordinary),
+          prominence: ActionProminence.high,
+          shape: const CarpenterShape(
+            start: ShapeRole.rounded,
+            end: ShapeRole.none,
+          ),
+        ),
+        CarpenterIconButton(
+          icon: GravityIcons.caretDown,
+          semanticLabel: 'Варианты отправки',
+          onPressed: () => setState(() => _sendMenuOpen = true),
+          prominence: ActionProminence.high,
+          shape: const CarpenterShape(
+            start: ShapeRole.none,
+            end: ShapeRole.rounded,
+          ),
+        ),
+      ],
     ),
   );
 

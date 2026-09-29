@@ -12,6 +12,24 @@ void main() {
     expect(find.textContaining('Загрузка'), findsNothing);
   });
 
+  testWidgets('jump to latest is icon-only and exposes unread count', (
+    tester,
+  ) async {
+    var invoked = false;
+    await tester.pumpWidget(
+      _host(
+        CarpenterJumpToLatest(newerCount: 7, onPressed: () => invoked = true),
+      ),
+    );
+
+    expect(find.textContaining('К последним'), findsNothing);
+    expect(find.text('7'), findsOneWidget);
+    await tester.tap(
+      find.bySemanticsLabel('К последним сообщениям, непрочитанных: 7'),
+    );
+    expect(invoked, isTrue);
+  });
+
   test('group breaks at twenty minutes, date and system events', () {
     final first = _message('first', DateTime(2026, 9, 24, 10));
     final nineteenMinutesLater = _message(

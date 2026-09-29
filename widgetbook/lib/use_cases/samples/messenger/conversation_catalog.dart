@@ -108,6 +108,25 @@ final conversationComponents = [
       ),
     ],
   ),
+  WidgetbookComponent(
+    name: 'Timeline navigation',
+    useCases: [
+      WidgetbookUseCase(
+        name: 'Playground',
+        builder: (context) => Center(
+          child: CarpenterJumpToLatest(
+            newerCount: context.knobs.int.slider(
+              label: 'Непрочитанные',
+              initialValue: 3,
+              min: 0,
+              max: 150,
+            ),
+            onPressed: () {},
+          ),
+        ),
+      ),
+    ],
+  ),
 ];
 
 class _DirectoryScenario extends StatefulWidget {

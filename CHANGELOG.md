@@ -1,3 +1,12 @@
+## 0.6.4
+
+### Messenger continuity and discoverability
+
+- Replace the textual jump-to-latest action with an accessible filled icon and an unread-count badge.
+- Keep swipe-to-reply coupled to visible bubble movement and a reply affordance throughout the gesture.
+- Expose send variants through a dedicated action and make the messenger master-detail split controlled by the host.
+- Extend Messenger Widgetbook and interaction tests for navigation, send variants, swipe feedback and split resizing.
+
 ## 0.6.3
 
 ### Messenger tactile media and interaction polish
