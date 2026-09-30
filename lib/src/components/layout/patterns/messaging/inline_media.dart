@@ -67,9 +67,25 @@ final class CarpenterInlineMedia extends StatelessWidget {
     final gap = context.units(theme.spacing.small);
     if (_isVisual) {
       final action = _visualStateAction(context);
-      return Stack(
+      final media = Stack(
         alignment: Alignment.center,
         children: [_presentation(context), ?action],
+      );
+      if (view.kind == CarpenterMediaKind.videoCircle) return media;
+      final radius = BorderRadius.circular(
+        context.units(theme.shapes.radius(ShapeRole.rounded)),
+      );
+      return DecoratedBox(
+        key: ValueKey('inline-media-bubble-${view.id}'),
+        decoration: BoxDecoration(
+          color: theme.surface.subtle,
+          border: Border.all(
+            color: theme.overlay.border,
+            width: context.units(theme.shapes.fieldBorderWidth),
+          ),
+          borderRadius: radius,
+        ),
+        child: ClipRRect(borderRadius: radius, child: media),
       );
     }
     return DecoratedBox(
@@ -163,7 +179,7 @@ final class CarpenterInlineMedia extends StatelessWidget {
         size: ControlSize.large,
       );
     }
-    if (_visualNeedsLoad) {
+    if (_visualNeedsLoad && view.kind != CarpenterMediaKind.videoCircle) {
       return CarpenterIconButton(
         icon: GravityIcons.arrowDownToLine,
         semanticLabel: 'Загрузить: ${view.label}',
@@ -348,44 +364,66 @@ final class CarpenterInlineMedia extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 LayoutBuilder(
-                  builder: (context, constraints) => Listener(
-                    behavior: HitTestBehavior.opaque,
-                    onPointerDown: onSeekRequested == null
+                  builder: (context, constraints) => Semantics(
+                    slider: onSeekRequested != null,
+                    label: 'Позиция: ${view.label}',
+                    value:
+                        '${_duration(view.position)} из ${_duration(view.duration ?? Duration.zero)}',
+                    increasedValue: onSeekRequested == null
                         ? null
-                        : (details) => _seek(
-                            details.localPosition.dx,
-                            constraints.maxWidth,
+                        : _duration(
+                            _relativePosition(const Duration(seconds: 10)),
                           ),
-                    onPointerMove: onSeekRequested == null
+                    decreasedValue: onSeekRequested == null
                         ? null
-                        : (details) => _seek(
-                            details.localPosition.dx,
-                            constraints.maxWidth,
+                        : _duration(
+                            _relativePosition(const Duration(seconds: -10)),
                           ),
-                    child: SizedBox(
-                      width: constraints.maxWidth,
-                      height: waveformHeight,
-                      child: CustomPaint(
-                        key: ValueKey(
-                          view.waveform.isEmpty
-                              ? 'media-timeline-${view.id}'
-                              : 'media-waveform-${view.id}',
-                        ),
-                        painter: _WaveformPainter(
-                          samples: view.waveform,
-                          color: theme.content.resolve(
-                            ContentColorRole.secondary,
+                    onIncrease: onSeekRequested == null
+                        ? null
+                        : () => _seekRelative(const Duration(seconds: 10)),
+                    onDecrease: onSeekRequested == null
+                        ? null
+                        : () => _seekRelative(const Duration(seconds: -10)),
+                    child: Listener(
+                      behavior: HitTestBehavior.opaque,
+                      onPointerDown: onSeekRequested == null
+                          ? null
+                          : (details) => _seek(
+                              details.localPosition.dx,
+                              constraints.maxWidth,
+                            ),
+                      onPointerMove: onSeekRequested == null
+                          ? null
+                          : (details) => _seek(
+                              details.localPosition.dx,
+                              constraints.maxWidth,
+                            ),
+                      child: SizedBox(
+                        width: constraints.maxWidth,
+                        height: waveformHeight,
+                        child: CustomPaint(
+                          key: ValueKey(
+                            view.waveform.isEmpty
+                                ? 'media-timeline-${view.id}'
+                                : 'media-waveform-${view.id}',
                           ),
-                          playedColor: theme.actions.primary.normal,
-                          strokeWidth: context.units(
-                            theme.shapes.fieldBorderWidth,
+                          painter: _WaveformPainter(
+                            samples: view.waveform,
+                            color: theme.content.resolve(
+                              ContentColorRole.secondary,
+                            ),
+                            playedColor: theme.actions.primary.normal,
+                            strokeWidth: context.units(
+                              theme.shapes.fieldBorderWidth,
+                            ),
+                            progress:
+                                view.duration == null ||
+                                    view.duration == Duration.zero
+                                ? 0
+                                : view.position.inMilliseconds /
+                                      view.duration!.inMilliseconds,
                           ),
-                          progress:
-                              view.duration == null ||
-                                  view.duration == Duration.zero
-                              ? 0
-                              : view.position.inMilliseconds /
-                                    view.duration!.inMilliseconds,
                         ),
                       ),
                     ),
@@ -425,10 +463,16 @@ final class CarpenterInlineMedia extends StatelessWidget {
                     ColoredBox(color: theme.surface.base),
               )) ??
         ColoredBox(color: theme.surface.base);
-    final actionLabel = view.playing
+    final actionLabel = _visualNeedsLoad
+        ? 'Загрузить и воспроизвести: ${view.label}'
+        : view.playing
         ? 'Пауза: ${view.label}'
         : 'Воспроизвести: ${view.label}';
     void activate() {
+      if (_visualNeedsLoad) {
+        onLoadRequested?.call();
+        return;
+      }
       if (onPlayPauseRequested case final play?) {
         play();
       } else if (!view.focused) {
@@ -436,13 +480,41 @@ final class CarpenterInlineMedia extends StatelessWidget {
       }
     }
 
+    final progressPadding = context.units(theme.shapes.fieldBorderWidth) * 2;
+    final totalExtent = extent + progressPadding * 2;
+    final canSeek =
+        onSeekRequested != null &&
+        view.duration != null &&
+        view.duration != Duration.zero;
+
     return Semantics(
       button: onPlayPauseRequested != null || onFocusChanged != null,
       label: '$actionLabel, ${_duration(view.position)}',
+      value: canSeek
+          ? '${_duration(view.position)} из ${_duration(view.duration!)}'
+          : null,
+      increasedValue: canSeek
+          ? _duration(_relativePosition(const Duration(seconds: 10)))
+          : null,
+      decreasedValue: canSeek
+          ? _duration(_relativePosition(const Duration(seconds: -10)))
+          : null,
       onTap: activate,
+      onIncrease: canSeek
+          ? () => _seekRelative(const Duration(seconds: 10))
+          : null,
+      onDecrease: canSeek
+          ? () => _seekRelative(const Duration(seconds: -10))
+          : null,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: activate,
+        onPanStart: canSeek
+            ? (details) => _seekCircle(details.localPosition, totalExtent)
+            : null,
+        onPanUpdate: canSeek
+            ? (details) => _seekCircle(details.localPosition, totalExtent)
+            : null,
         child: CustomPaint(
           key: ValueKey('inline-media-circle-progress-${view.id}'),
           foregroundPainter: _CircularProgressPainter(
@@ -452,9 +524,7 @@ final class CarpenterInlineMedia extends StatelessWidget {
             strokeWidth: context.units(theme.shapes.fieldBorderWidth) * 2,
           ),
           child: Padding(
-            padding: EdgeInsets.all(
-              context.units(theme.shapes.fieldBorderWidth) * 2,
-            ),
+            padding: EdgeInsets.all(progressPadding),
             child: SizedBox.square(
               key: ValueKey('inline-media-circle-${view.id}'),
               dimension: extent,
@@ -541,6 +611,34 @@ final class CarpenterInlineMedia extends StatelessWidget {
     onSeekRequested?.call(
       Duration(milliseconds: (duration.inMilliseconds * fraction).round()),
     );
+  }
+
+  void _seekCircle(Offset localPosition, double extent) {
+    final duration = view.duration;
+    if (duration == null || duration == Duration.zero || extent <= 0) return;
+    final center = Offset(extent / 2, extent / 2);
+    final vector = localPosition - center;
+    var angle = math.atan2(vector.dy, vector.dx) + math.pi / 2;
+    if (angle < 0) angle += math.pi * 2;
+    final fraction = (angle / (math.pi * 2)).clamp(0.0, 1.0);
+    onSeekRequested?.call(
+      Duration(milliseconds: (duration.inMilliseconds * fraction).round()),
+    );
+  }
+
+  void _seekRelative(Duration delta) {
+    onSeekRequested?.call(_relativePosition(delta));
+  }
+
+  Duration _relativePosition(Duration delta) {
+    final duration = view.duration;
+    if (duration == null || duration == Duration.zero) return view.position;
+    final requested = view.position + delta;
+    return requested < Duration.zero
+        ? Duration.zero
+        : requested > duration
+        ? duration
+        : requested;
   }
 
   Widget _playbackControls(BuildContext context) {

@@ -33,6 +33,10 @@ void main() {
 
     expect(find.byType(ImageFiltered), findsOneWidget);
     expect(find.byType(Image), findsOneWidget);
+    final bubble = tester.widget<DecoratedBox>(
+      find.byKey(const ValueKey('inline-media-bubble-image')),
+    );
+    expect((bubble.decoration as BoxDecoration).border, isNotNull);
     final action = find.bySemanticsLabel('Загрузить: Фото');
     expect(action, findsWidgets);
     expect(
@@ -109,6 +113,7 @@ void main() {
     (tester) async {
       var focused = false;
       var plays = 0;
+      final seeks = <Duration>[];
       await tester.pumpWidget(
         _host(
           StatefulBuilder(
@@ -134,6 +139,7 @@ void main() {
               onPlayPauseRequested: () => setState(() {
                 plays++;
               }),
+              onSeekRequested: seeks.add,
               onFocusChanged: (value) => setState(() => focused = value),
             ),
           ),
@@ -167,8 +173,46 @@ void main() {
       expect(plays, 1);
       expect(focused, isFalse);
       expect(find.byKey(const ValueKey('circle-player')), findsNothing);
+
+      final gesture = await tester.startGesture(rect.topCenter);
+      await gesture.moveTo(rect.centerRight);
+      await gesture.up();
+      expect(seeks.last, const Duration(seconds: 5));
     },
   );
+
+  testWidgets('video circle loads through its play affordance', (tester) async {
+    var loads = 0;
+    var plays = 0;
+    await tester.pumpWidget(
+      _host(
+        CarpenterInlineMedia(
+          view: CarpenterMediaView(
+            id: 'circle-preview',
+            kind: CarpenterMediaKind.videoCircle,
+            label: 'Кружок',
+            byteLength: carpenterEagerMediaLimitBytes + 1,
+            loadState: CarpenterMediaLoadState.previewReady,
+            duration: const Duration(seconds: 20),
+            previewBytes: base64Decode(
+              'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+            ),
+          ),
+          onLoadRequested: () => loads++,
+          onPlayPauseRequested: () => plays++,
+        ),
+      ),
+    );
+
+    expect(find.bySemanticsLabel('Загрузить: Кружок'), findsNothing);
+    final play = find.bySemanticsLabel(
+      RegExp(r'^Загрузить и воспроизвести: Кружок'),
+    );
+    expect(play, findsOneWidget);
+    await tester.tap(play);
+    expect(loads, 1);
+    expect(plays, 0);
+  });
 
   testWidgets('waveform tap requests an exact playback position', (
     tester,

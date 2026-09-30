@@ -1,3 +1,14 @@
+## 0.6.14
+
+### Messenger media playback
+
+- Restore one explicit media-owned bubble around image and video messages
+  without reintroducing a redundant outer message surface.
+- Use the video-circle play affordance to load missing media instead of
+  exposing a download action inside the circle.
+- Make audio timelines and video-circle progress directly seekable, including
+  accessible forward and backward actions.
+
 ## 0.6.13
 
 ### Messenger media and composer surfaces
