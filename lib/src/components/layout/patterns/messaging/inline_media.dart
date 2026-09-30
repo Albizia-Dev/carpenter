@@ -12,6 +12,7 @@ import '../../../basic/button/icon_button.dart';
 import '../../../basic/gravity_icons.g.dart';
 import '../../../basic/icon.dart';
 import '../../../basic/loader.dart';
+import '../../../basic/progress.dart';
 import '../../../basic/text.dart';
 import '../../../behaviour/dialog.dart';
 import 'messaging_models.dart';
@@ -65,6 +66,7 @@ final class CarpenterInlineMedia extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.small);
+    final transferStatus = _transferStatus(context);
     if (_isVisual) {
       final action = _visualStateAction(context);
       final media = Stack(
@@ -85,7 +87,24 @@ final class CarpenterInlineMedia extends StatelessWidget {
           borderRadius: radius,
         ),
         position: DecorationPosition.foreground,
-        child: ClipRRect(borderRadius: radius, child: media),
+        child: ClipRRect(
+          borderRadius: radius,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              media,
+              if (transferStatus != null)
+                ColoredBox(
+                  color: theme.surface.subtle,
+                  child: Padding(
+                    padding: EdgeInsets.all(gap),
+                    child: transferStatus,
+                  ),
+                ),
+            ],
+          ),
+        ),
       );
     }
     return DecoratedBox(
@@ -101,19 +120,45 @@ final class CarpenterInlineMedia extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              children: [
-                _presentation(context),
-                if (_loadAction(context) case final action?)
-                  PositionedDirectional(top: 0, end: 0, child: action),
-              ],
-            ),
+            _nonVisualPresentation(context),
             if (_hasPlayback) ...[
               SizedBox(height: context.units(theme.spacing.xsmall)),
               _playbackControls(context),
             ],
+            if (transferStatus != null) ...[
+              SizedBox(height: context.units(theme.spacing.xsmall)),
+              transferStatus,
+            ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _nonVisualPresentation(BuildContext context) {
+    final action = _loadAction(context);
+    final presentation = _presentation(context);
+    if (view.kind != CarpenterMediaKind.file) {
+      return Stack(
+        children: [
+          presentation,
+          if (action != null)
+            PositionedDirectional(top: 0, end: 0, child: action),
+        ],
+      );
+    }
+    final theme = CarpenterTheme.of(context);
+    return SizedBox(
+      width: context.units(theme.sizes.layoutSecondary),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(child: presentation),
+          if (action != null) ...[
+            SizedBox(width: context.units(theme.spacing.small)),
+            action,
+          ],
+        ],
       ),
     );
   }
@@ -139,13 +184,17 @@ final class CarpenterInlineMedia extends StatelessWidget {
   Widget? _loadAction(BuildContext context) {
     if (view.loadState == CarpenterMediaLoadState.originalLoading) {
       return CarpenterLoader(
-        semanticLabel: 'Загрузка оригинала: ${view.label}',
+        semanticLabel: view.kind == CarpenterMediaKind.file
+            ? 'Скачивание: ${view.label}'
+            : 'Загрузка оригинала: ${view.label}',
       );
     }
     if (view.loadState == CarpenterMediaLoadState.failed) {
       return CarpenterIconButton(
         icon: GravityIcons.arrowRotateRight,
-        semanticLabel: 'Повторить загрузку: ${view.label}',
+        semanticLabel: view.kind == CarpenterMediaKind.file
+            ? 'Повторить скачивание: ${view.label}'
+            : 'Повторить загрузку: ${view.label}',
         onPressed: onLoadRequested,
         colorRole: ActionColorRole.warning,
         prominence: ActionProminence.high,
@@ -155,7 +204,9 @@ final class CarpenterInlineMedia extends StatelessWidget {
     if (view.requiresExplicitOriginalLoad) {
       return CarpenterIconButton(
         icon: GravityIcons.arrowDownToLine,
-        semanticLabel: 'Загрузить оригинал: ${view.label}',
+        semanticLabel: view.kind == CarpenterMediaKind.file
+            ? 'Скачать и открыть: ${view.label}'
+            : 'Загрузить оригинал: ${view.label}',
         onPressed: onLoadRequested,
         colorRole: ActionColorRole.primary,
         prominence: ActionProminence.high,
@@ -164,6 +215,75 @@ final class CarpenterInlineMedia extends StatelessWidget {
     }
     return null;
   }
+
+  Widget? _transferStatus(BuildContext context) {
+    final phase = view.transferPhase;
+    if (phase == null) return null;
+    final progress = _normalizedProgress(view.transferProgress);
+    final active = switch (phase) {
+      CarpenterMediaTransferPhase.preparingUpload ||
+      CarpenterMediaTransferPhase.uploading ||
+      CarpenterMediaTransferPhase.verifyingUpload ||
+      CarpenterMediaTransferPhase.downloading => true,
+      _ => false,
+    };
+    final label = switch (phase) {
+      CarpenterMediaTransferPhase.preparingUpload => 'Готовим файл…',
+      CarpenterMediaTransferPhase.uploading =>
+        progress == null
+            ? 'Отправляем…'
+            : 'Отправляем · ${(progress * 100).round()}%',
+      CarpenterMediaTransferPhase.verifyingUpload => 'Проверяем файл…',
+      CarpenterMediaTransferPhase.downloading =>
+        progress == null
+            ? 'Скачиваем…'
+            : 'Скачиваем · ${(progress * 100).round()}%',
+      CarpenterMediaTransferPhase.uploadFailed => 'Не удалось отправить',
+      CarpenterMediaTransferPhase.downloadFailed => 'Не удалось скачать',
+      CarpenterMediaTransferPhase.uploadCancelled => 'Отправка отменена',
+      CarpenterMediaTransferPhase.sourceRequired => 'Выберите файл повторно',
+    };
+    final semanticLabel = '$label ${view.label}';
+    return Column(
+      key: ValueKey('media-transfer-status-${view.id}'),
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        if (phase == CarpenterMediaTransferPhase.uploadFailed ||
+            phase == CarpenterMediaTransferPhase.downloadFailed)
+          CarpenterText.feedback(
+            label,
+            role: TypographyRole.caption,
+            feedbackRole: FeedbackColorRole.danger,
+            semanticsLabel: semanticLabel,
+          )
+        else
+          CarpenterText.caption(
+            label,
+            colorRole: ContentColorRole.secondary,
+            semanticsLabel: semanticLabel,
+          ),
+        if (active) ...[
+          SizedBox(
+            height: context.units(CarpenterTheme.of(context).spacing.xsmall),
+          ),
+          CarpenterProgress(
+            value:
+                phase == CarpenterMediaTransferPhase.uploading ||
+                    phase == CarpenterMediaTransferPhase.downloading
+                ? progress
+                : null,
+            semanticLabel: semanticLabel,
+          ),
+        ],
+      ],
+    );
+  }
+
+  static double? _normalizedProgress(double? value) =>
+      value == null || !value.isFinite
+      ? null
+      : value.clamp(0.0, 1.0).toDouble();
 
   Widget? _visualStateAction(BuildContext context) {
     if (view.loadState == CarpenterMediaLoadState.originalLoading) {

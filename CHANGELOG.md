@@ -1,3 +1,12 @@
+## 0.6.16
+
+### Messenger attachment transfers
+
+- Expose typed upload and download phases with determinate transfer progress.
+- Show actionable transfer status in composer attachments and message media.
+- Reserve a dedicated trailing action column in file cards so long names never
+  run underneath download or retry controls.
+
 ## 0.6.15
 
 ### Messenger media boundary

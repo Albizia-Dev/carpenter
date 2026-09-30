@@ -30,6 +30,18 @@ enum CarpenterMediaLoadState {
   failed,
 }
 
+/// Host-owned transfer phase rendered alongside a media item.
+enum CarpenterMediaTransferPhase {
+  preparingUpload,
+  uploading,
+  verifyingUpload,
+  downloading,
+  uploadFailed,
+  downloadFailed,
+  uploadCancelled,
+  sourceRequired,
+}
+
 /// Recording kind selected by the composer action.
 enum CarpenterRecordingKind { voice, video }
 
@@ -111,6 +123,8 @@ final class CarpenterMediaView {
     required this.label,
     required this.byteLength,
     required this.loadState,
+    this.transferPhase,
+    this.transferProgress,
     this.duration,
     this.position = Duration.zero,
     this.playing = false,
@@ -128,6 +142,8 @@ final class CarpenterMediaView {
   final String label;
   final int byteLength;
   final CarpenterMediaLoadState loadState;
+  final CarpenterMediaTransferPhase? transferPhase;
+  final double? transferProgress;
   final Duration? duration;
   final Duration position;
   final bool playing;

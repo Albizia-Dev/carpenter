@@ -290,5 +290,7 @@ const _demoMedia = CarpenterMediaView(
   kind: CarpenterMediaKind.image,
   label: 'Фото.jpg',
   byteLength: 2048,
-  loadState: CarpenterMediaLoadState.ready,
+  loadState: CarpenterMediaLoadState.originalLoading,
+  transferPhase: CarpenterMediaTransferPhase.uploading,
+  transferProgress: .62,
 );

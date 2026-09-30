@@ -7,6 +7,7 @@ import '../../../../foundation/theme.dart';
 import '../../../basic/button/icon_button.dart';
 import '../../../basic/gravity_icons.g.dart';
 import '../../../basic/icon.dart';
+import '../../../basic/progress.dart';
 import '../../../basic/text.dart';
 import 'messaging_models.dart';
 
@@ -34,6 +35,7 @@ final class CarpenterComposerAttachmentTray extends StatelessWidget {
         separatorBuilder: (_, _) => SizedBox(width: gap),
         itemBuilder: (context, index) {
           final item = items[index];
+          final status = _transferStatus(item);
           return SizedBox(
             key: ValueKey('composer-attachment-${item.id}'),
             width: context.units(theme.sizes.tableColumn),
@@ -75,11 +77,27 @@ final class CarpenterComposerAttachmentTray extends StatelessWidget {
                         ),
                       ],
                     ),
-                    CarpenterText.caption(
-                      _bytes(item.byteLength),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    if (status == null)
+                      CarpenterText.caption(
+                        _bytes(item.byteLength),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    else ...[
+                      CarpenterText.caption(
+                        status.label,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        semanticsLabel: status.semanticLabel,
+                      ),
+                      if (status.active) ...[
+                        SizedBox(height: context.units(theme.spacing.xsmall)),
+                        CarpenterProgress(
+                          value: status.progress,
+                          semanticLabel: status.semanticLabel,
+                        ),
+                      ],
+                    ],
                   ],
                 ),
               ),
@@ -116,4 +134,57 @@ final class CarpenterComposerAttachmentTray extends StatelessWidget {
     if (value >= 1024) return '${(value / 1024).toStringAsFixed(1)} КБ';
     return '$value Б';
   }
+
+  static ({String label, String semanticLabel, double? progress, bool active})?
+  _transferStatus(CarpenterMediaView item) {
+    final phase = item.transferPhase;
+    if (phase == null) return null;
+    final progress = _progress(item.transferProgress);
+    return switch (phase) {
+      CarpenterMediaTransferPhase.preparingUpload => (
+        label: 'Готовим файл…',
+        semanticLabel: 'Подготовка файла ${item.label}',
+        progress: null,
+        active: true,
+      ),
+      CarpenterMediaTransferPhase.uploading => (
+        label: progress == null
+            ? 'Отправляем…'
+            : 'Отправляем · ${(progress * 100).round()}%',
+        semanticLabel: 'Отправка файла ${item.label}',
+        progress: progress,
+        active: true,
+      ),
+      CarpenterMediaTransferPhase.verifyingUpload => (
+        label: 'Проверяем файл…',
+        semanticLabel: 'Проверка файла ${item.label}',
+        progress: null,
+        active: true,
+      ),
+      CarpenterMediaTransferPhase.uploadFailed => (
+        label: 'Не удалось отправить',
+        semanticLabel: 'Не удалось отправить файл ${item.label}',
+        progress: null,
+        active: false,
+      ),
+      CarpenterMediaTransferPhase.uploadCancelled => (
+        label: 'Отправка отменена',
+        semanticLabel: 'Отправка файла ${item.label} отменена',
+        progress: null,
+        active: false,
+      ),
+      CarpenterMediaTransferPhase.sourceRequired => (
+        label: 'Выберите файл повторно',
+        semanticLabel: 'Нужно повторно выбрать файл ${item.label}',
+        progress: null,
+        active: false,
+      ),
+      CarpenterMediaTransferPhase.downloading ||
+      CarpenterMediaTransferPhase.downloadFailed => null,
+    };
+  }
+
+  static double? _progress(double? value) => value == null || !value.isFinite
+      ? null
+      : value.clamp(0.0, 1.0).toDouble();
 }

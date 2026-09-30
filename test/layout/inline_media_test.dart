@@ -341,6 +341,44 @@ void main() {
     expect(opens, 1);
   });
 
+  testWidgets('downloading file reserves action space and shows progress', (
+    tester,
+  ) async {
+    const label =
+        'Очень длинное название проектной документации и приложений.pdf';
+    await tester.pumpWidget(
+      _host(
+        CarpenterInlineMedia(
+          view: const CarpenterMediaView(
+            id: 'downloading-file',
+            kind: CarpenterMediaKind.file,
+            label: label,
+            byteLength: carpenterEagerMediaLimitBytes + 1,
+            loadState: CarpenterMediaLoadState.originalLoading,
+            transferPhase: CarpenterMediaTransferPhase.downloading,
+            transferProgress: .42,
+          ),
+        ),
+      ),
+    );
+
+    expect(find.text('Скачиваем · 42%'), findsOneWidget);
+    final progress = tester.widget<CarpenterProgress>(
+      find.descendant(
+        of: find.byKey(
+          const ValueKey('media-transfer-status-downloading-file'),
+        ),
+        matching: find.byType(CarpenterProgress),
+      ),
+    );
+    expect(progress.value, .42);
+    final nameRect = tester.getRect(find.text(label));
+    final actionRect = tester.getRect(
+      find.bySemanticsLabel('Скачивание: $label'),
+    );
+    expect(nameRect.right, lessThanOrEqualTo(actionRect.left));
+  });
+
   testWidgets('media load states use compact top-right actions', (
     tester,
   ) async {

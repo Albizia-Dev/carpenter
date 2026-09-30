@@ -18,7 +18,9 @@ void main() {
                 kind: CarpenterMediaKind.image,
                 label: 'Фото.jpg',
                 byteLength: 1024,
-                loadState: CarpenterMediaLoadState.ready,
+                loadState: CarpenterMediaLoadState.originalLoading,
+                transferPhase: CarpenterMediaTransferPhase.uploading,
+                transferProgress: .62,
               ),
             ],
           ),
@@ -35,6 +37,11 @@ void main() {
     expect(
       tester.widget<CarpenterTextArea>(find.byType(CarpenterTextArea)).maxLines,
       4,
+    );
+    expect(find.text('Отправляем · 62%'), findsOneWidget);
+    expect(
+      tester.widget<CarpenterProgress>(find.byType(CarpenterProgress)).value,
+      .62,
     );
     await tester.tap(find.bySemanticsLabel('Отправить'));
     expect(sends, [CarpenterSendMode.ordinary]);
