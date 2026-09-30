@@ -32,6 +32,7 @@ final class CarpenterChatComposer extends StatefulWidget {
     this.onRecordingStart,
     this.onRecordingLock,
     this.onRecordingStop,
+    this.onRecordingCancel,
   });
 
   final CarpenterComposerView view;
@@ -45,6 +46,7 @@ final class CarpenterChatComposer extends StatefulWidget {
   final ValueChanged<CarpenterRecordingKind>? onRecordingStart;
   final ValueChanged<CarpenterRecordingKind>? onRecordingLock;
   final ValueChanged<CarpenterRecordingKind>? onRecordingStop;
+  final ValueChanged<CarpenterRecordingKind>? onRecordingCancel;
 
   @override
   State<CarpenterChatComposer> createState() => _CarpenterChatComposerState();
@@ -249,6 +251,7 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
     onStart: widget.onRecordingStart,
     onLock: widget.onRecordingLock,
     onStop: widget.onRecordingStop,
+    onCancel: widget.onRecordingCancel,
   );
 }
 

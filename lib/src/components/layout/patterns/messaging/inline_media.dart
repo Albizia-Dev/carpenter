@@ -13,11 +13,11 @@ import '../../../basic/gravity_icons.g.dart';
 import '../../../basic/icon.dart';
 import '../../../basic/loader.dart';
 import '../../../basic/text.dart';
-import '../../../behaviour/popover.dart';
+import '../../../behaviour/dialog.dart';
 import 'messaging_models.dart';
 
 typedef CarpenterMediaPreviewBuilder =
-    Widget Function(BuildContext context, CarpenterMediaView media);
+    Widget? Function(BuildContext context, CarpenterMediaView media);
 typedef CarpenterMediaExpandedPreviewBuilder =
     Widget? Function(BuildContext context, CarpenterMediaView media);
 typedef CarpenterMediaSeekRequested =
@@ -140,17 +140,23 @@ final class CarpenterInlineMedia extends StatelessWidget {
   Widget _visualPreview(BuildContext context, {required bool blurred}) {
     final compact = _visualContent(context, blurred: blurred);
     if (onFocusChanged == null) return compact;
-    return CarpenterPopover(
+    return CarpenterDialog(
       open: view.focused,
       onOpenChanged: onFocusChanged!,
-      anchorActivates: true,
-      presentation: CarpenterPopoverPresentation.bare,
-      anchor: Semantics(
+      title: view.label,
+      semanticLabel: 'Просмотр ${view.label}',
+      dismissPolicy: DialogDismissPolicy.outsideAndEscape,
+      content: _visualContent(context, blurred: false, expanded: true),
+      child: Semantics(
         button: true,
         label: 'Открыть ${view.label}',
-        child: compact,
+        onTap: () => onFocusChanged!(true),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () => onFocusChanged!(true),
+          child: compact,
+        ),
       ),
-      content: _visualContent(context, blurred: false, expanded: true),
     );
   }
 
@@ -332,18 +338,7 @@ final class CarpenterInlineMedia extends StatelessWidget {
   Widget _videoCircle(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final compactExtent = context.units(theme.sizes.tableColumn);
-    final focusedExtent = context.units(theme.sizes.layoutNavigationSide);
-    final compact = view.focused
-        ? SizedBox.square(dimension: compactExtent)
-        : _circleVisual(context, compactExtent);
-    return CarpenterPopover(
-      open: view.focused,
-      onOpenChanged: (focused) => onFocusChanged?.call(focused),
-      anchorActivates: false,
-      presentation: CarpenterPopoverPresentation.bare,
-      anchor: compact,
-      content: expandedPreview ?? _circleVisual(context, focusedExtent),
-    );
+    return _circleVisual(context, compactExtent);
   }
 
   Widget _circleVisual(BuildContext context, double extent) {

@@ -1,3 +1,14 @@
+## 0.6.11
+
+### Messenger recording and media interaction
+
+- Keep video messages playing inside their circular surface instead of opening
+  a rectangular popover player.
+- Open image previews in a centered modal with explicit dismissal rather than
+  an anchor-relative popover.
+- Expose slide-left recording cancellation and allow host preview builders to
+  opt out for media kinds they do not render.
+
 ## 0.6.10
 
 ### Messenger video-circle activation

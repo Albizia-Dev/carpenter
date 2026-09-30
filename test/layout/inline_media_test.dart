@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:carpenter/carpenter.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -100,7 +99,7 @@ void main() {
   );
 
   testWidgets(
-    'video circle renders poster, exposes playback and opens host player',
+    'video circle stays inline and delegates playback without a popover',
     (tester) async {
       var focused = false;
       var plays = 0;
@@ -128,7 +127,6 @@ void main() {
               ),
               onPlayPauseRequested: () => setState(() {
                 plays++;
-                focused = true;
               }),
               onFocusChanged: (value) => setState(() => focused = value),
             ),
@@ -161,11 +159,8 @@ void main() {
       );
       await tester.pumpAndSettle();
       expect(plays, 1);
-      expect(focused, isTrue);
-      expect(find.byKey(const ValueKey('circle-player')), findsOneWidget);
-      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
-      await tester.pumpAndSettle();
       expect(focused, isFalse);
+      expect(find.byKey(const ValueKey('circle-player')), findsNothing);
     },
   );
 
@@ -224,7 +219,7 @@ void main() {
     );
   });
 
-  testWidgets('visual media preserves metadata ratio and expands in popover', (
+  testWidgets('visual media preserves metadata ratio and opens centered', (
     tester,
   ) async {
     var focused = false;
@@ -261,6 +256,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(focused, isTrue);
     expect(find.byKey(const ValueKey('expanded-portrait')), findsOneWidget);
+    expect(find.byType(CarpenterDialog), findsOneWidget);
   });
 
   testWidgets('file preview exposes metadata and opens as one action', (

@@ -21,6 +21,7 @@ final class CarpenterRecordingControl extends StatefulWidget {
     this.onStart,
     this.onLock,
     this.onStop,
+    this.onCancel,
   });
 
   final CarpenterRecordingView view;
@@ -28,6 +29,7 @@ final class CarpenterRecordingControl extends StatefulWidget {
   final ValueChanged<CarpenterRecordingKind>? onStart;
   final ValueChanged<CarpenterRecordingKind>? onLock;
   final ValueChanged<CarpenterRecordingKind>? onStop;
+  final ValueChanged<CarpenterRecordingKind>? onCancel;
 
   @override
   State<CarpenterRecordingControl> createState() =>
@@ -40,6 +42,7 @@ final class _CarpenterRecordingControlState
   Offset? _origin;
   bool _started = false;
   bool _locked = false;
+  bool _cancelled = false;
   bool _suppressTap = false;
 
   bool get _currentAvailable => widget.view.kind == CarpenterRecordingKind.voice
@@ -58,6 +61,7 @@ final class _CarpenterRecordingControlState
         widget.view.phase == CarpenterRecordingPhase.idle) {
       _started = false;
       _locked = false;
+      _cancelled = false;
     }
   }
 
@@ -87,6 +91,7 @@ final class _CarpenterRecordingControlState
 
   void _pointerDown(PointerDownEvent event) {
     _suppressTap = false;
+    _cancelled = false;
     _origin = event.position;
     if (!_currentAvailable ||
         widget.view.phase != CarpenterRecordingPhase.idle ||
@@ -103,21 +108,37 @@ final class _CarpenterRecordingControlState
   }
 
   void _pointerMove(BuildContext context, PointerMoveEvent event) {
-    if (!_started || _locked || _origin == null) return;
+    if (!_started || _locked || _cancelled || _origin == null) return;
     final threshold = context.units(
       CarpenterTheme.of(context).sizes.minimumTarget,
     );
     if (event.position.dy - _origin!.dy <= -threshold) {
       _locked = true;
       widget.onLock?.call(widget.view.kind);
+    } else if (event.position.dx - _origin!.dx <= -threshold) {
+      _cancelled = true;
+      _suppressTap = true;
+      widget.onCancel?.call(widget.view.kind);
     }
   }
 
   void _finishPointer() {
     _holdTimer?.cancel();
     _origin = null;
-    if (_started && !_locked) widget.onStop?.call(widget.view.kind);
+    if (_started && !_locked && !_cancelled) {
+      widget.onStop?.call(widget.view.kind);
+    }
     _started = false;
+  }
+
+  void _cancelPointer() {
+    _holdTimer?.cancel();
+    _origin = null;
+    if (_started && !_locked && !_cancelled) {
+      widget.onCancel?.call(widget.view.kind);
+    }
+    _started = false;
+    _cancelled = true;
   }
 
   @override
@@ -166,7 +187,7 @@ final class _CarpenterRecordingControlState
           onPointerDown: _pointerDown,
           onPointerMove: (event) => _pointerMove(context, event),
           onPointerUp: (_) => _finishPointer(),
-          onPointerCancel: (_) => _finishPointer(),
+          onPointerCancel: (_) => _cancelPointer(),
           child: TweenAnimationBuilder<double>(
             duration: theme.motion.transitionDuration(context),
             curve: theme.motion.stateCurve,

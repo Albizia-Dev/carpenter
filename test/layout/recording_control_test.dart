@@ -61,6 +61,34 @@ void main() {
     expect(modes, isEmpty);
   });
 
+  testWidgets('slide left cancels a held recording without sending it', (
+    tester,
+  ) async {
+    final events = <String>[];
+    await tester.pumpWidget(
+      _host(
+        CarpenterRecordingControl(
+          view: const CarpenterRecordingView(
+            kind: CarpenterRecordingKind.voice,
+            phase: CarpenterRecordingPhase.idle,
+          ),
+          onStart: (_) => events.add('start'),
+          onStop: (_) => events.add('stop'),
+          onCancel: (_) => events.add('cancel'),
+        ),
+      ),
+    );
+
+    final gesture = await tester.startGesture(
+      tester.getCenter(find.byType(CarpenterRecordingControl)),
+    );
+    await tester.pump(kLongPressTimeout + const Duration(milliseconds: 1));
+    await gesture.moveBy(const Offset(-80, 0));
+    await gesture.up();
+
+    expect(events, ['start', 'cancel']);
+  });
+
   testWidgets('drag lock is an icon state without visible status prose', (
     tester,
   ) async {
