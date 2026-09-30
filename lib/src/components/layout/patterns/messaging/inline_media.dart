@@ -342,11 +342,7 @@ final class CarpenterInlineMedia extends StatelessWidget {
       anchorActivates: false,
       presentation: CarpenterPopoverPresentation.bare,
       anchor: compact,
-      content: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: onPlayPauseRequested,
-        child: _circleVisual(context, focusedExtent),
-      ),
+      content: expandedPreview ?? _circleVisual(context, focusedExtent),
     );
   }
 
@@ -358,10 +354,24 @@ final class CarpenterInlineMedia extends StatelessWidget {
             0.0,
             1.0,
           );
-    final content = preview ?? ColoredBox(color: theme.surface.base);
+    final bytes = view.originalBytes ?? view.previewBytes;
+    final content =
+        preview ??
+        (bytes == null
+            ? null
+            : Image.memory(
+                bytes,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) =>
+                    ColoredBox(color: theme.surface.base),
+              )) ??
+        ColoredBox(color: theme.surface.base);
+    final actionLabel = view.playing
+        ? 'Пауза: ${view.label}'
+        : 'Воспроизвести: ${view.label}';
     return Semantics(
       button: onPlayPauseRequested != null || onFocusChanged != null,
-      label: '${view.label}, ${_duration(view.position)}',
+      label: '$actionLabel, ${_duration(view.position)}',
       onTap: () {
         onPlayPauseRequested?.call();
         if (!view.focused) onFocusChanged?.call(true);
@@ -387,7 +397,23 @@ final class CarpenterInlineMedia extends StatelessWidget {
             child: SizedBox.square(
               key: ValueKey('inline-media-circle-${view.id}'),
               dimension: extent,
-              child: ClipOval(child: content),
+              child: ClipOval(
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    content,
+                    Center(
+                      child: CarpenterIcon(
+                        view.playing
+                            ? GravityIcons.circlePauseFill
+                            : GravityIcons.circlePlayFill,
+                        size: IconSize.large,
+                        colorRole: ContentColorRole.inverse,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ),

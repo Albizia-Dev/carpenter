@@ -268,6 +268,13 @@ class _MediaScenarioState extends State<_MediaScenario> {
       playbackRate: speed,
     ),
     preview: const ColoredBox(color: Color(0xff7b5cd6)),
+    expandedPreview: widget.kind == CarpenterMediaKind.videoCircle
+        ? const SizedBox(
+            width: 320,
+            height: 240,
+            child: ColoredBox(color: Color(0xff4d3990)),
+          )
+        : null,
     onLoadRequested: () {},
     onPlayPauseRequested: () => setState(() => playing = !playing),
     onSpeedChanged: (value) => setState(() => speed = value),

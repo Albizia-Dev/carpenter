@@ -1,3 +1,12 @@
+## 0.6.9
+
+### Messenger video circles
+
+- Render embedded poster bytes in compact video circles and keep an explicit
+  play or pause affordance over the poster.
+- Let the host replace the enlarged circle with its real inline player so a
+  tap plays media in Messenger instead of acting like a file download.
+
 ## 0.6.8
 
 ### Messenger expanded media

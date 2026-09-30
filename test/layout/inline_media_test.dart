@@ -100,38 +100,41 @@ void main() {
   );
 
   testWidgets(
-    'video circle uses tap playback, focus overlay and perimeter progress',
+    'video circle renders poster, exposes playback and opens host player',
     (tester) async {
-      bool? focused;
+      var focused = false;
       var plays = 0;
       await tester.pumpWidget(
         _host(
-          CarpenterInlineMedia(
-            view: const CarpenterMediaView(
-              id: 'circle',
-              kind: CarpenterMediaKind.videoCircle,
-              label: 'Кружок',
-              byteLength: 1,
-              loadState: CarpenterMediaLoadState.ready,
-              focused: true,
-              duration: Duration(seconds: 20),
-              position: Duration(seconds: 5),
+          StatefulBuilder(
+            builder: (context, setState) => CarpenterInlineMedia(
+              view: CarpenterMediaView(
+                id: 'circle',
+                kind: CarpenterMediaKind.videoCircle,
+                label: 'Кружок',
+                byteLength: 1,
+                loadState: CarpenterMediaLoadState.ready,
+                focused: focused,
+                duration: const Duration(seconds: 20),
+                position: const Duration(seconds: 5),
+                previewBytes: base64Decode(
+                  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+                ),
+              ),
+              expandedPreview: const SizedBox(
+                key: ValueKey('circle-player'),
+                width: 320,
+                height: 240,
+              ),
+              onPlayPauseRequested: () => plays++,
+              onFocusChanged: (value) => setState(() => focused = value),
             ),
-            preview: const ColoredBox(color: Color(0xff334455)),
-            onPlayPauseRequested: () => plays++,
-            onFocusChanged: (value) => focused = value,
           ),
         ),
       );
-      await tester.pumpAndSettle();
 
+      expect(find.byType(Image), findsOneWidget);
       expect(find.byType(ClipOval), findsOneWidget);
-      expect(
-        tester
-            .getSize(find.byKey(const ValueKey('inline-media-circle-circle')))
-            .width,
-        greaterThan(160),
-      );
       expect(
         find.byKey(const ValueKey('inline-media-circle-progress-circle')),
         findsOneWidget,
@@ -146,12 +149,17 @@ void main() {
                 decoration.border != null;
           });
       expect(framedOverlays, isEmpty);
-      expect(find.bySemanticsLabel('Уменьшить видеосообщение'), findsNothing);
-      expect(find.bySemanticsLabel('Воспроизвести: Кружок'), findsNothing);
-      await tester.tap(
-        find.byKey(const ValueKey('inline-media-circle-circle')).last,
+      expect(
+        find.bySemanticsLabel(RegExp(r'^Воспроизвести: Кружок')),
+        findsOneWidget,
       );
+      await tester.tap(
+        find.bySemanticsLabel(RegExp(r'^Воспроизвести: Кружок')),
+      );
+      await tester.pumpAndSettle();
       expect(plays, 1);
+      expect(focused, isTrue);
+      expect(find.byKey(const ValueKey('circle-player')), findsOneWidget);
       await tester.sendKeyEvent(LogicalKeyboardKey.escape);
       await tester.pumpAndSettle();
       expect(focused, isFalse);
