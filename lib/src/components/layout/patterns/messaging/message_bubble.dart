@@ -136,6 +136,7 @@ final class _CarpenterMessageBubbleState extends State<CarpenterMessageBubble> {
     final message = widget.message;
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.small);
+    final standaloneMedia = _isStandaloneMedia(message);
     final semanticBase = message.meta.important || message.meta.requiresAnswer
         ? theme.feedback.resolve(FeedbackColorRole.danger).background
         : message.own
@@ -146,7 +147,7 @@ final class _CarpenterMessageBubbleState extends State<CarpenterMessageBubble> {
         : semanticBase;
     return ConstrainedBox(
       constraints: BoxConstraints(
-        minWidth: context.units(theme.sizes.tableColumn),
+        minWidth: standaloneMedia ? 0 : context.units(theme.sizes.tableColumn),
         maxWidth: context.units(theme.sizes.layoutSecondary),
       ),
       child: Listener(
@@ -237,147 +238,124 @@ final class _CarpenterMessageBubbleState extends State<CarpenterMessageBubble> {
                         duration: theme.motion.transitionDuration(context),
                         curve: theme.motion.stateCurve,
                         tween: ColorTween(end: bubbleColor),
-                        builder: (context, color, child) => DecoratedBox(
-                          key: ValueKey('message-bubble-${message.id}'),
-                          decoration: BoxDecoration(
-                            color: color,
-                            borderRadius: BorderRadius.circular(
-                              context.units(
-                                theme.shapes.radius(ShapeRole.rounded),
-                              ),
-                            ),
-                            border: Border.all(
-                              color: theme.overlay.border,
-                              width: context.units(
-                                theme.shapes.fieldBorderWidth,
-                              ),
-                            ),
-                          ),
-                          child: child,
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: context.units(theme.spacing.medium),
-                            vertical: gap,
-                          ),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              if (widget.showAuthor && !message.own)
-                                CarpenterText.label(
-                                  message.authorLabel,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  emphasis: TypographyEmphasis.strong,
+                        builder: (context, color, child) {
+                          final emphasized =
+                              widget.selected ||
+                              message.meta.important ||
+                              message.meta.requiresAnswer;
+                          return DecoratedBox(
+                            key: ValueKey('message-bubble-${message.id}'),
+                            decoration: BoxDecoration(
+                              color: standaloneMedia ? null : color,
+                              borderRadius: BorderRadius.circular(
+                                context.units(
+                                  theme.shapes.radius(ShapeRole.rounded),
                                 ),
-                              if (message.replyPreview case final preview?)
-                                _ReplyPreview(
-                                  preview: preview,
-                                  onPressed: widget.onReplyPreviewInvoked,
-                                ),
-                              if (message.meta.forwardedFrom case final author?)
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const CarpenterIcon(
-                                      GravityIcons.forwardStep,
-                                      size: IconSize.small,
-                                      semanticLabel: 'Переслано',
-                                    ),
-                                    SizedBox(
+                              ),
+                              border: standaloneMedia && !emphasized
+                                  ? null
+                                  : Border.all(
+                                      color: standaloneMedia
+                                          ? widget.selected
+                                                ? theme.actions.primary.normal
+                                                : theme.feedback
+                                                      .resolve(
+                                                        FeedbackColorRole
+                                                            .danger,
+                                                      )
+                                                      .foreground
+                                          : theme.overlay.border,
                                       width: context.units(
+                                        theme.shapes.fieldBorderWidth,
+                                      ),
+                                    ),
+                            ),
+                            child: child,
+                          );
+                        },
+                        child: standaloneMedia
+                            ? _standaloneMedia(context, message.media.single)
+                            : Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: context.units(
+                                    theme.spacing.medium,
+                                  ),
+                                  vertical: gap,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (widget.showAuthor && !message.own)
+                                      CarpenterText.label(
+                                        message.authorLabel,
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        emphasis: TypographyEmphasis.strong,
+                                      ),
+                                    if (message.replyPreview
+                                        case final preview?)
+                                      _ReplyPreview(
+                                        preview: preview,
+                                        onPressed: widget.onReplyPreviewInvoked,
+                                      ),
+                                    if (message.meta.forwardedFrom
+                                        case final author?)
+                                      Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const CarpenterIcon(
+                                            GravityIcons.forwardStep,
+                                            size: IconSize.small,
+                                            semanticLabel: 'Переслано',
+                                          ),
+                                          SizedBox(
+                                            width: context.units(
+                                              theme.spacing.xsmall,
+                                            ),
+                                          ),
+                                          Flexible(
+                                            child: CarpenterText.caption(
+                                              'Переслано от $author',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    for (final media in message.media)
+                                      _inlineMedia(
+                                        context,
+                                        media,
+                                        padded: true,
+                                      ),
+                                    if (message.body.isNotEmpty)
+                                      _MessageBody(
+                                        body: message.body,
+                                        onLinkInvoked: widget.onLinkInvoked,
+                                      ),
+                                    SizedBox(
+                                      height: context.units(
                                         theme.spacing.xsmall,
                                       ),
                                     ),
-                                    Flexible(
-                                      child: CarpenterText.caption(
-                                        'Переслано от $author',
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                                    Align(
+                                      alignment: AlignmentDirectional.centerEnd,
+                                      child: _MessageMetadata(
+                                        message: message,
+                                        inverse: false,
+                                        leading: widget.metadataLeading,
+                                        trailing: widget.metadataTrailing,
                                       ),
                                     ),
                                   ],
                                 ),
-                              for (final media in message.media)
-                                Padding(
-                                  key: ValueKey('message-media-${media.id}'),
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: context.units(
-                                      theme.spacing.xsmall,
-                                    ),
-                                  ),
-                                  child: CarpenterInlineMedia(
-                                    view: media,
-                                    preview: widget.mediaPreviewBuilder?.call(
-                                      context,
-                                      media,
-                                    ),
-                                    expandedPreview: widget
-                                        .mediaExpandedPreviewBuilder
-                                        ?.call(context, media),
-                                    onLoadRequested:
-                                        widget.onMediaLoadRequested == null
-                                        ? null
-                                        : () => widget.onMediaLoadRequested!(
-                                            media.id,
-                                          ),
-                                    onPlayPauseRequested:
-                                        widget.onMediaPlayPauseRequested == null
-                                        ? null
-                                        : () =>
-                                              widget.onMediaPlayPauseRequested!(
-                                                media.id,
-                                              ),
-                                    onSeekRequested:
-                                        widget.onMediaSeekRequested == null
-                                        ? null
-                                        : (position) =>
-                                              widget.onMediaSeekRequested!(
-                                                media.id,
-                                                position,
-                                              ),
-                                    onSpeedChanged:
-                                        widget.onMediaSpeedChanged == null
-                                        ? null
-                                        : (speed) =>
-                                              widget.onMediaSpeedChanged!(
-                                                media.id,
-                                                speed,
-                                              ),
-                                    onFocusChanged:
-                                        widget.onMediaFocusChanged == null
-                                        ? null
-                                        : (focused) =>
-                                              widget.onMediaFocusChanged!(
-                                                media.id,
-                                                focused,
-                                              ),
-                                  ),
-                                ),
-                              if (message.body.isNotEmpty)
-                                _MessageBody(
-                                  body: message.body,
-                                  onLinkInvoked: widget.onLinkInvoked,
-                                ),
-                              SizedBox(
-                                height: context.units(theme.spacing.xsmall),
                               ),
-                              Align(
-                                alignment: AlignmentDirectional.centerEnd,
-                                child: _MessageMetadata(
-                                  message: message,
-                                  inverse: false,
-                                  leading: widget.metadataLeading,
-                                  trailing: widget.metadataTrailing,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
                       ),
                     );
-                    return message.media.isEmpty
+                    return standaloneMedia
+                        ? Align(widthFactor: 1, child: anchor)
+                        : message.media.isEmpty
                         ? IntrinsicWidth(child: anchor)
                         : anchor;
                   },
@@ -387,6 +365,97 @@ final class _CarpenterMessageBubbleState extends State<CarpenterMessageBubble> {
           ],
         ),
       ),
+    );
+  }
+
+  bool _isStandaloneMedia(CarpenterMessageView message) =>
+      message.body.isEmpty &&
+      message.media.length == 1 &&
+      !widget.showAuthor &&
+      message.replyPreview == null &&
+      message.meta.forwardedFrom == null;
+
+  Widget _standaloneMedia(BuildContext context, CarpenterMediaView media) {
+    final theme = CarpenterTheme.of(context);
+    final gap = context.units(theme.spacing.xsmall);
+    final visual =
+        media.kind == CarpenterMediaKind.image ||
+        media.kind == CarpenterMediaKind.video ||
+        media.kind == CarpenterMediaKind.videoCircle;
+    final metadata = _MessageMetadata(
+      message: widget.message,
+      inverse: visual,
+      leading: widget.metadataLeading,
+      trailing: widget.metadataTrailing,
+    );
+    if (!visual) {
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          _inlineMedia(context, media),
+          Padding(
+            padding: EdgeInsetsDirectional.only(top: gap, end: gap),
+            child: metadata,
+          ),
+        ],
+      );
+    }
+    return Stack(
+      children: [
+        _inlineMedia(context, media),
+        PositionedDirectional(
+          end: gap,
+          bottom: gap,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: theme.overlay.scrim,
+              borderRadius: BorderRadius.circular(
+                context.units(theme.shapes.radius(ShapeRole.rounded)),
+              ),
+            ),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: gap, vertical: gap / 2),
+              child: metadata,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _inlineMedia(
+    BuildContext context,
+    CarpenterMediaView media, {
+    bool padded = false,
+  }) {
+    final child = CarpenterInlineMedia(
+      key: ValueKey('message-media-${media.id}'),
+      view: media,
+      preview: widget.mediaPreviewBuilder?.call(context, media),
+      expandedPreview: widget.mediaExpandedPreviewBuilder?.call(context, media),
+      onLoadRequested: widget.onMediaLoadRequested == null
+          ? null
+          : () => widget.onMediaLoadRequested!(media.id),
+      onPlayPauseRequested: widget.onMediaPlayPauseRequested == null
+          ? null
+          : () => widget.onMediaPlayPauseRequested!(media.id),
+      onSeekRequested: widget.onMediaSeekRequested == null
+          ? null
+          : (position) => widget.onMediaSeekRequested!(media.id, position),
+      onSpeedChanged: widget.onMediaSpeedChanged == null
+          ? null
+          : (speed) => widget.onMediaSpeedChanged!(media.id, speed),
+      onFocusChanged: widget.onMediaFocusChanged == null
+          ? null
+          : (focused) => widget.onMediaFocusChanged!(media.id, focused),
+    );
+    if (!padded) return child;
+    return Padding(
+      padding: EdgeInsets.symmetric(
+        vertical: context.units(CarpenterTheme.of(context).spacing.xsmall),
+      ),
+      child: child,
     );
   }
 

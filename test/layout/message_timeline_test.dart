@@ -229,6 +229,60 @@ void main() {
     );
   });
 
+  testWidgets('a single attachment is the bubble instead of nesting in one', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        SizedBox(
+          width: 700,
+          child: CarpenterMessageBubble(
+            message: CarpenterMessageView(
+              id: 'media-only',
+              authorId: 'me',
+              authorLabel: 'Вы',
+              body: '',
+              own: true,
+              sentAt: DateTime(2026, 9, 30, 18, 37),
+              media: const [
+                CarpenterMediaView(
+                  id: 'portrait',
+                  kind: CarpenterMediaKind.image,
+                  label: 'Фото',
+                  byteLength: 1,
+                  loadState: CarpenterMediaLoadState.ready,
+                  pixelWidth: 900,
+                  pixelHeight: 1600,
+                ),
+              ],
+            ),
+            selected: false,
+            selectionMode: false,
+            showAuthor: false,
+          ),
+        ),
+      ),
+    );
+
+    final bubble = tester.getRect(
+      find.byKey(const ValueKey('message-bubble-media-only')),
+    );
+    final media = tester.getRect(
+      find.byKey(const ValueKey('message-media-portrait')),
+    );
+    expect(bubble.width, closeTo(media.width, 1));
+    expect(bubble.height, closeTo(media.height, 1));
+    final decoration =
+        tester
+                .widget<DecoratedBox>(
+                  find.byKey(const ValueKey('message-bubble-media-only')),
+                )
+                .decoration
+            as BoxDecoration;
+    expect(decoration.color, isNull);
+    expect(decoration.border, isNull);
+  });
+
   testWidgets('timeline reports the message id with an invoked link', (
     tester,
   ) async {

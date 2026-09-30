@@ -6,6 +6,8 @@ import '../../foundation/theme.dart';
 import '../../internal/overlay/overlay_lifecycle_host.dart';
 import '../../internal/overlay/overlay_surface.dart';
 import '../basic/button/button.dart';
+import '../basic/button/icon_button.dart';
+import '../basic/gravity_icons.g.dart';
 
 typedef CarpenterDialogClose<T> = void Function([T? result]);
 typedef CarpenterDialogActionsBuilder<T> =
@@ -96,6 +98,11 @@ enum CarpenterDialogPresentation {
 
   /// Trailing full-height form, occupying the viewport on compact screens.
   editor,
+
+  /// Content-first full-viewport surface for inspectable media and documents.
+  /// The title remains available to assistive technology while the visible
+  /// chrome is limited to an explicit close action.
+  immersive,
 }
 
 /// A controlled modal composition container with trapped keyboard focus.
@@ -115,7 +122,11 @@ final class CarpenterDialog extends StatelessWidget {
     this.initialFocusNode,
     this.semanticLabel,
     this.presentation = CarpenterDialogPresentation.centered,
-  });
+  }) : assert(
+         presentation != CarpenterDialogPresentation.immersive ||
+             actions.length == 0,
+         'Immersive dialogs expose only their close action.',
+       );
 
   final bool open;
   final ValueChanged<bool> onOpenChanged;
@@ -150,6 +161,40 @@ final class CarpenterDialog extends StatelessWidget {
       initialFocusNode: initialFocusNode,
       scrimColor: theme.overlay.scrim,
       overlayBuilder: (context, info, dismiss) {
+        if (presentation == CarpenterDialogPresentation.immersive) {
+          return Semantics(
+            container: true,
+            scopesRoute: true,
+            namesRoute: true,
+            label: semanticLabel ?? title,
+            explicitChildNodes: true,
+            child: ColoredBox(
+              color: theme.overlay.background,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  content,
+                  PositionedDirectional(
+                    top: context.units(
+                      theme.spacing.overlayDialogViewportInset,
+                    ),
+                    end: context.units(
+                      theme.spacing.overlayDialogViewportInset,
+                    ),
+                    child: SafeArea(
+                      child: CarpenterIconButton(
+                        icon: GravityIcons.xmark,
+                        semanticLabel: 'Закрыть просмотр',
+                        onPressed: dismiss,
+                        prominence: ActionProminence.filled,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
         final editor = presentation == CarpenterDialogPresentation.editor;
         final compact =
             info.overlaySize.width < context.units(theme.sizes.layoutNarrowEnd);

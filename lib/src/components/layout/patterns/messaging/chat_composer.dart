@@ -1,4 +1,5 @@
 import 'package:carpenter_units/carpenter_units.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
@@ -12,6 +13,7 @@ import '../../../basic/text.dart';
 import '../../../behaviour/menu/menu.dart';
 import '../../../behaviour/menu/menu_entry.dart';
 import '../../../behaviour/popover.dart';
+import '../../../../internal/rendering/focus_ring.dart';
 import 'attachment_tray.dart';
 import 'messaging_models.dart';
 import 'recording_control.dart';
@@ -56,7 +58,13 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
   late final TextEditingController _controller = TextEditingController(
     text: widget.view.text,
   );
+  late final FocusNode _textFocusNode = FocusNode()
+    ..addListener(_handleTextFocusChanged);
   bool _sendMenuOpen = false;
+
+  void _handleTextFocusChanged() {
+    if (mounted) setState(() {});
+  }
 
   @override
   void didUpdateWidget(CarpenterChatComposer oldWidget) {
@@ -72,6 +80,9 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
 
   @override
   void dispose() {
+    _textFocusNode
+      ..removeListener(_handleTextFocusChanged)
+      ..dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -125,55 +136,62 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
               items: widget.view.attachments,
               onRemoved: widget.onAttachmentRemoved,
             ),
-            DecoratedBox(
-              key: const ValueKey('composer-input-surface'),
-              decoration: BoxDecoration(
-                color: theme.surface.subtle,
-                borderRadius: BorderRadius.circular(
-                  context.units(theme.shapes.radius(ShapeRole.rounded)),
-                ),
+            FocusRing(
+              visible: _textFocusNode.hasFocus,
+              borderRadius: BorderRadius.circular(
+                context.units(theme.shapes.radius(ShapeRole.rounded)),
               ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  CarpenterIconButton(
-                    icon: GravityIcons.paperclip,
-                    semanticLabel: 'Прикрепить файлы',
-                    onPressed: widget.view.busy
-                        ? null
-                        : widget.onAttachmentsRequested,
-                    prominence: ActionProminence.ghost,
+              child: DecoratedBox(
+                key: const ValueKey('composer-input-surface'),
+                decoration: BoxDecoration(
+                  color: theme.surface.subtle,
+                  borderRadius: BorderRadius.circular(
+                    context.units(theme.shapes.radius(ShapeRole.rounded)),
                   ),
-                  Expanded(
-                    child: Focus(
-                      onKeyEvent: (_, event) {
-                        if (event is KeyDownEvent &&
-                            event.logicalKey == LogicalKeyboardKey.enter &&
-                            !HardwareKeyboard.instance.isShiftPressed) {
-                          _send(CarpenterSendMode.ordinary);
-                          return KeyEventResult.handled;
-                        }
-                        return KeyEventResult.ignored;
-                      },
-                      child: CarpenterTextArea(
-                        controller: _controller,
-                        placeholder: 'Написать сообщение…',
-                        semanticLabel: 'Сообщение',
-                        minLines: 1,
-                        maxLines: 4,
-                        presentation: CarpenterFieldPresentation.seamless,
-                        availability: widget.view.busy
-                            ? FieldAvailability.disabled
-                            : FieldAvailability.enabled,
-                        onChanged: (value) {
-                          setState(() {});
-                          widget.onTextChanged(value);
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    CarpenterIconButton(
+                      icon: GravityIcons.paperclip,
+                      semanticLabel: 'Прикрепить файлы',
+                      onPressed: widget.view.busy
+                          ? null
+                          : widget.onAttachmentsRequested,
+                      prominence: ActionProminence.ghost,
+                    ),
+                    Expanded(
+                      child: Focus(
+                        onKeyEvent: (_, event) {
+                          if (event is KeyDownEvent &&
+                              event.logicalKey == LogicalKeyboardKey.enter &&
+                              !HardwareKeyboard.instance.isShiftPressed) {
+                            _send(CarpenterSendMode.ordinary);
+                            return KeyEventResult.handled;
+                          }
+                          return KeyEventResult.ignored;
                         },
+                        child: CarpenterTextArea(
+                          controller: _controller,
+                          focusNode: _textFocusNode,
+                          placeholder: 'Написать сообщение…',
+                          semanticLabel: 'Сообщение',
+                          minLines: 1,
+                          maxLines: 4,
+                          presentation: CarpenterFieldPresentation.seamless,
+                          availability: widget.view.busy
+                              ? FieldAvailability.disabled
+                              : FieldAvailability.enabled,
+                          onChanged: (value) {
+                            setState(() {});
+                            widget.onTextChanged(value);
+                          },
+                        ),
                       ),
                     ),
-                  ),
-                  if (_canSend) _sendControl() else _recordingControl(),
-                ],
+                    if (_canSend) _sendControl() else _recordingControl(),
+                  ],
+                ),
               ),
             ),
           ],
@@ -182,66 +200,55 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
     );
   }
 
-  Widget _sendControl() => CarpenterPopover(
-    open: _sendMenuOpen,
-    onOpenChanged: (value) => setState(() => _sendMenuOpen = value),
-    content: CarpenterMenu(
-      semanticLabel: 'Варианты отправки',
-      onDismissRequested: () => setState(() => _sendMenuOpen = false),
-      items: [
-        CarpenterMenuItem(
-          action: CarpenterActionDescriptor(
-            id: 'send-ordinary',
-            label: 'Обычное',
-            icon: GravityIcons.paperPlane,
-            onInvoke: () => _send(CarpenterSendMode.ordinary),
+  Widget _sendControl() => Semantics(
+    customSemanticsActions: {
+      const CustomSemanticsAction(label: 'Варианты отправки'): () =>
+          setState(() => _sendMenuOpen = true),
+    },
+    child: CarpenterPopover(
+      open: _sendMenuOpen,
+      onOpenChanged: (value) => setState(() => _sendMenuOpen = value),
+      content: CarpenterMenu(
+        semanticLabel: 'Варианты отправки',
+        onDismissRequested: () => setState(() => _sendMenuOpen = false),
+        items: [
+          CarpenterMenuItem(
+            action: CarpenterActionDescriptor(
+              id: 'send-ordinary',
+              label: 'Обычное',
+              icon: GravityIcons.paperPlane,
+              onInvoke: () => _send(CarpenterSendMode.ordinary),
+            ),
           ),
-        ),
-        CarpenterMenuItem(
-          action: CarpenterActionDescriptor(
-            id: 'send-important',
-            label: 'Важное',
-            icon: GravityIcons.exclamationShape,
-            colorRole: ActionColorRole.danger,
-            onInvoke: () => _send(CarpenterSendMode.important),
+          CarpenterMenuItem(
+            action: CarpenterActionDescriptor(
+              id: 'send-important',
+              label: 'Важное',
+              icon: GravityIcons.exclamationShape,
+              colorRole: ActionColorRole.danger,
+              onInvoke: () => _send(CarpenterSendMode.important),
+            ),
           ),
-        ),
-        CarpenterMenuItem(
-          action: CarpenterActionDescriptor(
-            id: 'send-requires-answer',
-            label: 'Требует ответа',
-            icon: GravityIcons.circleQuestion,
-            colorRole: ActionColorRole.danger,
-            onInvoke: () => _send(CarpenterSendMode.requiresAnswer),
+          CarpenterMenuItem(
+            action: CarpenterActionDescriptor(
+              id: 'send-requires-answer',
+              label: 'Требует ответа',
+              icon: GravityIcons.circleQuestion,
+              colorRole: ActionColorRole.danger,
+              onInvoke: () => _send(CarpenterSendMode.requiresAnswer),
+            ),
           ),
-        ),
-      ],
-    ),
-    anchorActivates: false,
-    anchor: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        CarpenterIconButton(
-          icon: GravityIcons.paperPlane,
-          semanticLabel: 'Отправить',
-          onPressed: () => _send(CarpenterSendMode.ordinary),
-          prominence: ActionProminence.high,
-          shape: const CarpenterShape(
-            start: ShapeRole.rounded,
-            end: ShapeRole.none,
-          ),
-        ),
-        CarpenterIconButton(
-          icon: GravityIcons.caretDown,
-          semanticLabel: 'Варианты отправки',
-          onPressed: () => setState(() => _sendMenuOpen = true),
-          prominence: ActionProminence.high,
-          shape: const CarpenterShape(
-            start: ShapeRole.none,
-            end: ShapeRole.rounded,
-          ),
-        ),
-      ],
+        ],
+      ),
+      anchorActivates: false,
+      anchor: CarpenterIconButton(
+        icon: GravityIcons.paperPlane,
+        semanticLabel: 'Отправить',
+        onPressed: () => _send(CarpenterSendMode.ordinary),
+        onLongPress: () => setState(() => _sendMenuOpen = true),
+        onSecondaryTap: () => setState(() => _sendMenuOpen = true),
+        prominence: ActionProminence.high,
+      ),
     ),
   );
 

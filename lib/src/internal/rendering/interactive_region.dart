@@ -14,6 +14,8 @@ final class InteractiveRegion extends StatefulWidget {
     required this.onActivate,
     required this.builder,
     this.onDoubleActivate,
+    this.onLongActivate,
+    this.onSecondaryActivate,
     this.activationBlocked = false,
     this.handlesActivationShortcuts = true,
     this.includeFocusSemantics = true,
@@ -24,6 +26,8 @@ final class InteractiveRegion extends StatefulWidget {
 
   final VoidCallback? onActivate;
   final VoidCallback? onDoubleActivate;
+  final VoidCallback? onLongActivate;
+  final VoidCallback? onSecondaryActivate;
   final InteractiveRegionBuilder builder;
   final bool activationBlocked;
   final bool handlesActivationShortcuts;
@@ -44,7 +48,10 @@ final class _InteractiveRegionState extends State<InteractiveRegion> {
   bool _pointerFocus = false;
 
   bool get _enabled =>
-      widget.onActivate != null || widget.onDoubleActivate != null;
+      widget.onActivate != null ||
+      widget.onDoubleActivate != null ||
+      widget.onLongActivate != null ||
+      widget.onSecondaryActivate != null;
   bool get _interactive => _enabled && !widget.activationBlocked;
 
   Set<WidgetState> get _states => <WidgetState>{
@@ -87,6 +94,14 @@ final class _InteractiveRegionState extends State<InteractiveRegion> {
 
   void _doubleActivate() {
     if (_interactive) widget.onDoubleActivate?.call();
+  }
+
+  void _longActivate() {
+    if (_interactive) widget.onLongActivate?.call();
+  }
+
+  void _secondaryActivate() {
+    if (_interactive) widget.onSecondaryActivate?.call();
   }
 
   @override
@@ -167,6 +182,12 @@ final class _InteractiveRegionState extends State<InteractiveRegion> {
                   : null,
               onDoubleTap: _interactive && widget.onDoubleActivate != null
                   ? _doubleActivate
+                  : null,
+              onLongPress: _interactive && widget.onLongActivate != null
+                  ? _longActivate
+                  : null,
+              onSecondaryTap: _interactive && widget.onSecondaryActivate != null
+                  ? _secondaryActivate
                   : null,
               child: widget.builder(
                 context,

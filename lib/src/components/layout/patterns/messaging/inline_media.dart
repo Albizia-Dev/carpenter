@@ -65,6 +65,13 @@ final class CarpenterInlineMedia extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.small);
+    if (_isVisual) {
+      final action = _visualStateAction(context);
+      return Stack(
+        alignment: Alignment.center,
+        children: [_presentation(context), ?action],
+      );
+    }
     return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.surface.subtle,
@@ -98,6 +105,11 @@ final class CarpenterInlineMedia extends StatelessWidget {
   bool get _hasPlayback =>
       view.kind == CarpenterMediaKind.audio ||
       view.kind == CarpenterMediaKind.voice;
+
+  bool get _isVisual =>
+      view.kind == CarpenterMediaKind.image ||
+      view.kind == CarpenterMediaKind.video ||
+      view.kind == CarpenterMediaKind.videoCircle;
 
   Widget _presentation(BuildContext context) => switch (view.kind) {
     CarpenterMediaKind.image => _visualPreview(context, blurred: true),
@@ -137,16 +149,70 @@ final class CarpenterInlineMedia extends StatelessWidget {
     return null;
   }
 
+  Widget? _visualStateAction(BuildContext context) {
+    if (view.loadState == CarpenterMediaLoadState.originalLoading) {
+      return CarpenterLoader(semanticLabel: 'Загрузка: ${view.label}');
+    }
+    if (view.loadState == CarpenterMediaLoadState.failed) {
+      return CarpenterIconButton(
+        icon: GravityIcons.arrowRotateRight,
+        semanticLabel: 'Повторить загрузку: ${view.label}',
+        onPressed: onLoadRequested,
+        colorRole: ActionColorRole.warning,
+        prominence: ActionProminence.filled,
+        size: ControlSize.large,
+      );
+    }
+    if (_visualNeedsLoad) {
+      return CarpenterIconButton(
+        icon: GravityIcons.arrowDownToLine,
+        semanticLabel: 'Загрузить: ${view.label}',
+        onPressed: onLoadRequested,
+        colorRole: ActionColorRole.primary,
+        prominence: ActionProminence.filled,
+        size: ControlSize.large,
+      );
+    }
+    return null;
+  }
+
+  bool get _visualNeedsLoad =>
+      view.loadState == CarpenterMediaLoadState.previewReady &&
+      view.originalBytes == null &&
+      onLoadRequested != null;
+
   Widget _visualPreview(BuildContext context, {required bool blurred}) {
     final compact = _visualContent(context, blurred: blurred);
+    if (_visualNeedsLoad) {
+      return Semantics(
+        button: true,
+        label: 'Загрузить: ${view.label}',
+        onTap: onLoadRequested,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: onLoadRequested,
+          child: compact,
+        ),
+      );
+    }
     if (onFocusChanged == null) return compact;
     return CarpenterDialog(
       open: view.focused,
       onOpenChanged: onFocusChanged!,
       title: view.label,
       semanticLabel: 'Просмотр ${view.label}',
-      dismissPolicy: DialogDismissPolicy.outsideAndEscape,
-      content: _visualContent(context, blurred: false, expanded: true),
+      dismissPolicy: DialogDismissPolicy.escapeOnly,
+      presentation: CarpenterDialogPresentation.immersive,
+      content: InteractiveViewer(
+        minScale: .5,
+        maxScale: 5,
+        boundaryMargin: EdgeInsets.all(
+          context.units(CarpenterTheme.of(context).spacing.large),
+        ),
+        child: Center(
+          child: _visualContent(context, blurred: false, expanded: true),
+        ),
+      ),
       child: Semantics(
         button: true,
         label: 'Открыть ${view.label}',
@@ -203,13 +269,11 @@ final class CarpenterInlineMedia extends StatelessWidget {
     final ratio =
         view.aspectRatio ??
         (view.kind == CarpenterMediaKind.video ? 16 / 9 : 4 / 3);
-    final maxWidth = context.units(
-      expanded
-          ? theme.sizes.overlayDialogMaxWidth
-          : theme.sizes.layoutSecondary,
-    );
+    final maxWidth = expanded
+        ? MediaQuery.sizeOf(context).width
+        : context.units(theme.sizes.layoutSecondary);
     final maxHeight = expanded
-        ? MediaQuery.sizeOf(context).height * .8
+        ? MediaQuery.sizeOf(context).height
         : context.units(theme.sizes.layoutNavigationSide);
     final visual = ClipRRect(
       borderRadius: BorderRadius.circular(
@@ -398,14 +462,16 @@ final class CarpenterInlineMedia extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    content,
+                    IgnorePointer(child: content),
                     Center(
-                      child: CarpenterIcon(
-                        view.playing
-                            ? GravityIcons.circlePauseFill
-                            : GravityIcons.circlePlayFill,
-                        size: IconSize.large,
-                        colorRole: ContentColorRole.inverse,
+                      child: IgnorePointer(
+                        child: CarpenterIcon(
+                          view.playing
+                              ? GravityIcons.circlePauseFill
+                              : GravityIcons.circlePlayFill,
+                          size: IconSize.large,
+                          colorRole: ContentColorRole.inverse,
+                        ),
                       ),
                     ),
                   ],

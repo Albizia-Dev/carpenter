@@ -33,7 +33,13 @@ void main() {
 
     expect(find.byType(ImageFiltered), findsOneWidget);
     expect(find.byType(Image), findsOneWidget);
-    await tester.tap(find.bySemanticsLabel('Загрузить оригинал: Фото'));
+    final action = find.bySemanticsLabel('Загрузить: Фото');
+    expect(action, findsWidgets);
+    expect(
+      tester.getCenter(action.last).dx,
+      closeTo(tester.getCenter(find.byType(ImageFiltered)).dx, 1),
+    );
+    await tester.tap(action.last);
     expect(loads, 1);
   });
 
@@ -154,9 +160,9 @@ void main() {
         find.bySemanticsLabel(RegExp(r'^Воспроизвести: Кружок')),
         findsOneWidget,
       );
-      await tester.tap(
-        find.bySemanticsLabel(RegExp(r'^Воспроизвести: Кружок')),
-      );
+      final circle = find.byKey(const ValueKey('inline-media-circle-circle'));
+      final rect = tester.getRect(circle);
+      await tester.tapAt(Offset(rect.left + 4, rect.center.dy));
       await tester.pumpAndSettle();
       expect(plays, 1);
       expect(focused, isFalse);
@@ -219,7 +225,7 @@ void main() {
     );
   });
 
-  testWidgets('visual media preserves metadata ratio and opens centered', (
+  testWidgets('visual media preserves metadata ratio and opens immersive', (
     tester,
   ) async {
     var focused = false;
@@ -257,6 +263,12 @@ void main() {
     expect(focused, isTrue);
     expect(find.byKey(const ValueKey('expanded-portrait')), findsOneWidget);
     expect(find.byType(CarpenterDialog), findsOneWidget);
+    expect(find.byType(InteractiveViewer), findsOneWidget);
+    expect(
+      tester.getSize(find.byType(InteractiveViewer)).height,
+      greaterThan(500),
+    );
+    expect(find.bySemanticsLabel('Закрыть просмотр'), findsOneWidget);
   });
 
   testWidgets('file preview exposes metadata and opens as one action', (
@@ -323,7 +335,7 @@ void main() {
     );
     expect(find.textContaining('Загружаем оригинал'), findsNothing);
     final loader = tester.widget<CarpenterLoader>(find.byType(CarpenterLoader));
-    expect(loader.semanticLabel, 'Загрузка оригинала: Фото');
+    expect(loader.semanticLabel, 'Загрузка: Фото');
   });
 }
 

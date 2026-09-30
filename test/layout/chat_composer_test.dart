@@ -40,7 +40,7 @@ void main() {
     expect(sends, [CarpenterSendMode.ordinary]);
   });
 
-  testWidgets('visible options expose working important and answer modes', (
+  testWidgets('long press exposes important and answer modes without a split', (
     tester,
   ) async {
     final sends = <CarpenterSendMode>[];
@@ -58,8 +58,8 @@ void main() {
       ),
     );
 
-    expect(find.bySemanticsLabel('Варианты отправки'), findsOneWidget);
-    await tester.tap(find.bySemanticsLabel('Варианты отправки'));
+    expect(find.byType(CarpenterIconButton), findsNWidgets(2));
+    await tester.longPress(find.bySemanticsLabel('Отправить'));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Важное'));
     expect(sends, [CarpenterSendMode.important]);
@@ -114,6 +114,38 @@ void main() {
       find.byKey(const ValueKey('recording-control-button')),
     );
     expect(record.width, greaterThan(record.height));
+  });
+
+  testWidgets('composer focus belongs to the complete input surface', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        CarpenterChatComposer(
+          view: const CarpenterComposerView(text: 'Текст'),
+          recording: const CarpenterRecordingView(
+            kind: CarpenterRecordingKind.voice,
+            phase: CarpenterRecordingPhase.idle,
+          ),
+          onTextChanged: (_) {},
+          onSendRequested: (_) {},
+          onAttachmentsRequested: () {},
+        ),
+      ),
+    );
+
+    await tester.tap(find.bySemanticsLabel('Сообщение'));
+    await tester.pump();
+
+    final attachCenter = tester.getCenter(
+      find.bySemanticsLabel('Прикрепить файлы'),
+    );
+    final sendCenter = tester.getCenter(find.bySemanticsLabel('Отправить'));
+    expect((attachCenter.dy - sendCenter.dy).abs(), lessThanOrEqualTo(2));
+    expect(
+      find.byKey(const ValueKey('composer-input-surface')),
+      findsOneWidget,
+    );
   });
 }
 

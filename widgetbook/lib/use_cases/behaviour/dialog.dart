@@ -41,9 +41,11 @@ Widget _playground(BuildContext context) {
     presentation: context.knobs.object.segmented(
       label: 'Layout · Presentation',
       options: CarpenterDialogPresentation.values,
-      labelBuilder: (value) => value == CarpenterDialogPresentation.editor
-          ? 'Editor panel / page'
-          : 'Centered',
+      labelBuilder: (value) => switch (value) {
+        CarpenterDialogPresentation.centered => 'Centered',
+        CarpenterDialogPresentation.editor => 'Editor panel / page',
+        CarpenterDialogPresentation.immersive => 'Immersive viewer',
+      },
     ),
     title: title,
     content: content,

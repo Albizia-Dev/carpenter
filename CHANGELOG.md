@@ -1,3 +1,14 @@
+## 0.6.13
+
+### Messenger media and composer surfaces
+
+- Make the complete video-circle surface interactive and show an explicit
+  download action over blurred visual previews.
+- Present images in a viewport-filling, zoomable viewer and let standalone
+  media own the message surface without a redundant outer bubble.
+- Keep the composer as one aligned focus surface and expose alternate send
+  modes from a long press or secondary click on the send button.
+
 ## 0.6.12
 
 ### Recording pointer continuity

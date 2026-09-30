@@ -208,8 +208,9 @@ final class CarpenterFieldShell extends StatelessWidget {
         _FieldControlTarget(
           fixedHeight: fixedHeight,
           minimumTarget: context.units(theme.sizes.minimumTarget),
-          child: FocusRing(
-            visible: states.contains(WidgetState.focused),
+          child: _FieldControlFrame(
+            presentation: presentation,
+            focused: states.contains(WidgetState.focused),
             borderRadius: borderRadius,
             child: AnimatedContainer(
               duration: theme.motion.transitionDuration(context),
@@ -258,6 +259,30 @@ final class CarpenterFieldShell extends StatelessWidget {
           Text(supportingText, style: supportingStyle),
         ],
       ],
+    );
+  }
+}
+
+final class _FieldControlFrame extends StatelessWidget {
+  const _FieldControlFrame({
+    required this.presentation,
+    required this.focused,
+    required this.borderRadius,
+    required this.child,
+  });
+
+  final CarpenterFieldPresentation presentation;
+  final bool focused;
+  final BorderRadius borderRadius;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (presentation == CarpenterFieldPresentation.seamless) return child;
+    return FocusRing(
+      visible: focused,
+      borderRadius: borderRadius,
+      child: child,
     );
   }
 }

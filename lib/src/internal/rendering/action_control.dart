@@ -27,6 +27,8 @@ final class ActionControl extends StatelessWidget {
     required this.iconOnly,
     required this.childBuilder,
     this.semanticHint,
+    this.onLongInvoke,
+    this.onSecondaryInvoke,
     this.toggled,
     this.focusNode,
     this.autofocus = false,
@@ -36,6 +38,8 @@ final class ActionControl extends StatelessWidget {
   final String? semanticHint;
   final bool? toggled;
   final VoidCallback? onInvoke;
+  final VoidCallback? onLongInvoke;
+  final VoidCallback? onSecondaryInvoke;
   final ActionColorRole colorRole;
   final ActionProminence prominence;
   final ControlSize size;
@@ -87,12 +91,15 @@ final class ActionControl extends StatelessWidget {
       value: _running ? 'running' : null,
       liveRegion: _running,
       onTap: _running ? null : onInvoke,
+      onLongPress: _running ? null : onLongInvoke,
       excludeSemantics: true,
       child: LayoutBuilder(
         builder: (context, constraints) {
           final fillTightParent = !iconOnly && constraints.hasTightWidth;
           return InteractiveRegion(
             onActivate: onInvoke,
+            onLongActivate: onLongInvoke,
+            onSecondaryActivate: onSecondaryInvoke,
             activationBlocked: _running,
             focusNode: focusNode,
             autofocus: autofocus,

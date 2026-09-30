@@ -23,6 +23,8 @@ final class CarpenterIconButton extends StatelessWidget {
     required this.semanticLabel,
     this.onPressed,
     this.onInvoke,
+    this.onLongPress,
+    this.onSecondaryTap,
     this.colorRole = ActionColorRole.neutral,
     this.prominence = ActionProminence.normal,
     this.size = ControlSize.medium,
@@ -55,6 +57,8 @@ final class CarpenterIconButton extends StatelessWidget {
        semanticLabel = action.effectiveSemanticLabel,
        onPressed = action.onInvoke,
        onInvoke = null,
+       onLongPress = null,
+       onSecondaryTap = null,
        colorRole = action.colorRole,
        toggled = action.toggled,
        shortcut = action.shortcut,
@@ -75,6 +79,12 @@ final class CarpenterIconButton extends StatelessWidget {
 
   /// Compatibility alias for older Carpenter call sites.
   final VoidCallback? onInvoke;
+
+  /// Optional alternate action invoked by a long press over the same hit area.
+  final VoidCallback? onLongPress;
+
+  /// Optional alternate action invoked by a secondary pointer click.
+  final VoidCallback? onSecondaryTap;
 
   /// Semantic action or selection color resolved from the current Carpenter
   /// theme.
@@ -121,6 +131,8 @@ final class CarpenterIconButton extends StatelessWidget {
       semanticLabel: semanticLabel,
       semanticHint: _semanticHint,
       onInvoke: _effectiveOnPressed,
+      onLongInvoke: onLongPress,
+      onSecondaryInvoke: onSecondaryTap,
       colorRole: colorRole,
       toggled: toggled,
       prominence: prominence,
