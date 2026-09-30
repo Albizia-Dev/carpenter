@@ -34,6 +34,7 @@ final class CarpenterMessageTimeline extends StatelessWidget {
     this.avatarBuilder,
     this.loadingOlder = false,
     this.mediaPreviewBuilder,
+    this.mediaExpandedPreviewBuilder,
     this.onMediaLoadRequested,
     this.onMediaPlayPauseRequested,
     this.onMediaSeekRequested,
@@ -56,6 +57,7 @@ final class CarpenterMessageTimeline extends StatelessWidget {
   final CarpenterMessageAvatarBuilder? avatarBuilder;
   final bool loadingOlder;
   final CarpenterMediaPreviewBuilder? mediaPreviewBuilder;
+  final CarpenterMediaExpandedPreviewBuilder? mediaExpandedPreviewBuilder;
   final ValueChanged<String>? onMediaLoadRequested;
   final ValueChanged<String>? onMediaPlayPauseRequested;
   final CarpenterMediaSeekRequested? onMediaSeekRequested;
@@ -165,6 +167,7 @@ final class CarpenterMessageTimeline extends StatelessWidget {
                 ? null
                 : (link) => onLinkInvoked!(cluster[index].id, link),
             mediaPreviewBuilder: mediaPreviewBuilder,
+            mediaExpandedPreviewBuilder: mediaExpandedPreviewBuilder,
             onMediaLoadRequested: onMediaLoadRequested,
             onMediaPlayPauseRequested: onMediaPlayPauseRequested,
             onMediaSeekRequested: onMediaSeekRequested,

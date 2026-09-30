@@ -216,21 +216,28 @@ void main() {
   testWidgets('visual media preserves metadata ratio and expands in popover', (
     tester,
   ) async {
-    bool? focused;
+    var focused = false;
     await tester.pumpWidget(
       _host(
-        CarpenterInlineMedia(
-          view: const CarpenterMediaView(
-            id: 'portrait',
-            kind: CarpenterMediaKind.image,
-            label: 'Портрет.jpg',
-            byteLength: 1,
-            loadState: CarpenterMediaLoadState.ready,
-            pixelWidth: 900,
-            pixelHeight: 1600,
+        StatefulBuilder(
+          builder: (context, setState) => CarpenterInlineMedia(
+            view: CarpenterMediaView(
+              id: 'portrait',
+              kind: CarpenterMediaKind.image,
+              label: 'Портрет.jpg',
+              byteLength: 1,
+              loadState: CarpenterMediaLoadState.ready,
+              pixelWidth: 900,
+              pixelHeight: 1600,
+              focused: focused,
+            ),
+            preview: const ColoredBox(color: Color(0xff223344)),
+            expandedPreview: const ColoredBox(
+              key: ValueKey('expanded-portrait'),
+              color: Color(0xff556677),
+            ),
+            onFocusChanged: (value) => setState(() => focused = value),
           ),
-          preview: const ColoredBox(color: Color(0xff223344)),
-          onFocusChanged: (value) => focused = value,
         ),
       ),
     );
@@ -242,6 +249,7 @@ void main() {
     await tester.tap(find.bySemanticsLabel('Открыть Портрет.jpg'));
     await tester.pumpAndSettle();
     expect(focused, isTrue);
+    expect(find.byKey(const ValueKey('expanded-portrait')), findsOneWidget);
   });
 
   testWidgets('file preview exposes metadata and opens as one action', (

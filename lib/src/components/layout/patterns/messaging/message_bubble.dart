@@ -29,6 +29,7 @@ final class CarpenterMessageBubble extends StatefulWidget {
     this.onReplyPreviewInvoked,
     this.onLinkInvoked,
     this.mediaPreviewBuilder,
+    this.mediaExpandedPreviewBuilder,
     this.onMediaLoadRequested,
     this.onMediaPlayPauseRequested,
     this.onMediaSeekRequested,
@@ -50,6 +51,7 @@ final class CarpenterMessageBubble extends StatefulWidget {
   /// Opens a URL found in the visible message body.
   final ValueChanged<Uri>? onLinkInvoked;
   final CarpenterMediaPreviewBuilder? mediaPreviewBuilder;
+  final CarpenterMediaExpandedPreviewBuilder? mediaExpandedPreviewBuilder;
   final ValueChanged<String>? onMediaLoadRequested;
   final ValueChanged<String>? onMediaPlayPauseRequested;
   final CarpenterMediaSeekRequested? onMediaSeekRequested;
@@ -311,6 +313,9 @@ final class _CarpenterMessageBubbleState extends State<CarpenterMessageBubble> {
                                       context,
                                       media,
                                     ),
+                                    expandedPreview: widget
+                                        .mediaExpandedPreviewBuilder
+                                        ?.call(context, media),
                                     onLoadRequested:
                                         widget.onMediaLoadRequested == null
                                         ? null

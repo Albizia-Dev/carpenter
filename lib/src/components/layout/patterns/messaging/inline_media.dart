@@ -18,6 +18,8 @@ import 'messaging_models.dart';
 
 typedef CarpenterMediaPreviewBuilder =
     Widget Function(BuildContext context, CarpenterMediaView media);
+typedef CarpenterMediaExpandedPreviewBuilder =
+    Widget? Function(BuildContext context, CarpenterMediaView media);
 typedef CarpenterMediaSeekRequested =
     void Function(String mediaId, Duration position);
 typedef CarpenterMediaSpeedChanged =
@@ -42,6 +44,7 @@ final class CarpenterInlineMedia extends StatelessWidget {
     super.key,
     required this.view,
     this.preview,
+    this.expandedPreview,
     this.onLoadRequested,
     this.onPlayPauseRequested,
     this.onSeekRequested,
@@ -51,6 +54,7 @@ final class CarpenterInlineMedia extends StatelessWidget {
 
   final CarpenterMediaView view;
   final Widget? preview;
+  final Widget? expandedPreview;
   final VoidCallback? onLoadRequested;
   final VoidCallback? onPlayPauseRequested;
   final ValueChanged<Duration>? onSeekRequested;
@@ -92,7 +96,6 @@ final class CarpenterInlineMedia extends StatelessWidget {
   }
 
   bool get _hasPlayback =>
-      view.kind == CarpenterMediaKind.video ||
       view.kind == CarpenterMediaKind.audio ||
       view.kind == CarpenterMediaKind.voice;
 
@@ -159,6 +162,7 @@ final class CarpenterInlineMedia extends StatelessWidget {
     final theme = CarpenterTheme.of(context);
     final bytes = view.originalBytes ?? view.previewBytes;
     final content =
+        (expanded ? expandedPreview : null) ??
         preview ??
         (bytes == null
             ? null
@@ -201,25 +205,26 @@ final class CarpenterInlineMedia extends StatelessWidget {
     final maxHeight = expanded
         ? MediaQuery.sizeOf(context).height * .8
         : context.units(theme.sizes.layoutNavigationSide);
+    final visual = ClipRRect(
+      borderRadius: BorderRadius.circular(
+        context.units(theme.shapes.radius(ShapeRole.rounded)),
+      ),
+      child: shouldBlur
+          ? ImageFiltered(
+              imageFilter: ImageFilter.blur(
+                sigmaX: context.units(theme.spacing.medium),
+                sigmaY: context.units(theme.spacing.medium),
+              ),
+              child: content,
+            )
+          : content,
+    );
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: maxWidth, maxHeight: maxHeight),
       child: AspectRatio(
         key: ValueKey('inline-media-aspect-${view.id}'),
         aspectRatio: ratio.clamp(.35, 3.0),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(
-            context.units(theme.shapes.radius(ShapeRole.rounded)),
-          ),
-          child: shouldBlur
-              ? ImageFiltered(
-                  imageFilter: ImageFilter.blur(
-                    sigmaX: context.units(theme.spacing.medium),
-                    sigmaY: context.units(theme.spacing.medium),
-                  ),
-                  child: content,
-                )
-              : content,
-        ),
+        child: visual,
       ),
     );
   }

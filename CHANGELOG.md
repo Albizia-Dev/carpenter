@@ -1,3 +1,12 @@
+## 0.6.8
+
+### Messenger expanded media
+
+- Let hosts provide a dedicated expanded visual-media preview so compact
+  posters and full players no longer share one mounted widget.
+- Keep host-supplied media dimensions intact and move video playback controls
+  into the real expanded player.
+
 ## 0.6.7
 
 ### Messenger media integrity
