@@ -1,3 +1,10 @@
+## 0.6.12
+
+### Recording pointer continuity
+
+- Preserve release-to-send when Flutter cancels the original pointer sequence
+  while the host transitions from idle into its recording state.
+
 ## 0.6.11
 
 ### Messenger recording and media interaction

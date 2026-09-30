@@ -131,16 +131,6 @@ final class _CarpenterRecordingControlState
     _started = false;
   }
 
-  void _cancelPointer() {
-    _holdTimer?.cancel();
-    _origin = null;
-    if (_started && !_locked && !_cancelled) {
-      widget.onCancel?.call(widget.view.kind);
-    }
-    _started = false;
-    _cancelled = true;
-  }
-
   @override
   Widget build(BuildContext context) {
     final view = widget.view;
@@ -187,7 +177,7 @@ final class _CarpenterRecordingControlState
           onPointerDown: _pointerDown,
           onPointerMove: (event) => _pointerMove(context, event),
           onPointerUp: (_) => _finishPointer(),
-          onPointerCancel: (_) => _cancelPointer(),
+          onPointerCancel: (_) => _finishPointer(),
           child: TweenAnimationBuilder<double>(
             duration: theme.motion.transitionDuration(context),
             curve: theme.motion.stateCurve,
