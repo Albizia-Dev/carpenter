@@ -1,3 +1,13 @@
+## 0.6.7
+
+### Messenger media integrity
+
+- Preserve image and video aspect ratios and expose a bare, dismissible
+  enlarged preview instead of forcing media into a fixed crop.
+- Keep playback controls inside one media surface, render an honest timeline
+  when waveform samples are unavailable, and make file cards direct actions.
+- Add optional pixel dimensions to the controlled media view model.
+
 ## 0.6.6
 
 ### Messenger links

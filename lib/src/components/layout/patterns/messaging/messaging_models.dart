@@ -117,6 +117,8 @@ final class CarpenterMediaView {
     this.playbackRate = 1,
     this.waveform = const [],
     this.focused = false,
+    this.pixelWidth,
+    this.pixelHeight,
     this.previewBytes,
     this.originalBytes,
   });
@@ -132,8 +134,19 @@ final class CarpenterMediaView {
   final double playbackRate;
   final List<int> waveform;
   final bool focused;
+  final int? pixelWidth;
+  final int? pixelHeight;
   final Uint8List? previewBytes;
   final Uint8List? originalBytes;
+
+  double? get aspectRatio {
+    final width = pixelWidth;
+    final height = pixelHeight;
+    if (width == null || height == null || width <= 0 || height <= 0) {
+      return null;
+    }
+    return width / height;
+  }
 
   bool get requiresExplicitOriginalLoad =>
       byteLength > carpenterEagerMediaLimitBytes &&

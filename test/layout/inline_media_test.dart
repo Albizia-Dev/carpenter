@@ -85,7 +85,7 @@ void main() {
       expect(find.text('−15 с'), findsNothing);
       expect(find.text('+15 с'), findsNothing);
       expect(
-        tester.getCenter(find.text('1.0×')).dy,
+        tester.getCenter(find.text('1×')).dy,
         greaterThan(
           tester
               .getBottomLeft(find.byKey(const ValueKey('media-waveform-audio')))
@@ -93,7 +93,7 @@ void main() {
         ),
       );
       await tester.tap(find.bySemanticsLabel('Воспроизвести: Аудио'));
-      await tester.tap(find.text('1.0×').last);
+      await tester.tap(find.text('1×').last);
       expect(plays, 1);
       expect(speed, 1.25);
     },
@@ -185,23 +185,88 @@ void main() {
     expect(requested, const Duration(seconds: 30));
   });
 
-  testWidgets('file preview exposes type and byte metadata', (tester) async {
+  testWidgets('missing waveform renders an honest seek timeline', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       _host(
         const CarpenterInlineMedia(
           view: CarpenterMediaView(
+            id: 'legacy-audio',
+            kind: CarpenterMediaKind.audio,
+            label: 'Запись.webm',
+            byteLength: 1,
+            loadState: CarpenterMediaLoadState.ready,
+            duration: Duration(seconds: 17),
+          ),
+        ),
+      ),
+    );
+
+    expect(
+      find.byKey(const ValueKey('media-timeline-legacy-audio')),
+      findsOneWidget,
+    );
+    expect(
+      find.byKey(const ValueKey('media-waveform-legacy-audio')),
+      findsNothing,
+    );
+  });
+
+  testWidgets('visual media preserves metadata ratio and expands in popover', (
+    tester,
+  ) async {
+    bool? focused;
+    await tester.pumpWidget(
+      _host(
+        CarpenterInlineMedia(
+          view: const CarpenterMediaView(
+            id: 'portrait',
+            kind: CarpenterMediaKind.image,
+            label: 'Портрет.jpg',
+            byteLength: 1,
+            loadState: CarpenterMediaLoadState.ready,
+            pixelWidth: 900,
+            pixelHeight: 1600,
+          ),
+          preview: const ColoredBox(color: Color(0xff223344)),
+          onFocusChanged: (value) => focused = value,
+        ),
+      ),
+    );
+
+    final ratio = tester.widget<AspectRatio>(
+      find.byKey(const ValueKey('inline-media-aspect-portrait')),
+    );
+    expect(ratio.aspectRatio, closeTo(900 / 1600, .001));
+    await tester.tap(find.bySemanticsLabel('Открыть Портрет.jpg'));
+    await tester.pumpAndSettle();
+    expect(focused, isTrue);
+  });
+
+  testWidgets('file preview exposes metadata and opens as one action', (
+    tester,
+  ) async {
+    var opens = 0;
+    await tester.pumpWidget(
+      _host(
+        CarpenterInlineMedia(
+          view: const CarpenterMediaView(
             id: 'file',
             kind: CarpenterMediaKind.file,
             label: 'Смета.pdf',
             byteLength: 2048,
             loadState: CarpenterMediaLoadState.ready,
           ),
+          onLoadRequested: () => opens++,
         ),
       ),
     );
 
     expect(find.text('PDF'), findsOneWidget);
     expect(find.text('2 КБ'), findsOneWidget);
+    await tester.tap(find.bySemanticsLabel('Открыть Смета.pdf'));
+    expect(opens, 1);
   });
 
   testWidgets('media load states use compact top-right actions', (

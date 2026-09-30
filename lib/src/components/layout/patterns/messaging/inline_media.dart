@@ -61,39 +61,33 @@ final class CarpenterInlineMedia extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final gap = context.units(theme.spacing.small);
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        DecoratedBox(
-          decoration: BoxDecoration(
-            color: theme.surface.subtle,
-            borderRadius: BorderRadius.circular(
-              context.units(theme.shapes.radius(ShapeRole.rounded)),
-            ),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(gap),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: theme.surface.subtle,
+        borderRadius: BorderRadius.circular(
+          context.units(theme.shapes.radius(ShapeRole.rounded)),
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(gap),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Stack(
               children: [
-                Stack(
-                  children: [
-                    _presentation(context),
-                    if (_loadAction(context) case final action?)
-                      PositionedDirectional(top: 0, end: 0, child: action),
-                  ],
-                ),
+                _presentation(context),
+                if (_loadAction(context) case final action?)
+                  PositionedDirectional(top: 0, end: 0, child: action),
               ],
             ),
-          ),
+            if (_hasPlayback) ...[
+              SizedBox(height: context.units(theme.spacing.xsmall)),
+              _playbackControls(context),
+            ],
+          ],
         ),
-        if (_hasPlayback) ...[
-          SizedBox(height: context.units(theme.spacing.xsmall)),
-          _playbackControls(context),
-        ],
-      ],
+      ),
     );
   }
 
@@ -141,6 +135,27 @@ final class CarpenterInlineMedia extends StatelessWidget {
   }
 
   Widget _visualPreview(BuildContext context, {required bool blurred}) {
+    final compact = _visualContent(context, blurred: blurred);
+    if (onFocusChanged == null) return compact;
+    return CarpenterPopover(
+      open: view.focused,
+      onOpenChanged: onFocusChanged!,
+      anchorActivates: true,
+      presentation: CarpenterPopoverPresentation.bare,
+      anchor: Semantics(
+        button: true,
+        label: 'Открыть ${view.label}',
+        child: compact,
+      ),
+      content: _visualContent(context, blurred: false, expanded: true),
+    );
+  }
+
+  Widget _visualContent(
+    BuildContext context, {
+    required bool blurred,
+    bool expanded = false,
+  }) {
     final theme = CarpenterTheme.of(context);
     final bytes = view.originalBytes ?? view.previewBytes;
     final content =
@@ -149,7 +164,7 @@ final class CarpenterInlineMedia extends StatelessWidget {
             ? null
             : Image.memory(
                 bytes,
-                fit: BoxFit.cover,
+                fit: BoxFit.contain,
                 errorBuilder: (_, _, _) => ColoredBox(
                   color: theme.surface.base,
                   child: const Center(
@@ -175,22 +190,36 @@ final class CarpenterInlineMedia extends StatelessWidget {
         blurred &&
         view.loadState != CarpenterMediaLoadState.ready &&
         view.loadState != CarpenterMediaLoadState.originalLoading;
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(
-        context.units(theme.shapes.radius(ShapeRole.rounded)),
-      ),
-      child: SizedBox(
-        width: context.units(theme.sizes.layoutSecondary),
-        height: context.units(theme.sizes.tableColumn),
-        child: shouldBlur
-            ? ImageFiltered(
-                imageFilter: ImageFilter.blur(
-                  sigmaX: context.units(theme.spacing.medium),
-                  sigmaY: context.units(theme.spacing.medium),
-                ),
-                child: content,
-              )
-            : content,
+    final ratio =
+        view.aspectRatio ??
+        (view.kind == CarpenterMediaKind.video ? 16 / 9 : 4 / 3);
+    final maxWidth = context.units(
+      expanded
+          ? theme.sizes.overlayDialogMaxWidth
+          : theme.sizes.layoutSecondary,
+    );
+    final maxHeight = expanded
+        ? MediaQuery.sizeOf(context).height * .8
+        : context.units(theme.sizes.layoutNavigationSide);
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxWidth, maxHeight: maxHeight),
+      child: AspectRatio(
+        key: ValueKey('inline-media-aspect-${view.id}'),
+        aspectRatio: ratio.clamp(.35, 3.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(
+            context.units(theme.shapes.radius(ShapeRole.rounded)),
+          ),
+          child: shouldBlur
+              ? ImageFiltered(
+                  imageFilter: ImageFilter.blur(
+                    sigmaX: context.units(theme.spacing.medium),
+                    sigmaY: context.units(theme.spacing.medium),
+                  ),
+                  child: content,
+                )
+              : content,
+        ),
       ),
     );
   }
@@ -262,7 +291,11 @@ final class CarpenterInlineMedia extends StatelessWidget {
                       width: constraints.maxWidth,
                       height: waveformHeight,
                       child: CustomPaint(
-                        key: ValueKey('media-waveform-${view.id}'),
+                        key: ValueKey(
+                          view.waveform.isEmpty
+                              ? 'media-timeline-${view.id}'
+                              : 'media-waveform-${view.id}',
+                        ),
                         painter: _WaveformPainter(
                           samples: view.waveform,
                           color: theme.content.resolve(
@@ -360,7 +393,7 @@ final class CarpenterInlineMedia extends StatelessWidget {
   Widget _filePreview(BuildContext context) {
     final theme = CarpenterTheme.of(context);
     final extension = _extension(view.label);
-    return Row(
+    final content = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         CarpenterIcon(
@@ -393,6 +426,17 @@ final class CarpenterInlineMedia extends StatelessWidget {
           ),
         ),
       ],
+    );
+    if (onLoadRequested == null) return content;
+    return Semantics(
+      button: true,
+      label: 'Открыть ${view.label}',
+      onTap: onLoadRequested,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: onLoadRequested,
+        child: content,
+      ),
     );
   }
 
@@ -431,7 +475,7 @@ final class CarpenterInlineMedia extends StatelessWidget {
         if (onSpeedChanged != null) ...[
           SizedBox(width: gap),
           CarpenterButton.text(
-            label: '${view.playbackRate.toStringAsFixed(1)}×',
+            label: '${_playbackRate(view.playbackRate)}×',
             size: ControlSize.small,
             onPressed: () => onSpeedChanged!(
               CarpenterPlaybackSpeeds.next(view.playbackRate),
@@ -466,9 +510,31 @@ final class _WaveformPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final values = samples.isEmpty
-        ? List<int>.generate(32, (index) => 2 + (index * 5) % 7)
-        : samples;
+    if (samples.isEmpty) {
+      final center = size.height / 2;
+      final played = size.width * progress.clamp(0.0, 1.0);
+      final trackPaint = Paint()
+        ..color = color
+        ..strokeWidth = strokeWidth * 2
+        ..strokeCap = StrokeCap.round;
+      canvas.drawLine(
+        Offset(0, center),
+        Offset(size.width, center),
+        trackPaint,
+      );
+      if (played > 0) {
+        canvas.drawLine(
+          Offset(0, center),
+          Offset(played, center),
+          Paint()
+            ..color = playedColor
+            ..strokeWidth = strokeWidth * 2
+            ..strokeCap = StrokeCap.round,
+        );
+      }
+      return;
+    }
+    final values = samples;
     final slot = size.width / values.length;
     final maximum = values.fold<int>(
       1,
@@ -497,6 +563,10 @@ final class _WaveformPainter extends CustomPainter {
       oldDelegate.playedColor != playedColor ||
       oldDelegate.strokeWidth != strokeWidth;
 }
+
+String _playbackRate(double value) => value == value.roundToDouble()
+    ? value.toInt().toString()
+    : value.toStringAsFixed(2).replaceFirst(RegExp(r'0+$'), '');
 
 final class _CircularProgressPainter extends CustomPainter {
   const _CircularProgressPainter({
