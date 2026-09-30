@@ -1,3 +1,10 @@
+## 0.6.10
+
+### Messenger video-circle activation
+
+- Route a video-circle tap through one host action instead of firing playback
+  and focus callbacks together, preventing duplicate authorization requests.
+
 ## 0.6.9
 
 ### Messenger video circles

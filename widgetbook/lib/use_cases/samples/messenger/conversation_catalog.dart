@@ -276,7 +276,10 @@ class _MediaScenarioState extends State<_MediaScenario> {
           )
         : null,
     onLoadRequested: () {},
-    onPlayPauseRequested: () => setState(() => playing = !playing),
+    onPlayPauseRequested: () => setState(() {
+      playing = !playing;
+      if (widget.kind == CarpenterMediaKind.videoCircle) focused = true;
+    }),
     onSpeedChanged: (value) => setState(() => speed = value),
     onFocusChanged: (value) => setState(() => focused = value),
   );

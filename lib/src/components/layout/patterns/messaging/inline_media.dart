@@ -369,19 +369,21 @@ final class CarpenterInlineMedia extends StatelessWidget {
     final actionLabel = view.playing
         ? 'Пауза: ${view.label}'
         : 'Воспроизвести: ${view.label}';
+    void activate() {
+      if (onPlayPauseRequested case final play?) {
+        play();
+      } else if (!view.focused) {
+        onFocusChanged?.call(true);
+      }
+    }
+
     return Semantics(
       button: onPlayPauseRequested != null || onFocusChanged != null,
       label: '$actionLabel, ${_duration(view.position)}',
-      onTap: () {
-        onPlayPauseRequested?.call();
-        if (!view.focused) onFocusChanged?.call(true);
-      },
+      onTap: activate,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () {
-          onPlayPauseRequested?.call();
-          if (!view.focused) onFocusChanged?.call(true);
-        },
+        onTap: activate,
         child: CustomPaint(
           key: ValueKey('inline-media-circle-progress-${view.id}'),
           foregroundPainter: _CircularProgressPainter(

@@ -126,7 +126,10 @@ void main() {
                 width: 320,
                 height: 240,
               ),
-              onPlayPauseRequested: () => plays++,
+              onPlayPauseRequested: () => setState(() {
+                plays++;
+                focused = true;
+              }),
               onFocusChanged: (value) => setState(() => focused = value),
             ),
           ),
