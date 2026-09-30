@@ -1,3 +1,10 @@
+## 0.6.15
+
+### Messenger media boundary
+
+- Paint the single media-owned bubble boundary above image and video previews
+  so the edge remains visible without adding padding or a nested surface.
+
 ## 0.6.14
 
 ### Messenger media playback

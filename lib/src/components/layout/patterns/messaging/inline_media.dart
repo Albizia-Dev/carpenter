@@ -78,13 +78,13 @@ final class CarpenterInlineMedia extends StatelessWidget {
       return DecoratedBox(
         key: ValueKey('inline-media-bubble-${view.id}'),
         decoration: BoxDecoration(
-          color: theme.surface.subtle,
           border: Border.all(
             color: theme.overlay.border,
             width: context.units(theme.shapes.fieldBorderWidth),
           ),
           borderRadius: radius,
         ),
+        position: DecorationPosition.foreground,
         child: ClipRRect(borderRadius: radius, child: media),
       );
     }

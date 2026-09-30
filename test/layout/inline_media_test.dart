@@ -37,6 +37,7 @@ void main() {
       find.byKey(const ValueKey('inline-media-bubble-image')),
     );
     expect((bubble.decoration as BoxDecoration).border, isNotNull);
+    expect(bubble.position, DecorationPosition.foreground);
     final action = find.bySemanticsLabel('Загрузить: Фото');
     expect(action, findsWidgets);
     expect(
