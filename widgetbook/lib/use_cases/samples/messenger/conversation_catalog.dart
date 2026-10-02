@@ -65,7 +65,11 @@ final conversationComponents = [
           readOnly: context.knobs.boolean(label: 'Только чтение'),
           withReply: context.knobs.boolean(label: 'Ответ'),
           withAttachment: context.knobs.boolean(label: 'Вложение'),
-          recording: context.knobs.boolean(label: 'Lock записи'),
+          recordingPhase: context.knobs.object.dropdown(
+            label: 'Состояние записи',
+            options: CarpenterRecordingPhase.values,
+            initialOption: CarpenterRecordingPhase.idle,
+          ),
         ),
       ),
       WidgetbookUseCase(
@@ -192,12 +196,12 @@ class _ComposerScenario extends StatefulWidget {
     this.readOnly = false,
     this.withReply = false,
     this.withAttachment = false,
-    this.recording = false,
+    this.recordingPhase = CarpenterRecordingPhase.idle,
   });
   final bool readOnly;
   final bool withReply;
   final bool withAttachment;
-  final bool recording;
+  final CarpenterRecordingPhase recordingPhase;
   @override
   State<_ComposerScenario> createState() => _ComposerScenarioState();
 }
@@ -205,6 +209,15 @@ class _ComposerScenario extends StatefulWidget {
 class _ComposerScenarioState extends State<_ComposerScenario> {
   String text = '';
   CarpenterRecordingKind kind = CarpenterRecordingKind.voice;
+  late CarpenterRecordingPhase phase = widget.recordingPhase;
+  @override
+  void didUpdateWidget(_ComposerScenario oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.recordingPhase != widget.recordingPhase) {
+      phase = widget.recordingPhase;
+    }
+  }
+
   @override
   Widget build(BuildContext context) => CarpenterChatComposer(
     view: CarpenterComposerView(
@@ -215,9 +228,8 @@ class _ComposerScenarioState extends State<_ComposerScenario> {
     ),
     recording: CarpenterRecordingView(
       kind: kind,
-      phase: widget.recording
-          ? CarpenterRecordingPhase.locked
-          : CarpenterRecordingPhase.idle,
+      phase: phase,
+      duration: const Duration(seconds: 42),
       level: .7,
     ),
     onTextChanged: (value) => setState(() => text = value),
@@ -226,9 +238,23 @@ class _ComposerScenarioState extends State<_ComposerScenario> {
     onAttachmentRemoved: (_) {},
     onReplyRemoved: () {},
     onRecordingModeChanged: (value) => setState(() => kind = value),
-    onRecordingStart: (_) {},
-    onRecordingLock: (_) {},
-    onRecordingStop: (_) {},
+    onRecordingStart: (_) =>
+        setState(() => phase = CarpenterRecordingPhase.recording),
+    onRecordingLock: (_) =>
+        setState(() => phase = CarpenterRecordingPhase.locked),
+    onRecordingStop: (_) =>
+        setState(() => phase = CarpenterRecordingPhase.preview),
+    onRecordingPause: (_) =>
+        setState(() => phase = CarpenterRecordingPhase.paused),
+    onRecordingResume: (_) =>
+        setState(() => phase = CarpenterRecordingPhase.locked),
+    onRecordingPreview: (_) {},
+    onRecordingSend: (_) =>
+        setState(() => phase = CarpenterRecordingPhase.idle),
+    onRecordingCancel: (_) =>
+        setState(() => phase = CarpenterRecordingPhase.idle),
+    onRecordingRerecord: (_) =>
+        setState(() => phase = CarpenterRecordingPhase.locked),
   );
 }
 

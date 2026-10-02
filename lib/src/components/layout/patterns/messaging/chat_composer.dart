@@ -35,6 +35,11 @@ final class CarpenterChatComposer extends StatefulWidget {
     this.onRecordingLock,
     this.onRecordingStop,
     this.onRecordingCancel,
+    this.onRecordingPause,
+    this.onRecordingResume,
+    this.onRecordingPreview,
+    this.onRecordingSend,
+    this.onRecordingRerecord,
   });
 
   final CarpenterComposerView view;
@@ -50,6 +55,22 @@ final class CarpenterChatComposer extends StatefulWidget {
   final ValueChanged<CarpenterRecordingKind>? onRecordingStop;
   final ValueChanged<CarpenterRecordingKind>? onRecordingCancel;
 
+  /// Host capabilities for the controlled recording session. Stop prepares
+  /// bytes; send explicitly requests delivery. Missing actions are hidden.
+  final ValueChanged<CarpenterRecordingKind>? onRecordingPause;
+
+  /// Resumes the host session when paused; absent capabilities remain hidden.
+  final ValueChanged<CarpenterRecordingKind>? onRecordingResume;
+
+  /// Previews the prepared bytes without modifying the text draft or sending.
+  final ValueChanged<CarpenterRecordingKind>? onRecordingPreview;
+
+  /// Explicit delivery request; the host retains preview bytes on failure.
+  final ValueChanged<CarpenterRecordingKind>? onRecordingSend;
+
+  /// Explicitly discards prepared bytes and starts a fresh host recording.
+  final ValueChanged<CarpenterRecordingKind>? onRecordingRerecord;
+
   @override
   State<CarpenterChatComposer> createState() => _CarpenterChatComposerState();
 }
@@ -61,6 +82,7 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
   late final FocusNode _textFocusNode = FocusNode()
     ..addListener(_handleTextFocusChanged);
   bool _sendMenuOpen = false;
+  final GlobalKey _recordingKey = GlobalKey();
 
   void _handleTextFocusChanged() {
     if (mounted) setState(() {});
@@ -88,10 +110,25 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
   }
 
   bool get _canSend =>
+      !_recordingActive &&
       !widget.view.readOnly &&
       !widget.view.busy &&
       (_controller.text.trim().isNotEmpty ||
           widget.view.attachments.isNotEmpty);
+
+  bool get _recordingActive => switch (widget.recording.phase) {
+    CarpenterRecordingPhase.idle ||
+    CarpenterRecordingPhase.failed ||
+    CarpenterRecordingPhase.unavailable => false,
+    _ => true,
+  };
+
+  bool get _recordingSessionControls => switch (widget.recording.phase) {
+    CarpenterRecordingPhase.locked ||
+    CarpenterRecordingPhase.paused ||
+    CarpenterRecordingPhase.preview => true,
+    _ => false,
+  };
 
   void _send(CarpenterSendMode mode) {
     if (!_canSend ||
@@ -149,49 +186,54 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
                     context.units(theme.shapes.radius(ShapeRole.rounded)),
                   ),
                 ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    CarpenterIconButton(
-                      icon: GravityIcons.paperclip,
-                      semanticLabel: 'Прикрепить файлы',
-                      onPressed: widget.view.busy
-                          ? null
-                          : widget.onAttachmentsRequested,
-                      prominence: ActionProminence.ghost,
-                    ),
-                    Expanded(
-                      child: Focus(
-                        onKeyEvent: (_, event) {
-                          if (event is KeyDownEvent &&
-                              event.logicalKey == LogicalKeyboardKey.enter &&
-                              !HardwareKeyboard.instance.isShiftPressed) {
-                            _send(CarpenterSendMode.ordinary);
-                            return KeyEventResult.handled;
-                          }
-                          return KeyEventResult.ignored;
-                        },
-                        child: CarpenterTextArea(
-                          controller: _controller,
-                          focusNode: _textFocusNode,
-                          placeholder: 'Написать сообщение…',
-                          semanticLabel: 'Сообщение',
-                          minLines: 1,
-                          maxLines: 4,
-                          presentation: CarpenterFieldPresentation.seamless,
-                          availability: widget.view.busy
-                              ? FieldAvailability.disabled
-                              : FieldAvailability.enabled,
-                          onChanged: (value) {
-                            setState(() {});
-                            widget.onTextChanged(value);
-                          },
-                        ),
+                child: _recordingSessionControls
+                    ? _recordingControl()
+                    : Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          CarpenterIconButton(
+                            icon: GravityIcons.paperclip,
+                            semanticLabel: 'Прикрепить файлы',
+                            onPressed: widget.view.busy || _recordingActive
+                                ? null
+                                : widget.onAttachmentsRequested,
+                            prominence: ActionProminence.ghost,
+                          ),
+                          Expanded(
+                            child: Focus(
+                              onKeyEvent: (_, event) {
+                                if (event is KeyDownEvent &&
+                                    event.logicalKey ==
+                                        LogicalKeyboardKey.enter &&
+                                    !HardwareKeyboard.instance.isShiftPressed) {
+                                  _send(CarpenterSendMode.ordinary);
+                                  return KeyEventResult.handled;
+                                }
+                                return KeyEventResult.ignored;
+                              },
+                              child: CarpenterTextArea(
+                                controller: _controller,
+                                focusNode: _textFocusNode,
+                                placeholder: 'Написать сообщение…',
+                                semanticLabel: 'Сообщение',
+                                minLines: 1,
+                                maxLines: 4,
+                                presentation:
+                                    CarpenterFieldPresentation.seamless,
+                                availability:
+                                    widget.view.busy || _recordingActive
+                                    ? FieldAvailability.disabled
+                                    : FieldAvailability.enabled,
+                                onChanged: (value) {
+                                  setState(() {});
+                                  widget.onTextChanged(value);
+                                },
+                              ),
+                            ),
+                          ),
+                          if (_canSend) _sendControl() else _recordingControl(),
+                        ],
                       ),
-                    ),
-                    if (_canSend) _sendControl() else _recordingControl(),
-                  ],
-                ),
               ),
             ),
           ],
@@ -253,12 +295,18 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
   );
 
   Widget _recordingControl() => CarpenterRecordingControl(
+    key: _recordingKey,
     view: widget.recording,
     onModeChanged: widget.onRecordingModeChanged,
     onStart: widget.onRecordingStart,
     onLock: widget.onRecordingLock,
     onStop: widget.onRecordingStop,
     onCancel: widget.onRecordingCancel,
+    onPause: widget.onRecordingPause,
+    onResume: widget.onRecordingResume,
+    onPreview: widget.onRecordingPreview,
+    onSend: widget.onRecordingSend,
+    onRerecord: widget.onRecordingRerecord,
   );
 }
 

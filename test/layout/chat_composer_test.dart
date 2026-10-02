@@ -1,8 +1,86 @@
 import 'package:carpenter/carpenter.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  testWidgets(
+    'controlled capture retains pointer until release prepares preview',
+    (tester) async {
+      var phase = CarpenterRecordingPhase.idle;
+      final events = <String>[];
+      await tester.pumpWidget(
+        _host(
+          StatefulBuilder(
+            builder: (context, update) => CarpenterChatComposer(
+              view: const CarpenterComposerView(text: ''),
+              recording: CarpenterRecordingView(
+                kind: CarpenterRecordingKind.voice,
+                phase: phase,
+              ),
+              onTextChanged: (_) {},
+              onSendRequested: (_) => events.add('text-send'),
+              onRecordingStart: (_) {
+                events.add('start');
+                update(() => phase = CarpenterRecordingPhase.recording);
+              },
+              onRecordingStop: (_) {
+                events.add('stop');
+                update(() => phase = CarpenterRecordingPhase.preview);
+              },
+              onRecordingCancel: (_) => events.add('cancel'),
+              onRecordingSend: (_) => events.add('recording-send'),
+            ),
+          ),
+        ),
+      );
+      final gesture = await tester.startGesture(
+        tester.getCenter(
+          find.byKey(const ValueKey('recording-control-button')),
+        ),
+      );
+      await tester.pump(kLongPressTimeout + const Duration(milliseconds: 1));
+      await tester.pump();
+      expect(events, ['start']);
+      await gesture.up();
+      await tester.pump();
+      expect(events, ['start', 'stop']);
+      await tester.tap(find.bySemanticsLabel('Отправить запись'));
+      expect(events, ['start', 'stop', 'recording-send']);
+    },
+  );
+
+  testWidgets('preview controls fit narrow layout and retain unrelated draft', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _host(
+        Center(
+          child: SizedBox(
+            width: 180,
+            child: CarpenterChatComposer(
+              view: const CarpenterComposerView(text: 'Сохранённый черновик'),
+              recording: const CarpenterRecordingView(
+                kind: CarpenterRecordingKind.voice,
+                phase: CarpenterRecordingPhase.preview,
+              ),
+              onTextChanged: (_) {},
+              onSendRequested: (_) {},
+              onRecordingCancel: (_) {},
+              onRecordingPreview: (_) {},
+              onRecordingRerecord: (_) {},
+              onRecordingSend: (_) {},
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(tester.takeException(), isNull);
+    expect(find.bySemanticsLabel('Отправить'), findsNothing);
+    expect(find.bySemanticsLabel('Отправить запись'), findsOneWidget);
+    expect(find.bySemanticsLabel('Прикрепить файлы'), findsNothing);
+  });
+
   testWidgets('composer grows to four lines and sends attachment-only draft', (
     tester,
   ) async {

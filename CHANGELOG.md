@@ -1,3 +1,15 @@
+## 0.6.17
+
+### Recording preview and recovery
+
+- Add host-owned pause/resume, playback, rerecord and explicit send actions.
+- Add `CarpenterRecordingPhase.paused`; exhaustive consumers must handle it.
+- Preserve unrelated text drafts during capture and wrap preview actions at
+  narrow widths. Missing recorder capabilities remain hidden.
+- Treat cancelled pointers as cancellation rather than a stop/send request,
+  while retaining the recording control across controlled state transitions.
+- Extend the composer Playground and non-golden interaction tests.
+
 ## 0.6.16
 
 ### Messenger attachment transfers

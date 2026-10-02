@@ -54,7 +54,10 @@ jobs:
 
       - name: Test Widgetbook without goldens
         working-directory: widgetbook
-        run: flutter test
+        shell: bash
+        run: |
+          mapfile -t tests < <(find test -name '*_test.dart' -not -path 'test/goldens/*' -print | sort)
+          flutter test "${tests[@]}"
 
       - name: Build Widgetbook
         working-directory: widgetbook

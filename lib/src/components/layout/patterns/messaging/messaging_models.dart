@@ -51,6 +51,9 @@ enum CarpenterRecordingPhase {
   requestingPermission,
   recording,
   locked,
+
+  /// The recorder retains its session and bytes while capture is suspended.
+  paused,
   stopping,
   preview,
   failed,
@@ -235,6 +238,7 @@ final class CarpenterRecordingView {
     this.voiceAvailable = true,
     this.videoAvailable = true,
     this.failureLabel,
+    this.busy = false,
   });
 
   final CarpenterRecordingKind kind;
@@ -244,4 +248,8 @@ final class CarpenterRecordingView {
   final bool voiceAvailable;
   final bool videoAvailable;
   final String? failureLabel;
+
+  /// The host is committing the prepared recording. Recovery actions retain
+  /// their geometry but are disabled until the operation completes.
+  final bool busy;
 }
