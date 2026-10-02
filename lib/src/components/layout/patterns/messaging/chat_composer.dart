@@ -186,54 +186,63 @@ final class _CarpenterChatComposerState extends State<CarpenterChatComposer> {
                     context.units(theme.shapes.radius(ShapeRole.rounded)),
                   ),
                 ),
-                child: _recordingSessionControls
-                    ? _recordingControl()
-                    : Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          CarpenterIconButton(
-                            icon: GravityIcons.paperclip,
-                            semanticLabel: 'Прикрепить файлы',
-                            onPressed: widget.view.busy || _recordingActive
-                                ? null
-                                : widget.onAttachmentsRequested,
-                            prominence: ActionProminence.ghost,
-                          ),
-                          Expanded(
-                            child: Focus(
-                              onKeyEvent: (_, event) {
-                                if (event is KeyDownEvent &&
-                                    event.logicalKey ==
-                                        LogicalKeyboardKey.enter &&
-                                    !HardwareKeyboard.instance.isShiftPressed) {
-                                  _send(CarpenterSendMode.ordinary);
-                                  return KeyEventResult.handled;
-                                }
-                                return KeyEventResult.ignored;
-                              },
-                              child: CarpenterTextArea(
-                                controller: _controller,
-                                focusNode: _textFocusNode,
-                                placeholder: 'Написать сообщение…',
-                                semanticLabel: 'Сообщение',
-                                minLines: 1,
-                                maxLines: 4,
-                                presentation:
-                                    CarpenterFieldPresentation.seamless,
-                                availability:
-                                    widget.view.busy || _recordingActive
-                                    ? FieldAvailability.disabled
-                                    : FieldAvailability.enabled,
-                                onChanged: (value) {
-                                  setState(() {});
-                                  widget.onTextChanged(value);
-                                },
-                              ),
-                            ),
-                          ),
-                          if (_canSend) _sendControl() else _recordingControl(),
-                        ],
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Visibility(
+                      visible: !_recordingSessionControls,
+                      child: CarpenterIconButton(
+                        icon: GravityIcons.paperclip,
+                        semanticLabel: 'Прикрепить файлы',
+                        onPressed: widget.view.busy || _recordingActive
+                            ? null
+                            : widget.onAttachmentsRequested,
+                        prominence: ActionProminence.ghost,
                       ),
+                    ),
+                    Flexible(
+                      flex: _recordingSessionControls ? 0 : 1,
+                      fit: FlexFit.tight,
+                      child: Visibility(
+                        visible: !_recordingSessionControls,
+                        child: Focus(
+                          onKeyEvent: (_, event) {
+                            if (event is KeyDownEvent &&
+                                event.logicalKey == LogicalKeyboardKey.enter &&
+                                !HardwareKeyboard.instance.isShiftPressed) {
+                              _send(CarpenterSendMode.ordinary);
+                              return KeyEventResult.handled;
+                            }
+                            return KeyEventResult.ignored;
+                          },
+                          child: CarpenterTextArea(
+                            controller: _controller,
+                            focusNode: _textFocusNode,
+                            placeholder: 'Написать сообщение…',
+                            semanticLabel: 'Сообщение',
+                            minLines: 1,
+                            maxLines: 4,
+                            presentation: CarpenterFieldPresentation.seamless,
+                            availability: widget.view.busy || _recordingActive
+                                ? FieldAvailability.disabled
+                                : FieldAvailability.enabled,
+                            onChanged: (value) {
+                              setState(() {});
+                              widget.onTextChanged(value);
+                            },
+                          ),
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      flex: _recordingSessionControls ? 1 : 0,
+                      fit: _recordingSessionControls
+                          ? FlexFit.tight
+                          : FlexFit.loose,
+                      child: _canSend ? _sendControl() : _recordingControl(),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

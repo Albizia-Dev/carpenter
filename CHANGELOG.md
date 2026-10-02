@@ -1,3 +1,14 @@
+## 0.6.18
+
+### Recording composer transitions
+
+- Keep the recording control in one layout slot across capture, lock, pause and
+  preview. Avoid reparenting active focus/tooltip overlays during layout.
+- Preserve the composer-owned draft controller and selection while hiding the
+  text field during a recording session.
+- Add regression coverage for focused and hovered phase transitions inside
+  LayoutBuilder, pointer continuity and narrow preview controls.
+
 ## 0.6.17
 
 ### Recording preview and recovery

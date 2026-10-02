@@ -5,6 +5,65 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets(
+    'focused recording control stays in the same slot across session phases',
+    (tester) async {
+      var phase = CarpenterRecordingPhase.idle;
+      late StateSetter update;
+      await tester.pumpWidget(
+        _host(
+          StatefulBuilder(
+            builder: (context, setState) {
+              update = setState;
+              return LayoutBuilder(
+                builder: (context, constraints) => CarpenterChatComposer(
+                  view: const CarpenterComposerView(text: ''),
+                  recording: CarpenterRecordingView(
+                    kind: CarpenterRecordingKind.voice,
+                    phase: phase,
+                  ),
+                  onTextChanged: (_) {},
+                  onSendRequested: (_) {},
+                  onRecordingStart: (_) {},
+                  onRecordingStop: (_) {},
+                  onRecordingCancel: (_) {},
+                  onRecordingPause: (_) {},
+                  onRecordingResume: (_) {},
+                  onRecordingPreview: (_) {},
+                  onRecordingRerecord: (_) {},
+                  onRecordingSend: (_) {},
+                ),
+              );
+            },
+          ),
+        ),
+      );
+      final recording = find.byType(CarpenterRecordingControl);
+      final original = tester.element(recording);
+      final scope = FocusScope.of(original);
+      scope.nextFocus();
+      await tester.pump();
+      scope.nextFocus();
+      await tester.pump();
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await mouse.addPointer(location: tester.getCenter(recording));
+      await tester.pump(const Duration(seconds: 1));
+      for (final next in [
+        CarpenterRecordingPhase.recording,
+        CarpenterRecordingPhase.locked,
+        CarpenterRecordingPhase.paused,
+        CarpenterRecordingPhase.preview,
+        CarpenterRecordingPhase.idle,
+      ]) {
+        update(() => phase = next);
+        await tester.pump();
+        expect(tester.element(recording), same(original));
+        expect(tester.takeException(), isNull);
+      }
+      await mouse.removePointer();
+      await tester.pumpWidget(const SizedBox.shrink());
+    },
+  );
+  testWidgets(
     'controlled capture retains pointer until release prepares preview',
     (tester) async {
       var phase = CarpenterRecordingPhase.idle;
